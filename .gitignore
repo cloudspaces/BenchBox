@@ -62,9 +62,18 @@ monitor/logger/parser
 monitor/logger/post-process
 monitor/logger/py_cpu_monitor/*.pyc
 
+
+
+managerGUI/manager
+managerGUI/synthesize
+# managerGUI/
+
+
+
+
 # hide or ignore installation packages
 *.deb
 *.OLD.*
-managerGUI
 test.py
 npm-debug.log
+
