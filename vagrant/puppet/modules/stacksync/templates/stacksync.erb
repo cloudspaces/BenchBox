@@ -1,0 +1,30 @@
+#!/bin/bash
+
+
+# kill the previous running if exists
+if [ -f /tmp/StackSync.pid ] && [ -d "/proc/$(cat /tmp/StackSync.pid)" ];
+then
+	kill -9 $(cat /tmp/StackSync.pid)
+fi
+#
+
+
+echo 'start stackyncClient'
+cd /usr/lib/stacksync/
+nohup java -jar Stacksync.jar -d -c <%= @confdir %> & echo $!
+lastPid=$!
+echo $lastPid> /tmp/StackSync.pid
+
+# they should not allow runnin more than one instance of this, how can i know the which procedure to monitor???,
+# if this is called java...
+# echo 'clear existing stacksync processes'
+# kill -9 $(ps -ef | grep -i stacksync | grep -v 'grep' | awk '{print $2}')
+
+
+# echo 'start socketListener'
+# if [ -d ~/monitor ]; then
+# cd ~/monitor/logger/py_cpu_monitor && python SocketListener.py
+# echo 'stacksync client and monitor started'
+# else
+# echo 'stacksync client monitoring not available'
+# fi

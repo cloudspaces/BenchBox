@@ -1,0 +1,70 @@
+
+# do not upload intelij project metadata and settings
+*.iml
+*/*.iml
+.idea
+
+
+# do not upload boxes or the repo will get corrupted becuase of its size
+*.box
+*/*.box
+
+
+# omit specific folders and files
+*/hints
+manager/example
+manager/status
+manager/status/*
+manager/misc
+manager/misc/*
+manager/init.sh
+manager/config
+manager/config/*
+manager/output
+manager/hosts
+# manager/*.csv
+test
+
+
+# simulator/data
+# simulator/files
+simulator/output
+simulator/simulator
+simulator/build
+simulator/build/*
+
+
+simulator/markov_chain.pyc
+simulator/data_generator.pyc
+simulator/pcb/__init__.pyc
+simulator/pcb/actions.pyc
+simulator/pcb/general/__init__.pyc
+simulator/pcb/general/files.pyc
+simulator/pcb/general/ftp_sender.pyc
+simulator/pcb/general/logger.pyc
+simulator/inter_arrivals_manager.pyc
+
+
+vagrant/.*
+vagrant/slaves
+vagrant/slaves/*
+vagrant/slaves/*/*
+vagrant/scripts/test
+vagrant/puppet/manifests/test
+vagrant/puppet/manifests/test/*
+
+
+monitor/logger/test
+monitor/logger/plots/output
+monitor/logger/capture
+monitor/logger/matlab_scripts
+monitor/logger/parser
+monitor/logger/post-process
+monitor/logger/py_cpu_monitor/*.pyc
+
+# hide or ignore installation packages
+*.deb
+*.OLD.*
+managerGUI
+test.py
+npm-debug.log
