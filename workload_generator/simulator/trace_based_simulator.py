@@ -4,7 +4,7 @@ Created on Sep 21, 2015
 @author: user
 '''
 import time
-from simulator.benchmark_simulator import StatisticsManager
+from benchmark_simulator import StatisticsManager
 import calendar
 
 class TraceNode():
