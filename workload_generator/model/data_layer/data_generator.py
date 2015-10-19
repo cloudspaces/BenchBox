@@ -12,7 +12,7 @@ import os
 from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string
 from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH,\
     DATA_CHARACTERIZATIONS_PATH, DIRECTORY_DEPTH_PROBABILITY, FS_SNAPSHOT_PATH,\
-    DATA_GENERATOR_PATH
+    DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH
 import tempfile
 import time
 
@@ -172,9 +172,9 @@ class DataGenerator(object):
         '''Pick a random position in the fs hierarchy (consider only dirs)'''
         directory_path = self.get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH)
         to_create = directory_path + get_random_alphanumeric_string()
-        print "CREATING DIRECTORY: ", to_create
-        os.makedirs(to_create)
+        print "CREATING DIRECTORY: ", to_create        
         add_fs_node(self.file_system, to_create.split('/'))
+        os.makedirs(to_create)
         return to_create
         
     '''Delete an empty directory from te structure, if it does exist. If not,
@@ -182,8 +182,8 @@ class DataGenerator(object):
     def delete_directory(self):
         dir_path_to_delete = self.get_empty_directory(self.file_system, FS_SNAPSHOT_PATH)
         print "DELETING DIRECTORY: ", dir_path_to_delete
-        if dir_path_to_delete != None:
-            os.remove(dir_path_to_delete)
+        if dir_path_to_delete != None and os.listdir(dir_path_to_delete) == []:
+            os.rmdir(dir_path_to_delete)
             delete_fs_node(self.file_system, dir_path_to_delete.split('/'))
         return dir_path_to_delete
     
@@ -227,6 +227,7 @@ class DataGenerator(object):
         base_path += '/'                
         '''If this level has no more directories, we force this as the random position'''
         if fs_level_directories == []:
+            print fs_level_files
             if fs_level_files == []: return base_path[:-1]
             else: return None 
         random.shuffle(fs_level_directories)
@@ -262,14 +263,15 @@ class DataGenerator(object):
 
 if __name__ == '__main__':
     data_generator = DataGenerator()
+    data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backupsample")
     data_generator.create_file_system_snapshot()
     data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
-    for i in range (10):
+    for i in range (50):
         data_generator.create_directory()
-        #data_generator.delete_directory()  
+        data_generator.delete_directory()  
         data_generator.create_file()
-        #data_generator.delete_file()
-        time.sleep(1)
+        data_generator.create_file()
+        data_generator.delete_file()
         
     print_tree(data_generator.file_system)
     #data_generator.create_file_system_snapshot()

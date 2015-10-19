@@ -11,9 +11,9 @@ import os, sys
 import random
 import time
 
-from workload_generator.model.markov_chain import SimpleMarkovChain
-from workload_generator.model.inter_arrivals_manager import InterArrivalsManager
-from workload_generator.model.data_generator import DataGenerator
+from workload_generator.model.user_activity.markov_chain import SimpleMarkovChain
+from workload_generator.model.user_activity.inter_arrivals_manager import InterArrivalsManager
+from workload_generator.model.data_layer.data_generator import DataGenerator
 
 from pcb.general.ftp_sender import ftp_sender
 from pcb.general.logger import logger
