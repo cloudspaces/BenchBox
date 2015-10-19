@@ -1,10 +1,14 @@
-MoveResponse,MoveResponse,1401,invgauss,{'shape':1363.32646109922,'scale':0.101918365352736}
-MoveResponse,PutContentResponse,719,genextreme,{'shape':-2.11992852538215,'scale':3.2980052810641,'loc':1.54615519456346}
-MoveResponse,Unlink,398,genpareto,{'shape':3.02809764917398,'scale':0.0664626786932026,'threshold':0.0279999999328978}
-PutContentResponse,MoveResponse,789,genextreme,{'shape':-3.45248397723402,'scale':24.7987682442144,'loc':7.19504059331674}
-PutContentResponse,PutContentResponse,56203,genextreme,{'shape':-1.87110387302981,'scale':0.38096890778117,'loc':0.199634595057584}
-PutContentResponse,Unlink,978,genpareto,{'shape':5.59532304512292,'scale':0.430467922602313,'threshold':0.00499999988823778}
-Unlink,MoveResponse,318,genpareto,{'shape':4.05974572112893,'scale':0.230971524365217,'threshold':0.0200000000185978}
-Unlink,PutContentResponse,1053,genpareto,{'shape':3.13573091706067,'scale':0.746839394368102,'threshold':0.00100000016390778}
-Unlink,Unlink,18057,genpareto,{'shape':0.949044501927819,'scale':0.0508355787457194,'threshold':0.0249999999068978}
+chain,MoveResponse,MoveResponse,1401,invgauss,{'shape':1363.32646109922,'scale':0.101918365352736}
+chain,MoveResponse,PutContentResponse,719,genextreme,{'shape':-2.11992852538215,'scale':3.2980052810641,'loc':1.54615519456346}
+chain,MoveResponse,Unlink,398,genpareto,{'shape':3.02809764917398,'scale':0.0664626786932026,'threshold':0.0279999999328978}
+chain,PutContentResponse,MoveResponse,789,genextreme,{'shape':-3.45248397723402,'scale':24.7987682442144,'loc':7.19504059331674}
+chain,PutContentResponse,PutContentResponse,56203,genextreme,{'shape':-1.87110387302981,'scale':0.38096890778117,'loc':0.199634595057584}
+chain,PutContentResponse,Unlink,978,genpareto,{'shape':5.59532304512292,'scale':0.430467922602313,'threshold':0.00499999988823778}
+chain,Unlink,MoveResponse,318,genpareto,{'shape':4.05974572112893,'scale':0.230971524365217,'threshold':0.0200000000185978}
+chain,Unlink,PutContentResponse,1053,genpareto,{'shape':3.13573091706067,'scale':0.746839394368102,'threshold':0.00100000016390778}
+chain,Unlink,Unlink,18057,genpareto,{'shape':0.949044501927819,'scale':0.0508355787457194,'threshold':0.0249999999068978}
 activity_distribution,genpareto,{'shape':3.02809764917398,'scale':0.0664626786932026,'threshold':0.027999999932897}
+stereotype_file_types,{'Pics': 0.1,'Text': 0.5,'Docs': 0.2,'Media': 0.05,'Applications': 0.05,'Compressed': 0.1}
+stereotype_file_types_extensions,{'Pics': ['.jpg', '.png'],'Text': ['.java', '.py'],'Docs': ['.log', '.csv'],'Media': ['.avi', '.mp3'],'Applications': ['.exe', '.bin'],'Compressed': ['.rar', '.zip']}
+file_types_sizes,{'Pics': ('norm' ,{'loc':100, 'scale':10}),'Text':('norm' ,{'loc':5,'scale':1}), 'Docs': ('norm' ,{'loc':50,'scale':5}),'Media': ('norm',{'loc':2000,'scale':200}),'Applications': ('norm' ,{'loc':150,'scale':15}), 'Compressed': ('norm' ,{'loc':120,'scale':12})}
+file_update_location_probabilities,{'B':0.38, 'E': 0.03, 'M': 0.08, 'BE': 0.1, 'BM': 0.11, 'ME': 0.01, 'BEM': 0.29}

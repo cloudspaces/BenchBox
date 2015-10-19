@@ -3,17 +3,19 @@ Created on 19/10/2015
 
 @author: Raul
 '''
+
 import os
-from workload_generator.constants import SIMULATION_OUTPUT, SIMULATION_TIME_SLOT
+from workload_generator.constants import SIMULATION_TIME_SLOT
 
 class StatisticsManager(object):
     
-    def __init__(self):
+    def __init__(self, output_dir):
         self.operations_per_user = dict()
         self.operations_per_timeslot = dict()
         self.inter_arrivals_per_transition = dict()
-        if not os.path.exists(SIMULATION_OUTPUT):
-            os.makedirs(SIMULATION_OUTPUT)        
+        self.output_dir = output_dir
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)        
         
     def trace_operations_per_user(self, stereotype, user, operation, timestamp):
         current_timeslot = int(timestamp/SIMULATION_TIME_SLOT)
@@ -41,7 +43,8 @@ class StatisticsManager(object):
             self.inter_arrivals_per_transition[stereotype] = dict()            
         transition = previous_state + "_" + current_state        
         if transition not in self.inter_arrivals_per_transition[stereotype]:
-            self.inter_arrivals_per_transition[stereotype][transition] = open(SIMULATION_OUTPUT + stereotype + "_" + transition + ".dat", "w")            
+            self.inter_arrivals_per_transition[stereotype][transition] = open(self.output_dir 
+                    + stereotype + "_" + transition + ".dat", "w")            
         print >> self.inter_arrivals_per_transition[stereotype][transition], interarrival 
         
     def finish_statistics(self):
@@ -50,7 +53,7 @@ class StatisticsManager(object):
                 self.inter_arrivals_per_transition[stereotype][transition].close()
         
         for stereotype in sorted(self.operations_per_timeslot.keys()):
-            stereotype_file = open(SIMULATION_OUTPUT + stereotype + "_ops_per_timeslot.dat", "w")
+            stereotype_file = open(self.output_dir + stereotype + "_ops_per_timeslot.dat", "w")
             for current_timeslot in sorted(self.operations_per_timeslot[stereotype].keys()):
                 to_print = ""
                 for operation in sorted(self.operations_per_timeslot[stereotype][current_timeslot].keys()):
@@ -59,8 +62,7 @@ class StatisticsManager(object):
             stereotype_file.close()
             
         for stereotype in sorted(self.operations_per_user.keys()):
-            stereotype_file = open(SIMULATION_OUTPUT + stereotype + "_ops_per_user.dat", "w")
+            stereotype_file = open(self.output_dir + stereotype + "_ops_per_user.dat", "w")
             for user in self.operations_per_user[stereotype].keys():
                 print >> stereotype_file, self.operations_per_user[stereotype][user]
             stereotype_file.close()
-            

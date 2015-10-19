@@ -11,8 +11,10 @@ import os
 
 from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string
 from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH,\
-    DATA_CHARACTERIZATIONS_PATH, DIRECTORY_DEPTH_PROBABILITY
+    DATA_CHARACTERIZATIONS_PATH, DIRECTORY_DEPTH_PROBABILITY, FS_SNAPSHOT_PATH,\
+    DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH
 import tempfile
+import time
 
 '''Simple tree data structure and utility methods to manipulate the tree'''
 def FileSystem():
@@ -76,26 +78,19 @@ class DataGenerator(object):
     def __init__(self):
         self.file_system = FileSystem()  
         self.file_update_manager = FileUpdateManager()
-        #TODO: All this stuff should be imported from a characterization file
-        self.initialize_file_system_tree('C:/Users/Raul/Desktop/NEC logs/')
-        self.stereotype_file_types = {"Pics": 0.1, "Code": 0.5, "Docs": 0.2, "Media": 0.05, "Applications": 0.05, "Compressed": 0.1}
-        self.stereotype_file_types_extensions = {"Pics": ['.jpg', '.png'], 
-                                                 "Code": ['.java', '.py'], 
-                                                 "Docs": ['.log', '.csv'], 
-                                                 "Media": ['.avi', '.mp3'], 
-                                                 "Applications": ['.exe', '.bin'], 
-                                                 "Compressed": ['.rar', '.zip']}
-        
-        self.file_types_sizes = {"Pics": ('norm' ,{'loc':100, 'scale':10}), 
-                                 "Code":('norm' ,{'loc':5,'scale':1}), 
-                                 "Docs": ('norm' ,{'loc':50,'scale':5}), 
-                                 "Media": ('norm' ,{'loc':2000,'scale':200}), 
-                                 "Applications": ('norm' ,{'loc':150,'scale':15}), 
-                                 "Compressed": ('norm' ,{'loc':120,'scale':12})}  #KB   
-        
+        self.stereotype_file_types = dict()       
+        self.stereotype_file_types_extensions = dict()       
+        self.file_types_sizes = dict()  #KB           
         #Extracted from Tarasov paper, Home dataset
-        self.file_update_location_probabilities = {"B":0.38, "E": 0.03, "M": 0.08, "BE": 0.1, "BM": 0.11, "ME": 0.01, "BEM": 0.29}   
+        self.file_update_location_probabilities = dict()  
             
+    def initialize_from_recipe(self, stereotype_recipe):
+        for l in open(stereotype_recipe, "r"):
+            model_attribute = l.split(',')[0]
+            if model_attribute in dir(self):
+                setattr(self, model_attribute, eval(l[l.index('{'):])) 
+                #print "Activity rate: ", self.activity_rate     
+        
     '''Initialize the file system of the user (delegated to Impressions benchmark)'''
     def create_file_system_snapshot(self):
         '''Get initial number of directories for this user'''
@@ -104,6 +99,10 @@ class DataGenerator(object):
         '''Change config file of Impressions'''
         fs_config = ''
         for line in open(FS_IMAGE_CONFIG_PATH, 'r'):
+            if "Parent_Path: " in line:
+                line = "Parent_Path: " + FS_SNAPSHOT_PATH + " 1\n"
+                if not os.path.exists(FS_SNAPSHOT_PATH):
+                    os.makedirs(FS_SNAPSHOT_PATH)
             if "Numdirs" in line:
                 line = "Numdirs: " + str(initial_directories) + " N\n"
             fs_config = ''.join([fs_config, line])
@@ -111,6 +110,7 @@ class DataGenerator(object):
         print >> fs_config_file, fs_config[:-1]
         fs_config_file.close() 
         '''Create the file system'''
+        time.sleep(1)
         subprocess.call([FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH])
         
     '''Generate the logical structure of the initial snapshot before migration to sandbox'''
@@ -118,16 +118,16 @@ class DataGenerator(object):
         for top, dirs, files in os.walk(fs_snapshot_path):
             top = top.replace("\\", "/")
             if top[-1] != '/': top += '/'
-            #print top, dirs, files
+            print top, dirs, files
             for dir in dirs:
                 add_fs_node(self.file_system, (top+dir).split('/'))
             for file in files:
                 add_fs_node(self.file_system, (top+file).split('/'))  
                 
-    def migrate_file_system_snapshot_to_sandbox(self): 
+    def migrate_file_system_snapshot_to_sandbox(self, to_migrate): 
         print "move the whole fs to the sandbox via ftp during warm-up"             
         
-    '''Createa file at random based on the file type popularity for this stereotype'''
+    '''Create file at random based on the file type popularity for this stereotype'''
     def create_file(self):
         '''Prior creating a file, we first decide which type of file to create'''
         file_type = self.get_fitness_proportionate_file_type()
@@ -136,16 +136,16 @@ class DataGenerator(object):
         size = int(get_random_value_from_fitting(function, kv_params)) 
         print size
         '''After generating the file size, we should decide the path for the new file'''
-        synthetic_file_base_path = self.get_random_fs_directory(self.file_system, 'C:')
+        synthetic_file_base_path = self.get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH)
         '''Create a realistic name'''
-        synthetic_file_base_path += get_random_alphanumeric_string(random.randint(1,20)) + random.choice(self.stereotype_file_types_extensions[file_type])      
+        synthetic_file_base_path += get_random_alphanumeric_string(random.randint(1,20)) + \
+                random.choice(self.stereotype_file_types_extensions[file_type])      
         print "CREATING FILE: ", synthetic_file_base_path
         add_fs_node(self.file_system, synthetic_file_base_path.split('/'))
         '''Invoke SDGen to generate realistic file contents'''
         characterization = DATA_CHARACTERIZATIONS_PATH + file_type
-        synthetic_file_path = '/home/user/workspace/BenchBox/external/sdgen_characterizations/synthetic'
-        #subprocess.call(['java', '-jar', constants.DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_path])
-        return synthetic_file_path
+        subprocess.call(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path])
+        return synthetic_file_base_path
         
     '''Delete a file at random depending on the file type popularity for this stereotype'''
     def delete_file(self):
@@ -155,7 +155,7 @@ class DataGenerator(object):
             '''Prior creating a file, we first decide which type of file to create'''
             file_type = self.get_fitness_proportionate_file_type()
             if file_type in tested_file_types: continue
-            all_files_of_type = self.get_fs_files_of_type(self.file_system, file_type, 'C:')
+            all_files_of_type = self.get_fs_files_of_type(self.file_system, file_type, FS_SNAPSHOT_PATH)
             tested_file_types.add(file_type)
             if all_files_of_type != []: 
                 to_delete = random.choice(all_files_of_type)  
@@ -170,18 +170,20 @@ class DataGenerator(object):
     '''Create a directory in a random point of the file system'''
     def create_directory(self):
         '''Pick a random position in the fs hierarchy (consider only dirs)'''
-        directory_path = self.get_random_fs_directory(self.file_system, 'C:')
+        directory_path = self.get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH)
         to_create = directory_path + get_random_alphanumeric_string()
-        print "CREATING DIRECTORY: ", to_create
+        print "CREATING DIRECTORY: ", to_create        
         add_fs_node(self.file_system, to_create.split('/'))
+        os.makedirs(to_create)
         return to_create
         
     '''Delete an empty directory from te structure, if it does exist. If not,
     we prefer to do not perform file deletes as they may yield cascade operations'''
     def delete_directory(self):
-        dir_path_to_delete = self.get_empty_directory(self.file_system, 'C:')
+        dir_path_to_delete = self.get_empty_directory(self.file_system, FS_SNAPSHOT_PATH)
         print "DELETING DIRECTORY: ", dir_path_to_delete
-        if dir_path_to_delete != None:
+        if dir_path_to_delete != None and os.listdir(dir_path_to_delete) == []:
+            os.rmdir(dir_path_to_delete)
             delete_fs_node(self.file_system, dir_path_to_delete.split('/'))
         return dir_path_to_delete
     
@@ -225,6 +227,7 @@ class DataGenerator(object):
         base_path += '/'                
         '''If this level has no more directories, we force this as the random position'''
         if fs_level_directories == []:
+            print fs_level_files
             if fs_level_files == []: return base_path[:-1]
             else: return None 
         random.shuffle(fs_level_directories)
@@ -260,12 +263,16 @@ class DataGenerator(object):
 
 if __name__ == '__main__':
     data_generator = DataGenerator()
-    print_tree(data_generator.file_system)
-    for i in range (1000):
+    data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backupsample")
+    data_generator.create_file_system_snapshot()
+    data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
+    for i in range (50):
         data_generator.create_directory()
-        #data_generator.delete_directory()  
+        data_generator.delete_directory()  
         data_generator.create_file()
-        #data_generator.delete_file()
+        data_generator.create_file()
+        data_generator.delete_file()
+        
     print_tree(data_generator.file_system)
     #data_generator.create_file_system_snapshot()
     #create_file('/home/user/workspace/BenchBox/external/sdgen_characterizations/text', 

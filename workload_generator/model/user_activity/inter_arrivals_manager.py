@@ -27,9 +27,11 @@ class InterArrivalsManager(object):
     '''Get the inter-arrival inforation from stereotype recipe'''
     def initialize_from_recipe(self, stereotype_recipe):
         for l in open(stereotype_recipe, "r"):
-            state1, state2, transitions, fitting = l[:-1].split(',')[0:4]
-            kw_params = eval(l[l.index('{'):])
-            self.add_interarrival_transition_fitting(state1, state2, fitting, kw_params)
+            model_attribute = l.split(',')[0]
+            if model_attribute == 'chain':
+                state1, state2, transitions, fitting = l[:-1].split(',')[1:5]
+                kw_params = eval(l[l.index('{'):])
+                self.add_interarrival_transition_fitting(state1, state2, fitting, kw_params)
             
 if __name__ == '__main__':
     
