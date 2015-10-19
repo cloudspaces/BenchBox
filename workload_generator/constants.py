@@ -27,4 +27,4 @@ FS_IMAGE_PATH = "/home/user/workspace/BenchBox/external/impressions"
 FS_IMAGE_CONFIG_PATH = "/home/user/workspace/BenchBox/external/impressions_config"
 
 MY_CONSTANT = 50
-STEREOTYPE_RECIPES_PATH = './data'
+STEREOTYPE_RECIPES_PATH = './user_stereotypes/'
