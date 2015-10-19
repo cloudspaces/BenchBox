@@ -44,10 +44,11 @@ def do_simulation_step(env, node):
             yield env.timeout(wait_time)
         except (Exception):
             print node.stereotype_executor.markov_chain.previous_state, node.stereotype_executor.markov_chain.current_state
-            print "WARNING: bad call to generator function!"           
+            print "WARNING: bad call to generator function!"     
+                  
         if wait_time < 0:
             print node.stereotype_executor.markov_chain.previous_state, node.stereotype_executor.markov_chain.current_state
-            print "WARNING: Negative inter-arrival time!"
+            print "WARNING: Negative inter-arrival time!", wait_time
         
         '''Log operation'''
         node.statistics.trace_operations_per_user(node.stereotype, node.process_id,

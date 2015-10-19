@@ -18,6 +18,7 @@ class SimpleMarkovChain(object):
         self.result_chain = dict()
         self.previous_state = None
         self.current_state = None
+        self.activity_distribution = None
         self.activity_rate = None
         
     def add_transition(self, state1, state2, probability):
@@ -68,14 +69,17 @@ class SimpleMarkovChain(object):
             
     def initialize_from_recipe(self, file_name):
         for l in open(file_name, "r"):
-            if l.startswith("activity_distribution"):
+            model_attribute = l.split(',')[0]
+            if model_attribute == 'chain':
+                state1, state2, num_transitions  = l.split(",")[1:4]
+                self.add_transition(state1, state2, float(num_transitions))
+            elif model_attribute in dir(self):
                 fitting = l[:-1].split(',')[1]
                 kv_params = eval(l[l.index('{'):])
+                setattr(self, model_attribute, (fitting, kv_params))
                 self.activity_rate = get_random_value_from_fitting(fitting, kv_params)
                 #print "Activity rate: ", self.activity_rate
-            else:
-                state1, state2, num_transitions  = l.split(",")[0:3]
-                self.add_transition(state1, state2, float(num_transitions))
+            
     
     def print_states(self):  
         self.printChain(self.chain)

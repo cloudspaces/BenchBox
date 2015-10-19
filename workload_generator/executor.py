@@ -73,6 +73,8 @@ class StereotypeExecutor(object):
         self.markov_chain.calculate_chain_relative_probabilities()
         '''Initialize the inter-arrival times'''
         self.inter_arrivals_manager.initialize_from_recipe(stereotype_recipe)
+        '''Initialize data generation layer'''
+        self.data_generator.initialize_from_recipe(stereotype_recipe)
 
     def get_waiting_time(self):
         return self.inter_arrivals_manager.get_waiting_time(self.markov_chain.previous_state,
