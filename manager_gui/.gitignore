@@ -1,0 +1,6 @@
+.idea
+*.iml
+*.ignore
+build
+npm-debug.log
+node_modules/*
