@@ -6,6 +6,7 @@ Created on 6/7/2015
 from constants import STEREOTYPE_RECIPES_PATH
 from scipy import stats
 import random
+from workload_generator import constants
 
 def translate_matlab_fitting_to_scipy(fitting, parameters):
     
@@ -91,7 +92,7 @@ def get_random_alphanumeric_string(str_length=10):
     return ''.join(random.choice('0123456789ABCDEF') for i in range(str_length))
         
 if __name__ == '__main__':
-    build_stereotype("backupsample", "D://Documentos//Recerca//Proyectos//IOStack//Code//BenchBox//stereotypes//backupsample_markov.csv", 
-                     "D://Documentos//Recerca//Proyectos//IOStack//Code//BenchBox//stereotypes//backupsample_interarrivals.csv",
-                     "D://Documentos//Recerca//Proyectos//IOStack//Code//BenchBox//stereotypes//backupsample_activity_distribution.csv")
+    build_stereotype("backupsample", constants.STEREOTYPE_RECIPES_PATH + "backupsample_markov.csv", 
+                      constants.STEREOTYPE_RECIPES_PATH + "backupsample_interarrivals.csv",
+                      constants.STEREOTYPE_RECIPES_PATH + "backupsample_activity_distribution.csv")
     

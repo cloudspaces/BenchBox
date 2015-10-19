@@ -8,7 +8,6 @@ from ConfigParser import SafeConfigParser
 from argparse import ArgumentParser
 
 import os, sys
-import subprocess
 import random
 import time
 
@@ -21,6 +20,7 @@ from pcb.general.logger import logger
 from pcb.actions import get_action, MakeResponse, PutContentResponse, Unlink, MoveResponse, GetContentResponse
 
 from workload_generator.resource_monitoring.cpu_monitor import CPUMonitor
+from workload_generator import constants
 
 
 def process_opt():
@@ -59,8 +59,6 @@ def process_opt():
     return opt
 
 
-
-
 class StereotypeExecutor(object):
 
     def __init__(self):
@@ -68,26 +66,20 @@ class StereotypeExecutor(object):
         self.markov_current_state = 'MakeResponse' # there should be an initial state @ can be random
         self.inter_arrivals_manager = InterArrivalsManager()
         self.data_generator = DataGenerator()
-        # self.data_generator.initialize_file_system()
-        # self.sender
-
+        
     def initialize_from_stereotype_recipe(self, stereotype_recipe):
         '''Initialize the Markov Chain states'''
         self.markov_chain.initialize_from_recipe(stereotype_recipe)
         self.markov_chain.calculate_chain_relative_probabilities()
         '''Initialize the inter-arrival times'''
         self.inter_arrivals_manager.initialize_from_recipe(stereotype_recipe)
-        '''Initialize the file system'''
-        self.data_generator.initialize_file_system()
 
     def get_waiting_time(self):
         return self.inter_arrivals_manager.get_waiting_time(self.markov_chain.previous_state,
                                                             self.markov_chain.current_state)
-
-    def next_operation(self):
-        '''Get the next operation to be done'''
+    '''Get the next operation to be done'''
+    def next_operation(self):        
         self.markov_chain.next_step_in_random_navigation()
-
 
     '''Do an execution step as a client'''
     def execute(self):
@@ -99,6 +91,12 @@ class StereotypeExecutorU1(StereotypeExecutor):
         StereotypeExecutor.__init__(self)
         self.ftp_client = ftp_client
         self.ftp_files = ftp_files
+        
+    def initialize_from_stereotype_recipe(self, stereotype_recipe):
+        StereotypeExecutor.initialize_from_stereotype_recipe(self, stereotype_recipe)
+        '''Initialize the file system in addition to the models'''
+        self.data_generator.create_file_system_snapshot()
+        self.data_generator.initialize_file_system_tree(constants.FS_SNAPSHOT_PATH)
 
     '''Do an execution step as a client'''
     def execute(self):

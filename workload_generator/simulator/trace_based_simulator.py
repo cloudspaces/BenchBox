@@ -6,6 +6,7 @@ Created on Sep 21, 2015
 import time
 from benchmark_simulator import StatisticsManager
 import calendar
+from workload_generator import constants
 
 class TraceNode():
     
@@ -16,9 +17,9 @@ class TraceNode():
 
 def replay_trace():
     users = dict()
-    statistics = StatisticsManager()
+    statistics = StatisticsManager(constants.TRACE_REPLAY_OUTPUT)
     initial_time = -1
-    for l in open('D://Documentos//Recerca//Proyectos//IOStack//Code//BenchBox//traces//200_users_backup.csv','r'):
+    for l in open(constants.TRACE_REPLAY_PATH,'r'):
         t,ext,size,tstamp,req_t,node_id, user_id = l.replace('\r','').replace('\n','').split(',')
         
         if node_id == 'node_id' or node_id == '' or t!='storage_done': continue
