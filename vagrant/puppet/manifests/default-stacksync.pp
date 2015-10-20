@@ -42,12 +42,12 @@ node 'benchBox' {
   ->
   exec {
     'launch_benchbox_simulator':
-      command => 'python /home/vagrant/simulator/executor.p-o 100 -p sync -t 1 -f stacksync_folder -x StackSync &',
+      command => 'python /home/vagrant/workload_generator/executor.p-o 100 -p sync -t 1 -f stacksync_folder -x StackSync &',
     # sudo kill -9 $(ps -ef | grep -i stacksync | grep -v \'grep\' | awk '{print $2}')
       user    => 'vagrant',
       group   =>'vagrant',
       path    => ['/usr/bin', '/bin/'],
-      cwd     => '/home/vagrant/simulator'
+      cwd     => '/home/vagrant/workload_generator'
   }
 
 
