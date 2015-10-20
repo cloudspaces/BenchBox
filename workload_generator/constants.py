@@ -5,6 +5,8 @@ Created on 6/7/2015
 '''
 PROJECT_PATH = '/home/user/workspace/BenchBox/'
 
+DEBUG = True
+
 SIMULATION_DURATION = 31*24*3600.
 SIMULATION_TIME_SLOT = 3600
 NODES = 200

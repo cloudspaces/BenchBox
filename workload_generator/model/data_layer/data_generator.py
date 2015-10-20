@@ -10,8 +10,8 @@ import collections
 import os
 
 from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string
-from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH, \
-    DATA_CHARACTERIZATIONS_PATH, DIRECTORY_DEPTH_PROBABILITY, FS_SNAPSHOT_PATH, \
+from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH,\
+    DATA_CHARACTERIZATIONS_PATH, DIRECTORY_DEPTH_PROBABILITY, FS_SNAPSHOT_PATH,\
     DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH, DEBUG
 import time
 from workload_generator.model.data_layer.update_manager import FileUpdateManager
@@ -50,7 +50,7 @@ class DataGenerator(object):
         self.file_update_manager = FileUpdateManager()
         self.stereotype_file_types = dict()
         self.stereotype_file_types_extensions = dict()
-        self.file_types_sizes = dict()  #KB           
+        self.file_types_sizes = dict()  #KB
         #Extracted from Tarasov paper, Home dataset
         self.file_update_location_probabilities = dict()
         self.current_updated_file = None
@@ -102,7 +102,7 @@ class DataGenerator(object):
             for file in files:
                 add_fs_node(self.file_system, (top+file).split('/'))
 
-                #TODO: After initializing the file system, we need to move it to the sandbox
+    #TODO: After initializing the file system, we need to move it to the sandbox
     def migrate_file_system_snapshot_to_sandbox(self, to_migrate):
         print "move the whole fs to the sandbox via ftp during warm-up"
 

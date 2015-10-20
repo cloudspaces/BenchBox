@@ -44,6 +44,9 @@ simulator/pcb/general/ftp_sender.pyc
 simulator/pcb/general/logger.pyc
 simulator/inter_arrivals_manager.pyc
 
+workload_generator/*.pyc
+workload_generator/external/impressions-code/*.o
+
 
 vagrant/.*
 vagrant/slaves
@@ -69,7 +72,8 @@ managerGUI/synthesize
 # managerGUI/
 
 
-
+output
+out
 
 # hide or ignore installation packages
 *.deb

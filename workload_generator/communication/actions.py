@@ -5,16 +5,16 @@ Created on 30/6/2015
 '''
 
 class Action(object):
-
+    
     def __init__(self, path):
         self.path = path
-
+    
     def get_path(self):
         return self.path
-
+    
     def perform_action(self, sender):
         raise Exception("NotImplementedException")
-
+    
     def to_string(self):
         raise Exception("NotImplementedException")
 
