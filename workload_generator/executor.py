@@ -17,7 +17,7 @@ from workload_generator.model.user_activity.inter_arrivals_manager import InterA
 from workload_generator.model.data_layer.data_generator import DataGenerator
 
 from workload_generator.communication.ftp_sender import ftp_sender
-from workload_generator.communication.actions import CreateFileOrDirectory, DeleteFileOrDirectory
+from workload_generator.communication.actions import CreateFileOrDirectory, DeleteFileOrDirectory, MoveFileOrDirectory
 
 from workload_generator.constants import DEBUG, FS_SNAPSHOT_PATH
 
@@ -132,7 +132,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
         self.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
         '''When the initial file system has been built, migrate it to the sandbox'''
         if not self.debug_mode:
-            self.data_generator.migrate_file_system_snapshot_to_sandbox("migrate location")
+            # self.data_generator.migrate_file_system_snapshot_to_sandbox("migrate location")
+            action = MoveFileOrDirectory(FS_SNAPSHOT_PATH, '/')
 
     '''Do an execution step as a client'''
     def execute(self):
@@ -239,7 +240,9 @@ if __name__ == '__main__':
     ftp_files = parser.get('executor','files_folder') # relative path to local files :: ./files/demoFiles.txt
     print 'Markov/OK'
     stereotype_executor = StereotypeExecutorU1(ftp_client, ftp_files)
+    stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
 
+    stereotype_executor.doMakeResponse()
     # read the line /vagrant/profile and use it
 
     if opt.profile is not None:
