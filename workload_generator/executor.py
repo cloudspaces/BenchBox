@@ -11,16 +11,15 @@ import os, sys
 import random
 import time
 
+
 from workload_generator.model.user_activity.markov_chain import SimpleMarkovChain
 from workload_generator.model.user_activity.inter_arrivals_manager import InterArrivalsManager
 from workload_generator.model.data_layer.data_generator import DataGenerator
 
-from pcb.general.ftp_sender import ftp_sender
-from pcb.general.logger import logger
-from pcb.actions import get_action, MakeResponse, PutContentResponse, Unlink, MoveResponse, GetContentResponse
+from workload_generator.communication.ftp_sender import ftp_sender
+from workload_generator.communication.actions import CreateFileOrDirectory, DeleteFileOrDirectory
 
-from workload_generator.resource_monitoring.cpu_monitor import CPUMonitor
-from workload_generator import constants
+from workload_generator.constants import DEBUG, FS_SNAPSHOT_PATH
 
 
 def process_opt():
@@ -66,7 +65,7 @@ class StereotypeExecutor(object):
         self.markov_current_state = 'MakeResponse' # there should be an initial state @ can be random
         self.inter_arrivals_manager = InterArrivalsManager()
         self.data_generator = DataGenerator()
-        
+
     def initialize_from_stereotype_recipe(self, stereotype_recipe):
         '''Initialize the Markov Chain states'''
         self.markov_chain.initialize_from_recipe(stereotype_recipe)
@@ -80,7 +79,7 @@ class StereotypeExecutor(object):
         return self.inter_arrivals_manager.get_waiting_time(self.markov_chain.previous_state,
                                                             self.markov_chain.current_state)
     '''Get the next operation to be done'''
-    def next_operation(self):        
+    def next_operation(self):
         self.markov_chain.next_step_in_random_navigation()
 
     '''Do an execution step as a client'''
@@ -93,7 +92,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         StereotypeExecutor.__init__(self)
         self.ftp_client = ftp_client
         self.ftp_files = ftp_files
-        
+
     def initialize_from_stereotype_recipe(self, stereotype_recipe):
         StereotypeExecutor.initialize_from_stereotype_recipe(self, stereotype_recipe)
         '''Initialize the file system in addition to the models'''
@@ -162,31 +161,31 @@ class StereotypeExecutorU1(StereotypeExecutor):
             time.sleep(1)
             wait = wait-1
             print '{}s'.format(wait)
-            
+
 '''Dummy class to emulate the calls of the real one, for simulation purposes'''
 class SimulatedStereotypeExecutorU1(StereotypeExecutor):
-    
+
     '''Do an execution step as a client'''
-    def execute(self):    
+    def execute(self):
         to_execute = getattr(self, 'do' + self.markov_chain.current_state)
         to_execute()
 
-    '''Operations that should connect to the Cristian's Benchmarking Framework'''        
+    '''Operations that should connect to the Cristian's Benchmarking Framework'''
     def doMakeResponse(self):
         '''Get the time to wait for this transition in millis'''
-        
+
     def doPutContentResponse(self):
         '''Get the time to wait for this transition in millis'''
-        
+
     def doSync(self):
         self.doPutContentResponse()
-        
+
     def doUnlink(self):
         '''Get the time to wait for this transition in millis'''
-        
+
     def doMoveResponse(self):
         '''Get the time to wait for this transition in millis'''
-        
+
     def doGetContentResponse(self):
         '''Get the time to wait for this transition in millis'''
 
@@ -226,7 +225,7 @@ if __name__ == '__main__':
     # log experiment metadata
 
     # print parser.options('executor')
-    log = logger(parser.get('executor', 'output') + os.sep + "metadata.log", dict(parser._sections['executor']) )
+    # log = logger(parser.get('executor', 'output') + os.sep + "metadata.log", dict(parser._sections['executor']) )
     ftp_client = ftp_sender(parser.get('executor','ftp'),
                         parser.get('executor','port'),
                         parser.get('executor','user'),
