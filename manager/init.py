@@ -160,7 +160,7 @@ def preconfig(h, hostname):
               "cd BenchBox;" \
               "git pull; " \
               "else " \
-              "git clone --recursive https://github.com/2XL/BenchBox.git; " \
+              "git clone --recursive https://github.com/CloudSpaces/BenchBox.git; " \
               "fi;" \
               "" % h['passwd']
     print h

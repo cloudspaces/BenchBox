@@ -63,10 +63,10 @@ BenchBox/manager is currently extended with the following plugins (personal clou
 
 Readmes, how to use them in your own application can be found here:
 
-* [monitor/README.md](https://github.com/2XL/BenchBox/tree/master/monitor/README.md)
-* [simulator/README.md](https://github.com/2XL/BenchBox/tree/master/simulator/README.md)
-* [vagrant/README.md](https://github.com/2XL/BenchBox/tree/master/vagrant/README.md)
-* [manager/README.md](https://github.com/2XL/BenchBox/tree/master/manager/README.md)
+* [monitor/README.md](https://github.com/CloudSpaces/BenchBox/tree/master/monitor/README.md)
+* [simulator/README.md](https://github.com/CloudSpaces/BenchBox/tree/master/simulator/README.md)
+* [vagrant/README.md](https://github.com/CloudSpaces/BenchBox/tree/master/vagrant/README.md)
+* [manager/README.md](https://github.com/CloudSpaces/BenchBox/tree/master/manager/README.md)
 
 ### Development
 
