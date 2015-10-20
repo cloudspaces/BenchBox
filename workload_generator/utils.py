@@ -50,6 +50,8 @@ def get_random_value_from_fitting(function, kv_params):
         return fitting(kv_params['shape'], scale=kv_params['scale']).rvs()
     elif function == "genpareto": 
         return fitting(kv_params['shape'], scale=kv_params['scale'], threshold=kv_params['threshold']).rvs()
+    elif function == "randint": 
+        return fitting.rvs(kv_params['low'], kv_params['high'])
     else: 
         return fitting(**kv_params).rvs()
 

@@ -83,19 +83,26 @@ class DataGenerator(object):
         self.file_types_sizes = dict()  #KB           
         #Extracted from Tarasov paper, Home dataset
         self.file_update_location_probabilities = dict()  
+        self.current_updated_file = None
+        self.initial_num_directories = None
             
     def initialize_from_recipe(self, stereotype_recipe):
         for l in open(stereotype_recipe, "r"):
             model_attribute = l.split(',')[0]
             if model_attribute in dir(self):
-                setattr(self, model_attribute, eval(l[l.index('{'):])) 
+                if model_attribute == "initial_num_directories":
+                    fitting = l.split(',')[1]
+                    kw_params = eval(l[l.index('{'):])
+                    setattr(self, model_attribute, (fitting, kw_params))
+                else:
+                    setattr(self, model_attribute, eval(l[l.index('{'):])) 
                 #print "Activity rate: ", self.activity_rate     
         
     '''Initialize the file system of the user (delegated to Impressions benchmark)'''
     def create_file_system_snapshot(self):
         '''Get initial number of directories for this user'''
-        #TODO: Change this by a real distribution
-        initial_directories = random.randint(1,100)
+        (function, kv_params) = self.initial_num_directories
+        num_dirs = get_random_value_from_fitting(function, kv_params)
         '''Change config file of Impressions'''
         fs_config = ''
         for line in open(FS_IMAGE_CONFIG_PATH, 'r'):
@@ -104,7 +111,7 @@ class DataGenerator(object):
                 if not os.path.exists(FS_SNAPSHOT_PATH):
                     os.makedirs(FS_SNAPSHOT_PATH)
             if "Numdirs" in line:
-                line = "Numdirs: " + str(initial_directories) + " N\n"
+                line = "Numdirs: " + str(num_dirs) + " N\n"
             fs_config = ''.join([fs_config, line])
         fs_config_file = open(FS_IMAGE_CONFIG_PATH, 'w')
         print >> fs_config_file, fs_config[:-1]
@@ -190,7 +197,10 @@ class DataGenerator(object):
     #TODO: Updates are missing, and will we somewhat complex to do
     def update_file(self):
         '''We have to respect both temporal and spatial localities, as well as to model updates themselves'''
-        '''Make use of the UpdateManaer for the last aspect'''
+        '''Make use of the UpdateManager for the last aspect'''
+        '''1) If there is a file that has been updated, check if we should continue editing it'''
+        #if self.current_updated_file != None:
+            
         return "text.txt"   
         
     '''Pick a file type based on the probabilities of this stereotype'''
