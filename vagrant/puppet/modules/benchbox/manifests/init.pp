@@ -1,12 +1,7 @@
 class benchbox{
 
 
-  file{
-    '/home/vagrant/BenchBox/xl_markov_min_regular.csv':
-      recurse => true,
-      ensure => present,
-      source=> 'puppet:///modules/benchbox/chain/xl_markov_regular_all_sid_ms.csv'
-  }->
+
   file{
     '/home/vagrant/profile.csv':
       recurse => true,
