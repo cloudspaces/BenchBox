@@ -12,9 +12,9 @@ import os
 from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string
 from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH,\
     DATA_CHARACTERIZATIONS_PATH, DIRECTORY_DEPTH_PROBABILITY, FS_SNAPSHOT_PATH,\
-    DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH
-import tempfile
+    DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH, DEBUG
 import time
+from workload_generator.model.data_layer.update_manager import FileUpdateManager
 
 '''Simple tree data structure and utility methods to manipulate the tree'''
 def FileSystem():
@@ -42,40 +42,10 @@ def print_tree(t, depth = 0):
         print_tree(t[k], depth)
         depth -= 1
         
-class FileUpdateManager(object):
-    
-    def modify_file(self, file_path, starting_point, num_bytes):    
-        rand_bytes = bytearray(random.getrandbits(8) for _ in range(num_bytes))        
-        if starting_point == 0: # Prepend
-            with tempfile.TemporaryFile() as f:
-                f.write(rand_bytes)
-                f.write(open(file_path).read())
-                f.seek(0)
-                dest_file = open(file_path, 'wb+')
-                dest_file.write(f.read())
-                dest_file.close()
-        elif starting_point == -1: # Append
-            with open(file_path, 'ab+') as dest_file:
-                dest_file.write(rand_bytes)  
-        else: # Modification in the middle
-            with open(file_path, 'r+b') as dest_file:
-                dest_file.seek(starting_point)
-                dest_file.write(rand_bytes)
-                dest_file.close()
-    
-    def add_content_file(self, file_path, starting_point, num_bytes):        
-        rand_bytes = bytearray(random.getrandbits(8) for _ in range(num_bytes))        
-        with open(file_path, 'r+b') as dest_file:
-            dest_file.seek(starting_point)
-            final_content = dest_file.read()
-            dest_file.seek(starting_point)
-            dest_file.write(rand_bytes)
-            dest_file.write(final_content)
-            dest_file.close()
-
 class DataGenerator(object):
     
     def __init__(self):
+        self.debug_mode = DEBUG
         self.file_system = FileSystem()  
         self.file_update_manager = FileUpdateManager()
         self.stereotype_file_types = dict()       
@@ -85,6 +55,7 @@ class DataGenerator(object):
         self.file_update_location_probabilities = dict()  
         self.current_updated_file = None
         self.initial_num_directories = None
+        self.last_update_time = -1
             
     def initialize_from_recipe(self, stereotype_recipe):
         for l in open(stereotype_recipe, "r"):
@@ -130,7 +101,8 @@ class DataGenerator(object):
                 add_fs_node(self.file_system, (top+dir).split('/'))
             for file in files:
                 add_fs_node(self.file_system, (top+file).split('/'))  
-                
+               
+    #TODO: After initializing the file system, we need to move it to the sandbox 
     def migrate_file_system_snapshot_to_sandbox(self, to_migrate): 
         print "move the whole fs to the sandbox via ftp during warm-up"             
         
@@ -141,7 +113,6 @@ class DataGenerator(object):
         '''After choosing the type, we proceed by generating the size of the file'''
         (function, kv_params) = self.file_types_sizes[file_type]
         size = int(get_random_value_from_fitting(function, kv_params)) 
-        print size
         '''After generating the file size, we should decide the path for the new file'''
         synthetic_file_base_path = self.get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH)
         '''Create a realistic name'''
@@ -153,6 +124,14 @@ class DataGenerator(object):
         characterization = DATA_CHARACTERIZATIONS_PATH + file_type
         subprocess.call(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path])
         return synthetic_file_base_path
+    
+    #TODO: MISSING!
+    def move_file(self):
+        print "MOVE FILE"
+        
+    #TODO: MISSING!
+    def move_directory(self):
+        print "MOVE DIRECTORY"
         
     '''Delete a file at random depending on the file type popularity for this stereotype'''
     def delete_file(self):
@@ -199,8 +178,14 @@ class DataGenerator(object):
         '''We have to respect both temporal and spatial localities, as well as to model updates themselves'''
         '''Make use of the UpdateManager for the last aspect'''
         '''1) If there is a file that has been updated, check if we should continue editing it'''
-        #if self.current_updated_file != None:
-            
+        if self.current_updated_file != None or time.time()-self.last_update_time > 10:
+            '''2) If we select a new file, do it based on popularity'''
+            self.current_updated_file = 'Select new file to update'
+            self.last_update_time = time.time()
+        '''3) Select the type of update to be done (Prepend, Middle or Append)'''
+        
+        '''4) Select the size of the update to be done (1%, 40% of the content)'''
+        
         return "text.txt"   
         
     '''Pick a file type based on the probabilities of this stereotype'''
