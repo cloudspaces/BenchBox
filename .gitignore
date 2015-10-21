@@ -47,6 +47,8 @@ simulator/inter_arrivals_manager.pyc
 workload_generator/*.pyc
 workload_generator/external/impressions-code/*.o
 workload_generator/workload_generator/*
+# ignore this binary as it has to be recompiled foreach machine
+workload_generator/external/impressions
 
 
 vagrant/.*
