@@ -3,6 +3,9 @@ Created on 30/6/2015
 
 @author: Raul
 '''
+import sys
+base_path = '/home/vagrant/workload_generator/'
+sys.path.append(base_path)
 
 import subprocess
 import random
@@ -58,7 +61,9 @@ class DataGenerator(object):
         self.last_update_time = -1
 
     def initialize_from_recipe(self, stereotype_recipe):
+        print "-------------", stereotype_recipe
         for l in open(stereotype_recipe, "r"):
+            print l
             model_attribute = l.split(',')[0]
             if model_attribute in dir(self):
                 if model_attribute == "initial_num_directories":
@@ -72,7 +77,11 @@ class DataGenerator(object):
     '''Initialize the file system of the user (delegated to Impressions benchmark)'''
     def create_file_system_snapshot(self):
         '''Get initial number of directories for this user'''
+        print 'create_file_system_snapshot'
+        print self.initial_num_directories
+
         (function, kv_params) = self.initial_num_directories
+
         num_dirs = get_random_value_from_fitting(function, kv_params)
         '''Change config file of Impressions'''
         fs_config = ''
