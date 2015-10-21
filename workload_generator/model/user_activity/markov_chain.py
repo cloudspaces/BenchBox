@@ -69,6 +69,7 @@ class SimpleMarkovChain(object):
             
     def initialize_from_recipe(self, file_name):
         for l in open(file_name, "r"):
+
             model_attribute = l.split(',')[0]
             if model_attribute == 'chain':
                 state1, state2, num_transitions  = l.split(",")[1:4]
