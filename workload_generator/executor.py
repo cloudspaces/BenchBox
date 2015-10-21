@@ -166,7 +166,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
         self.markov_chain.next_step_in_random_navigation()
         to_execute = getattr(self, 'do' + self.markov_chain.current_state)
         to_execute()
-    
+
+    """
     def doMakeResponse(self):
         print "do create" 
         #TODO: We have to define the operations correctly, because we cannot distinguish
@@ -179,7 +180,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'MakeResponse')
         action.perform_action(ftp_client)
-
+    """
     def doPutContentResponse(self):
         print "do update"
         synthetic_file_name = self.data_generator.create_file()
@@ -271,8 +272,11 @@ if __name__ == '__main__':
     stereotype_executor.markov_chain.initialize_from_recipe(receipt)
     stereotype_executor.data_generator.initialize_from_recipe(receipt)
     stereotype_executor.inter_arrivals_manager.initialize_from_recipe(receipt)
+
+
     stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
-    stereotype_executor.doMakeResponse()
+    # stereotype_executor.doMakeResponse()
+    stereotype_executor.doPutContentResponse()
     # read the line /vagrant/profile and use it
 
     if opt.profile is not None:
