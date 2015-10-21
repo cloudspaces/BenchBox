@@ -8,7 +8,7 @@
 # do not upload boxes or the repo will get corrupted becuase of its size
 *.box
 */*.box
-
+*.pyc
 
 # omit specific folders and files
 */hints
