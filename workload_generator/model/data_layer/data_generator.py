@@ -35,7 +35,9 @@ def delete_fs_node(t, path):
 
     pprint(t)
 
-    if path == []: del t[node]
+    if path == []:
+        # TODO: del t[node]
+        print 'delete {} '.format(node)
     else: return delete_fs_node(t[node], path)
 
 def get_tree_node(t, path):
