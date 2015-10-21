@@ -291,6 +291,7 @@ if __name__ == '__main__':
 
 
 
+
     stereotype_executor.markov_chain.calculate_chain_relative_probabilities()
 
     print 'IPTables/OK'
@@ -318,6 +319,10 @@ if __name__ == '__main__':
     print "Finish executing/****************************"
 
     print "ClearingProcess/..."
+
+
+    MoveFileOrDirectory('../output','/').perform_action(ftp_client)
+
 
     if ftp_client:
         print "close sender"
