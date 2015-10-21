@@ -3,10 +3,12 @@ Created on 30/6/2015
 
 @author: Raul
 '''
+import os
 
 class Action(object):
     
     def __init__(self, path):
+        print path
         self.path = path
     
     def get_path(self):
@@ -38,13 +40,13 @@ class DeleteFileOrDirectory(Action):
     and from the FTP. Return: 0 as no bytes are added or modified'''
     def perform_action(self, sender):
         try:
-            sender.delete(self.name)
+            sender.delete(self.path)
         except Exception as e:
             print e.message
         return 0
 
     def to_string(self):
-        return "Unlink "+str(self.name)+"\n"
+        return "Unlink "+str(self.path)+"\n"
 
 class MoveFileOrDirectory(Action):
 
@@ -56,13 +58,31 @@ class MoveFileOrDirectory(Action):
     and from the FTP. Return: 0 as no bytes are added or modified'''
     def perform_action(self, sender):
         try:
-            sender.mv(self.path, self.destination_path)
+            # sender.mv(self.path, self.destination_path)
+            self.uploadThis(sender, self.path)
         except Exception as e:
             print e.message
         return 0
 
+
+    def uploadThis(self, myFTP, path):
+        files = os.listdir(path)
+        os.chdir(path)
+        for f in files:
+            if os.path.isfile(path + r'\{}'.format(f)):
+                fh = open(f, 'rb')
+                myFTP.storbinary('STOR %s' % f, fh)
+                fh.close()
+            elif os.path.isdir(path + r'\{}'.format(f)):
+                myFTP.mkd(f)
+                myFTP.cwd(f)
+                self.uploadThis(path + r'\{}'.format(f))
+        myFTP.cwd('..')
+        os.chdir('..')
+
+
     def to_string(self):
-        return "MoveResponse "+str(self.name)+"\n"
+        return "MoveResponse "+str(self.path)+"\n"
 
 class GetContentResponse(Action):
     def __init__(self, name, dst, folder):
@@ -71,12 +91,12 @@ class GetContentResponse(Action):
 
     def perform_action(self, sender):
         try:
-            sender.get('RETR %s' % self.name, open(self.dst+self.name, 'wb').write)
+            sender.get('RETR %s' % self.path, open(self.dst+self.path, 'wb').write)
         except Exception as e:
             print e.message
 
     def to_string(self):
-        return "GetContentResponse "+str(self.name)+"\n"
+        return "GetContentResponse "+str(self.path)+"\n"
 
 # def get_action(args, folder):
 #     
