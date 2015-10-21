@@ -270,8 +270,8 @@ if __name__ == '__main__':
     print receipt
     stereotype_executor.markov_chain.initialize_from_recipe(receipt)
     stereotype_executor.data_generator.initialize_from_recipe(receipt)
+    stereotype_executor.inter_arrivals_manager.initialize_from_recipe(receipt)
     stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
-
     stereotype_executor.doMakeResponse()
     # read the line /vagrant/profile and use it
 
