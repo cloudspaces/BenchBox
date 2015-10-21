@@ -87,7 +87,7 @@ class StereotypeExecutor(object):
     def __init__(self):
         self.debug_mode = DEBUG
         self.markov_chain = SimpleMarkovChain()
-        self.markov_current_state = 'MakeResponse' # there should be an initial state @ can be random
+        self.markov_current_state = 'PutContentResponse' # there should be an initial state @ can be random
         self.inter_arrivals_manager = InterArrivalsManager()
         self.data_generator = DataGenerator()
 
@@ -184,9 +184,12 @@ class StereotypeExecutorU1(StereotypeExecutor):
     def doPutContentResponse(self):
         print "do update"
         synthetic_file_name = self.data_generator.create_file()
+        print synthetic_file_name
         action = CreateFileOrDirectory(synthetic_file_name)
+        print action
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'PutContentResponse')
+        print to_wait
         action.perform_action(ftp_client)
 
     def doSync(self ):
