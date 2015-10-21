@@ -51,13 +51,14 @@ class DataGenerator(object):
         self.debug_mode = DEBUG
         self.file_system = FileSystem()
         self.file_update_manager = FileUpdateManager()
-        self.stereotype_file_types = dict()
+        '''Parameters to model files and directories'''
+        self.stereotype_file_types_probabilities = dict()
         self.stereotype_file_types_extensions = dict()
-        self.file_types_sizes = dict()  #KB
-        #Extracted from Tarasov paper, Home dataset
-        self.file_update_location_probabilities = dict()
-        self.current_updated_file = None
-        self.initial_num_directories = None
+        self.file_types_sizes = dict()  #Bytes
+        self.directory_count_distribution = None
+        '''Parameters to model files updates'''
+        self.file_update_location_probabilities = dict() #Extracted from Tarasov paper, Home dataset
+        self.current_updated_file = None        
         self.last_update_time = -1
 
     def initialize_from_recipe(self, stereotype_recipe):
@@ -66,7 +67,7 @@ class DataGenerator(object):
             print l
             model_attribute = l.split(',')[0]
             if model_attribute in dir(self):
-                if model_attribute == "initial_num_directories":
+                if model_attribute == "directory_count_distribution":
                     fitting = l.split(',')[1]
                     kw_params = eval(l[l.index('{'):])
                     setattr(self, model_attribute, (fitting, kw_params))
@@ -77,11 +78,8 @@ class DataGenerator(object):
     '''Initialize the file system of the user (delegated to Impressions benchmark)'''
     def create_file_system_snapshot(self):
         '''Get initial number of directories for this user'''
-        print 'create_file_system_snapshot'
-        print self.initial_num_directories
 
-        (function, kv_params) = self.initial_num_directories
-
+        (function, kv_params) = self.directory_count_distribution
         num_dirs = get_random_value_from_fitting(function, kv_params)
         '''Change config file of Impressions'''
         fs_config = ''
@@ -118,7 +116,7 @@ class DataGenerator(object):
     '''Create file at random based on the file type popularity for this stereotype'''
     def create_file(self):
         '''Prior creating a file, we first decide which type of file to create'''
-        file_type = self.get_fitness_proportionate_file_type()
+        file_type = self.get_fitness_proportionate_element(self.stereotype_file_types_probabilities)
         '''After choosing the type, we proceed by generating the size of the file'''
         (function, kv_params) = self.file_types_sizes[file_type]
         size = int(get_random_value_from_fitting(function, kv_params))
@@ -144,18 +142,7 @@ class DataGenerator(object):
 
     '''Delete a file at random depending on the file type popularity for this stereotype'''
     def delete_file(self):
-        tested_file_types = set()
-        to_delete = None
-        while len(tested_file_types) < len(self.stereotype_file_types):
-            '''Prior creating a file, we first decide which type of file to create'''
-            file_type = self.get_fitness_proportionate_file_type()
-            if file_type in tested_file_types: continue
-            all_files_of_type = self.get_fs_files_of_type(self.file_system, file_type, FS_SNAPSHOT_PATH)
-            tested_file_types.add(file_type)
-            if all_files_of_type != []:
-                to_delete = random.choice(all_files_of_type)
-                break
-
+        to_delete = ''
         print "DELETING FILE: ", to_delete
         if to_delete != None:
             delete_fs_node(self.file_system, to_delete.split('/'))
@@ -182,32 +169,55 @@ class DataGenerator(object):
             delete_fs_node(self.file_system, dir_path_to_delete.split('/'))
         return dir_path_to_delete
 
-    #TODO: Updates are missing, and will we somewhat complex to do
     def update_file(self):
         '''We have to respect both temporal and spatial localities, as well as to model updates themselves'''
         '''Make use of the UpdateManager for the last aspect'''
         '''1) If there is a file that has been updated, check if we should continue editing it'''
-        if self.current_updated_file != None or time.time()-self.last_update_time > 10:
-            '''2) If we select a new file, do it based on popularity'''
-            self.current_updated_file = 'Select new file to update'
+        if self.current_updated_file != None or time.time()-self.last_update_time > 10: #TODO: This threshold should be changed by a real distribution
+            '''2) Select a random file of the given type to update (this is a simple approach, which can be
+            sophisticated, if necessary, by adding individual "edit probabilities" to files based on distributions)'''
+            self.current_updated_file = self.get_file_based_on_type_popularity()
             self.last_update_time = time.time()
-        '''3) Select the type of update to be done (Prepend, Middle or Append)'''
-
-        '''4) Select the size of the update to be done (1%, 40% of the content)'''
-
-        return "text.txt"
+                        
+        print "FILE TO EDIT: ", self.current_updated_file
+        if self.current_updated_file != None: 
+            '''3) Select the type of update to be done (Prepend, Middle or Append)'''
+            update_type = self.get_fitness_proportionate_element(self.file_update_location_probabilities)
+            print "UPDATE TYPE: ", update_type
+            '''4) Select the size of the update to be done (1%, 40% of the content)'''
+            file_size = os.path.getsize(self.current_updated_file)
+            updated_bytes = int(file_size*random.random()) #TODO: This should be changed by a real distribution
+            update_type = self.get_fitness_proportionate_element(self.file_update_location_probabilities)
+            self.file_update_manager.modify_file(self.current_updated_file, update_type, updated_bytes)
+        else: print "WARNING: No files to update!"
+        '''5) Return the path to the locally updated file to be transferred to the sandbox'''
+        return self.current_updated_file
 
     '''Pick a file type based on the probabilities of this stereotype'''
-    def get_fitness_proportionate_file_type(self):
+    def get_fitness_proportionate_element(self, probabilities_dict):
         file_type = None
         random_trial = random.random()
         start_range = 0.0
-        for k in sorted(self.stereotype_file_types.keys()):
-            if start_range <= random_trial and random_trial <= start_range+self.stereotype_file_types[k]:
+        for k in sorted(probabilities_dict.keys()):
+            if start_range <= random_trial and random_trial <= start_range+probabilities_dict[k]:
                 file_type = k
                 break
-            else: start_range += self.stereotype_file_types[k]
+            else: start_range += probabilities_dict[k]
         return file_type
+    
+    def get_file_based_on_type_popularity(self):
+        tested_file_types = set()
+        selected_file = None
+        while len(tested_file_types) < len(self.stereotype_file_types_probabilities):
+            '''Prior creating a file, we first decide which type of file to create'''
+            file_type = self.get_fitness_proportionate_element(self.stereotype_file_types_probabilities)
+            if file_type in tested_file_types: continue
+            all_files_of_type = self.get_fs_files_of_type(self.file_system, file_type, FS_SNAPSHOT_PATH)
+            tested_file_types.add(file_type)
+            if all_files_of_type != []:
+                selected_file = random.choice(all_files_of_type)
+                break
+        return selected_file
 
     def get_random_fs_directory(self, tree, base_path=''):
         '''Get only directories from this tree level'''
@@ -268,14 +278,15 @@ class DataGenerator(object):
 if __name__ == '__main__':
     data_generator = DataGenerator()
     data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backupsample")
-    data_generator.create_file_system_snapshot()
+    #data_generator.create_file_system_snapshot()
     data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
     for i in range (50):
-        data_generator.create_directory()
+        '''data_generator.create_directory()
         data_generator.delete_directory()
         data_generator.create_file()
         data_generator.create_file()
-        data_generator.delete_file()
+        data_generator.delete_file()'''
+        
 
     print_tree(data_generator.file_system)
     #data_generator.create_file_system_snapshot()

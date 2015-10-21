@@ -19,7 +19,7 @@ from workload_generator.model.data_layer.data_generator import DataGenerator
 from workload_generator.communication.ftp_sender import ftp_sender
 from workload_generator.communication.actions import CreateFileOrDirectory, DeleteFileOrDirectory, MoveFileOrDirectory
 
-from workload_generator.constants import DEBUG, FS_SNAPSHOT_PATH
+from workload_generator.constants import DEBUG, FS_SNAPSHOT_PATH, STEREOTYPE_RECIPES_PATH
 
 
 def process_opt():
@@ -123,6 +123,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         StereotypeExecutor.__init__(self)
         self.ftp_client = ftp_client
 
+
     def initialize_from_stereotype_recipe(self, stereotype_recipe):
         StereotypeExecutor.initialize_from_stereotype_recipe(self, stereotype_recipe)
         
@@ -219,7 +220,7 @@ if __name__ == '__main__':
     parser = SafeConfigParser()
 
 
-    parser.read('/home/vagrant/simulator/config.ini')
+    parser.read('/home/vagrant/workload_generator/config.ini')
     print parser.get('executor', 'interface')   # eth0
     print parser.get('executor', 'ftp')         # 192.168.56.2
     print parser.get('executor', 'port')        # 21
@@ -239,7 +240,12 @@ if __name__ == '__main__':
     # parser.get('executor','folder')) # root path ftp_client directory :: ~/stacksync_folder
     ftp_files = parser.get('executor','files_folder') # relative path to local files :: ./files/demoFiles.txt
     print 'Markov/OK'
-    stereotype_executor = StereotypeExecutorU1(ftp_client, ftp_files)
+    stereotype_executor = StereotypeExecutorU1(ftp_client)
+
+    receipt = STEREOTYPE_RECIPES_PATH + opt.profile
+    print receipt
+    stereotype_executor.markov_chain.initialize_from_recipe(receipt)
+
     stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
 
     stereotype_executor.doMakeResponse()
@@ -250,10 +256,10 @@ if __name__ == '__main__':
     else:
         with open('/vagrant/profile') as f:
             profile_type= f.read().split('\n')[0]
-    profile = '/home/vagrant/simulator/data/xl_markov_{}_all_ms.csv'.format(profile_type)
+    #profile = '/home/vagrant/simulator/data/xl_markov_{}_all_ms.csv'.format(profile_type)
 
-    print profile
-    stereotype_executor.markov_chain.initialize_from_recipe(profile)
+
+
     stereotype_executor.markov_chain.calculate_chain_relative_probabilities()
 
     print 'IPTables/OK'

@@ -3,7 +3,7 @@ Created on 6/7/2015
 
 @author: Raul
 '''
-PROJECT_PATH = '/home/user/workspace/BenchBox/'
+PROJECT_PATH = '/home/vagrant/workload_generator/'
 
 DEBUG = True
 

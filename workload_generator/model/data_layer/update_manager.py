@@ -5,27 +5,62 @@ Created on Oct 20, 2015
 '''
 import random
 import tempfile
+import os
+from workload_generator.utils import split_list_into_chunks
 
 class FileUpdateManager(object):
     
-    def modify_file(self, file_path, starting_point, num_bytes):    
-        rand_bytes = bytearray(random.getrandbits(8) for _ in range(num_bytes))        
-        if starting_point == 0: # Prepend
-            with tempfile.TemporaryFile() as f:
-                f.write(rand_bytes)
-                f.write(open(file_path).read())
-                f.seek(0)
-                dest_file = open(file_path, 'wb+')
-                dest_file.write(f.read())
-                dest_file.close()
-        elif starting_point == -1: # Append
-            with open(file_path, 'ab+') as dest_file:
-                dest_file.write(rand_bytes)  
-        else: # Modification in the middle
-            with open(file_path, 'r+b') as dest_file:
-                dest_file.seek(starting_point)
-                dest_file.write(rand_bytes)
-                dest_file.close()
+    def modify_file(self, file_path, update_type, num_bytes):    
+        #'B':0.38, 'E': 0.03, 'M': 0.08, 'BE': 0.1, 'BM': 0.11, 'ME': 0.01, 'BEM': 0.29
+        new_content = bytearray(random.getrandbits(8) for _ in range(num_bytes))        
+        if update_type == 'B': # Prepend
+            self.do_prepend(file_path, new_content)
+        elif update_type == 'E': # Append
+            self.do_append(file_path, new_content)
+        elif update_type == 'M': # Modification in the middle
+            self.do_middle_update(file_path, new_content)
+        elif update_type == 'BE':
+            content_parts = split_list_into_chunks(new_content, 2)
+            self.do_prepend(file_path, content_parts[0])
+            self.do_append(file_path, content_parts[1])
+        elif update_type == 'BM':
+            content_parts = split_list_into_chunks(new_content, 2)
+            self.do_prepend(file_path, content_parts[0])
+            self.do_middle_update(file_path, content_parts[1])
+        elif update_type == 'ME':
+            content_parts = split_list_into_chunks(new_content, 2)
+            self.do_middle_update(file_path, content_parts[0])
+            self.do_append(file_path, content_parts[1])
+        elif update_type == 'BEM':
+            content_parts = split_list_into_chunks(new_content, 3)
+            self.do_prepend(file_path, content_parts[0])
+            self.do_middle_update(file_path, content_parts[1])
+            self.do_append(file_path, content_parts[2])
+        else:
+            raise NotImplementedError("NOT IMPLEMENTED UPDATE TYPE: " + update_type)
+    
+    def do_prepend(self, file_path, content):
+        with tempfile.TemporaryFile() as f:
+            f.write(content)
+            f.write(open(file_path).read())
+            f.seek(0)
+            dest_file = open(file_path, 'wb+')
+            dest_file.write(f.read())
+            dest_file.close()
+            
+    def do_append(self, file_path, content):
+        with open(file_path, 'ab+') as dest_file:
+            dest_file.write(content) 
+    
+    def do_middle_update(self, file_path, content):
+        file_size = os.path.getsize(file_path)
+        starting_point = 0
+        if file_size > 1:
+            starting_point = int(file_size/2)
+        with open(file_path, 'r+b') as dest_file:
+            dest_file.seek(starting_point)
+            dest_file.write(content)
+            dest_file.close()
     
     def add_content_file(self, file_path, starting_point, num_bytes):        
         rand_bytes = bytearray(random.getrandbits(8) for _ in range(num_bytes))        

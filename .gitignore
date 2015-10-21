@@ -46,9 +46,11 @@ simulator/inter_arrivals_manager.pyc
 
 workload_generator/*.pyc
 workload_generator/external/impressions-code/*.o
+workload_generator/workload_generator/*
 
 
 vagrant/.*
+vagrant/hostname
 vagrant/slaves
 vagrant/slaves/*
 vagrant/slaves/*/*
