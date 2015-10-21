@@ -12,6 +12,10 @@ node 'benchBox' {
   class {
     'git':
   }->
+  class {
+    'java':
+      distribution => 'jdk',
+  }->
   class { 'python' :
     version    => 'system',
     pip        => true,

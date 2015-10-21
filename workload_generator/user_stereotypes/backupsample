@@ -8,7 +8,8 @@ chain,Unlink,MoveResponse,318,genpareto,{'shape':4.05974572112893,'scale':0.2309
 chain,Unlink,PutContentResponse,1053,genpareto,{'shape':3.13573091706067,'scale':0.746839394368102,'threshold':0.00100000016390778}
 chain,Unlink,Unlink,18057,genpareto,{'shape':0.949044501927819,'scale':0.0508355787457194,'threshold':0.0249999999068978}
 activity_distribution,genpareto,{'shape':3.02809764917398,'scale':0.0664626786932026,'threshold':0.027999999932897}
-stereotype_file_types,{'Pics': 0.1,'Text': 0.5,'Docs': 0.2,'Media': 0.05,'Applications': 0.05,'Compressed': 0.1}
-stereotype_file_types_extensions,{'Pics': ['.jpg', '.png'],'Text': ['.java', '.py'],'Docs': ['.log', '.csv'],'Media': ['.avi', '.mp3'],'Applications': ['.exe', '.bin'],'Compressed': ['.rar', '.zip']}
-file_types_sizes,{'Pics': ('norm' ,{'loc':100, 'scale':10}),'Text':('norm' ,{'loc':5,'scale':1}), 'Docs': ('norm' ,{'loc':50,'scale':5}),'Media': ('norm',{'loc':2000,'scale':200}),'Applications': ('norm' ,{'loc':150,'scale':15}), 'Compressed': ('norm' ,{'loc':120,'scale':12})}
+stereotype_file_types,{'Pics': 0.1,'Code': 0.5,'Docs': 0.2,'Media': 0.05,'Applications': 0.05,'Compressed': 0.1}
+stereotype_file_types_extensions,{'Pics': ['.jpg', '.png'],'Code': ['.java', '.py'],'Docs': ['.log', '.csv'],'Media': ['.avi', '.mp3'],'Applications': ['.exe', '.bin'],'Compressed': ['.rar', '.zip']}
+file_types_sizes,{'Pics': ('norm' ,{'loc':102400, 'scale':10}),'Code':('norm' ,{'loc':51200,'scale':1}), 'Docs': ('norm' ,{'loc':51200,'scale':5}),'Media': ('norm',{'loc':2048000,'scale':200}),'Applications': ('norm' ,{'loc':153600,'scale':15}), 'Compressed': ('norm' ,{'loc':122880,'scale':12})}
 file_update_location_probabilities,{'B':0.38, 'E': 0.03, 'M': 0.08, 'BE': 0.1, 'BM': 0.11, 'ME': 0.01, 'BEM': 0.29}
+initial_num_directories,randint,{'low':1,'high':50}

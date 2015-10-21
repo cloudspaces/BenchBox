@@ -40,12 +40,12 @@ node 'benchBox' {
   ->
   exec {
     'launch_benchbox_simulator':
-      command => 'python /home/vagrant/simulator/executor.py -o 100 -p sync -t 1 -f owncloud_folder -x OwnCloud &',
+      command => 'python /home/vagrant/workload_generator/executor.py -o 100 -p sync -t 1 -f owncloud_folder -x OwnCloud &',
     # sudo kill -9 $(ps -ef | grep -i stacksync | grep -v \'grep\' | awk '{print $2}')
       user    => 'vagrant',
       group   =>'vagrant',
       path    => ['/usr/bin', '/bin/'],
-      cwd     => '/home/vagrant/simulator'
+      cwd     => '/home/vagrant/workload_generator'
   }
 
 
