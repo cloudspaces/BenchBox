@@ -29,6 +29,12 @@ def add_fs_node(t, path):
 
 def delete_fs_node(t, path):
     node = path.pop(0)
+    print "selected node to delete, from {}".format(path)
+    print node
+    from pprint import pprint
+
+    pprint(t)
+
     if path == []: del t[node]
     else: return delete_fs_node(t[node], path)
 

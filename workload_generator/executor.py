@@ -195,7 +195,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
     def doSync(self ):
         self.doPutContentResponse()
 
-    def doUnlink(self ):
+    def doUnlink(self):
         print "do delete"
         synthetic_file_name = None
         if random.random() > 0.25:        
