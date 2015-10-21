@@ -10,6 +10,30 @@ from argparse import ArgumentParser
 import os, sys
 import random
 import time
+import getpass
+
+
+
+'''
+HardCode path for each environment, should be dev, debug, production instead...
+'''
+curr_dir = os.path.dirname(os.path.realpath(__file__))
+home_dir = os.path.expanduser("~")
+hard_dir = '/home/anna/CloudSpaces/Dev/BenchBox'
+print curr_dir
+print home_dir
+print hard_dir
+
+username = getpass.getuser()
+
+dev_dir = {
+    'anna': hard_dir,
+    'vagrant': home_dir,
+    'milax': curr_dir
+}
+
+sys.path.append(dev_dir[username])
+
 
 
 from workload_generator.model.user_activity.markov_chain import SimpleMarkovChain
@@ -220,7 +244,7 @@ if __name__ == '__main__':
     parser = SafeConfigParser()
 
 
-    parser.read('/home/vagrant/workload_generator/config.ini')
+    parser.read('./config.ini')
     print parser.get('executor', 'interface')   # eth0
     print parser.get('executor', 'ftp')         # 192.168.56.2
     print parser.get('executor', 'port')        # 21
@@ -238,7 +262,7 @@ if __name__ == '__main__':
                         parser.get('executor','passwd'),
                         opt.folder)
     # parser.get('executor','folder')) # root path ftp_client directory :: ~/stacksync_folder
-    ftp_files = parser.get('executor','files_folder') # relative path to local files :: ./files/demoFiles.txt
+    # ftp_files = parser.get('executor','files_folder') # relative path to local files :: ./files/demoFiles.txt
     print 'Markov/OK'
     stereotype_executor = StereotypeExecutorU1(ftp_client)
 

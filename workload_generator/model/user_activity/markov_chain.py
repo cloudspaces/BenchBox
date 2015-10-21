@@ -79,8 +79,8 @@ class SimpleMarkovChain(object):
                 setattr(self, model_attribute, (fitting, kv_params))
                 self.activity_rate = get_random_value_from_fitting(fitting, kv_params)
                 print "Activity rate: ", self.activity_rate
-                print "Activity rate: ", self.activity_rate
-                print "Activity rate: ", self.activity_rate
+                from pprint import pprint
+                print "self: ", pprint (vars(self))
 
     def print_states(self):  
         self.printChain(self.chain)

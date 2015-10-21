@@ -3,7 +3,16 @@ Created on 6/7/2015
 
 @author: Raul
 '''
-PROJECT_PATH = '/home/vagrant/workload_generator/'
+import getpass
+
+username = getpass.getuser()
+PROJECT_PATH = None
+TEMP_PATH = {
+    'vagrant': '/home/vagrant/',
+    'anna': '/home/anna/CloudSpaces/Dev/BenchBox/'
+}
+
+PROJECT_PATH = TEMP_PATH[username]
 
 DEBUG = True
 
