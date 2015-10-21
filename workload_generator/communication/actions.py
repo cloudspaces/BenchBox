@@ -26,7 +26,8 @@ class CreateFileOrDirectory(Action):
             sender.send(self.path)
         except Exception as e:
             print e
-        return self.size
+        # TODO return self.size
+        return 0
 
     def to_string(self):
         return "MakeResponse " + str(self.path) + "\n"
