@@ -9,14 +9,15 @@ import getpass
 PROJECT_PATH = '/home/user/workspace/BenchBox/'
 
 '''Chenglong configuration'''
-'''username = getpass.getuser()
+username = getpass.getuser()
 PROJECT_PATH = None
 TEMP_PATH = {
     'vagrant': '/home/vagrant/',
-    'anna': '/home/anna/CloudSpaces/Dev/BenchBox/'
+    'anna': '/home/anna/CloudSpaces/Dev/BenchBox/',
+    'user': '/home/user/workspace/BenchBox/'
 }
 
-PROJECT_PATH = TEMP_PATH[username]'''
+PROJECT_PATH = TEMP_PATH[username]
 
 DEBUG = True
 
