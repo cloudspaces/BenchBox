@@ -5,14 +5,18 @@ Created on 6/7/2015
 '''
 import getpass
 
-username = getpass.getuser()
+'''Raul configuration'''
+PROJECT_PATH = '/home/user/workspace/BenchBox/'
+
+'''Chenglong configuration'''
+'''username = getpass.getuser()
 PROJECT_PATH = None
 TEMP_PATH = {
     'vagrant': '/home/vagrant/',
     'anna': '/home/anna/CloudSpaces/Dev/BenchBox/'
 }
 
-PROJECT_PATH = TEMP_PATH[username]
+PROJECT_PATH = TEMP_PATH[username]'''
 
 DEBUG = True
 

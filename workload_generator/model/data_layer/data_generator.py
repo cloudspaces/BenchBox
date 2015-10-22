@@ -4,6 +4,7 @@ Created on 30/6/2015
 @author: Raul
 '''
 import sys
+import shutil
 base_path = '/home/vagrant/workload_generator/'
 sys.path.append(base_path)
 
@@ -24,23 +25,21 @@ def FileSystem():
     return collections.defaultdict(FileSystem)
 
 def add_fs_node(t, path):
+    if type(path) is not list:
+        path = path.split(os.path.sep)
     for node in path:
         t = t[node]
 
 def delete_fs_node(t, path):
+    if type(path) is not list:
+        path = path.split(os.path.sep)
     node = path.pop(0)
-    print "selected node to delete, from {}".format(path)
-    print node
-    from pprint import pprint
-
-    pprint(t)
-
-    if path == []:
-        # TODO: del t[node]
-        print 'delete {} '.format(node)
+    if path == []: del t[node]
     else: return delete_fs_node(t[node], path)
 
 def get_tree_node(t, path):
+    if type(path) is not list:
+        path = path.split(os.path.sep)
     node = path.pop(0)
     if path == []: return t[node]
     else: return get_tree_node(t[node], path)
@@ -70,9 +69,7 @@ class DataGenerator(object):
         self.last_update_time = -1
 
     def initialize_from_recipe(self, stereotype_recipe):
-        print "-------------", stereotype_recipe
         for l in open(stereotype_recipe, "r"):
-            print l
             model_attribute = l.split(',')[0]
             if model_attribute in dir(self):
                 if model_attribute == "directory_count_distribution":
@@ -86,7 +83,6 @@ class DataGenerator(object):
     '''Initialize the file system of the user (delegated to Impressions benchmark)'''
     def create_file_system_snapshot(self):
         '''Get initial number of directories for this user'''
-
         (function, kv_params) = self.directory_count_distribution
         num_dirs = get_random_value_from_fitting(function, kv_params)
         '''Change config file of Impressions'''
@@ -109,17 +105,13 @@ class DataGenerator(object):
     '''Generate the logical structure of the initial snapshot before migration to sandbox'''
     def initialize_file_system_tree(self, fs_snapshot_path):
         for top, dirs, files in os.walk(fs_snapshot_path):
-            top = top.replace("\\", "/")
-            if top[-1] != '/': top += '/'
+            top = top.replace("\\", os.path.sep)
+            if top[-1] != os.path.sep: top += os.path.sep
             print top, dirs, files
             for dir in dirs:
-                add_fs_node(self.file_system, (top+dir).split('/'))
+                add_fs_node(self.file_system, top+dir)
             for file in files:
-                add_fs_node(self.file_system, (top+file).split('/'))
-
-    #TODO: After initializing the file system, we need to move it to the sandbox
-    def migrate_file_system_snapshot_to_sandbox(self, to_migrate):
-        print "move the whole fs to the sandbox via ftp during warm-up"
+                add_fs_node(self.file_system, top+file)
 
     '''Create file at random based on the file type popularity for this stereotype'''
     def create_file(self):
@@ -134,26 +126,59 @@ class DataGenerator(object):
         synthetic_file_base_path += get_random_alphanumeric_string(random.randint(1,20)) + \
                                     random.choice(self.stereotype_file_types_extensions[file_type])
         print "CREATING FILE: ", synthetic_file_base_path
-        add_fs_node(self.file_system, synthetic_file_base_path.split('/'))
+        add_fs_node(self.file_system, synthetic_file_base_path)
         '''Invoke SDGen to generate realistic file contents'''
         characterization = DATA_CHARACTERIZATIONS_PATH + file_type
         subprocess.call(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path])
         return synthetic_file_base_path
 
-    #TODO: MISSING!
     def move_file(self):
-        print "MOVE FILE"
-
-    #TODO: MISSING!
+        src_path = self.get_file_based_on_type_popularity()
+        dest_path = self.get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH) 
+        if src_path == None or dest_path == None:
+            print "WARNING: No files or directories to move!"
+            return None, None
+        dest_path += src_path.split(os.path.sep)[-1]
+        print "MOVE FILE: ", src_path, " TO: ", dest_path
+        shutil.move(src_path, dest_path)
+        delete_fs_node(self.file_system, src_path)
+        add_fs_node(self.file_system, dest_path)
+        return src_path, dest_path
+    
     def move_directory(self):
-        print "MOVE DIRECTORY"
+        src_path = self.get_empty_directory(self.file_system, FS_SNAPSHOT_PATH)
+        if src_path == None:
+            print "WARNING: No empty directories to move!"
+            return None, None
+        dest_path = src_path
+        '''Avoid moving a directory to itself'''
+        trials = 0
+        while src_path in dest_path:
+            dest_path = self.get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH) + src_path.split(os.path.sep)[-1]
+            trials +=1
+            '''Avoid infinite loops'''
+            if trials > 5: 
+                dest_path = None 
+                break
+                        
+        if dest_path == None:
+            print "WARNING: Not enough distinct directories to move!"
+            return None, None        
+        
+        '''If things are ok, do the move operation'''        
+        print "MOVE DIRECTORY: ", src_path, " TO: ", dest_path
+        shutil.move(src_path, dest_path)
+        delete_fs_node(self.file_system, src_path)
+        add_fs_node(self.file_system, dest_path)
+        return src_path, dest_path
 
     '''Delete a file at random depending on the file type popularity for this stereotype'''
     def delete_file(self):
-        to_delete = ''
+        to_delete = self.get_file_based_on_type_popularity()
         print "DELETING FILE: ", to_delete
         if to_delete != None:
-            delete_fs_node(self.file_system, to_delete.split('/'))
+            os.remove(to_delete)
+            delete_fs_node(self.file_system, to_delete)
         '''Delete a random file from the '''
         return to_delete
 
@@ -163,7 +188,7 @@ class DataGenerator(object):
         directory_path = self.get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH)
         to_create = directory_path + get_random_alphanumeric_string()
         print "CREATING DIRECTORY: ", to_create
-        add_fs_node(self.file_system, to_create.split('/'))
+        add_fs_node(self.file_system, to_create)
         os.makedirs(to_create)
         return to_create
 
@@ -174,7 +199,7 @@ class DataGenerator(object):
         print "DELETING DIRECTORY: ", dir_path_to_delete
         if dir_path_to_delete != None and os.listdir(dir_path_to_delete) == []:
             os.rmdir(dir_path_to_delete)
-            delete_fs_node(self.file_system, dir_path_to_delete.split('/'))
+            delete_fs_node(self.file_system, dir_path_to_delete)
         return dir_path_to_delete
 
     def update_file(self):
@@ -229,24 +254,24 @@ class DataGenerator(object):
 
     def get_random_fs_directory(self, tree, base_path=''):
         '''Get only directories from this tree level'''
-        fs_level_directories = [fs_node for fs_node in get_tree_node(tree, base_path.split('/')) if '.' not in fs_node]
-        base_path += '/'
+        fs_level_directories = [fs_node for fs_node in get_tree_node(tree, base_path) if '.' not in fs_node]
+        base_path += os.path.sep
         '''If this level has no more directories, we force this as the random position'''
         if fs_level_directories == []: return base_path
         '''If we can choose among several directories, pick one'''
         fs_node = random.choice(fs_level_directories)
         '''If the trial succeeds, this will be the new location'''
         if  random.random() < DIRECTORY_DEPTH_PROBABILITY:
-            return base_path + fs_node + '/'
+            return base_path + fs_node + os.path.sep
         '''If not, continue the random navigation'''
         return self.get_random_fs_directory(tree, base_path + fs_node)
 
     def get_empty_directory(self, tree, base_path=''):
         '''Get only directories from this tree level'''
-        this_level_nodes = get_tree_node(tree, base_path.split('/'))
+        this_level_nodes = get_tree_node(tree, base_path)
         fs_level_files = [fs_node for fs_node in this_level_nodes if '.' in fs_node]
         fs_level_directories = [fs_node for fs_node in this_level_nodes if '.' not in fs_node]
-        base_path += '/'
+        base_path += os.path.sep
         '''If this level has no more directories, we force this as the random position'''
         if fs_level_directories == []:
             print fs_level_files
@@ -263,8 +288,8 @@ class DataGenerator(object):
 
     def get_fs_files_of_type(self, tree, file_type, base_path=''):
         '''Get all files of the given type at this level'''
-        this_level_nodes = get_tree_node(tree, base_path.split('/'))
-        base_path += '/'
+        this_level_nodes = get_tree_node(tree, base_path)
+        base_path += os.path.sep
         fs_level_files = [base_path+fs_node for fs_node in this_level_nodes if '.' in fs_node and \
                           self.matches_file_type(fs_node, file_type)]
         '''Get all directories at this level'''
@@ -284,19 +309,25 @@ class DataGenerator(object):
         return False
 
 if __name__ == '__main__':
-    data_generator = DataGenerator()
-    data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backupsample")
-    #data_generator.create_file_system_snapshot()
-    data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
-    for i in range (50):
-        '''data_generator.create_directory()
-        data_generator.delete_directory()
-        data_generator.create_file()
-        data_generator.create_file()
-        data_generator.delete_file()'''
+    
+    for i in range(10):
+        data_generator = DataGenerator()
+        data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backupsample")
+        data_generator.create_file_system_snapshot()
+        data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
+        for j in range (50):
+            data_generator.create_directory()
+            data_generator.delete_directory()
+            data_generator.create_directory()
+            data_generator.create_file()
+            data_generator.create_file()
+            data_generator.delete_file()
+            data_generator.move_file()
+            data_generator.move_directory() 
+            
+        '''DANGER! This deletes a directory recursively!'''    
+        shutil.rmtree(FS_SNAPSHOT_PATH)       
         
-
-    print_tree(data_generator.file_system)
     #data_generator.create_file_system_snapshot()
     #create_file('/home/user/workspace/BenchBox/external/sdgen_characterizations/text', 
     #                           '10240',
