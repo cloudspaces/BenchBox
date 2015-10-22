@@ -1,14 +1,14 @@
 #!/bin/bash
 
-
 echo 'Install MongoDB'
-sudo apt-get install mongodb -y
-echo 'Start MongoDB'
-sudo /etc/init.d/mongodb start
+sudo apt-get  -y install mongodb
+
+#echo 'Start MongoDB'
+#sudo /etc/init.d/mongodb start
 
 
-
-if [ -f which mongod ];
+which mongod
+if [ ! $? -eq 0 ]
 	then
 
 
@@ -39,7 +39,9 @@ if [ -f which mongod ];
 
 		echo "Mongo installed"
 else
-	sudo service mongod start
+	sudo service mongodb status
+	sudo service mongodb stop
+	sudo service mongodb start
 
 	if [ $? -eq 0 ]
 	then
@@ -52,4 +54,3 @@ else
 fi
 
 
-END
