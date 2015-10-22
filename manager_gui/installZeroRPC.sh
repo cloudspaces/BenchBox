@@ -20,10 +20,10 @@ sudo apt-get -y install libevent
 # If you don't already have pip installed:
 sudo apt-get -y install python-setuptools
 sudo apt-get -y install python-pip
-sudo pip -y install pyzmq
+sudo pip install pyzmq
 
 # Now we can install ZeroRPC
-sudo pip -y install zerorpc
+sudo pip install zerorpc
 
 # Node.js dependencies
 
