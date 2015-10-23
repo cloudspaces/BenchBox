@@ -8,7 +8,7 @@ import shutil
 from workload_generator.model.data_layer.directory_tree_manager import delete_fs_node,\
     add_fs_node, FileSystem, get_file_based_on_type_popularity,\
     get_random_fs_directory, get_empty_directory,\
-    get_fitness_proportionate_element
+    get_fitness_proportionate_element, get_type_of_file
 base_path = '/home/vagrant/workload_generator/'
 sys.path.append(base_path)
 
@@ -188,19 +188,21 @@ class DataGenerator(object):
         if self.current_updated_file != None or time.time()-self.last_update_time > 10: #TODO: This threshold should be changed by a real distribution
             '''2) Select a random file of the given type to update (this is a simple approach, which can be
             sophisticated, if necessary, by adding individual "edit probabilities" to files based on distributions)'''
-            self.current_updated_file = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities)
+            self.current_updated_file = get_file_based_on_type_popularity(self.file_system, \
+                            self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
             self.last_update_time = time.time()
                         
         print "FILE TO EDIT: ", self.current_updated_file
         if self.current_updated_file != None: 
             '''3) Select the type of update to be done (Prepend, Middle or Append)'''
             update_type = get_fitness_proportionate_element(self.file_update_location_probabilities)
-            print "UPDATE TYPE: ", update_type
             '''4) Select the size of the update to be done (1%, 40% of the content)'''
             if not DEBUG:
                 file_size = os.path.getsize(self.current_updated_file)
-                updated_bytes = int(file_size*random.random()) #TODO: This should be changed by a real distribution
-                self.file_update_manager.modify_file(self.current_updated_file, update_type, updated_bytes)
+                updated_bytes = int(file_size*random.random()) #TODO: This should be changed by a real distribution            
+                print "UPDATE TYPE: ", update_type, " UPDATE SIZE: ", updated_bytes
+                content_type = DATA_CHARACTERIZATIONS_PATH + get_type_of_file(self.current_updated_file, self.stereotype_file_types_extensions)
+                self.file_update_manager.modify_file(self.current_updated_file, update_type, content_type, updated_bytes)
         else: print "WARNING: No files to update!"
         '''5) Return the path to the locally updated file to be transferred to the sandbox'''
         return self.current_updated_file
@@ -213,6 +215,7 @@ if __name__ == '__main__':
         data_generator.create_file_system_snapshot()
         data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
         for j in range (50):
+            data_generator.update_file()
             data_generator.create_directory()
             data_generator.delete_directory()
             data_generator.create_directory()

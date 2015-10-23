@@ -126,3 +126,10 @@ def matches_file_type(fs_node, file_type_extensions):
     for extension in file_type_extensions: 
         if extension in fs_node: return True
     return False
+
+def get_type_of_file(fs_node, file_type_extensions):
+    file_extension = '.' + fs_node.split('.')[-1]
+    for file_type in file_type_extensions.keys(): 
+        if file_extension in file_type_extensions[file_type]: 
+            return file_type
+    return None

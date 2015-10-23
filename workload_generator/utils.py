@@ -95,7 +95,7 @@ def get_random_alphanumeric_string(str_length=10):
 
 def split_list_into_chunks(a, n):
     k, m = len(a) / n, len(a) % n
-    return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in xrange(n))
+    return [a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in xrange(n)]
         
 if __name__ == '__main__':
     build_stereotype("backupsample", constants.STEREOTYPE_RECIPES_PATH + "backupsample_markov.csv", 
