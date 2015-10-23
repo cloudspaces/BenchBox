@@ -85,7 +85,6 @@ def process_opt():
 class StereotypeExecutor(object):
 
     def __init__(self):
-        self.debug_mode = DEBUG
         self.markov_chain = SimpleMarkovChain()
         self.markov_current_state = 'PutContentResponse' # there should be an initial state @ can be random
         self.inter_arrivals_manager = InterArrivalsManager()
@@ -156,7 +155,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         self.data_generator.create_file_system_snapshot()
         self.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
         '''When the initial file system has been built, migrate it to the sandbox'''
-        if not self.debug_mode:
+        if not DEBUG:
             # self.data_generator.migrate_file_system_snapshot_to_sandbox("migrate location")
             action = MoveFileOrDirectory(FS_SNAPSHOT_PATH, '/')
 
@@ -181,6 +180,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'MakeResponse')
         action.perform_action(ftp_client)
     """
+    
     def doPutContentResponse(self):
         print "do update"
         synthetic_file_name = self.data_generator.create_file()
@@ -192,7 +192,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
         print to_wait
         action.perform_action(ftp_client)
 
-    def doSync(self ):
+    def doSync(self):
+        #TODO: Cheng, you can make use of data_generator.update() to test updating files
         self.doPutContentResponse()
 
     def doUnlink(self):
