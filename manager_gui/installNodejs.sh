@@ -24,13 +24,10 @@ if [ ! $? -eq 0 ]
 		# apt-get install --yes nodejs
 
 		echo "Check if node is installed"
-		curl -sL https://deb.nodesource.com/setup_0.12 | sudo -E bash -
+		curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
 		sudo apt-get install -y nodejs
 
-
 		echo  "Finish installing nodejs"
-
 else
-
 	echo "Node is already installed"
 fi

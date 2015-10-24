@@ -4,6 +4,9 @@
 echo "Install Zero RPC dependencies"
 
 
+# gevent for testing purpose
+# curl -O https://github.com/downloads/SiteSupport/gevent/gevent-1.0rc2.tar.gz && tar xvzpf gevent-1.0rc2.tar.gz && cd gevent-1.0rc2 && sudo python setup.py install
+
 # Simple script for installing ZeroRPC on Ubuntu 12.04 LTS
 
 # System dependencies
@@ -28,4 +31,5 @@ sudo pip install zerorpc
 # Node.js dependencies
 
 # Just install the ZeroRPC node module
+sudo npm install -g node-gyp
 sudo npm install -g zerorpc
