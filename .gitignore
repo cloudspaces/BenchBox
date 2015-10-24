@@ -53,6 +53,11 @@ workload_generator/external/impressions
 
 vagrant/.*
 vagrant/hostname
+vagrant/config.xml
+vagrant/*.box
+vagrant/profile
+vagrant/ss.*
+vagrant/owncloud.sh
 vagrant/slaves
 vagrant/slaves/*
 vagrant/slaves/*/*
