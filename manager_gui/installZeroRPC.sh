@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 
 echo "Install Zero RPC dependencies"
@@ -15,14 +15,26 @@ echo "Install Zero RPC dependencies"
 sudo apt-get -y install libzmq-dev
 
 # Next install libevent, an event notification library required by zerorpc
-sudo apt-get -y install libevent
-
+dpkg -l libevent
+if [ $? -ne 0 ]
+then
+# wget http://monkey.org/~provos/libevent-1.4.13-stable.tar.gz
+sudo apt-get -y install libevent-dev
+fi
 # Python dependencies
 
 # Now install pyzmq: Python bindings for ZeroMQ
 # If you don't already have pip installed:
+dpkg -l python-setuptools
+if [ $? -ne 0 ]
+then
 sudo apt-get -y install python-setuptools
+fi
+dpkg -l python-pip
+if [ $? -ne 0 ]
+then
 sudo apt-get -y install python-pip
+fi
 sudo pip install pyzmq
 
 # Now we can install ZeroRPC
@@ -31,5 +43,13 @@ sudo pip install zerorpc
 # Node.js dependencies
 
 # Just install the ZeroRPC node module
-sudo npm install -g node-gyp
-sudo npm install -g zerorpc
+npm list -g node-gyp
+if [ $? -ne 0 ]
+then
+sudo npm update -g node-gyp
+fi
+npm list -g zerorpc
+if [ $? -ne 0 ]
+then
+sudo npm update -g zerorpc
+fi

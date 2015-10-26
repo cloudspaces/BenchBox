@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -ex
 
 echo 'Install MongoDB'
 sudo apt-get  -y install mongodb
