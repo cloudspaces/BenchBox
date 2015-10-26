@@ -9,15 +9,16 @@ import getpass
 PROJECT_PATH = 'D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\' #'/home/user/workspace/BenchBox/'
 
 '''Chenglong configuration'''
-#username = getpass.getuser()
-#PROJECT_PATH = None
-#TEMP_PATH = {
-#    'vagrant': '/home/vagrant/',
-#    'anna': '/home/anna/CloudSpaces/Dev/BenchBox/',
-#    'user': '/home/user/workspace/BenchBox/'
-#}
+username = getpass.getuser()
+PROJECT_PATH = None
+TEMP_PATH = {
+    'vagrant': '/home/vagrant/',
+    'anna': '/home/anna/CloudSpaces/Dev/BenchBox/',
+    'user': '/home/user/workspace/BenchBox/',
+    'Raul': 'D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\'
+}
 
-#PROJECT_PATH = TEMP_PATH[username]
+PROJECT_PATH = TEMP_PATH[username]
 
 '''In debug mode the system works without doing changes in the local file system'''
 DEBUG = True
@@ -41,7 +42,19 @@ SIMULATOR_TRACE_PATH = PROJECT_PATH + 'workload_generator/traces/200_users_backu
 #EXTERNAL PROGRAMS USED BY BENCHBOX
 DATA_GENERATOR_PATH = PROJECT_PATH + "workload_generator/external/sdgen.jar"
 DATA_CHARACTERIZATIONS_PATH = PROJECT_PATH + "workload_generator/external/sdgen_characterizations/"
-FS_SNAPSHOT_PATH = "C:\\Users\\Raul\\Desktop\\test" #PROJECT_PATH + "output"
+
+FS_SNAPSHOT_PATH = None
+SNAPSHOT_PATH = {
+    'vagrant': PROJECT_PATH + "output",
+    'anna': PROJECT_PATH + "output",
+    'user': PROJECT_PATH + "output",
+    'Raul': "C:\\Users\\Raul\\Desktop\\test"
+}
+
+FS_SNAPSHOT_PATH = SNAPSHOT_PATH[username]
+
+
+
 UPDATES_CONTENT_GENERATION_PATH = PROJECT_PATH + "workload_generator/updates_content/"
 DIRECTORY_DEPTH_PROBABILITY = 0.1
 FS_IMAGE_PATH = PROJECT_PATH + "workload_generator/external/impressions"
