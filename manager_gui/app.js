@@ -88,18 +88,19 @@ mongoOps = {
 
 // operations...
 
-
+/*
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
+*/
 
+// var url = 'mongodb://test:test@ds055822.mongolab.com:55822/benchbox'
+var url = 'mongodb://localhost:27017/benchbox'
 
-var url = 'mongodb://test:test@ds055822.mongolab.com:55822/benchbox'
-
-
+/*
 MongoClient.connect(url, function (err, db) {
     assert.equal(null, err);
     console.log("Connected correctly to server");
-    /*
+
      // do db operations
      mongoOps.insertDocuments(db, function () {
      console.log("Document pushed to the db correctly");
@@ -114,9 +115,9 @@ MongoClient.connect(url, function (err, db) {
      })
      });
      });
-     */
-});
 
+});
+*/
 
 // another mongodb client
 

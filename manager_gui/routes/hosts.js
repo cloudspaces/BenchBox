@@ -39,8 +39,19 @@ router.get('/:id', function(req, res, next) {
 
 /* PUT /hosts/:id */
 router.put('/:id', function(req, res, next) {
+
+    delete req.body._id
+
     Host.findByIdAndUpdate(req.params.id, req.body, function (err, put) {
-        if (err) return next(err);
+        console.log(JSON.stringify(req.params))
+        console.log(JSON.stringify(req.body))
+
+        if (err)
+        {
+            console.log(err.message);
+            return next(err);
+
+        }
         res.json(put);
     });
 });

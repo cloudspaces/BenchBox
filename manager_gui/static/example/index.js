@@ -1,10 +1,11 @@
 (function () {
     var jsonDesc;
+    var graphiteDomain = 'localhost'
     // var demoURL = 'https://ast03:8443/render?target=benchbox.ast04.StackSync.cpu_usage&format=json'
-    var demoURLCpuUsage = 'https://ast03:8443/render?from=-20minutes&until=now&target=benchbox.*.StackSync.cpu_usage&_uniq=0.24690097919665277&title=benchbox.d119.eth0.bytes_recv&format=json'
-    var demoURLRamUsage = 'https://ast03:8443/render?from=-20minutes&until=now&target=benchbox.*.StackSync.memory_usage&_uniq=0.24690097919665277&title=benchbox.d119.eth0.bytes_recv&format=json'
-    var demoURLHddUsage = 'https://ast03:8443/render?from=-20minutes&until=now&target=benchbox.*.stacksync_folder.disk_usage&_uniq=0.24690097919665277&title=benchbox.d119.eth0.bytes_recv&format=json'
-    var demoURL = 'https://ast03:8443/render?target=collectd.graphite.processes.fork_rate&format=json';
+    var demoURLCpuUsage = 'https://'+graphiteDomain+':8443/render?from=-20minutes&until=now&target=benchbox.*.StackSync.cpu_usage&_uniq=0.24690097919665277&title=benchbox.d119.eth0.bytes_recv&format=json'
+    var demoURLRamUsage = 'https://'+graphiteDomain+':8443/render?from=-20minutes&until=now&target=benchbox.*.StackSync.memory_usage&_uniq=0.24690097919665277&title=benchbox.d119.eth0.bytes_recv&format=json'
+    var demoURLHddUsage = 'https://'+graphiteDomain+':8443/render?from=-20minutes&until=now&target=benchbox.*.stacksync_folder.disk_usage&_uniq=0.24690097919665277&title=benchbox.d119.eth0.bytes_recv&format=json'
+    var demoURL = 'https://'+graphiteDomain+':8443/render?target=collectd.graphite.processes.fork_rate&format=json';
     // demoURLCpuUsage = demoURLHddUsage = demoURLRamUsage = demoURL;
     jsonDesc = {
 

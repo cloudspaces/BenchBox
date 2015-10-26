@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -ex
 
 
 
@@ -11,7 +11,7 @@
 
 # init manager-rpc server
 echo "start manager RPC Server"
-python manager.py &
+python static/manager.py &
 
 # init node server
 echo "start manager GUI Server"
