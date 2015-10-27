@@ -21,7 +21,7 @@ TEMP_PATH = {
 PROJECT_PATH = TEMP_PATH[username]
 
 '''In debug mode the system works without doing changes in the local file system'''
-DEBUG = True
+DEBUG = False
 
 SIMULATION_DURATION = 31*24*3600.
 SIMULATION_TIME_SLOT = 3600
