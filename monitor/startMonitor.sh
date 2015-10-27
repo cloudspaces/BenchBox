@@ -1,11 +1,17 @@
-#!/usr/bin/env bash
+#!/bin/bash -x
 
 
 echo 'kill socketListener.sh'
-echo 'vagrant' | sudo -S kill -9 $(pidof python)
-echo 'start socketListener';  
+killer_pid=$(pidof python)
+if [ $? -ne 0 ]
+then
+echo 'No such pid'
+else
+echo 'vagrant' | sudo -S kill -9 $killer_pid
+fi
+echo 'start socketListener';
 if [ -d ~/monitor ]; then  
-cd ~/monitor/logger/py_cpu_monitor
+cd ~/monitor/py_cpu_monitor
 echo 'vagrant' | sudo -S python SocketListener.py;
 echo 'stacksync client and monitor started';  
 else  
