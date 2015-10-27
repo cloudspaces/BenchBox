@@ -1,14 +1,19 @@
 class benchbox{
 
 
+  /*
+   compilar impressions
+  */
 
+
+  /*
   file{
     '/home/vagrant/profile.csv':
       recurse => true,
       ensure => present,
       content=> $facter
   }
-
+  */
 
   host { # jo :D
     'torrentjs':
@@ -35,7 +40,13 @@ class benchbox{
     'mountain':
       ip => '10.30.235.145'
   }
-
+  exec {
+    'compile_impressions':
+      command => 'make && mv impressions ../impressions',
+      path    => ['/usr/bin/', '/bin/'],
+      cwd     => '/home/vagrant/workload_generator/external/impressions-code',
+      onlyif  => '[ ! -e "/usr/bin/stacksync" ]'
+  }
 
 
 }

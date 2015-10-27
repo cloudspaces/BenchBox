@@ -11,7 +11,7 @@ fi
 
 echo 'start stackyncClient'
 cd /usr/lib/stacksync/
-nohup java -jar Stacksync.jar -d -c <%= @confdir %> & echo $!
+java -jar Stacksync.jar -d -c <%= @confdir %> & echo $!
 lastPid=$!
 echo $lastPid> /tmp/StackSync.pid
 

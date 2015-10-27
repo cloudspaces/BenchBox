@@ -41,7 +41,10 @@ node 'benchBox' {
   class {
     'benchbox':
   }
-
+  ->
+  class {
+    'vim':
+  }
 
 }
 
@@ -88,7 +91,7 @@ node 'sandBox' {
     ['python-setuptools', 'build-essential']:
       ensure => installed
   }
-    ->
+  ->
   # owncloud
   class{
     "owncloud":
@@ -191,6 +194,9 @@ node 'sandBox' {
       group   =>'vagrant',
       path    => ['/usr/bin', '/bin/'],
       returns => [0,1]
+  }->
+  class{
+    "vim":
   }
 /*
 exec {
