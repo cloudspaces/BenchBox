@@ -5,12 +5,19 @@ Created on 30/6/2015
 '''
 import sys
 import shutil
-from workload_generator.model.data_layer.directory_tree_manager import delete_fs_node,\
-    add_fs_node, FileSystem, get_file_based_on_type_popularity,\
-    get_random_fs_directory, get_empty_directory,\
-    get_fitness_proportionate_element, get_type_of_file
-base_path = '/home/vagrant/workload_generator/'
-sys.path.append(base_path)
+import getpass
+
+username = getpass.getuser()
+# parent directory of 'workload_generator' -> /home/vagrant/workload_generator
+base_path = {
+    'vagrant': '/home/vagrant/',
+    'anna': '/home/anna/CloudSpaces/Dev/BenchBox/',
+    'user': '/home/user/workspace/BenchBox/',
+    'Raul': 'D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\'
+}
+sys.path.append(base_path[username])
+# issue, this file cannot load utils because its in a parent directory different for each dev-environment,
+# fix this by adding project path to python runner path
 
 import subprocess
 import random
@@ -22,7 +29,10 @@ from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH,\
     DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH, DEBUG
 import time
 from workload_generator.model.data_layer.update_manager import FileUpdateManager
-
+from workload_generator.model.data_layer.directory_tree_manager import delete_fs_node, \
+    add_fs_node, FileSystem, get_file_based_on_type_popularity, \
+    get_random_fs_directory, get_empty_directory, \
+    get_fitness_proportionate_element, get_type_of_file
 
 class DataGenerator(object):
 
