@@ -26,9 +26,7 @@ class CreateFileOrDirectory(Action):
         self.fs_rel_path = fs_rel_path
         Action.__init__(self, origin_path)
     '''Create file locally and in the remote host'''
-    def perform_action(self, sender, ):
-
-
+    def perform_action(self, sender):
         try:
             # os.path.basename('/home/vagrant/output/2/12/36/2205FC054D7BD409BF59.jpg') -> 2205FC054D7BD409BF59.jpg
             # sender.send(os.path.basename(self.path), os.path.dirname(self.path))
@@ -47,9 +45,14 @@ class DeleteFileOrDirectory(Action):
 
     '''Perform a remove action deleting the file from the FS
     and from the FTP. Return: 0 as no bytes are added or modified'''
+    def __init__(self, origin_path, fs_rel_path):
+        self.fs_rel_path = fs_rel_path
+        Action.__init__(self, origin_path)
+
     def perform_action(self, sender):
         try:
-            sender.delete(self.path)
+            print "delete: -> to: {}".format(os.path.relpath(os.path.dirname(self.path), self.fs_rel_path))
+            sender.delete(os.path.relpath(os.path.dirname(self.path), self.fs_rel_path))
         except Exception as e:
             print e.message
         return 0
@@ -59,7 +62,8 @@ class DeleteFileOrDirectory(Action):
 
 class MoveFileOrDirectory(Action):
 
-    def __init__(self, origin_path):
+    def __init__(self, origin_path, fs_rel_path):
+        self.fs_rel_path = fs_rel_path
         Action.__init__(self, origin_path)
 
     '''Perform a remove action deleting the file from the FS
@@ -67,35 +71,38 @@ class MoveFileOrDirectory(Action):
     def perform_action(self, sender):
         try:
             # sender.mv(self.path, self.destination_path)
-            self.uploadFolder(sender, self.path) # self.path is the source path of the folder
+            self.uploadFolder(sender, self.path, self.fs_rel_path) # self.path is the source path of the folder
         except Exception as e:
             print e.message
         return 0
 
 
-    def uploadFolder(self, sender, path):
+    def uploadFolder(self, sender, tgt_path, src_path):
         #print "Push files to target: {}".format(path)
         # http://www.programmerinterview.com/index.php/general-miscellaneous/ftp-command-to-transfer-a-directory/
-        files = os.listdir(path) # list the files at the source directory
+        files = os.listdir(src_path) # list the files at the source directory
         #print files
         #print "Currdir: {}".format(os.getcwd())
-        os.chdir(path) # goto the directory
+        os.chdir(src_path) # goto the directory
         for f in files:
 
-            target_file = '{}/{}'.format(path, f)
+            target_file = '{}/{}'.format(tgt_path, f)
 
             #print os.path.isfile(target_file)
             #print os.path.isdir(target_file)
 
-            #print(target_file)
+            print(target_file)
             if os.path.isfile(target_file):
-                #print "{} is file".format(target_file)
-                sender.send(f)
+                print "{} is file".format(target_file)
+                if(tgt_path == src_path):
+                  sender.send(f)
+                else:
+                  sender.send(f, None, os.path.relpath(tgt_path, src_path))
             elif os.path.isdir(target_file):
-                #print "{} is dir".format(target_file)
+                print "{} is dir".format(target_file)
                 sender.mkd(f)
                 sender.cwd(f)
-                self.uploadFolder(sender, target_file)
+                self.uploadFolder(sender, target_file, target_file)
         sender.cwd('..')
         os.chdir('..')
         #print "Finish Moving"
