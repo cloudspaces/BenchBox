@@ -98,7 +98,7 @@ class ManagerOps():
         print test
         print 'tell benchBox at dummy host to run Test'
         # str_cmd = './monitor/startMonitor.sh'
-        str_cmd = 'cd /home/vagrant/simulator && ./executor.py -o {} -p {} -t {} -f {} -x {}'.format(test['operations'], test['profile'], test['interval'], test['folder'], test['client'])
+        str_cmd = 'cd /home/vagrant/workload_generator && ./executor.py -o {} -p {} -t {} -f {} -x {}'.format(test['operations'], test['profile'], test['interval'], test['folder'], test['client'])
         print str_cmd
         self.rmibenchBox(h['ip'], h['user'], h['passwd'], str_cmd)
 
