@@ -190,7 +190,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'PutContentResponse')
         print to_wait
-        action.perform_action(ftp_client)
+        #action.perform_action(ftp_client)
 
     def doSync(self):
         #TODO: Cheng, you can make use of data_generator.update() to test updating files
@@ -205,7 +205,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         action = DeleteFileOrDirectory(synthetic_file_name)
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'Unlink')
-        action.perform_action(ftp_client)
+        #action.perform_action(ftp_client)
 
     #TODO: Needs implementation in data generator first
     def doMoveResponse(self):
@@ -321,13 +321,15 @@ if __name__ == '__main__':
 
     print "ClearingProcess/..."
 
-
-    MoveFileOrDirectory('../output','/').perform_action(ftp_client)
+    # WarmUp move the output directory to the target
+    print "Syntetic File System Path:".format(FS_SNAPSHOT_PATH)
+    MoveFileOrDirectory(FS_SNAPSHOT_PATH,'/').perform_action(ftp_client)
 
 
     if ftp_client:
         print "close sender"
-        ftp_client.close()
+        print "Finish Moving???"
+        #ftp_client.close()
     #os.system('sudo ./pcb/scripts/firewall stop')
 
     print "ClearingProcess/OK"
