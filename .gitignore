@@ -52,6 +52,7 @@ workload_generator/external/impressions
 
 
 vagrant/.*
+vagrant/db
 vagrant/hostname
 vagrant/config.xml
 vagrant/*.box
