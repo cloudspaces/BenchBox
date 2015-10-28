@@ -19,7 +19,6 @@ class ftp_sender():
         self.ftp_root = ftp_folder
 
     def send(self, fname, new_name=None, sub_folder=None):
-
         print ">> {} <<  ".format(self.ftp.pwd())
 
         if sub_folder:
@@ -49,26 +48,27 @@ class ftp_sender():
             print "" # e.message
             # directory already exists
 
-    def rmd(self, path):
+
+
+    def rm(self, fname, sub_folder=None):
+
+        if sub_folder:
+            self.ftp.cwd("~")  # move to home
+            if self.ftp_root:
+                print "move to "+self.ftp_root
+                self.ftp.cwd(self.ftp_root)
+            print "move to "+sub_folder
+            self.ftp.cwd(sub_folder)
+            # self.ftp.delete(sub_folder + "/" + os.path.basename(fname))
+        print self.ftp.pwd()
+
         try:
-            self.ftp.rmd(path)
-        except:
-            # yes, there was an error...
-            traceback.print_exc(file=sys.stderr)
-
-    def delete(self, fname, sub_folder=None):
-        try:
-            if sub_folder:
-
-                self.ftp.delete(sub_folder + "/" + os.path.basename(fname))
-
-            else:
-                try:
-                    self.ftp.delete(os.path.basename(fname))
-                except Exception as e:
-                    print "" # e.message
+            self.ftp.rmd(os.path.basename(fname))
         except Exception as e:
-            print "" # e.message
+            self.ftp.delete(os.path.basename(fname))
+            print "rm folder >> {}".format(fname)
+
+
             # yes, there was an error...
             traceback.print_exc(file=sys.stderr)
 

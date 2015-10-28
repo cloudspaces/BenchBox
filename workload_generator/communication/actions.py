@@ -51,8 +51,8 @@ class DeleteFileOrDirectory(Action):
 
     def perform_action(self, sender):
         try:
-            print "delete: -> to: {}".format(os.path.relpath(os.path.dirname(self.path), self.fs_rel_path))
-            sender.delete(os.path.relpath(os.path.dirname(self.path), self.fs_rel_path))
+            print "delete: -> to: {}".format(self.path)
+            sender.rm(os.path.basename(self.path), os.path.relpath(os.path.dirname(self.path), self.fs_rel_path))
         except Exception as e:
             print e.message
         return 0
@@ -95,9 +95,10 @@ class MoveFileOrDirectory(Action):
             if os.path.isfile(target_file):
                 print "{} is file".format(target_file)
                 if(tgt_path == src_path):
-                  sender.send(f)
+                    sender.send(f)
                 else:
-                  sender.send(f, None, os.path.relpath(tgt_path, src_path))
+                    print "mv from: {} -> {}".format(f,os.path.relpath(tgt_path, src_path))
+                    sender.mv(f, os.path.relpath(tgt_path, src_path))
             elif os.path.isdir(target_file):
                 print "{} is dir".format(target_file)
                 sender.mkd(f)
