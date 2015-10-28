@@ -59,26 +59,38 @@ class MoveFileOrDirectory(Action):
     def perform_action(self, sender):
         try:
             # sender.mv(self.path, self.destination_path)
-            self.uploadThis(sender, self.path)
+            self.uploadFolder(sender, self.path) # self.path is the source path of the folder
         except Exception as e:
             print e.message
         return 0
 
 
-    def uploadThis(self, myFTP, path):
-        files = os.listdir(path)
-        os.chdir(path)
+    def uploadFolder(self, sender, path, subFolder=None):
+        print "Push files to target: {}".format(path)
+        # http://www.programmerinterview.com/index.php/general-miscellaneous/ftp-command-to-transfer-a-directory/
+        files = os.listdir(path) # list the files at the source directory
+        print files
+        print "Currdir: {}".format(os.getcwd())
+        os.chdir(path) # goto the directory
         for f in files:
-            if os.path.isfile(path + r'\{}'.format(f)):
-                fh = open(f, 'rb')
-                myFTP.storbinary('STOR %s' % f, fh)
-                fh.close()
-            elif os.path.isdir(path + r'\{}'.format(f)):
-                myFTP.mkd(f)
-                myFTP.cwd(f)
-                self.uploadThis(path + r'\{}'.format(f))
-        myFTP.cwd('..')
+
+            target_file = '{}/{}'.format(path, f)
+
+            print os.path.isfile(target_file)
+            print os.path.isdir(target_file)
+
+            print(target_file)
+            if os.path.isfile(target_file):
+                print "{} is file".format(target_file)
+                sender.send(f)
+            elif os.path.isdir(target_file):
+                print "{} is dir".format(target_file)
+                sender.mkd(f)
+                sender.cwd(f)
+                self.uploadFolder(sender, target_file)
+        sender.cwd('..')
         os.chdir('..')
+        print "Finish Moving"
 
 
     def to_string(self):
@@ -131,5 +143,17 @@ class GetContentResponse(Action):
 #         
 ### ------------------------- ###
 ### ------------------------- ###
+
 if __name__ == '__main__':
     print 'This is the main Program'
+
+    #ftp_client = ftp_sender("192.168.56.2",'21',"vagrant","vagrant","stacksync_folder")
+    #MoveFileOrDirectory('../../ouput','').perform_action(ftp_client)
+    from ftp_sender import ftp_sender
+
+    server = '192.168.56.101'
+    username = 'vagrant'
+    password = 'vagrant'
+    path = 'stacksync_folder'
+    ftp_client = ftp_sender(server, "21", username, password, path)
+    MoveFileOrDirectory('/home/vagrant/output', '').perform_action(ftp_client)

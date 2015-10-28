@@ -32,7 +32,11 @@ class ftp_sender():
             self.ftp.cwd("..")
 
     def mkd(self, path):
-        self.ftp.mkd(path)
+        try:
+            self.ftp.mkd(path)
+        except Exception as e:
+            print e.message
+            # directory already exists
 
     def rmd(self, path):
         try:
@@ -71,6 +75,9 @@ class ftp_sender():
         self.ftp.cwd('..')
         
     def move_up(self, folder):
+        self.ftp.cwd(folder)
+
+    def cwd(self, folder):
         self.ftp.cwd(folder)
     
     def get_ftp_host(self):
