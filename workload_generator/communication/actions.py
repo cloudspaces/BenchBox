@@ -22,10 +22,19 @@ class Action(object):
 
 class CreateFileOrDirectory(Action):
 
+    def __init__(self, origin_path, fs_rel_path):
+        self.fs_rel_path = fs_rel_path
+        Action.__init__(self, origin_path)
     '''Create file locally and in the remote host'''
-    def perform_action(self, sender):
+    def perform_action(self, sender, ):
+
+
         try:
-            sender.send(self.path)
+            # os.path.basename('/home/vagrant/output/2/12/36/2205FC054D7BD409BF59.jpg') -> 2205FC054D7BD409BF59.jpg
+            # sender.send(os.path.basename(self.path), os.path.dirname(self.path))
+            print "send: {} -> to: {}".format(self.path, os.path.relpath(os.path.dirname(self.path), self.fs_rel_path))
+            #sender.send(self.path, os.path.dirname(self.path))
+            sender.send(self.path, None, os.path.relpath(os.path.dirname(self.path), self.fs_rel_path))
         except Exception as e:
             print e
         # TODO return self.size
@@ -50,9 +59,8 @@ class DeleteFileOrDirectory(Action):
 
 class MoveFileOrDirectory(Action):
 
-    def __init__(self, origin_path, destination_path):
+    def __init__(self, origin_path):
         Action.__init__(self, origin_path)
-        self.destination_path = destination_path
 
     '''Perform a remove action deleting the file from the FS
     and from the FTP. Return: 0 as no bytes are added or modified'''
@@ -65,32 +73,32 @@ class MoveFileOrDirectory(Action):
         return 0
 
 
-    def uploadFolder(self, sender, path, subFolder=None):
-        print "Push files to target: {}".format(path)
+    def uploadFolder(self, sender, path):
+        #print "Push files to target: {}".format(path)
         # http://www.programmerinterview.com/index.php/general-miscellaneous/ftp-command-to-transfer-a-directory/
         files = os.listdir(path) # list the files at the source directory
-        print files
-        print "Currdir: {}".format(os.getcwd())
+        #print files
+        #print "Currdir: {}".format(os.getcwd())
         os.chdir(path) # goto the directory
         for f in files:
 
             target_file = '{}/{}'.format(path, f)
 
-            print os.path.isfile(target_file)
-            print os.path.isdir(target_file)
+            #print os.path.isfile(target_file)
+            #print os.path.isdir(target_file)
 
-            print(target_file)
+            #print(target_file)
             if os.path.isfile(target_file):
-                print "{} is file".format(target_file)
+                #print "{} is file".format(target_file)
                 sender.send(f)
             elif os.path.isdir(target_file):
-                print "{} is dir".format(target_file)
+                #print "{} is dir".format(target_file)
                 sender.mkd(f)
                 sender.cwd(f)
                 self.uploadFolder(sender, target_file)
         sender.cwd('..')
         os.chdir('..')
-        print "Finish Moving"
+        #print "Finish Moving"
 
 
     def to_string(self):
@@ -105,7 +113,8 @@ class GetContentResponse(Action):
         try:
             sender.get('RETR %s' % self.path, open(self.dst+self.path, 'wb').write)
         except Exception as e:
-            print e.message
+            # print e.message
+            print ""
 
     def to_string(self):
         return "GetContentResponse "+str(self.path)+"\n"
