@@ -129,7 +129,10 @@ class MoveFileOrDirectory(Action):
                     print sender.ftp.pwd()
                     sender.mkd(os.path.join(sender.ftp_root, os.path.relpath(self.output_tgt, self.output_root)))
                     print "remove the folder"
-                    sender.rm(self.path, os.path.dirname(os.path.relpath(self.path, self.output_root)))
+                    sub_dir =  os.path.dirname(os.path.relpath(self.path, self.output_root))
+                    print sub_dir
+
+                    sender.rm(self.path, sub_dir)
                     # remove folder after move the directories
             else:
                 print "is not dir"+self.output_tgt
