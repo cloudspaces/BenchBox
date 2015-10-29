@@ -8,7 +8,7 @@ import tempfile
 import os
 from workload_generator.utils import split_list_into_chunks
 from workload_generator.constants import DATA_GENERATOR_PATH, DEBUG,\
-    UPDATES_CONTENT_GENERATION_PATH
+    UPDATES_CONTENT_GENERATION_PATH, PROJECT_PATH
 import subprocess
 import uuid
 
@@ -21,7 +21,8 @@ class FileUpdateManager(object):
     def modify_file(self, file_path, update_type, content_type, num_bytes):    
         #'B':0.38, 'E': 0.03, 'M': 0.08, 'BE': 0.1, 'BM': 0.11, 'ME': 0.01, 'BEM': 0.29
         new_content = None        
-        if not DEBUG: 
+        if not DEBUG:
+            os.chdir(PROJECT_PATH)
             generated_update_content_file = UPDATES_CONTENT_GENERATION_PATH + str(uuid.uuid4())
             subprocess.call(['java', '-jar', DATA_GENERATOR_PATH, content_type, str(num_bytes), generated_update_content_file])
             in_file = open(generated_update_content_file, "rb") 
