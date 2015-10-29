@@ -22,6 +22,24 @@ class Action(object):
         raise Exception("NotImplementedException")
 
 
+class UpdateFile(Action):
+    def __init__(self, output_src, output_root):
+        self.output_root = output_root
+        Action.__init__(self, output_src)
+
+    def perform_action(self, sender):
+        try:
+            send_output_to = os.path.relpath(os.path.dirname(self.path), self.output_root)  # / == output
+            print "update with binary write: {} -> to: {}".format(self.path, send_output_to) # filename, sub_folder
+            sender.send(self.path, None, send_output_to)
+        except Exception as e:
+            print e
+        # TODO return self.size
+        return 0
+
+    def to_string(self):
+        return "UpdateFile "+ str(self.path) +"\n"
+
 # OK
 class CreateFileOrDirectory(Action):
 
