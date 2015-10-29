@@ -9,14 +9,14 @@ import sys, os
 # Upload a file to a remove ftp server
 #-------------------------------------------------------------------------------
 class ftp_sender():
-    def __init__(self, ftp_host, ftp_port, ftp_user, ftp_pass, ftp_folder):
+    def __init__(self, ftp_host, ftp_port, ftp_user, ftp_pass, ftp_root):
         self.ftp = FTP()
         self.ftp.connect(ftp_host, ftp_port)
         self.ftp.login(ftp_user, ftp_pass)
-        self.ftp.cwd(ftp_folder)
+        self.ftp.cwd(ftp_root)
 
         self.ftp_host = ftp_host
-        self.ftp_root = ftp_folder
+        self.ftp_root = ftp_root
 
     def send(self, fname, new_name=None, sub_folder=None):
         print ">> {} <<  ".format(self.ftp.pwd())
@@ -63,14 +63,14 @@ class ftp_sender():
         print self.ftp.pwd()
 
         try:
-            self.ftp.rmd(os.path.basename(fname))
-        except Exception as e:
             self.ftp.delete(os.path.basename(fname))
+        except Exception as e:
             print "rm folder >> {}".format(fname)
-
+            self.ftp.rmd(os.path.basename(fname))
+            #traceback.print_exc(file=sys.stderr)
 
             # yes, there was an error...
-            traceback.print_exc(file=sys.stderr)
+
 
     def get(self, src, tgt):
         return self.ftp.retrbinary(src, tgt)
@@ -82,6 +82,12 @@ class ftp_sender():
         self.ftp.close()
 
     def mv(self, src, tgt):
+        #
+        self.ftp.cwd("~")  # move to home
+        if self.ftp_root:
+            print "move to "+self.ftp_root
+            self.ftp.cwd(self.ftp_root)
+
         self.ftp.rename(src, tgt)
 
     def move_down(self):
