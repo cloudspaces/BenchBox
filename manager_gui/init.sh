@@ -15,5 +15,6 @@ python static/manager.py &
 
 # init node server
 echo "start manager GUI Server"
+npm install # install the package to node_modules defined at the package.json
 npm start
 
