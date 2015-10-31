@@ -193,6 +193,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'PutContentResponse')
         print "Wait: {}s".format(to_wait)
+        time.sleep(to_wait)
         action.perform_action(ftp_client)
 
     def doSync(self):
@@ -201,10 +202,15 @@ class StereotypeExecutorU1(StereotypeExecutor):
         print colored("doSync",'green')
         synthetic_file_name = self.data_generator.update_file()
         print synthetic_file_name
-        action = UpdateFile(synthetic_file_name,FS_SNAPSHOT_PATH)
-        #to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'Sync')
-        #print "Wait: {}s".format(to_wait)
-        action.perform_action(ftp_client)
+        if synthetic_file_name is None:
+            print "no file selected!"
+        else:
+            action = UpdateFile(synthetic_file_name,FS_SNAPSHOT_PATH)
+            #to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'Sync')
+            print "Wait: {}s".format(2)
+            time.sleep(2)
+
+            action.perform_action(ftp_client)
 
     def doUnlink(self):
         print colored("doUnlink",'yellow')
@@ -218,6 +224,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             '''Get the time to wait for this transition in millis'''
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'Unlink')
             print "Wait: {}s".format(to_wait)
+            time.sleep(to_wait)
             action.perform_action(ftp_client)
         else:
             print "No file selected!"
@@ -236,6 +243,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             '''Get the time to wait for this transition in millis'''
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'MoveResponse')
             print "Wait: {}s".format(to_wait)
+            time.sleep(to_wait)
             action.perform_action(ftp_client)
         else:
             print "No file selected!"
