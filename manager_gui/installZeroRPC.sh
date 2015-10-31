@@ -12,6 +12,7 @@ echo "Install Zero RPC dependencies"
 # System dependencies
 
 # First install ZeroMQ
+sudo apt-get -y install python-dev
 sudo apt-get -y install libzmq-dev
 
 # Next install libevent, an event notification library required by zerorpc
