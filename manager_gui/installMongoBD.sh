@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -x
 
 echo 'Install MongoDB'
 sudo apt-get  -y install mongodb
@@ -40,7 +40,6 @@ if [ ! $? -eq 0 ]
 		echo "Mongo installed"
 else
 	sudo service mongodb status
-	sudo service mongodb stop
 	sudo service mongodb start
 
 	if [ $? -eq 0 ]
