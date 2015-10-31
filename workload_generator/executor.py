@@ -11,7 +11,7 @@ import os, sys
 import random
 import time
 import getpass
-
+from termcolor import colored
 
 
 '''
@@ -41,7 +41,7 @@ from workload_generator.model.user_activity.inter_arrivals_manager import InterA
 from workload_generator.model.data_layer.data_generator import DataGenerator
 
 from workload_generator.communication.ftp_sender import ftp_sender
-from workload_generator.communication.actions import CreateFileOrDirectory, DeleteFileOrDirectory, MoveFileOrDirectory
+from workload_generator.communication.actions import CreateFileOrDirectory, UpdateFile, DeleteFileOrDirectory, MoveFileOrDirectory
 
 from workload_generator.constants import DEBUG, FS_SNAPSHOT_PATH, STEREOTYPE_RECIPES_PATH
 
@@ -80,6 +80,8 @@ def process_opt():
     print opt.itv
 
     return opt
+
+
 
 
 class StereotypeExecutor(object):
@@ -150,15 +152,16 @@ class StereotypeExecutorU1(StereotypeExecutor):
     def initialize_from_stereotype_recipe(self, stereotype_recipe):
         StereotypeExecutor.initialize_from_stereotype_recipe(self, stereotype_recipe)
         
-    def create_fs_snapshot_and_migrate_to_sandbox(self):
+    def create_fs_snapshot_and_migrate_to_sandbox(self, ftp_client):
         '''Initialize the file system in addition to the models'''
         self.data_generator.create_file_system_snapshot()
         self.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
         '''When the initial file system has been built, migrate it to the sandbox'''
         if not DEBUG:
             # self.data_generator.migrate_file_system_snapshot_to_sandbox("migrate location")
-            action = MoveFileOrDirectory(FS_SNAPSHOT_PATH, '/')
-
+            action = MoveFileOrDirectory(FS_SNAPSHOT_PATH, FS_SNAPSHOT_PATH)
+            action.perform_action(ftp_client)
+            print "MoveFileOrDirectory/to/SandBox/DONE"
     '''Do an execution step as a client'''
     def execute(self):
         '''Get the next operation to be done'''
@@ -182,45 +185,69 @@ class StereotypeExecutorU1(StereotypeExecutor):
     """
     
     def doPutContentResponse(self):
-        print "do update"
+        print colored("doPutContentResponse",'cyan')
         synthetic_file_name = self.data_generator.create_file()
-        print synthetic_file_name
-        action = CreateFileOrDirectory(synthetic_file_name)
-        print action
+        print "{} :>>> NEW ".format(synthetic_file_name)
+        action = CreateFileOrDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
+        print "{} :>>> ACTION".format(action)
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'PutContentResponse')
-        print to_wait
-        #action.perform_action(ftp_client)
+        print "Wait: {}s".format(to_wait)
+        action.perform_action(ftp_client)
 
     def doSync(self):
-        #TODO: Cheng, you can make use of data_generator.update() to test updating files
-        self.doPutContentResponse()
+        # TODO: Cheng, you can make use of data_generator.update() to test updating files
+        # self.doPutContentResponse()
+        print colored("doSync",'green')
+        synthetic_file_name = self.data_generator.update_file()
+        print synthetic_file_name
+        action = UpdateFile(synthetic_file_name,FS_SNAPSHOT_PATH)
+        #to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'Sync')
+        #print "Wait: {}s".format(to_wait)
+        action.perform_action(ftp_client)
 
     def doUnlink(self):
-        print "do delete"
+        print colored("doUnlink",'yellow')
         synthetic_file_name = None
-        if random.random() > 0.25:        
-            synthetic_file_name = self.data_generator.delete_file()
-        else: synthetic_file_name = self.data_generator.delete_directory()
-        action = DeleteFileOrDirectory(synthetic_file_name)
-        '''Get the time to wait for this transition in millis'''
-        to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'Unlink')
-        #action.perform_action(ftp_client)
+        #if random.random() > 0.25:
+        #    synthetic_file_name = self.data_generator.delete_file()
+        #else:
+        synthetic_file_name = self.data_generator.delete_directory()
+        if synthetic_file_name:
+            action = DeleteFileOrDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
+            '''Get the time to wait for this transition in millis'''
+            to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'Unlink')
+            print "Wait: {}s".format(to_wait)
+            action.perform_action(ftp_client)
+        else:
+            print "No file selected!"
 
     #TODO: Needs implementation in data generator first
     def doMoveResponse(self):
-        print "do move"
-        #action = get_action(["MoveResponse", 'files', 'ReSampleMake.txt'], ftp_files)
-        '''Get the time to wait for this transition in millis'''
-        to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'MoveResponse')
-        #action.perform_action(ftp_client)
+        print colored("doMoveResponse",'magenta')
+        #if random.random() > 0.25:
+         #   synthetic_file_name = self.data_generator.move_file()
+        #else:
+        synthetic_file_name = self.data_generator.move_directory()
+        print synthetic_file_name
+        (src_mov, tgt_mov) = synthetic_file_name
+        if src_mov:
+            action = MoveFileOrDirectory(src_mov, FS_SNAPSHOT_PATH, tgt_mov)
+            '''Get the time to wait for this transition in millis'''
+            to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'MoveResponse')
+            print "Wait: {}s".format(to_wait)
+            action.perform_action(ftp_client)
+        else:
+            print "No file selected!"
 
     #TODO: Let's see how we can solve this
     def doGetContentResponse(self):
-        print "do download"
-        #action = get_action(["GetContentResponse", 'sampleMake.txt', 'files/get/'], ftp_files)
+        print colored("doGetContentResponse",'blue')
+
+    #action = get_action(["GetContentResponse", 'sampleMake.txt', 'files/get/'], ftp_files)
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'GetContentResponse')
+        print "Wait: {}s".format(to_wait)
         #action.perform_action(ftp_client)
 
 
@@ -278,9 +305,13 @@ if __name__ == '__main__':
     stereotype_executor.inter_arrivals_manager.initialize_from_recipe(receipt)
 
 
-    stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
+    print "Syntetic File System Path:".format(FS_SNAPSHOT_PATH)
+    stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(ftp_client)
     # stereotype_executor.doMakeResponse()
-    stereotype_executor.doPutContentResponse()
+
+
+
+
     # read the line /vagrant/profile and use it
 
     if opt.profile is not None:
@@ -315,21 +346,37 @@ if __name__ == '__main__':
     for i in range(operations):
         # stereotype_executor.execute(sender, parser.get('executor','files_folder'))
         stereotype_executor.execute()
+        print colored("doOps {}/{}".format(i, operations),'red')
     # stop monitoring
     #monitor.stop_monitor()
     print "Finish executing/****************************"
 
+
+
+    print "Test do operations"
+    loops = 10
+    for ops in range(loops):
+        print "loop {}/{}".format(ops, loops)
+        stereotype_executor.doMoveResponse()
+        stereotype_executor.doSync()
+        stereotype_executor.doPutContentResponse()
+        stereotype_executor.doSync()
+        '''
+        stereotype_executor.doPutContentResponse()
+        stereotype_executor.doSync()
+        stereotype_executor.doUnlink()
+        stereotype_executor.doMoveResponse()
+        stereotype_executor.doPutContentResponse()
+        '''
+    print "Test do operations/DONE"
+
     print "ClearingProcess/..."
 
     # WarmUp move the output directory to the target
-    print "Syntetic File System Path:".format(FS_SNAPSHOT_PATH)
-    MoveFileOrDirectory(FS_SNAPSHOT_PATH,'/').perform_action(ftp_client)
 
 
     if ftp_client:
-        print "close sender"
-        print "Finish Moving???"
-        #ftp_client.close()
-    #os.system('sudo ./pcb/scripts/firewall stop')
+        print "close ftp_client"
+        ftp_client.close()
 
     print "ClearingProcess/OK"
