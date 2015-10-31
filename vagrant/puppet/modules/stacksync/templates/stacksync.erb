@@ -4,17 +4,33 @@
 # kill the previous running if exists
 if [ -f /tmp/StackSync.pid ] && [ -d "/proc/$(cat /tmp/StackSync.pid)" ];
 then
-	kill -9 $(cat /tmp/StackSync.pid)
+kill -9 $(cat /tmp/StackSync.pid)
 fi
 #
 
-
+if [ $# -eq 0 ]
+then
 echo 'start stackyncClient'
 cd /usr/lib/stacksync/
 java -jar Stacksync.jar -d -c <%= @confdir %> & echo $!
 lastPid=$!
 echo $lastPid> /tmp/StackSync.pid
-
+else
+if [ $1 == 'clear' ]; then
+#statements
+java_proc=$(pgrep java)
+if [ $? -eq 0 ]; then
+kill -9 $java_proc
+rm ~/.stacksync -R
+rm ~/stacksync_folder/* -R
+echo 'Cleaning bd and stacksync_folder /OK'
+else
+echo 'No proc found!'
+fi
+else
+echo 'Statement option not defined!'
+fi
+fi
 # they should not allow runnin more than one instance of this, how can i know the which procedure to monitor???,
 # if this is called java...
 # echo 'clear existing stacksync processes'
