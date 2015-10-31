@@ -28,6 +28,11 @@ node 'benchBox' {
       provider => pip
   }->
   package {
+    ['termcolor']:
+      ensure   => 'installed',
+      provider => pip
+  }->
+  package {
     ['simpy']:
       ensure   => '2.3',
       provider => pip
