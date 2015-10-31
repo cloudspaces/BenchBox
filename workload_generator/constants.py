@@ -41,6 +41,7 @@ SIMULATOR_TRACE_PATH = PROJECT_PATH + 'workload_generator/traces/200_users_backu
 
 #EXTERNAL PROGRAMS USED BY BENCHBOX
 DATA_GENERATOR_PATH = PROJECT_PATH + "workload_generator/external/sdgen.jar"
+DATA_GENERATOR_PROPERTIES_DIR = PROJECT_PATH + "workload_generator/model/data_layer" #/application.properties
 DATA_CHARACTERIZATIONS_PATH = PROJECT_PATH + "workload_generator/external/sdgen_characterizations/"
 
 FS_SNAPSHOT_PATH = None
