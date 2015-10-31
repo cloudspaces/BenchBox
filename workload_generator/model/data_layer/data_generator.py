@@ -26,7 +26,7 @@ import os
 from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string
 from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH,\
     DATA_CHARACTERIZATIONS_PATH, FS_SNAPSHOT_PATH,\
-    DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH, DEBUG
+    DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH, DEBUG, DATA_GENERATOR_PROPERTIES_DIR
 import time
 from workload_generator.model.data_layer.update_manager import FileUpdateManager
 from workload_generator.model.data_layer.directory_tree_manager import delete_fs_node, \
@@ -112,7 +112,9 @@ class DataGenerator(object):
         add_fs_node(self.file_system, synthetic_file_base_path)
         '''Invoke SDGen to generate realistic file contents'''
         characterization = DATA_CHARACTERIZATIONS_PATH + file_type
-        if not DEBUG: 
+
+        if not DEBUG:
+            os.chdir(DATA_GENERATOR_PROPERTIES_DIR)
             subprocess.call(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path])
         return synthetic_file_base_path
 
