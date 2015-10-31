@@ -5,12 +5,12 @@ cd graphite
 # sudo ./install
 
 action=$1
-vagrant plugin list | grep vagrant-vbguest
-plugin_status=$?
-if [ $plugin_status -ne 0 ]
-then
-vagrant plugin install vagrant-vbguest
-fi
+#vagrant plugin list | grep vagrant-vbguest
+#plugin_status=$?
+#if [ $plugin_status -ne 0 ]
+#then
+vagrant plugin update vagrant-vbguest
+#fi
 
 case "$action" in
 ("up") echo "start graphite"
