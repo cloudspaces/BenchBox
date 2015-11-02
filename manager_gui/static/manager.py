@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python -v
 # -*- coding: iso-8859-1 -*-
 __author__ = 'anna'
 
@@ -16,7 +16,7 @@ from ConfigParser import SafeConfigParser
 
 from argparse import ArgumentParser
 import shlex
-import psycopg2
+# import psycopg2
 import threading
 from subprocess import Popen, PIPE
 import traceback, time, sys, os
