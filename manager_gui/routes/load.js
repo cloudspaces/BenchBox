@@ -27,17 +27,8 @@ router.get('/', function (req, res, next) {
         console.log('configuration', obj);
         sess.config = obj[0];
 
-
-        // console.log("Session load vars", JSON.stringify(sess, null , 2));
-        /*
-         console.log("Session", sess);
-         */
-        res.render('init', {title: 'Init', session: sess});
-
+        res.render('init', {title: 'BenchBox', session: sess});
     });
-
-
-
 });
 
 

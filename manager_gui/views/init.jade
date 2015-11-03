@@ -78,29 +78,35 @@ block content
                 h4 ConfigTabs
             .col-md-8
                 ul.nav.nav-pills
+
                     li
-                        a(data-toggle='pill' href='#configManager') Manager
-                    li
-                        a(data-toggle='pill' href='#configSyncServer') SyncServer
-                    li
-                        a(data-toggle='pill' href='#configLogServer') LogServer
+                        a(data-toggle='pill' href='#configManager') Configuration
+                    //
+                        li
+                            a(data-toggle='pill' href='#configSyncServer') Cloud Servers
+                    //
+                        li
+                            a(data-toggle='pill' href='#configLogServer') Log Servers
                     li.active
                         a(data-toggle='pill' href='#configHosts') Hosts
-                    li
-                        a(data-toggle='pill' href='#configProfile') Profile
+                    //
+                        li
+                            a(data-toggle='pill' href='#configProfile') Profile
                     li
                         a(data-toggle='pill' href='#configMonitor') Monitor
-                    li
-                        a(data-toggle='pill' href='#configConsole') Console
-            .col-md-2
-                a.btn.btn-success.btn-block(href='/load') Load Default
+                    //
+                        li
+                            a(data-toggle='pill' href='#configConsole') Console
+            //
+                .col-md-2
+                    a.btn.btn-success.btn-block(href='/load') Load Default
         hr
         .row.tab-content.frame-fixed-size
             #configManager.tab-pane.fade
 
                 .row.col-md-12
                     .col-md-2
-                        p Manager
+                        p Manager RPC Server
                     .col-md-6
                         input.bb-config.form-control#manager-ip(type='text' placeholder='manager.ip' value='localhost' )
                     .col-md-2
@@ -109,57 +115,58 @@ block content
                         button.btn.btn-primary.btn-block(onclick="testConnection($('#manager-ip').val(),$('#manager-port').val())") Test Connect
                 .row.col-md-12
                     .col-md-2
-                        p Install new Manager
-                    .col-md-2
-                        form(method='get' action='/manager.py')
-                            button.btn.btn-info.btn-block(type='submit') Download!
-                    .col-md-2
-                        input.form-control(type='text' value='run: python manager.py')
-                    .col-md-2
-                        input.form-control(type='text' value='stop: CTRL + C')
-                    .col-md-4
-                        button.btn.btn-warning.btn-block AutoRun!
-
-            #configSyncServer.tab-pane.fade
-                .row.col-md-12
-                    .col-md-2
-                        p StackSyncServer
-                    .col-md-4
+                        p StackSync Server
+                    .col-md-6
                         input.bb-config.form-control#stacksync-ip(type='text' placeholder='ss.stacksync.ip' value='#{session.config.ss.stacksync.ip}')
-                    .col-md-4
+                    .col-md-2
                         input.bb-config.form-control#stacksync-port(type='text' placeholder='ss.stacksync.port' value='#{session.config.ss.stacksync.port}')
                     .col-md-2
                         button.btn.btn-primary.btn-block(onclick="testConnection($('#stacksync-ip').val(),$('#stacksync-port').val())") Test Connect
                 .row.col-md-12
                     .col-md-2
-                        p OwnCloudServer
-                    .col-md-4
+                        p OwnCloud Server
+                    .col-md-6
                         input.bb-config.form-control#owncloud-ip(type='text' placeholder='ss.owncloud.ip' value='#{session.config.ss.owncloud.ip}')
-                    .col-md-4
+                    .col-md-2
                         input.bb-config.form-control#owncloud-port(type='text' placeholder='ss.owncloud.port' value='#{session.config.ss.owncloud.port}')
                     .col-md-2
                         button.btn.btn-primary.btn-block(onclick="testConnection($('#owncloud-ip').val(),$('#owncloud-port').val())") Test Connect
-
-            #configLogServer.tab-pane.fade
                 .row.col-md-12
                     .col-md-2
                         p Graphite
-                    .col-md-4
+                    .col-md-6
                         input.bb-config.form-control#graphite-ip(type='text' placeholder='ls.graphite.ip' value='#{session.config.ls.graphite.ip}')
-                    .col-md-4
+                    .col-md-2
                         input.bb-config.form-control#graphite-port(type='text' placeholder='ls.graphite.port' value='#{session.config.ls.graphite.port}')
                     .col-md-2
                         button.btn.btn-primary.btn-block(onclick="testConnection($('#graphite-ip').val(),$('#graphite-port').val())") Test Connect
                 .row.col-md-12
                     .col-md-2
                         p Impala
-                    .col-md-4
+                    .col-md-6
                         input.bb-config.form-control#impala-ip(type='text' placeholder='ls.impala.ip' value='#{session.config.ls.impala.ip}')
-                    .col-md-4
+                    .col-md-2
                         input.bb-config.form-control#impala-port(type='text' placeholder='ls.impala.port' value='#{session.config.ls.impala.port}')
                     .col-md-2
                         button.btn.btn-primary.btn-block(onclick="testConnection($('#impala-ip').val(),$('#impala-port').val())") Test Connect
 
+            //
+                    .row.col-md-12
+                        .col-md-2
+                            p Install new Manager
+                        .col-md-2
+                            form(method='get' action='/manager.py')
+                                button.btn.btn-info.btn-block(type='submit') Download!
+                        .col-md-2
+                            input.form-control(type='text' value='run: python manager.py')
+                        .col-md-2
+                            input.form-control(type='text' value='stop: CTRL + C')
+                        .col-md-4
+                            button.btn.btn-warning.btn-block AutoRun!
+
+            #configSyncServer.tab-pane.fade
+
+            #configLogServer.tab-pane.fade
 
             #configMonitor.tab-pane.fade
                 .col-md-2
@@ -206,10 +213,10 @@ block content
                                         script(type='text/javascript').
                                             console.log('Testing graphene')
                                             /*
-                                            $(function () {
-                                                $("#includedContent").load("/example/index.html");
-                                            });
-                                            */
+                                             $(function () {
+                                             $("#includedContent").load("/example/index.html");
+                                             });
+                                             */
 
 
 
@@ -279,6 +286,13 @@ block content
         hr
         footer.footer
             p © AST 2015
+        #requestStatus
+            .row
+                .col-md-4 action
+                .col-md-8 status
+
+
+
 
         script(type='text/javascript').
             angular.module('app', ['ngRoute', 'ngResource'])
@@ -344,7 +358,7 @@ block content
                         $scope.run = {
                             testOps: 10,
                             testItv: 1,
-                            testProfile: 'sync',
+                            testProfile: 'backupsample',
                             testFolder: 'stacksync_folder',
                             testClient: 'StackSync'
                         };
@@ -395,7 +409,7 @@ block content
                         };
                         $scope.ping = function (index) {
                             var host = $scope.hosts[index];
-                            console.log(host)
+                            console.log(host);
                             testConnection(host.ip, 22); // port ssh
                             /*
                              Hosts.update({id: host._id}, host);
@@ -404,8 +418,8 @@ block content
                         };
                         $scope.rpc = function (index, cmd) {
                             var host = $scope.hosts[index];
-                            console.log(host)
-                            rpcHost(host, cmd); // port ssh
+                            console.log(host);
+                            rpcHost(host, cmd, addStatusScope); // port ssh
                             /*
                              Hosts.update({id: host._id}, host);
                              $scope.editing[index] = false;
@@ -475,8 +489,64 @@ block content
             console.log("Home Script loaded");
 
         script(type='text/javascript').
-            GLOBAL_VAR = null
+            GLOBAL_VAR = null;
             console.log("button controller");
+            var statusIdx = 0;
+
+            function addStatusScope(args) {
+                // console.log(args);
+                var name = args.ip + ':' + args.cmd;
+                var statusId = "stat_" + statusIdx++;
+                $("#requestStatus").append("<div class='row' id=" + statusId + "><div class='col-md-4'>" + name + " : " + statusId + "</div><div class='col-md-8 stats'>liveRpcFeedBack</div></div>");
+                var statusCmd;
+                // alert(args.cmd)
+                switch (args.cmd) {
+                    case "setup":
+                        statusCmd = 'ls ';
+                        break;
+                    case "up":
+                        statusCmd = '';
+                        break;
+                    case "up":
+                        statusCmd = '';
+                        break;
+                    default:
+                        console.log(args.cmd);
+                        statusCmd = 'ls -l';
+                        break;
+                }
+
+
+                // args.target = 'sandBox';
+
+                var finish = false;
+                var itv = 0;
+                var statusItv = setInterval(function () {
+                    console.log(itv);
+                    itv++;
+                    if (finish === true) {
+                        clearInterval(statusItv);
+                        $('#' + statusId).remove();
+                    }
+                    if (itv === 5) {
+                        finish = true;
+                    } else {
+                        switch (args.target) {
+                            case 'sandBox':
+                                rpcStatus(args, statusCmd, statusId);
+
+                                break;
+                            case 'benchBox':
+                                rpcStatus(args, statusCmd, statusId);
+
+                                break;
+                            default:
+                                break;
+
+                        }
+                    }
+                }, 2000);
+            }
 
             $('#btnHello').click(
                     function () {
@@ -499,7 +569,6 @@ block content
                                 function (data) {
                                     console.log("success hello!!!!!!!!!!!!!!!!!!!!!!!!!!");
                                     writeToLogger('loggerFrame', data);
-
                                 });
                         console.log("Success, run cmd!");
                     });
@@ -560,10 +629,6 @@ block content
                         $('#' + loggerID).val($('#' + loggerID).val() + line + '\n');
                 });
                 $('#' + loggerID).scrollTop($('#' + loggerID)[0].scrollHeight);
-                    //for(line in lines)
-                       // console.log(lines[line]);
-                        // $('#loggerFrame').val($('#loggerFrame').val() + line);
-
             };
 
 
@@ -582,15 +647,12 @@ block content
                         console.log(data);
                         // console.log(JSON.parse(JSON.stringify(data)));
                         console.log('...');
-
                         if (JSON.parse(data.result)) {
                             $.notify('Success! ping(' + ip + ':' + port + ')', 'success');
                         } else {
                             $.notify('Warning! ping(' + ip + ':' + port + ')', 'warn');
                         }
-
                         // $.notify('Hello','info');
-
                     },
                     error: function (err) {
                         console.log(err);
@@ -602,7 +664,6 @@ block content
 
             // cmd should be an object
             rpcHost = function (host, cmd, cb) {
-
                 var args = {
                     ip: host.ip,
                     hostname: host.hostname,
@@ -612,8 +673,6 @@ block content
                     cred_owncloud: host.cred_owncloud,
                     cmd: cmd
                 };
-                console.log(args);
-                console.log(args);
                 appendAllParams(args, 'bb-config');
                 appendAllHosts(args, 'bb-hosts');
                 $.ajax({
@@ -627,28 +686,48 @@ block content
                         $.notify('Success! ' + host.hostname + ' ' + cmd, 'success');
                     },
                     error: function (err) {
-                        console.log(err)
+                        console.log(err);
                         console.log('pc, Error ' + host + ' ' + cmd + ' ', err);
                         $.notify('Error! ' + err, 'error');
                     }
                 });
+                cb(args);
             };
 
-
+            rpcStatus = function (args, cmd, statusId) {
+                console.log("rpcStatus");
+                console.log(args, cmd, statusId);
+                args.status = cmd;
+                $.ajax({
+                    url: 'http://localhost:3000/rpc/status',
+                    data: args,
+                    timeout: 6000000, // 6000s ::100min
+                    type: 'GET',
+                    success: function (data) {
+                        console.log("Success, run start!");
+                        console.log(JSON.stringify(data));
+                        // $.notify('Success! ' + args.hostname + ' ' + cmd, 'success');
+                        console.log($('#' + statusId))
+                        // $('#'+statusId).children('.stats').text(data.result);
+                        $('#' + statusId).children('.stats').text(JSON.stringify(data));
+                    },
+                    error: function (err) {
+                        console.log(err);
+                        console.log('pc, Error ' + args + ' ' + cmd + ' ', err);
+                        $.notify('Error! ' + err, 'error');
+                    }
+                });
+            };
             rpcTest = function (hosts, test, cb) {
                 console.log("RunTests ");
                 console.log("Hosts: ", hosts);
                 console.log("Test: ", test);
 
-
                 hosts.forEach(function (host) {
-
                     console.log(host);
                     console.log('->');
                     console.log(test);
-
                     var cmd = 'test';
-
                     var args = {
                         ip: host.ip,
                         hostname: host.hostname,
@@ -671,18 +750,12 @@ block content
                             $.notify('Success! ' + host.hostname + ' ' + cmd, 'success');
                         },
                         error: function (err) {
-                            console.log(err)
+                            console.log(err);
                             console.log('pc, Error ' + host + ' ' + cmd + ' ', err);
                             $.notify('Error! ' + err, 'error');
                         }
                     });
-
-
-                    // './executor.py -o 20 -p sync -t 1 -f stacksync_folder -x StackSync'
-
                 });
-
-
             };
 
             appendAllParams = function (target, className) {
@@ -700,62 +773,61 @@ block content
                         login: $(this).find('p.host-login').text()
 
                     };
-                // $(this).find('p.host-name');
-
+                    // $(this).find('p.host-name');
                     console.log(target.hosts);
                 });
-
                 GLOBAL_VAR = target;
             };
-
 
             notifyButtonById = function (btnId) {
               // self
             };
-
 
             $.fn.graphite.defaults.url = "https://localhost:8443/renderer/";
             $.fn.graphite.defaults.width = "450";
             $.fn.graphite.defaults.height = "300";
 
             try {
-                $('#monitorCPU').graphite({
-               // url: "http://myserver/render/",
-                    from: "-1d",
-                    target: [
-                        "carbon.agents.vagrant-ubuntu-trusty-64-1.memUsage"
-                    ],
-                    title: "CPUMonitor"
-                });
-                $('#monitorXXX').graphite({
-               // url: "http://myserver/render/",
-                    from: "-1hours",
-                    target: [
-                        "carbon.agents.vagrant-ubuntu-trusty-64-1.cpuUsage"
-                    ],
-                    title: "XXXMonitor"
-                });
+                /*
+                 $('#monitorCPU').graphite({
+                 // url: "http://myserver/render/",
+                 from: "-1d",
+                 target: [
+                 "carbon.agents.vagrant-ubuntu-trusty-64-1.memUsage"
+                 ],
+                 title: "CPUMonitor"
+                 });
+                 $('#monitorXXX').graphite({
+                 // url: "http://myserver/render/",
+                 from: "-1hours",
+                 target: [
+                 "carbon.agents.vagrant-ubuntu-trusty-64-1.cpuUsage"
+                 ],
+                 title: "XXXMonitor"
+                 });
 
 
-                $('#monitorRAM').graphite({
-               // url: "http://myserver/render/",
-                    from: "-1hours",
-                    target: [
-                        "carbon.agents.vagrant-ubuntu-trusty-64-1.memUsage"
-                    ],
-                    title: "RamMonitor"
-                });
+                 $('#monitorRAM').graphite({
+                 // url: "http://myserver/render/",
+                 from: "-1hours",
+                 target: [
+                 "carbon.agents.vagrant-ubuntu-trusty-64-1.memUsage"
+                 ],
+                 title: "RamMonitor"
+                 });
 
-                $('#monitorNET').graphite({
-               // url: "http://myserver/render/",
-                    from: "-1hours",
-                    colorList: 'red,green',
-                    target: [
-                        "alias(carbon.agents.vagrant-ubuntu-trusty-64-1.pointsPerUpdate, 'pointsPerUpdate')",
-                        "alias(carbon.agents.vagrant-ubuntu-trusty-64-1.updateOperations, 'updateOps')"
-                    ],
-                    title: "NetworkMonitor"
-                });
+                 $('#monitorNET').graphite({
+                 // url: "http://myserver/render/",
+                 from: "-1hours",
+                 colorList: 'red,green',
+                 target: [
+                 "alias(carbon.agents.vagrant-ubuntu-trusty-64-1.pointsPerUpdate, 'pointsPerUpdate')",
+                 "alias(carbon.agents.vagrant-ubuntu-trusty-64-1.updateOperations, 'updateOps')"
+                 ],
+                 title: "NetworkMonitor"
+                 });
+                 */
+                console.log("do grephite");
             } catch (err) {
                 console.warn('Error happened', JSON.stringify(err));
             }
@@ -767,7 +839,6 @@ block content
                     a.href = url;
                     var evt = document.createEvent("MouseEvents");
 
-                    //the tenth parameter of initMouseEvent sets ctrl key
                     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0,
                             true, false, false, false, 0, null);
                     a.dispatchEvent(evt);
@@ -777,12 +848,9 @@ block content
                 if (url != null) {
                     console.log('Dispatch openNewWindow')
                     openNewBackgroundTab('https://' + url + '/renderer/?from=-1d&height=300&until=now&width=450&target=carbon.agents.vagrant-ubuntu-trusty-64-1.memUsage&title=CPUMonitor&_t=0.013591398485004902');
-                    // alert('Accept certificate and refresh page!')
                 }
 
             });
 
 
             console.log(GLOBAL_VAR);
-
-            // TODO refresh onclick

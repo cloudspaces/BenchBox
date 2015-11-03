@@ -18,6 +18,7 @@ from argparse import ArgumentParser
 import shlex
 # import psycopg2
 import threading
+from multiprocessing.pool import ThreadPool
 from subprocess import Popen, PIPE
 import traceback, time, sys, os
 import random, numpy
@@ -378,20 +379,41 @@ class ManagerOps():
             'stacksync-ip': args['stacksync-ip'][0],
             'owncloud-ip': args['owncloud-ip'][0]
         }
-        print h
+
         hostname = args['hostname'][0]
-        print hostname
-        print 'tell sandBox at dummy host to start client OwnCloud'
+
         str_cmd = 'nohup /vagrant/owncloud.sh &'
         self.rmisandBox(h['ip'], h['user'], h['passwd'], str_cmd)
         # have session at the dummy host
 
 
-    def runTest(self, h, args):
-        print 'run specific targeted test at a target node... how to target 2nd layer virtualization???'
-        # 1st ssh to the dummy host
-        # 2nd have a script at dummy to relay the execution...
-        # otherwise how???
+    def requestStatus(self, args):
+        print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<STATUS"
+        print "request status to sandBox or benchBox"
+
+        result = None
+        if args['target'] is None:
+            print "no target specified"
+        else:
+
+            hostname = args['ip'][0]
+            username = args['login'][0]
+            password = username
+            str_cmd = args['status'][0]
+            print username
+            print hostname
+            print password
+            print str_cmd
+            if args['target'] == ['sandBox']:
+                result = self.rmiStatus(hostname, username , password , str_cmd)
+            elif args['target'] == ['benchBox']:
+                result = self.rmibenchBox(hostname, username , password , str_cmd)
+            else:
+                result = 0
+
+        print "STATUS>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        return result
+
 
 
     def start_node_server(self, h):
@@ -411,47 +433,58 @@ class ManagerOps():
                 s = pxssh.pxssh()
                 s.login(hostname, login, passwd)
                 s.timeout = 3600  # set timeout to one hour
-                s.sendline(cmd)  # run a command
+                s.sendline('who')
                 s.prompt()  # match the prompt
-                # print s.before # print everyting before the prompt
-                # s.sendline ('uptime;df -h') # running multiple lines
+                s.sendline(cmd)  # run a command
+                s.prompt()
+                # s.login('192.168.56.101','vagrant', 'vagrant')
+                last_output = s.before # print everyting before the prompt
                 s.logout()
+                print 'end try'
             except pxssh.ExceptionPxssh, e:
                 print "pxssh failed on login."
                 print str(e)
                 print 'error'
                 continue
             break
+        return last_output
 
-        if callback:
-            return callback()
-
-
+    # relay ssh
     def rmisandBox(self, hostname, login, passwd, cmd, callback=None):
         sandboxIP = '192.168.56.101'
         sandboxUser = 'vagrant'
         sandboxPass = 'vagrant'
-
         str_cmd = " " \
                   'sshpass -p {} ssh -f -n -o StrictHostKeyChecking=no {}@{} "{}"' \
                   " ".format(sandboxPass, sandboxUser, sandboxIP, cmd)
-        print str_cmd
-        self.rmi(hostname, login, passwd, str_cmd)
+
+        # return "asdasdf"
+        return self.rmi(hostname, login, passwd, str_cmd)
 
 
     def rmibenchBox(self, hostname, login, passwd, cmd, callback=None):
         benchboxIP = '192.168.56.2'
         benchboxUser = 'vagrant'
         benchboxPass = 'vagrant'
-
         str_cmd = " " \
                   'sshpass -p {} ssh -f -n -o StrictHostKeyChecking=no {}@{} "{}"' \
                   " ".format(benchboxPass, benchboxUser, benchboxIP, cmd)
-        print str_cmd
-        self.rmi(hostname, login, passwd, str_cmd)
+
+        return 'asdf'
+        return self.rmi(hostname, login, passwd, str_cmd)
+
+    def rmiStatus(self, hostname, login, passwd, cmd, callback=None):
+        benchboxIP = '192.168.56.101'
+        benchboxUser = 'vagrant'
+        benchboxPass = 'vagrant'
+        str_cmd = " " \
+                  'sshpass -p {} ssh -o StrictHostKeyChecking=no {}@{} "{}"' \
+                  " ".format(benchboxPass, benchboxUser, benchboxIP, cmd)
+
+        # return 'asdf'
+        return self.rmi(hostname, login, passwd, str_cmd)
 
 
-# this is the manager server
 
 class Manager(object):
     hosts = None
@@ -483,9 +516,7 @@ class Manager(object):
         print name
         print str
         print 'Request: -> cmd {}'.format(name)
-        bashCommand = name  # "{}".format(name)
         output = subprocess.check_output(['bash', '-c', urllib.unquote_plus(bashCommand)])
-        # json.dumps("Response: -> client: List from manager " % name),
         return output.split('\n')
 
 
@@ -493,7 +524,6 @@ class Manager(object):
         print 'Request: -> list {}'.format(name)
         bashCommand = "ls {}".format(name)
         output = subprocess.check_output(['bash', '-c', bashCommand])
-        # json.dumps("Response: -> client: List from manager " % name),
         return output.split('\n')
 
     def bad(self):
@@ -506,9 +536,6 @@ class Manager(object):
         result = output.split('\n')
         print result
         if len(result) > 5:
-            # print result[5]
-            #print result[5].split()[1]
-            # print result[5].split(' ', 1)
             if result[5].split()[1] == 'open':
                 print result[5]
                 print result[5].split()[1]
@@ -521,8 +548,6 @@ class Manager(object):
         # print url # full url
 
         str = urlparse.urlparse(url)
-        #print str
-        #print str.query
         argslist = urlparse.parse_qs(str.query)
         toExecute = getattr(self.ops, argslist['cmd'][0])
 
@@ -531,12 +556,29 @@ class Manager(object):
         t = threading.Thread(target=toExecute, args=(argslist,))
         t.start()
         result = None # None Blocking
-        #result = toExecute(argslist)
-        #print argslist
-        #print argslist
         print 'command {}/--->FINISH'.format(argslist['cmd'][0])
         argslist['result'] = result;
         return argslist
+
+
+    def status(self, url):
+        print 'Request: -> rpc to dummyhost'
+        str = urlparse.urlparse(url)
+        argslist = urlparse.parse_qs(str.query)
+        toExecute = self.ops.requestStatus
+        print argslist['status'][0]
+
+        #pool = ThreadPool(processes=1)
+        #async_result = pool.apply_async(toExecute, (argslist,))
+        #print async_result
+        #result = async_result.get()
+        #print result
+
+        result = toExecute(argslist)
+
+        print 'command {}/--->FINISH'.format(argslist['cmd'][0])
+        argslist['result'] = result;
+        return result
 
 
 def ManagerRPC():

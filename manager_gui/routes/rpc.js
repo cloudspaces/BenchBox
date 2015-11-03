@@ -11,67 +11,78 @@ client.connect('tcp://127.0.0.1:4242');
 
 /* GET manager rpc page. */
 router.get('/goodbye', function (req, res, next) {
-    // el servidor rep una peticio get,
     client.invoke('goodbye', "Goodbye", function (error, resp, more) {
         if (error) {
             console.log("Error:", error)
         }
         console.log(resp);
-
-       // res.json(resp)
     });
-
 });
 
 
 /* GET manager rpc page. */
 router.get('/hello', function (req, res, next) {
-    // el servidor rep una peticio get,
-
     client.invoke('hello', "Hello", function (error, resp, more) {
         if (error) {
             console.log("Error:", error)
         }
         console.log(resp);
-
         res.json(resp)
     });
-
 });
 
 
-/* GET manager rpc/rpc page. */
+/* GET manager rpc/rpc page.
+* None Blocking Wait Response
+* */
 router.get('/rpc', function (req, res, next) {
-    // el servidor rep una peticio get,
     console.log('/rpc/rpc');
-    //console.log(req.url);
     var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
 
-    // this is  blocking the code...
     console.log("LETS SPAWNN------------------>>>>>>>");
     try {
         client.invoke('rpc', fullUrl, function (error, resp, more) {
             if (error) {
                 console.log("Error:", error)
             }
-            // console.log(resp);
-            // res.json(resp)
         });
     }catch(err){
         console.log(err.message)
     };
     console.log("END SPAWN-------------------<<<<<<<");
-    // implementar un mecanisme de callback amb delay
     res.json({});
-
 });
 
 
+
+/* GET manager rpc/status page.
+* Blocking wait response
+* */
+router.get('/status', function (req, res, next) {
+    // el servidor rep una peticio get,
+    console.log('/rpc/status');
+    var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+
+    console.log("<<<<<<<<<<<<<<<<<<<<<<<<<LETS STATUS");
+    try {
+        client.invoke('status', fullUrl, function (error, resp, more) {
+            if (error) {
+                console.log("Error:", error)
+            }
+            console.log("Result: ---------------------");
+            console.log(resp);
+            console.log("ResultEnd: ------------------");
+            res.json(resp);
+        });
+    }catch(err){
+        console.log(err.message);
+        res.json(err.message)
+    };
+    console.log("END STATUS>>>>>>>>>>>>>>>>>>>>>>>>>>");
+});
+
 /* GET manager rpc page. */
 router.get('/start', function (req, res, next) {
-    // el servidor rep una peticio get,
-
-
     client.invoke('start', "Start", function (error, resp, more) {
         if (error) {
             console.log("Error:", error)
@@ -85,17 +96,8 @@ router.get('/start', function (req, res, next) {
 
 /* GET manager rpc page. */
 router.get('/nmap', function (req, res, next) {
-    // el servidor rep una peticio get,
-    //console.log(req.params)
-
-    //console.log(req.url)
     var cmd = req.url.split('=')[1].replace(/\+/g, ' ');
     console.log("COMMAND: " + cmd);
-    // console.log(cmd);
-    //console.log(" ex: ------------->", queryString.extract(req.params));
-    //console.log(" ex: ------------->", queryString.parse(req.params));
-    // console.log(" parse: --> Query String", queryString.parse(location.search))
-
     client.invoke('nmap', cmd.split(' ')[1], cmd.split(' ')[0], function (error, resp, more) {
         if (error) {
             console.log("Error:", error)
@@ -103,16 +105,11 @@ router.get('/nmap', function (req, res, next) {
         console.log(resp);
         res.json({result: JSON.stringify(resp)})
     });
-
-    // res.json({result: JSON.stringify({})})
 });
 
 
 /* GET manager rpc page. */
 router.get('/list', function (req, res, next) {
-    // el servidor rep una peticio get,
-
-
     client.invoke('list', "~", function (error, resp, more) {
         if (error) {
             console.log("Error:", error)
@@ -124,29 +121,15 @@ router.get('/list', function (req, res, next) {
 
 /* GET manager rpc page. */
 router.get('/cmd', function (req, res, next) {
-    // el servidor rep una peticio get,
-    //console.log(req.params)
-
-    // console.log(req.url);
     var cmd = req.url.split('=')[1].replace(/\+/g, ' ');
-    // cmd = JSON.stringify(cmd);
-    // console.log(cmd);
     console.log("COMMAND: " + cmd);
-    //console.log(" ex: ------------->", queryString.extract(req.params));
-    //console.log(" ex: ------------->", queryString.parse(req.params));
-
-    // console.log(" parse: --> Query String", queryString.parse(location.search))
-
-
     (client.invoke('cmd', cmd, function (error, resp, more) {
         if (error) {
             console.log("Error:", error)
         }
-        // console.log(JSON.stringify(resp))
         res.json({result: JSON.stringify(resp)})
     }));
 
-    // res.json({result: JSON.stringify(resp)})
 });
 
 
