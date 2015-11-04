@@ -390,12 +390,11 @@ class ManagerOps():
     def requestStatus(self, args):
         print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<STATUS"
         print "request status to sandBox or benchBox"
-
+        print args
         result = None
         if args['target'] is None:
             print "no target specified"
         else:
-
             hostname = args['ip'][0]
             username = args['login'][0]
             password = username
@@ -404,12 +403,12 @@ class ManagerOps():
             print hostname
             print password
             print str_cmd
-            if args['target'] == ['sandBox']:
+            if args['target'][0] == ['sandBox']:
                 result = self.rmiStatus(hostname, username , password , str_cmd)
-            elif args['target'] == ['benchBox']:
+            elif args['target'][0] == ['benchBox']:
                 result = self.rmibenchBox(hostname, username , password , str_cmd)
             else:
-                result = 0
+                result = self.rmi(hostname, username, password, str_cmd)
 
         print "STATUS>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
         return result
@@ -470,17 +469,24 @@ class ManagerOps():
                   'sshpass -p {} ssh -f -n -o StrictHostKeyChecking=no {}@{} "{}"' \
                   " ".format(benchboxPass, benchboxUser, benchboxIP, cmd)
 
-        return 'asdf'
+        # return 'asdf'
         return self.rmi(hostname, login, passwd, str_cmd)
 
-    def rmiStatus(self, hostname, login, passwd, cmd, callback=None):
-        benchboxIP = '192.168.56.101'
-        benchboxUser = 'vagrant'
-        benchboxPass = 'vagrant'
+    def rmiStatus(self, hostname, login, passwd, cmd, localhost):
+        if localhost == 'localhost':
+            return self.rmi(hostname, login, passwd, cmd)
+        elif localhost == 'sandBox':
+            boxIP = '192.168.56.101'
+        elif localhost == 'benchBox':
+            boxIP = '192.168.56.2'
+        else:
+            return 0
+        boxUser = 'vagrant'
+        boxPass = 'vagrant'
+
         str_cmd = " " \
                   'sshpass -p {} ssh -o StrictHostKeyChecking=no {}@{} "{}"' \
-                  " ".format(benchboxPass, benchboxUser, benchboxIP, cmd)
-
+                  " ".format(boxPass, boxUser, boxIP, cmd)
         # return 'asdf'
         return self.rmi(hostname, login, passwd, str_cmd)
 
@@ -516,7 +522,7 @@ class Manager(object):
         print name
         print str
         print 'Request: -> cmd {}'.format(name)
-        output = subprocess.check_output(['bash', '-c', urllib.unquote_plus(bashCommand)])
+        output = subprocess.check_output(['bash', '-c', urllib.unquote_plus(name)])
         return output.split('\n')
 
 
