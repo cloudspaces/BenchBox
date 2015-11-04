@@ -38,7 +38,7 @@ then
 sudo apt-get -y install python-pip
 fi
 sudo pip install pyzmq
-
+sudo pip install python-nmap
 # Now we can install ZeroRPC
 sudo pip install zerorpc
 
@@ -51,6 +51,10 @@ then
 sudo npm update -g node-gyp
 fi
 npm list -g zerorpc
+if [ $? -eq 1 ]
+then
+sudo npm install -g zerorpc
+fi
 if [ $? -ne 0 ]
 then
 sudo npm update -g zerorpc
