@@ -1,8 +1,7 @@
 #!/bin/bash -ex
 
 
-
-
+./installVagrantVBox.sh
 ./installZeroRPC.sh
 ./installNodejs.sh
 ./installGraphite.sh up &
