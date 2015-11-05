@@ -286,7 +286,7 @@ block content
         hr
         footer.footer
             p © AST 2015
-        #requestStatus
+        .row.tab-content.frame-fixed-size#requestStatus
             .row
                 .col-md-4 action
                 .col-md-8 status
@@ -503,64 +503,97 @@ block content
                 switch (args.cmd) {
                     case "setup":
                         args.target = 'localhost'
-                        statusCmd = 'ls -l';
-                            // comprovar en la maquina dummy si existeix
+                        statusCmd = 'hostname; ls BenchBox -R | grep -q ss.*.key; echo $?\?; ';
+
+                            // check if the vms exists
                             // preparar scripts i realitzar comprovacions incrementals?
                             // 1/6 existeix la carpeta benchbox i no esta buida?
                             // 2/6 te instalat vagrant i virtualbox? | vagrant list-commands && $? -eq 0 &&
                             // 3/6 te descarregat la imatge de vagrant?  | --> ls -l ~/BenchBox/vagrant/*.box
                             // 4/6 te asignat el profile?  | --> ~/BenchBox/vagrant/profile
+                            /*
+                            comprovar que en la maquina estigui installats els claus dels usuaris
+                            si esta retorna 0 exit code OK
+                            else retorn != 0
+                            */
                         break;
                     case "vagrantUp":
-                        statusCmd = '';
                         args.target = 'localhost';
+
+                        // ho to implement two phase check??,
+                        statusCmd = 'hostname; VBoxManage list runningvms | [ $(wc -l) -eq 2 ]; echo $?\?; ';
+                            // check there are no provisioning procedures running
+                            // if its equal to one it belongs to the grep opration
+                            // how to know if the vms are running
+                            // VBoxManage list runningvms
+                            // and count the number of machines running
+                            // if its 2 we consider it ok but it might not be the case.
+                        break;
+
+                    case "vagrantProvisioned":
+                        args.target = 'localhost';
+
+                        //   statusCmd = 'hostname; ps -ef | grep provision | [ $(wc -l) -eq 1 ]; echo $?\?; ';
+
+                        break;
+                    case "vagrantDown":
+
+                        args.target = 'localhost';
+                        statusCmd = 'hostname; VBoxManage list runningvms | [ $(wc -l) -eq 0 ]; echo $?\?; ';
+                        // check that there are no virtual machines running
+                        //
                         break;
                     case "monitorUp":
-                        statusCmd = '';
                         args.target = 'sandBox';
+                        statusCmd = 'hostname; pgrep python > /dev/null; echo $?\?; ';
+                            // how to check if the sandBox monitor listener is running?
+                            // check if an python process is running
+                            //
                         break;
                     case "clientStacksyncUp":
-                        statusCmd = '';
+                        statusCmd = 'hostname; pgrep java > /dev/null; echo $?\?; ';
                         args.target = 'sandBox';
+                            // check there is no java process running
                         break;
                     case "clientStacksyncDown":
-                        statusCmd = '';
-                        args.target = 'sandBox';
+                        statusCmd = 'hostname; pgrep java > /dev/null; [ $? -ne 0 ]; echo $?\?; ';
+                        args.target = 'localhost';
+                            // check there is java process running
                         break;
                     case "clientOwncloudUp":
-                        statusCmd = '';
-                        args.target = 'sandBox';
-                        break;
-                    case "monitorUp":
-                        statusCmd = '';
+                        statusCmd = 'hostname; echo 0\?; ';
                         args.target = 'benchBox';
                         break;
+                    case "execute":
+                            // check if the execute procedure is still running at the benchBox machine.
                     default:
                         console.log(args.cmd);
-                        statusCmd = 'ls -l';
+                        statusCmd = 'hostname; echo 0\?';
                         break;
                 }
 
-
+                console.log(args)
                 // args.target = 'sandBox';
 
                 var finish = false;
-                var itv = 0;
+                var itvTimeout = 0;
+                var itvTimer = 3000;
                 var statusItv = setInterval(function () {
-                    console.log(itv);
-                    itv++;
+                    console.log(itvTimeout);
+                    itvTimeout++;
                     if (finish === true) {
-                        clearInterval(statusItv);
+
                         $('#' + statusId).remove();
+                        clearInterval(statusItv);
                     }
-                    if (itv === 5) {
+                    if (itvTimeout === 50) {
                         finish = true;
+                        $.notify('ExitTryLimit', 'warn')
                     } else {
                         switch (args.target) {
                             case 'sandBox':
-                                    console.warn('sandBox');
+                                console.warn('sandBox');
                                 rpcStatus(args, statusCmd, statusId, 'sandBox');
-
                                 break;
 
                             case 'benchBox':
@@ -572,10 +605,31 @@ block content
                                 console.warn('localhost');
                                 rpcStatus(args, statusCmd, statusId, 'localhost');
                                 break;
-
                         }
+
+                        var currStatus = $('#' + statusId).children('.stats').text();
+                        var notFound = "-1"
+                        console.log(currStatus)
+                        if (currStatus.indexOf('0?') == notFound){
+                            console.warn('Still not found!')
+                            if(currStatus.indexOf('No route to host') == notFound){
+                                console.log('Waiting' + statusId);
+                            }else{
+                                console.error('First setup vagrant up');
+                                $.notify('Require vagrantUp: ' + statusId + args.cmd, 'error');
+                                finish = true;
+                            }
+
+                            // si no existe un 0 implica que no ha terminado
+                        }else{
+                            // ha terminado
+                            console.info('StatusId: '+statusId+ 'Completed!');
+                            finish = true; // por que se ha encontrado un exit code zero
+                            $.notify('SuccessStatus: ' + statusId + args.cmd, 'success');
+                        }
+
                     }
-                }, 2000);
+                }, itvTimer);
             }
 
             $('#btnHello').click(
@@ -712,7 +766,7 @@ block content
                     type: 'GET',
                     success: function (data) {
                         console.log("Success, run start!");
-                        console.log(JSON.stringify(data));
+                        console.log(data);
                         $.notify('Success! ' + host.hostname + ' ' + cmd, 'success');
                     },
                     error: function (err) {
@@ -724,10 +778,12 @@ block content
                 cb(args);
             };
 
-            rpcStatus = function (args, cmd, statusId) {
+            rpcStatus = function (args, cmd, statusId, target) {
                 console.log("rpcStatus");
-                console.log(args, cmd, statusId);
+                console.log(args, cmd, statusId, target);
                 args.status = cmd;
+                args.target = target;
+
                 $.ajax({
                     url: 'http://localhost:3000/rpc/status',
                     data: args,
@@ -735,11 +791,11 @@ block content
                     type: 'GET',
                     success: function (data) {
                         console.log("Success, run start!");
-                        console.log(JSON.stringify(data));
+                        console.log(data);
                         // $.notify('Success! ' + args.hostname + ' ' + cmd, 'success');
                         console.log($('#' + statusId))
                         // $('#'+statusId).children('.stats').text(data.result);
-                        $('#' + statusId).children('.stats').text(JSON.stringify(data));
+                        $('#' + statusId).children('.stats').text(data);
                     },
                     error: function (err) {
                         console.log(err);
