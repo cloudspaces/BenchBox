@@ -144,8 +144,8 @@ node 'sandBox' {
   ->
   class {
     "stacksync":
-      rmq_host                  => '130.206.36.143',
-      p_repo_connection_authurl => 'http://130.206.36.143:5000/v2.0/tokens'
+      rmq_host                  => '10.30.239.119',
+      p_repo_connection_authurl => 'http://10.30.239.119:5000/v2.0/tokens'
   }->
   file {
     ['/home/vagrant/stacksync_folder', '/home/vagrant/.stacksync', '/home/vagrant/.stacksync/cache']:

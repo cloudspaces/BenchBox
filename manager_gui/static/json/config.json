@@ -9,7 +9,7 @@
     },
     "ss": {
       "stacksync": {
-        "ip": "130.206.36.143",
+        "ip": "10.30.239.119",
         "port": 80
       },
       "owncloud": {
@@ -56,7 +56,7 @@
         },
         {
           "id": "d745174c-23d0-4df4-b956-3821691301a8",
-          "name": "demo3",
+          "name": "demo2",
           "swift_account": "AUTH_47f13d9fe178438580ffb08ddca763a4",
           "swift_user": "stacksync_3e456cdc_demo2",
           "email": "demo2@stacksync.org"

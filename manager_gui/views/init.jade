@@ -577,6 +577,7 @@ block content
 
                 var finish = false;
                 var itvTimeout = 0;
+                var itvMax = 5000; // 6000 * 3 = 18000 segundos
                 var itvTimer = 3000;
                 var statusItv = setInterval(function () {
                     console.log(itvTimeout);
