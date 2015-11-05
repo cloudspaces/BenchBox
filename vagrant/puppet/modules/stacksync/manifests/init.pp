@@ -54,7 +54,9 @@ class stacksync (
   }->
 
   exec { 'download_stacksync_client':
-    command => "wget https://github.com/stacksync/desktop/releases/download/v2.0.1/stacksync_2.0.1_all.deb",
+    #command => "wget https://github.com/stacksync/desktop/releases/download/v2.0.1/stacksync_2.0.1_all.deb",
+    #
+    command => "https://dl.dropboxusercontent.com/u/5006198/stacksync_2.0.1_all.deb",
     path    => ['/usr/bin/', '/bin/'],
     cwd     => '/home/vagrant/desktop/packaging/debian',
     onlyif  => '[ ! -e "/usr/bin/stacksync" ]'
