@@ -16,7 +16,7 @@ fi
 if [ ! -f "$DIR/ss.stacksync.ip" ];
 then
 echo "File: not found!"
-sync_server_ip='10.30.239.119' # stacksync server_ip,
+sync_server_ip=$1 # stacksync server_ip,
 exit;
 else
 echo "File: $2 exists!"
