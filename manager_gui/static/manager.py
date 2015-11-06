@@ -226,12 +226,43 @@ class ManagerOps():
         self.rmi(h['ip'], h['user'], h['passwd'], str_cmd)
         self.HOST_STATUS[hostname]['t6assignSyncServer'] = True
         # print 't6assignSyncServer/OK {} '.format(hostname)
-
     def warmUp(self, args):
         print 'warmUP'
+        # run execute only prepare directories
+        h = {
+            'ip': args['ip'][0],
+            'passwd': args['login'][0],
+            'user': args['login'][0],
+            'cred_stacksync': args['cred_stacksync'][0],
+            'cred_owncloud': args['cred_owncloud'][0],
+            'profile': args['profile'][0],
+            'stacksync-ip': args['stacksync-ip'][0],
+            'owncloud-ip': args['owncloud-ip'][0]
+        }
+        str_cmd = "if [ -d workload_generator ]; then " \
+                  "rm -R output; " \
+                  "fi; "
+
+        self.rmi(h['ip'], h['user'], h['passwd'], str_cmd)
 
     def tearDown(self, args):
+        # clear benchBox output directory
         print 'tearDown'
+        h = {
+            'ip': args['ip'][0],
+            'passwd': args['login'][0],
+            'user': args['login'][0],
+            'cred_stacksync': args['cred_stacksync'][0],
+            'cred_owncloud': args['cred_owncloud'][0],
+            'profile': args['profile'][0],
+            'stacksync-ip': args['stacksync-ip'][0],
+            'owncloud-ip': args['owncloud-ip'][0]
+        }
+        str_cmd = "if [ -d output ]; then " \
+                  "rm -R output; " \
+                  "fi; "
+
+        self.rmi(h['ip'], h['user'], h['passwd'], str_cmd)
 
     def vagrantDown(self, args):
         # if self.HOST_STATUS[hostname]
