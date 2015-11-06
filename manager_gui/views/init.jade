@@ -413,9 +413,15 @@ block content
                              $scope.editing[index] = false;
                              */
                         };
-                        $scope.rpc = function (name, cmd) {
+                        $scope.rpc = function (name, cmd, ss) {
                             // console.log()
                             // console.log($scope)
+                            if (ss === undefined){
+                                console.log("Not ss cmd")
+                            }else{
+                                console.info("ss cmd!")
+                                cmd = cmd + $("#radioDiv input[type='radio']:checked")[0].checked + ss;
+                            }
 
                             $('.' + name).each(function () {
                                 // console.log(this)
@@ -547,10 +553,23 @@ block content
 
                     case "vagrantProvisioned":
                         args.target = 'localhost';
-
                         //   statusCmd = 'hostname; ps -ef | grep provision | [ $(wc -l) -eq 1 ]; echo $?\?; ';
 
                         break;
+
+                    case "warmUp":
+                        args.target = 'benchBox';
+                        //  check benchBox ~/output folder not empty
+                        statusCmd = 'hostname; [ $(ls output) -ne 0 ]; echo $?\?; '
+                        break;
+
+                    case "tearDown":
+                        args.target = 'benchBox';
+                        statusCmd = 'hostname; [ $(ls output) -ne 0 ]; echo $?\?; '
+                        //  check that the benchBox ~/output folder is empty of residual files.
+
+                        break;
+
                     case "vagrantDown":
 
                         args.target = 'localhost';
@@ -639,7 +658,7 @@ block content
                             // si no existe un 0 implica que no ha terminado
                         } else {
                             // ha terminado
-                            console.info('StatusId: ' + statusId + 'Completed!');
+                            console.info('StatusId: ' + statusId + ' Completed!');
                             finish = true; // por que se ha encontrado un exit code zero
                             $.notify('SuccessStatus: ' + statusId + args.cmd, 'success');
                         }

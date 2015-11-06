@@ -58,6 +58,9 @@ def process_opt():
     parser.add_argument("-t", dest="itv", default=1, help="Option: itv #"
                                                              "example: ./executor.py -t 5")
 
+    parser.add_argument("-w", dest="warmup", default=0, help="Option: warmup #"
+                                                             "example: ./executor.py -w 1")
+
     parser.add_argument("-f", dest="folder", default='stacksync_folder', help="Option: ftp folder, folder owncloud_folder|stacksync_folder "
                                                           "example: ./executor.py -f owncloud_folder")
 
@@ -192,6 +195,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         print "{} :>>> ACTION".format(action)
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'PutContentResponse')
+        to_wait = random.randint(1, 10)
         print "Wait: {}s".format(to_wait)
         time.sleep(to_wait)
         action.perform_action(ftp_client)
@@ -207,8 +211,9 @@ class StereotypeExecutorU1(StereotypeExecutor):
         else:
             action = UpdateFile(synthetic_file_name,FS_SNAPSHOT_PATH)
             #to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'Sync')
-            print "Wait: {}s".format(2)
-            time.sleep(2)
+            to_wait = random.randint(1, 10)
+            print "Wait: {}s".format(to_wait)
+            time.sleep(to_wait)
 
             action.perform_action(ftp_client)
 
@@ -223,6 +228,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             action = DeleteFileOrDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
             '''Get the time to wait for this transition in millis'''
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'Unlink')
+            to_wait = random.randint(1, 10)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
             action.perform_action(ftp_client)
@@ -242,6 +248,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             action = MoveFileOrDirectory(src_mov, FS_SNAPSHOT_PATH, tgt_mov)
             '''Get the time to wait for this transition in millis'''
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'MoveResponse')
+            to_wait = random.randint(1, 10)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
             action.perform_action(ftp_client)
@@ -252,9 +259,10 @@ class StereotypeExecutorU1(StereotypeExecutor):
     def doGetContentResponse(self):
         print colored("doGetContentResponse",'blue')
 
-    #action = get_action(["GetContentResponse", 'sampleMake.txt', 'files/get/'], ftp_files)
+        #action = get_action(["GetContentResponse", 'sampleMake.txt', 'files/get/'], ftp_files)
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'GetContentResponse')
+        to_wait = random.randint(1, 10)
         print "Wait: {}s".format(to_wait)
         #action.perform_action(ftp_client)
 
@@ -314,73 +322,76 @@ if __name__ == '__main__':
 
 
     print "Syntetic File System Path:".format(FS_SNAPSHOT_PATH)
-    stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(ftp_client)
-    # stereotype_executor.doMakeResponse()
-
-
-
-
-    # read the line /vagrant/profile and use it
-
-    if opt.profile is not None:
-        profile_type = opt.profile
+    if opt.warmup is not 0:
+        stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(ftp_client)
     else:
-        with open('/vagrant/profile') as f:
-            profile_type= f.read().split('\n')[0]
-    #profile = '/home/vagrant/simulator/data/xl_markov_{}_all_ms.csv'.format(profile_type)
+
+        # stereotype_executor.doMakeResponse()
 
 
 
 
-    stereotype_executor.markov_chain.calculate_chain_relative_probabilities()
+        # read the line /vagrant/profile and use it
 
-    print 'IPTables/OK'
-    # os.system('sudo ./pcb/scripts/firewall start')
-    # os.system('sudo iptables -L')
-
-    print 'FTP/OK'
-    worker = None
-    print "Start executing/****************************"
-    # start monitoring
-    #sandBoxSocketIpPort = '192.168.56.101',11000
-    #monitor = CPUMonitor('192.168.56.101',11000)
-    interval = int(opt.itv)
-    log_filename = 'local.csv'
-    proc_name = opt.pid # if its stacksync
-    print interval
-    #monitor.start_monitor(interval, log_filename, proc_name, opt.ops, opt.profile, hostname)
-    #  operations = 100
-    #  operations = 10000
-    for i in range(operations):
-        # stereotype_executor.execute(sender, parser.get('executor','files_folder'))
-        stereotype_executor.execute()
-        print colored("doOps {}/{}".format(i, operations),'red')
-    # stop monitoring
-    #monitor.stop_monitor()
-    print "Finish executing/****************************"
+        if opt.profile is not None:
+            profile_type = opt.profile
+        else:
+            with open('/vagrant/profile') as f:
+                profile_type= f.read().split('\n')[0]
+        #profile = '/home/vagrant/simulator/data/xl_markov_{}_all_ms.csv'.format(profile_type)
 
 
 
-    print "Test do operations"
-    loops = 10
-    for ops in range(loops):
-        print "loop {}/{}".format(ops, loops)
-        stereotype_executor.doMoveResponse()
-        stereotype_executor.doSync()
-        stereotype_executor.doPutContentResponse()
-        stereotype_executor.doSync()
-        '''
-        stereotype_executor.doPutContentResponse()
-        stereotype_executor.doSync()
-        stereotype_executor.doUnlink()
-        stereotype_executor.doMoveResponse()
-        stereotype_executor.doPutContentResponse()
-        '''
-    print "Test do operations/DONE"
 
-    print "ClearingProcess/..."
+        stereotype_executor.markov_chain.calculate_chain_relative_probabilities()
 
-    # WarmUp move the output directory to the target
+        print 'IPTables/OK'
+        # os.system('sudo ./pcb/scripts/firewall start')
+        # os.system('sudo iptables -L')
+
+        print 'FTP/OK'
+        worker = None
+        print "Start executing/****************************"
+        # start monitoring
+        #sandBoxSocketIpPort = '192.168.56.101',11000
+        #monitor = CPUMonitor('192.168.56.101',11000)
+        interval = int(opt.itv)
+        log_filename = 'local.csv'
+        proc_name = opt.pid # if its stacksync
+        print interval
+        #monitor.start_monitor(interval, log_filename, proc_name, opt.ops, opt.profile, hostname)
+        #  operations = 100
+        #  operations = 10000
+        for i in range(operations):
+            # stereotype_executor.execute(sender, parser.get('executor','files_folder'))
+            stereotype_executor.execute()
+            print colored("doOps {}/{}".format(i, operations),'red')
+        # stop monitoring
+        #monitor.stop_monitor()
+        print "Finish executing/****************************"
+
+
+        """
+        print "Test do operations"
+        loops = 10
+        for ops in range(loops):
+            print "loop {}/{}".format(ops, loops)
+            stereotype_executor.doMoveResponse()
+            stereotype_executor.doSync()
+            stereotype_executor.doPutContentResponse()
+            stereotype_executor.doSync()
+            '''
+            stereotype_executor.doPutContentResponse()
+            stereotype_executor.doSync()
+            stereotype_executor.doUnlink()
+            stereotype_executor.doMoveResponse()
+            stereotype_executor.doPutContentResponse()
+            '''
+        print "Test do operations/DONE"
+
+        print "ClearingProcess/..."
+        """
+        # WarmUp move the output directory to the target
 
 
     if ftp_client:
