@@ -312,7 +312,6 @@ block content
                     })
 
 
-
                 //---------------
                 // Factory
                 //---------------
@@ -331,8 +330,7 @@ block content
 
 
                 // notify
-                    // .controller('ConnectionNotify', [])
-
+                // .controller('ConnectionNotify', [])
 
 
                 // hostDetails.html
@@ -362,7 +360,6 @@ block content
                             testFolder: 'stacksync_folder',
                             testClient: 'StackSync'
                         };
-
 
 
                         // controller actions
@@ -416,10 +413,25 @@ block content
                              $scope.editing[index] = false;
                              */
                         };
-                        $scope.rpc = function (index, cmd) {
-                            var host = $scope.hosts[index];
-                            console.log(host);
-                            rpcHost(host, cmd, addStatusScope); // port ssh
+                        $scope.rpc = function (name, cmd) {
+                            // console.log()
+                            // console.log($scope)
+
+                            $('.' + name).each(function () {
+                                // console.log(this)
+                                if ($(this).prop('checked')) {
+                                    var checkedId = this.value;
+                                    var host = $scope.hosts.filter(function (item) {
+                                        return item._id == checkedId
+                                    })
+
+                                    console.log("rpcHost" + cmd, this.name, checkedId, host[0]);
+                                    rpcHost(host[0], cmd, addStatusScope)
+                                }
+                            })
+                            // Hosts.get({id: this.value})
+                            // DETECTAR PER CLASS QUINES IDS ESTAN SELECCIONADES
+                            // rpcHost(host, cmd, addStatusScope); // port ssh
                             /*
                              Hosts.update({id: host._id}, host);
                              $scope.editing[index] = false;
@@ -431,7 +443,7 @@ block content
                             $scope.checkedAll = !$scope.checkedAll;
                             // console.log($scope.checkedAll );
                             $('.' + name).each(function () {
-                                console.log(this);
+                                // console.log(this);
                                 // (this).prop('checked', $scope.checkedAll);
                                 if ($(this).prop('checked') !== $scope.checkedAll)
                                     $(this).trigger('click');
@@ -439,7 +451,8 @@ block content
                             });
                         };
 
-                        $scope.runTest = function () {
+                        $scope.runTest = function (name) {
+
                             console.log($scope.hosts.length);
                             var test = $scope.run;
 
@@ -459,6 +472,8 @@ block content
                         };
 
                         $scope.edit = function (index) {
+                            console.log(index)
+                            console.log($scope.editing)
                             $scope.editing[index] = angular.copy($scope.hosts[index]);
                         };
                         $scope.cancel = function (index) {
@@ -505,29 +520,29 @@ block content
                         args.target = 'localhost'
                         statusCmd = 'hostname; ls BenchBox -R | grep -q ss.*.key; echo $?\?; ';
 
-                            // check if the vms exists
-                            // preparar scripts i realitzar comprovacions incrementals?
-                            // 1/6 existeix la carpeta benchbox i no esta buida?
-                            // 2/6 te instalat vagrant i virtualbox? | vagrant list-commands && $? -eq 0 &&
-                            // 3/6 te descarregat la imatge de vagrant?  | --> ls -l ~/BenchBox/vagrant/*.box
-                            // 4/6 te asignat el profile?  | --> ~/BenchBox/vagrant/profile
-                            /*
-                            comprovar que en la maquina estigui installats els claus dels usuaris
-                            si esta retorna 0 exit code OK
-                            else retorn != 0
-                            */
+                        // check if the vms exists
+                        // preparar scripts i realitzar comprovacions incrementals?
+                        // 1/6 existeix la carpeta benchbox i no esta buida?
+                        // 2/6 te instalat vagrant i virtualbox? | vagrant list-commands && $? -eq 0 &&
+                        // 3/6 te descarregat la imatge de vagrant?  | --> ls -l ~/BenchBox/vagrant/*.box
+                        // 4/6 te asignat el profile?  | --> ~/BenchBox/vagrant/profile
+                        /*
+                         comprovar que en la maquina estigui installats els claus dels usuaris
+                         si esta retorna 0 exit code OK
+                         else retorn != 0
+                         */
                         break;
                     case "vagrantUp":
                         args.target = 'localhost';
 
                         // ho to implement two phase check??,
                         statusCmd = 'hostname; VBoxManage list runningvms | [ $(wc -l) -eq 2 ]; echo $?\?; ';
-                            // check there are no provisioning procedures running
-                            // if its equal to one it belongs to the grep opration
-                            // how to know if the vms are running
-                            // VBoxManage list runningvms
-                            // and count the number of machines running
-                            // if its 2 we consider it ok but it might not be the case.
+                        // check there are no provisioning procedures running
+                        // if its equal to one it belongs to the grep opration
+                        // how to know if the vms are running
+                        // VBoxManage list runningvms
+                        // and count the number of machines running
+                        // if its 2 we consider it ok but it might not be the case.
                         break;
 
                     case "vagrantProvisioned":
@@ -546,26 +561,26 @@ block content
                     case "monitorUp":
                         args.target = 'sandBox';
                         statusCmd = 'hostname; pgrep python > /dev/null; echo $?\?; ';
-                            // how to check if the sandBox monitor listener is running?
-                            // check if an python process is running
-                            //
+                        // how to check if the sandBox monitor listener is running?
+                        // check if an python process is running
+                        //
                         break;
                     case "clientStacksyncUp":
                         statusCmd = 'hostname; pgrep java > /dev/null; echo $?\?; ';
                         args.target = 'sandBox';
-                            // check there is no java process running
+                        // check there is no java process running
                         break;
                     case "clientStacksyncDown":
                         statusCmd = 'hostname; pgrep java > /dev/null; [ $? -ne 0 ]; echo $?\?; ';
                         args.target = 'localhost';
-                            // check there is java process running
+                        // check there is java process running
                         break;
                     case "clientOwncloudUp":
                         statusCmd = 'hostname; echo 0\?; ';
                         args.target = 'benchBox';
                         break;
                     case "execute":
-                            // check if the execute procedure is still running at the benchBox machine.
+                    // check if the execute procedure is still running at the benchBox machine.
                     default:
                         console.log(args.cmd);
                         statusCmd = 'hostname; echo 0\?';
@@ -611,20 +626,20 @@ block content
                         var currStatus = $('#' + statusId).children('.stats').text();
                         var notFound = "-1"
                         console.log(currStatus)
-                        if (currStatus.indexOf('0?') == notFound){
+                        if (currStatus.indexOf('0?') == notFound) {
                             console.warn('Still not found!')
-                            if(currStatus.indexOf('No route to host') == notFound){
+                            if (currStatus.indexOf('No route to host') == notFound) {
                                 console.log('Waiting' + statusId);
-                            }else{
+                            } else {
                                 console.error('First setup vagrant up');
                                 $.notify('Require vagrantUp: ' + statusId + args.cmd, 'error');
                                 finish = true;
                             }
 
                             // si no existe un 0 implica que no ha terminado
-                        }else{
+                        } else {
                             // ha terminado
-                            console.info('StatusId: '+statusId+ 'Completed!');
+                            console.info('StatusId: ' + statusId + 'Completed!');
                             finish = true; // por que se ha encontrado un exit code zero
                             $.notify('SuccessStatus: ' + statusId + args.cmd, 'success');
                         }
@@ -867,7 +882,7 @@ block content
             };
 
             notifyButtonById = function (btnId) {
-              // self
+                // self
             };
 
             $.fn.graphite.defaults.url = "https://localhost:8443/renderer/";

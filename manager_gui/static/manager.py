@@ -197,9 +197,9 @@ class ManagerOps():
                   "echo 'Run: clients configuration scripts: '; " \
                   "cd scripts; " \
                   "./config.owncloud.sh; " \
-                  "./config.stacksync.sh; " \
+                  "./config.stacksync.sh;  '%s'" \
                   "echo 'clients configuration files generated'; " \
-                  "fi; " % (h['cred_stacksync'], h['cred_owncloud'], hostname)
+                  "fi; " % (h['cred_stacksync'], h['cred_owncloud'],  hostname, h['stacksync-ip'])
         # # print str_cmd
         self.rmi(h['ip'], h['user'], h['passwd'], str_cmd)
         self.HOST_STATUS[hostname]['t5assignCredentialsToProfile'] = True
@@ -226,6 +226,12 @@ class ManagerOps():
         self.rmi(h['ip'], h['user'], h['passwd'], str_cmd)
         self.HOST_STATUS[hostname]['t6assignSyncServer'] = True
         # print 't6assignSyncServer/OK {} '.format(hostname)
+
+    def warmUp(self, args):
+        print 'warmUP'
+
+    def tearDown(self, args):
+        print 'tearDown'
 
     def vagrantDown(self, args):
         # if self.HOST_STATUS[hostname]
@@ -378,7 +384,7 @@ class ManagerOps():
         hostname = args['hostname'][0]
         # print hostname
         # print 'tell sandBox at dummy host to clear the client StackSync'
-        str_cmd = '/usr/bin/stacksync clear &'
+        str_cmd = '/usr/bin/stacksync clearls &'
         self.rmisandBox(h['ip'], h['user'], h['passwd'], str_cmd)
         # have session at the dummy host
 
