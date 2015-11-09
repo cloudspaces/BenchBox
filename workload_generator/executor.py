@@ -12,6 +12,7 @@ import random
 import time
 import getpass
 from termcolor import colored
+from metrics.cpu_monitor import CPUMonitor
 
 
 '''
@@ -302,8 +303,8 @@ if __name__ == '__main__':
     print 'Logger/OK'
     # log experiment metadata
 
-    # print parser.options('executor')
-    #log = logger(parser.get('executor', 'output') + os.sep + "metadata.log", dict(parser._sections['executor']) )
+    print parser.options('executor')
+    # log = logger(parser.get('executor', 'output') + os.sep + "metadata.log", dict(parser._sections['executor']) )
     ftp_client = ftp_sender(parser.get('executor','ftp'),
                         parser.get('executor','port'),
                         parser.get('executor','user'),
@@ -353,13 +354,13 @@ if __name__ == '__main__':
         worker = None
         print "Start executing/****************************"
         # start monitoring
-        #sandBoxSocketIpPort = '192.168.56.101',11000
-        #monitor = CPUMonitor('192.168.56.101',11000)
+        # sandBoxSocketIpPort = '192.168.56.101',11000
+        monitor = CPUMonitor('192.168.56.101',11000)
         interval = int(opt.itv)
         log_filename = 'local.csv'
-        proc_name = opt.pid # if its stacksync
+        proc_name = opt.pid  # if its stacksync
         print interval
-        #monitor.start_monitor(interval, log_filename, proc_name, opt.ops, opt.profile, hostname)
+        monitor.start_monitor(interval, log_filename, proc_name, opt.ops, opt.profile, hostname)
         #  operations = 100
         #  operations = 10000
         for i in range(operations):
@@ -367,7 +368,7 @@ if __name__ == '__main__':
             stereotype_executor.execute()
             print colored("doOps {}/{}".format(i, operations),'red')
         # stop monitoring
-        #monitor.stop_monitor()
+        monitor.stop_monitor()
         print "Finish executing/****************************"
 
 
