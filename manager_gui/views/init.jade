@@ -414,13 +414,15 @@ block content
                              */
                         };
                         $scope.rpc = function (name, cmd, ss) {
-                            // console.log()
+                            console.info(name, cmd, ss)
                             // console.log($scope)
-                            if (ss === undefined){
+                            if (ss == undefined){
                                 console.log("Not ss cmd")
+
                             }else{
                                 console.info("ss cmd!")
-                                cmd = cmd + $("#radioDiv input[type='radio']:checked")[0].checked + ss;
+                                cmd = cmd + $("#ssRadio input[type='radio']:checked")[0].value + ss;
+                                console.log(cmd)
                             }
 
                             $('.' + name).each(function () {
@@ -431,8 +433,13 @@ block content
                                         return item._id == checkedId
                                     })
 
-                                    console.log("rpcHost" + cmd, this.name, checkedId, host[0]);
-                                    rpcHost(host[0], cmd, addStatusScope)
+                                    if(cmd !== 'warmUp'){
+                                        console.log("rpcHost" + cmd, this.name, checkedId, host[0]);
+                                        rpcHost(host[0], cmd, addStatusScope)
+                                    }else{
+                                        console.log("warmUp" + cmd, this.name, checkedId, host[0]);
+                                        runTest(host[0], cmd, addStatusScope)
+                                    }
                                 }
                             })
                             // Hosts.get({id: this.value})
@@ -457,11 +464,18 @@ block content
                             });
                         };
 
-                        $scope.runTest = function (name) {
+                        $scope.runTest = function (warmup) {
 
                             console.log($scope.hosts.length);
                             var test = $scope.run;
 
+
+                            if(warmup){
+                                test.warmup = true; !!!
+                            }
+
+                            console.log(name)
+                            console.log(test)
                             var hosts = $scope.hosts.filter(function (item) {
                                 console.log(item);
                                 if (item.test)
@@ -473,7 +487,7 @@ block content
                             else
                                 $.notify('Request rpcTest forwarded!', 'info');
                             console.log('Hosts!!!');
-                            rpcTest(hosts, test);
+                            // rpcTest(hosts, test);
 
                         };
 
@@ -560,12 +574,12 @@ block content
                     case "warmUp":
                         args.target = 'benchBox';
                         //  check benchBox ~/output folder not empty
-                        statusCmd = 'hostname; [ $(ls output) -ne 0 ]; echo $?\?; '
+                        statusCmd = 'hostname; [ -d output ]; echo $?\?; '
                         break;
 
                     case "tearDown":
                         args.target = 'benchBox';
-                        statusCmd = 'hostname; [ $(ls output) -ne 0 ]; echo $?\?; '
+                        statusCmd = 'hostname; [ ! -d output ]; echo $?\?; '
                         //  check that the benchBox ~/output folder is empty of residual files.
 
                         break;
@@ -877,6 +891,11 @@ block content
                         }
                     });
                 });
+
+                /*
+                if (cb !== undefined)
+                    cb()
+                */
             };
 
             appendAllParams = function (target, className) {

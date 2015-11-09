@@ -240,14 +240,15 @@ class ManagerOps():
             'owncloud-ip': args['owncloud-ip'][0]
         }
         str_cmd = "if [ -d workload_generator ]; then " \
-                  "rm -R output; " \
-                  "fi; "
+                  "cd workload_generator;" \
+                  "./executor.py -o {} -p {} -t {} -f {} -x {} -w 1; " \
+                  "fi; ".format(0, 'backupsample', 0, 'stacksync_folder', 'StackSync')
 
-        self.rmi(h['ip'], h['user'], h['passwd'], str_cmd)
+        self.rmisandBox(h['ip'], h['user'], h['passwd'], str_cmd)
 
     def tearDown(self, args):
         # clear benchBox output directory
-        print 'tearDown'
+        print 'TEARDOWN'
         h = {
             'ip': args['ip'][0],
             'passwd': args['login'][0],
@@ -258,11 +259,11 @@ class ManagerOps():
             'stacksync-ip': args['stacksync-ip'][0],
             'owncloud-ip': args['owncloud-ip'][0]
         }
-        str_cmd = "if [ -d output ]; then " \
-                  "rm -R output; " \
+        str_cmd = "if [ -d ~/output ]; then " \
+                  "rm -R ~/output; " \
                   "fi; "
 
-        self.rmi(h['ip'], h['user'], h['passwd'], str_cmd)
+        self.rmibenchBox(h['ip'], h['user'], h['passwd'], str_cmd)
 
     def vagrantDown(self, args):
         # if self.HOST_STATUS[hostname]
@@ -377,7 +378,8 @@ class ManagerOps():
         self.rmisandBox(h['ip'], h['user'], h['passwd'], str_cmd)
         # have session at the dummy host
 
-    def clientStacksyncUp(self, args):
+
+    def clientStackSyncUp(self, args):
 
         # if self.HOST_STATUS[hostname]
         h = {
@@ -398,7 +400,7 @@ class ManagerOps():
         self.rmisandBox(h['ip'], h['user'], h['passwd'], str_cmd)
         # have session at the dummy host
 
-    def clientStacksyncDown(self, args):
+    def clientStackSyncDown(self, args):
 
         # if self.HOST_STATUS[hostname]
         h = {
@@ -420,7 +422,7 @@ class ManagerOps():
         # have session at the dummy host
 
 
-    def clientOwncloudUp(self, args):
+    def clientOwnCloudUp(self, args):
 
         # if self.HOST_STATUS[hostname]
         h = {
@@ -587,8 +589,8 @@ class Manager(object):
     def cmd(self, name):
         str = urllib.quote_plus(name)
         # # print name
-        # # print str
-        # # print 'Request: -> cmd {}'.format(name)
+        print str
+        print 'Request: -> cmd {}'.format(name)
         output = subprocess.check_output(['bash', '-c', urllib.unquote_plus(name)])
         return output.split('\n')
 
