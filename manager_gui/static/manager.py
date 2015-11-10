@@ -55,7 +55,9 @@ class ManagerOps():
             'cred_owncloud': args['cred_owncloud'][0],
             'profile': args['profile'][0],
             'stacksync-ip': args['stacksync-ip'][0],
-            'owncloud-ip': args['owncloud-ip'][0]
+            'owncloud-ip': args['owncloud-ip'][0],
+            'impala-ip': args['impala-ip'][0],
+            'graphite-ip': args['graphite-ip'][0]
         }
         # print h
         hostname = args['hostname'][0]
@@ -215,18 +217,26 @@ class ManagerOps():
         # # print config
         owncloud_ip = h['owncloud-ip']
         stacksync_ip = h['stacksync-ip']
+        impala_ip = h['impala-ip']
+        graphite_ip = h['graphite-ip']
 
         str_cmd = "" \
                   "if [ -d BenchBox ]; then " \
                   "cd BenchBox/vagrant; " \
                   "echo '%s' > ss.stacksync.ip; " \
                   "echo '%s' > ss.owncloud.ip; " \
-                  "fi; " % (stacksync_ip, owncloud_ip)
+                  "echo '%s' > log.impala.ip; " \
+                  "echo '%s' > log.graphite.ip; " \
+                  "fi; " % (stacksync_ip, owncloud_ip, impala_ip, graphite_ip)
 
         # # print str_cmd
         self.rmi(h['ip'], h['user'], h['passwd'], str_cmd)
         self.HOST_STATUS[hostname]['t6assignSyncServer'] = True
         # print 't6assignSyncServer/OK {} '.format(hostname)
+
+
+
+
     def warmUp(self, args):
         print 'warmUP'
         # run execute only prepare directories
