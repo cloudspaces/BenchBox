@@ -355,12 +355,17 @@ if __name__ == '__main__':
         print "Start executing/****************************"
         # start monitoring
         # sandBoxSocketIpPort = '192.168.56.101',11000
-        monitor = CPUMonitor('192.168.56.101',11000)
-        interval = int(opt.itv)
-        log_filename = 'local.csv'
-        proc_name = opt.pid  # if its stacksync
-        print interval
-        monitor.start_monitor(interval, log_filename, proc_name, opt.ops, opt.profile, hostname)
+
+        try:
+            monitor = CPUMonitor('192.168.56.101',11000)
+            interval = int(opt.itv)
+            log_filename = 'local.csv'
+            proc_name = opt.pid  # if its stacksync
+            print interval
+            monitor.start_monitor(interval, log_filename, proc_name, opt.ops, opt.profile, hostname)
+        except:
+            print "Could not connect to SocketListener at sandBox".format(Exception)
+
         #  operations = 100
         #  operations = 10000
         for i in range(operations):
@@ -368,7 +373,8 @@ if __name__ == '__main__':
             stereotype_executor.execute()
             print colored("doOps {}/{}".format(i, operations),'red')
         # stop monitoring
-        monitor.stop_monitor()
+        if monitor:
+            monitor.stop_monitor()
         print "Finish executing/****************************"
 
 
