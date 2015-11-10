@@ -19,7 +19,14 @@ class PerformanceCounter:
         self.processName = processName
         self.log_file = self.Type + '_append.log'
         self.logger = open(self.log_file, 'w').close() # clear the log file for new session
-        graphiteUrl = '10.30.103.95' # has to be ip if we test with lab machines
+
+        # graphiteUrl = '10.30.103.146'  # has to be ip if we test with lab machines
+
+        with open('/vagrant/log.graphite.ip', 'r') as f:
+            first_line = f.readline()
+
+        graphiteUrl = first_line
+
         graphitePort = 22003
         self.gc = GraphiteClient(graphiteUrl, graphitePort)
         self.gc.initClient()

@@ -270,14 +270,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
 if __name__ == '__main__':
 
-    # Root permissions are needed, and some checks to save existing files
-    # if not os.geteuid() == 0:
-    #     print "Only root can run this script"  # exit()
-    # else:
-    #     print 'Config/OK'
 
-
-    # read hostname
     hostname = None
     try:
         f = open('/vagrant/hostname', 'r')
@@ -323,40 +316,23 @@ if __name__ == '__main__':
 
 
     print "Syntetic File System Path:".format(FS_SNAPSHOT_PATH)
-
-    stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(ftp_client)
     if opt.warmup is not 0:
         print "only warming up"
+        stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(ftp_client)
     else:
-        # stereotype_executor.doMakeResponse()
-
-
-
-
-        # read the line /vagrant/profile and use it
+        stereotype_executor.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
 
         if opt.profile is not None:
             profile_type = opt.profile
         else:
             with open('/vagrant/profile') as f:
-                profile_type= f.read().split('\n')[0]
-        #profile = '/home/vagrant/simulator/data/xl_markov_{}_all_ms.csv'.format(profile_type)
-
-
-
+                profile_type = f.read().split('\n')[0]
 
         stereotype_executor.markov_chain.calculate_chain_relative_probabilities()
-
-        print 'IPTables/OK'
-        # os.system('sudo ./pcb/scripts/firewall start')
-        # os.system('sudo iptables -L')
 
         print 'FTP/OK'
         worker = None
         print "Start executing/****************************"
-        # start monitoring
-        # sandBoxSocketIpPort = '192.168.56.101',11000
-
         try:
             monitor = CPUMonitor('192.168.56.101',11000)
             interval = int(opt.itv)
@@ -364,11 +340,10 @@ if __name__ == '__main__':
             proc_name = opt.pid  # if its stacksync
             print interval
             monitor.start_monitor(interval, log_filename, proc_name, opt.ops, opt.profile, hostname)
-        except:
+        except :
             print "Could not connect to SocketListener at sandBox".format(Exception)
 
         #  operations = 100
-        #  operations = 10000
         for i in range(operations):
         # stereotype_executor.execute(sender, parser.get('executor','files_folder'))
             stereotype_executor.execute()
