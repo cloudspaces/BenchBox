@@ -47,7 +47,7 @@ class ManagerOps():
     def setup(self, args):
         print 'ManagerOps {}'.format(args['cmd'][0])
 
-        h = {
+        host_settings = {
             'ip': args['ip'][0],
             'passwd': args['login'][0],
             'user': args['login'][0],
@@ -59,7 +59,7 @@ class ManagerOps():
             'impala-ip': args['impala-ip'][0],
             'graphite-ip': args['graphite-ip'][0]
         }
-        # print h
+        print host_settings
         hostname = args['hostname'][0]
         # print hostname
         if not self.HOST_STATUS.has_key(hostname):
@@ -68,12 +68,12 @@ class ManagerOps():
         else:
             print 'have {}'.format(hostname)
 
-        self.t1downloadBenchBox(h, hostname)
-        self.t2installVagrantVBox(h, hostname)
-        self.t3downloadVagrantBoxImg(h, hostname)
-        self.t4assignStereoTypeToProfile(h, hostname)
-        self.t5assignCredentialsToProfile(h, hostname)
-        self.t6assignSyncServer(h, hostname)
+        self.t1downloadBenchBox(host_settings, hostname)
+        self.t2installVagrantVBox(host_settings, hostname)
+        self.t3downloadVagrantBoxImg(host_settings, hostname)
+        self.t4assignStereoTypeToProfile(host_settings, hostname)
+        self.t5assignCredentialsToProfile(host_settings, hostname)
+        self.t6assignSyncServer(host_settings, hostname)
 
         return self.HOST_STATUS[hostname]
 
@@ -188,7 +188,7 @@ class ManagerOps():
         # if self.HOST_STATUS[hostname].has_key('t5assignCredentialsToProfile'):
         #    # print 'HAS true'
         #    return True
-        print 't5assignCredentialsToProfile'
+        # print 't5assignCredentialsToProfile'
         str_cmd = "" \
                   "if [ -d BenchBox ]; then " \
                   "cd BenchBox; " \
@@ -229,7 +229,7 @@ class ManagerOps():
                   "echo '%s' > log.graphite.ip; " \
                   "fi; " % (stacksync_ip, owncloud_ip, impala_ip, graphite_ip)
 
-        # # print str_cmd
+        print str_cmd
         self.rmi(h['ip'], h['user'], h['passwd'], str_cmd)
         self.HOST_STATUS[hostname]['t6assignSyncServer'] = True
         # print 't6assignSyncServer/OK {} '.format(hostname)

@@ -23,11 +23,11 @@
         "port": 21050
       },
       "graphite": {
-        "ip": "localhost",
+        "ip": "10.30.103.146",
         "port": 8443
       },
       "grafana": {
-        "ip": "localhost",
+        "ip": "10.30.103.146",
         "port": 3000
       }
     },
