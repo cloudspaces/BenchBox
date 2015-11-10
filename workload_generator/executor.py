@@ -323,10 +323,11 @@ if __name__ == '__main__':
 
 
     print "Syntetic File System Path:".format(FS_SNAPSHOT_PATH)
-    if opt.warmup is not 0:
-        stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(ftp_client)
-    else:
 
+    stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(ftp_client)
+    if opt.warmup is not 0:
+        print "only warming up"
+    else:
         # stereotype_executor.doMakeResponse()
 
 
@@ -368,18 +369,11 @@ if __name__ == '__main__':
 
         #  operations = 100
         #  operations = 10000
-        while True:
-            try:
-                for i in range(operations):
-                # stereotype_executor.execute(sender, parser.get('executor','files_folder'))
-                    stereotype_executor.execute()
-                    print colored("doOps {}/{}".format(i, operations),'red')
-                    # stop monitoring
-                break # Only triggered if input is valid...
-            except ValueError:
-                print "Require warmup!!! output folder not found!"
-                stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(ftp_client)
-                print "warmup..."
+        for i in range(operations):
+        # stereotype_executor.execute(sender, parser.get('executor','files_folder'))
+            stereotype_executor.execute()
+            print colored("doOps {}/{}".format(i, operations),'red')
+            # stop monitoring
 
         if monitor:
             monitor.stop_monitor()
