@@ -77,7 +77,7 @@ class ManagerOps():
 
     def test(self, args):
         # print 'Test args'
-        print args
+        # print args
         # if self.HOST_STATUS[hostname]
 
         h = {
