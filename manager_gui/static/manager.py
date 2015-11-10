@@ -77,7 +77,7 @@ class ManagerOps():
 
     def test(self, args):
         # print 'Test args'
-        # print args
+        print args
         # if self.HOST_STATUS[hostname]
 
         h = {
@@ -94,7 +94,7 @@ class ManagerOps():
             'operations': args['test[testOps]'][0],
             'client': args['test[testClient]'][0],
             'interval': args['test[testItv]'][0],
-            'warmup': args['test[testWarmUp'][0]
+            'warmup': args['test[testWarmUp]'][0]
         }
 
         # print test
