@@ -44,7 +44,9 @@ from workload_generator.model.data_layer.data_generator import DataGenerator
 from workload_generator.communication.ftp_sender import ftp_sender
 from workload_generator.communication.actions import CreateFileOrDirectory, UpdateFile, DeleteFileOrDirectory, MoveFileOrDirectory
 
-from workload_generator.constants import DEBUG, FS_SNAPSHOT_PATH, STEREOTYPE_RECIPES_PATH
+from workload_generator.constants import DEBUG, FS_SNAPSHOT_PATH, STEREOTYPE_RECIPES_PATH, \
+    BENCHBOX_IP, CPU_MONITOR_PORT, TO_WAIT_STATIC_MAX, TO_WAIT_STATIC_MIN,\
+    FTP_SENDER_IP, FTP_SENDER_PASS, FTP_SENDER_PORT, FTP_SENDER_USER
 
 
 def process_opt():
@@ -196,7 +198,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         print "{} :>>> ACTION".format(action)
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'PutContentResponse')
-        to_wait = random.randint(1, 10)
+        to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         print "Wait: {}s".format(to_wait)
         time.sleep(to_wait)
         action.perform_action(ftp_client)
@@ -212,7 +214,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         else:
             action = UpdateFile(synthetic_file_name,FS_SNAPSHOT_PATH)
             #to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'Sync')
-            to_wait = random.randint(1, 10)
+            to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
 
@@ -221,15 +223,15 @@ class StereotypeExecutorU1(StereotypeExecutor):
     def doUnlink(self):
         print colored("doUnlink",'yellow')
         synthetic_file_name = None
-        #if random.random() > 0.25:
-        #    synthetic_file_name = self.data_generator.delete_file()
-        #else:
-        synthetic_file_name = self.data_generator.delete_directory()
+        if random.random() > 0.25:
+            synthetic_file_name = self.data_generator.delete_file()
+        else:
+            synthetic_file_name = self.data_generator.delete_directory()
         if synthetic_file_name:
             action = DeleteFileOrDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
             '''Get the time to wait for this transition in millis'''
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'Unlink')
-            to_wait = random.randint(1, 10)
+            to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
             action.perform_action(ftp_client)
@@ -239,17 +241,17 @@ class StereotypeExecutorU1(StereotypeExecutor):
     #TODO: Needs implementation in data generator first
     def doMoveResponse(self):
         print colored("doMoveResponse",'magenta')
-        #if random.random() > 0.25:
-         #   synthetic_file_name = self.data_generator.move_file()
-        #else:
-        synthetic_file_name = self.data_generator.move_directory()
+        if random.random() > 0.25:
+            synthetic_file_name = self.data_generator.move_file()
+        else:
+            synthetic_file_name = self.data_generator.move_directory()
         print synthetic_file_name
         (src_mov, tgt_mov) = synthetic_file_name
         if src_mov:
             action = MoveFileOrDirectory(src_mov, FS_SNAPSHOT_PATH, tgt_mov)
             '''Get the time to wait for this transition in millis'''
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'MoveResponse')
-            to_wait = random.randint(1, 10)
+            to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
             action.perform_action(ftp_client)
@@ -259,11 +261,9 @@ class StereotypeExecutorU1(StereotypeExecutor):
     #TODO: Let's see how we can solve this
     def doGetContentResponse(self):
         print colored("doGetContentResponse",'blue')
-
-        #action = get_action(["GetContentResponse", 'sampleMake.txt', 'files/get/'], ftp_files)
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'GetContentResponse')
-        to_wait = random.randint(1, 10)
+        to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         print "Wait: {}s".format(to_wait)
         #action.perform_action(ftp_client)
 
@@ -287,22 +287,14 @@ if __name__ == '__main__':
 
 
     parser.read('./config.ini')
-    print parser.get('executor', 'interface')   # eth0
-    print parser.get('executor', 'ftp')         # 192.168.56.2
-    print parser.get('executor', 'port')        # 21
-    print parser.get('executor', 'user')        # cotes -> vagrant
-    print parser.get('executor', 'passwd')      # lab144 -> vagrant
+
 
     print 'Logger/OK'
     # log experiment metadata
 
     print parser.options('executor')
     # log = logger(parser.get('executor', 'output') + os.sep + "metadata.log", dict(parser._sections['executor']) )
-    ftp_client = ftp_sender(parser.get('executor','ftp'),
-                        parser.get('executor','port'),
-                        parser.get('executor','user'),
-                        parser.get('executor','passwd'),
-                        opt.folder)
+    ftp_client = ftp_sender(FTP_SENDER_IP, FTP_SENDER_PORT, FTP_SENDER_USER, FTP_SENDER_PASS, opt.folder)
     # parser.get('executor','folder')) # root path ftp_client directory :: ~/stacksync_folder
     # ftp_files = parser.get('executor','files_folder') # relative path to local files :: ./files/demoFiles.txt
     print 'Markov/OK'
@@ -334,7 +326,7 @@ if __name__ == '__main__':
         worker = None
         print "Start executing/****************************"
         try:
-            monitor = CPUMonitor('192.168.56.101',11000)
+            monitor = CPUMonitor(BENCHBOX_IP, CPU_MONITOR_PORT)
             interval = int(opt.itv)
             log_filename = 'local.csv'
             proc_name = opt.pid  # if its stacksync
@@ -350,8 +342,11 @@ if __name__ == '__main__':
             print colored("doOps {}/{}".format(i, operations),'red')
             # stop monitoring
 
-        if monitor:
+        try:
             monitor.stop_monitor()
+        except:
+            print 'Error stoping cpu_monitor'
+
         print "Finish executing/****************************"
 
 

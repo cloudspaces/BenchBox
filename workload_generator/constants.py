@@ -60,3 +60,19 @@ UPDATES_CONTENT_GENERATION_PATH = PROJECT_PATH + "workload_generator/updates_con
 DIRECTORY_DEPTH_PROBABILITY = 0.1
 FS_IMAGE_PATH = PROJECT_PATH + "workload_generator/external/impressions"
 FS_IMAGE_CONFIG_PATH = PROJECT_PATH + "workload_generator/external/impressions_config"
+
+
+# executor constants
+
+SANDBOX_IP = '192.168.56.101'
+BENCHBOX_IP = '192.168.56.2'
+CPU_MONITOR_PORT = 11000
+TO_WAIT_STATIC_MAX = 8
+TO_WAIT_STATIC_MIN = 1
+
+# FTP SENDER CONSTANTS
+
+FTP_SENDER_IP = SANDBOX_IP
+FTP_SENDER_PORT = 21
+FTP_SENDER_USER = 'vagrant'
+FTP_SENDER_PASS = 'vagrant'
