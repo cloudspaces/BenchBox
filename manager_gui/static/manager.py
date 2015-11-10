@@ -94,12 +94,13 @@ class ManagerOps():
             'operations': args['test[testOps]'][0],
             'client': args['test[testClient]'][0],
             'interval': args['test[testItv]'][0],
+            'warmup': args['test[testWarmUp'][0]
         }
 
         # print test
         # print 'tell benchBox at dummy host to run Test'
         # str_cmd = './monitor/startMonitor.sh'
-        str_cmd = 'cd /home/vagrant/workload_generator && ./executor.py -o {} -p {} -t {} -f {} -x {}'.format(test['operations'], test['profile'], test['interval'], test['folder'], test['client'])
+        str_cmd = 'cd /home/vagrant/workload_generator && ./executor.py -o {} -p {} -t {} -f {} -x {} -w {}'.format(test['operations'], test['profile'], test['interval'], test['folder'], test['client'], test['warmup'])
         # print str_cmd
         self.rmibenchBox(h['ip'], h['user'], h['passwd'], str_cmd)
 
@@ -417,7 +418,7 @@ class ManagerOps():
         hostname = args['hostname'][0]
         # print hostname
         # print 'tell sandBox at dummy host to clear the client StackSync'
-        str_cmd = '/usr/bin/stacksync clearls &'
+        str_cmd = '/usr/bin/stacksync clear &'
         self.rmisandBox(h['ip'], h['user'], h['passwd'], str_cmd)
         # have session at the dummy host
 

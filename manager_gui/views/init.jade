@@ -416,32 +416,33 @@ block content
                         $scope.rpc = function (name, cmd, ss) {
                             console.info(name, cmd, ss)
                             // console.log($scope)
-                            if (ss == undefined){
+                            if (ss == undefined) {
                                 console.log("Not ss cmd")
 
-                            }else{
+                            } else {
                                 console.info("ss cmd!")
                                 cmd = cmd + $("#ssRadio input[type='radio']:checked")[0].value + ss;
                                 console.log(cmd)
                             }
+                            if (cmd !== 'warmUp') {
+                                $('.' + name).each(function () {
+                                    // console.log(this)
+                                    if ($(this).prop('checked')) {
+                                        var checkedId = this.value;
+                                        var host = $scope.hosts.filter(function (item) {
+                                            return item._id == checkedId
+                                        })
 
-                            $('.' + name).each(function () {
-                                // console.log(this)
-                                if ($(this).prop('checked')) {
-                                    var checkedId = this.value;
-                                    var host = $scope.hosts.filter(function (item) {
-                                        return item._id == checkedId
-                                    })
 
-                                    if(cmd !== 'warmUp'){
                                         console.log("rpcHost" + cmd, this.name, checkedId, host[0]);
                                         rpcHost(host[0], cmd, addStatusScope)
-                                    }else{
-                                        console.log("warmUp" + cmd, this.name, checkedId, host[0]);
-                                        runTest(host[0], cmd, addStatusScope)
+
                                     }
-                                }
-                            })
+                                })
+                            } else {
+                                console.log("warmUp" + cmd, this.name, checkedId, host[0]);
+                                runTest(cmd)
+                            }
                             // Hosts.get({id: this.value})
                             // DETECTAR PER CLASS QUINES IDS ESTAN SELECCIONADES
                             // rpcHost(host, cmd, addStatusScope); // port ssh
@@ -464,14 +465,16 @@ block content
                             });
                         };
 
-                        $scope.runTest = function (warmup) {
+                        $scope.runTest = function (warmup, cb) {
 
                             console.log($scope.hosts.length);
                             var test = $scope.run;
 
 
-                            if(warmup){
-                                test.warmup = true; !!!
+                            if (warmup === undefined) {
+                                test.testWarmUp = '0';
+                            } else {
+                                test.testWarmUp = '1';
                             }
 
                             console.log(name)
@@ -487,7 +490,7 @@ block content
                             else
                                 $.notify('Request rpcTest forwarded!', 'info');
                             console.log('Hosts!!!');
-                            // rpcTest(hosts, test);
+                            rpcTest(hosts, test);
 
                         };
 
@@ -893,9 +896,9 @@ block content
                 });
 
                 /*
-                if (cb !== undefined)
-                    cb()
-                */
+                 if (cb !== undefined)
+                 cb()
+                 */
             };
 
             appendAllParams = function (target, className) {
