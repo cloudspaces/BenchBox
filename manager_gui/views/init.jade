@@ -117,18 +117,18 @@ block content
                     .col-md-2
                         p StackSync Server
                     .col-md-6
-                        input.bb-config.form-control#stacksync-ip(type='text' placeholder='ss.stacksync.ip' value='#{session.config.ss.stacksync.ip}')
+                        input.bb-config.form-control#stacksync-ip(type='text' placeholder='ss.stacksync.ip' value="#{session.config.ss.stacksync.ip}")
                     .col-md-2
-                        input.bb-config.form-control#stacksync-port(type='text' placeholder='ss.stacksync.port' value='#{session.config.ss.stacksync.port}')
+                        input.bb-config.form-control#stacksync-port(type='text' placeholder='ss.stacksync.port' value="#{session.config.ss.stacksync.port}")
                     .col-md-2
                         button.btn.btn-primary.btn-block(onclick="testConnection($('#stacksync-ip').val(),$('#stacksync-port').val())") Test Connect
                 .row.col-md-12
                     .col-md-2
                         p OwnCloud Server
                     .col-md-6
-                        input.bb-config.form-control#owncloud-ip(type='text' placeholder='ss.owncloud.ip' value='#{session.config.ss.owncloud.ip}')
+                        input.bb-config.form-control#owncloud-ip(type='text' placeholder='ss.owncloud.ip' value="#{session.config.ss.owncloud.ip}")
                     .col-md-2
-                        input.bb-config.form-control#owncloud-port(type='text' placeholder='ss.owncloud.port' value='#{session.config.ss.owncloud.port}')
+                        input.bb-config.form-control#owncloud-port(type='text' placeholder='ss.owncloud.port' value="#{session.config.ss.owncloud.port}")
                     .col-md-2
                         button.btn.btn-primary.btn-block(onclick="testConnection($('#owncloud-ip').val(),$('#owncloud-port').val())") Test Connect
                 .row.col-md-12
@@ -904,7 +904,9 @@ block content
 
             appendAllParams = function (target, className) {
                 $('.' + className).each(function () {
-                    target[$(this).attr("id")] = ($(this).attr('value'));
+                    // console.log(this)
+
+                    target[$(this).attr("id")] = (this.value);
                 });
             };
 

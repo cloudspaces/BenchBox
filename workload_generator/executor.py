@@ -340,7 +340,7 @@ if __name__ == '__main__':
             proc_name = opt.pid  # if its stacksync
             print interval
             monitor.start_monitor(interval, log_filename, proc_name, opt.ops, opt.profile, hostname)
-        except :
+        except:
             print "Could not connect to SocketListener at sandBox".format(Exception)
 
         #  operations = 100
