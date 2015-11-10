@@ -186,7 +186,7 @@ class ManagerOps():
         # if self.HOST_STATUS[hostname].has_key('t5assignCredentialsToProfile'):
         #    # print 'HAS true'
         #    return True
-        # print 't5assignCredentialsToProfile'
+        print 't5assignCredentialsToProfile'
         str_cmd = "" \
                   "if [ -d BenchBox ]; then " \
                   "cd BenchBox; " \

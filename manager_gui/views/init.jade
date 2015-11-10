@@ -440,7 +440,7 @@ block content
                                     }
                                 })
                             } else {
-                                console.log("warmUp" + cmd, this.name, checkedId, host[0]);
+                                console.log("warmUp" + cmd);
                                 runTest(cmd)
                             }
                             // Hosts.get({id: this.value})
@@ -561,11 +561,12 @@ block content
                         // ho to implement two phase check??,
                         statusCmd = 'hostname; VBoxManage list runningvms | [ $(wc -l) -eq 2 ]; echo $?\?; ';
                         // check there are no provisioning procedures running
-                        // if its equal to one it belongs to the grep opration
+                        // if its equal to one it belongs to the grep operation
                         // how to know if the vms are running
                         // VBoxManage list runningvms
                         // and count the number of machines running
                         // if its 2 we consider it ok but it might not be the case.
+
                         break;
 
                     case "vagrantProvisioned":
