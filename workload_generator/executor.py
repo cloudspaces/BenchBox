@@ -368,11 +368,19 @@ if __name__ == '__main__':
 
         #  operations = 100
         #  operations = 10000
-        for i in range(operations):
-            # stereotype_executor.execute(sender, parser.get('executor','files_folder'))
-            stereotype_executor.execute()
-            print colored("doOps {}/{}".format(i, operations),'red')
-        # stop monitoring
+        while True:
+            try:
+                for i in range(operations):
+                # stereotype_executor.execute(sender, parser.get('executor','files_folder'))
+                    stereotype_executor.execute()
+                    print colored("doOps {}/{}".format(i, operations),'red')
+                    # stop monitoring
+                break # Only triggered if input is valid...
+            except ValueError:
+                print "Require warmup!!! output folder not found!"
+                stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(ftp_client)
+                print "warmup..."
+
         if monitor:
             monitor.stop_monitor()
         print "Finish executing/****************************"
