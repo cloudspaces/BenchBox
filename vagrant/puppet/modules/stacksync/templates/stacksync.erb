@@ -22,12 +22,13 @@ if [ $1 == 'clear' ]; then
 java_proc=$(pgrep java)
 if [ $? -eq 0 ]; then
 kill -9 $java_proc
-rm ~/.stacksync -R
-rm ~/stacksync_folder/* -R
-echo 'Cleaning bd and stacksync_folder /OK'
+
 else
 echo 'No proc found!'
 fi
+rm ~/.stacksync -R
+rm ~/stacksync_folder/* -R
+echo 'Cleaning bd and stacksync_folder /OK'
 else
 echo 'Statement option not defined!'
 fi
