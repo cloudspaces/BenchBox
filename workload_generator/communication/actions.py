@@ -20,8 +20,7 @@ class Action(object):
     
     def to_string(self):
         raise Exception("NotImplementedException")
-
-
+# -------------------------------------------
 class UpdateFile(Action):
     def __init__(self, output_src, output_root):
         self.output_root = output_root
@@ -31,18 +30,16 @@ class UpdateFile(Action):
         try:
             send_output_to = os.path.relpath(os.path.dirname(self.path), self.output_root)  # / == output
             print "update with binary write: {} -> to: {}".format(self.path, send_output_to) # filename, sub_folder
-            sender.send(self.path, None, send_output_to)
+            ftp_abs_path = sender.send(self.path, None, send_output_to)
         except Exception as e:
             print e
         # TODO return self.size
-        return 0
+        return ftp_abs_path
 
     def to_string(self):
         return "UpdateFile "+ str(self.path) +"\n"
-
-# OK
+# -------------------------------------------
 class CreateFileOrDirectory(Action):
-
     def __init__(self, output_src, output_root):
         self.output_root = output_root
         Action.__init__(self, output_src)
@@ -56,12 +53,45 @@ class CreateFileOrDirectory(Action):
             print e
         # TODO return self.size
         return 0
-
     def to_string(self):
         return "MakeResponse " + str(self.path) + "\n"
 
+class CreateFile(Action):
+    def __init__(self, output_src_abs_path, output_root_dir):
+        self.output_root = output_root_dir
+        Action.__init__(self, output_src_abs_path)
+    '''Create file locally and in the remote host'''
+    def perform_action(self, sender):
+        try:
+            ftp_rel_path = os.path.relpath(os.path.dirname(self.path), self.output_root)  # / == output
+            print "send: {} -> to: {}".format(self.path, ftp_rel_path)
+            ftp_abs_path = sender.send(self.path, None, ftp_rel_path)
+        except Exception as e:
+            print e
+            # TODO return self.size
+        print ftp_abs_path
+        return ftp_abs_path
+    def to_string(self):
+        return "MakeResponse " + str(self.path) + "\n"
 
-# OK
+class CreateDirectory(Action):
+    def __init__(self, output_abs_src, output_root):
+        self.output_root = output_root
+        Action.__init__(self, output_abs_src)
+    '''Create file locally and in the remote host'''
+    def perform_action(self, sender):
+        try:
+            ftp_rel_path = os.path.relpath(os.path.dirname(self.path), self.output_root)  # / == output
+            ftp_basename = os.path.basename(self.path)
+            print "mkdir: {} -> to: {}".format(self.path, os.path.join(ftp_rel_path, ftp_basename))
+            ftp_abs_path = sender.mkdir(os.path.join(ftp_rel_path, ftp_basename))
+        except Exception as e:
+            print e
+            # TODO return self.size
+        return ftp_abs_path
+    def to_string(self):
+        return "MakeResponse " + str(self.path) + "\n"
+# -------------------------------------------
 class DeleteFileOrDirectory(Action):
 
     '''Perform a remove action deleting the file from the FS
@@ -83,7 +113,44 @@ class DeleteFileOrDirectory(Action):
     def to_string(self):
         return "Unlink "+str(self.path)+"\n"
 
-#
+class DeleteFile(Action):
+    '''Perform a remove action deleting the file from the FS
+    and from the FTP. Return: 0 as no bytes are added or modified'''
+    def __init__(self, output_src, output_root):
+        self.output_root = output_root
+        Action.__init__(self, output_src)
+
+    def perform_action(self, sender):
+
+        delete_output_at = os.path.relpath(os.path.dirname(self.path), self.output_root)
+        delete_output_filename = os.path.basename(self.path)
+        sender.rm(delete_output_filename, delete_output_at)
+
+        return 0
+
+    def to_string(self):
+        return "Unlink "+str(self.path)+"\n"
+
+class DeleteDirectory(Action):
+    '''Perform a remove action deleting the file from the FS
+    and from the FTP. Return: 0 as no bytes are added or modified'''
+    def __init__(self, output_src, output_root):
+        self.output_root = output_root
+        Action.__init__(self, output_src)
+
+    def perform_action(self, sender):
+        try:
+            print "delete: -> to: {}".format(self.path)
+            delete_output_at = os.path.relpath(os.path.dirname(self.path), self.output_root)
+            delete_output_filename = os.path.basename(self.path)
+            sender.rmd(delete_output_filename, delete_output_at)
+        except Exception as e:
+            print "removed a folder "  # e.message
+        return 0
+
+    def to_string(self):
+        return "Unlink "+str(self.path)+"\n"
+# -------------------------------------------
 class MoveFileOrDirectory(Action):
     def __init__(self, output_src, output_root, output_tgt=None):
         self.output_root = output_root
@@ -147,7 +214,7 @@ class MoveFileOrDirectory(Action):
 
         files = os.listdir(tgt_path) # list the files at the source directory
         print "files to move: {}".format(files)
-        os.chdir(tgt_path) # goto the directory
+        os.chdir(tgt_path)  # goto the directory
 
         if len(files) == 0:
             print "no files to move"
@@ -204,6 +271,125 @@ class MoveFileOrDirectory(Action):
     def to_string(self):
         return "MoveResponse "+str(self.path)+"\n"
 
+class MoveFile(Action):
+    def __init__(self, output_src, output_root, output_tgt=None):
+        self.output_root = output_root
+        self.output_tgt = output_tgt
+        Action.__init__(self, output_src)
+
+    def perform_action(self, sender):
+        print "MOVE file from :::::"
+        print self.path
+        print "TO >> "
+        print self.output_tgt
+        if os.path.isfile(self.output_tgt):
+            print "{} : is file ".format(self.output_tgt)
+            print colored("move a FILE", "cyan")
+            ftp_rel_src_path = os.path.relpath(self.path, self.output_root)
+            ftp_rel_tgt_path = os.path.relpath(self.output_tgt, self.output_root)
+            ftp_abs_path = sender.mv(ftp_rel_src_path, ftp_rel_tgt_path) # rename the file at sandBox ftp_folder from # ftp_root
+        print ftp_abs_path
+        return ftp_abs_path
+
+    def to_string(self):
+        return "MoveResponse "+str(self.path)+"\n"
+
+class MoveDirectory(Action):
+    def __init__(self, output_src, output_root, output_tgt=None):
+        self.output_root = output_root
+        self.is_upload = False
+        self.output_tgt = output_tgt
+
+        Action.__init__(self, output_src)
+
+    def perform_action(self, sender):
+        print "MOVE directory >>"
+        print self.path
+        print "to >> "
+        print self.output_tgt
+
+        if os.path.isdir(self.output_tgt):
+            print "is dir "+self.output_tgt
+            print colored("Move a folder" , "red")
+            self.moveFolder(sender, self.path, self.output_tgt)
+            print colored("REMOVE FOLDER AFTER moving all the files" , 'red')
+            sub_dir = os.path.dirname(os.path.relpath(self.path, self.output_root))
+            print sub_dir
+            sender.rm(self.path, sub_dir)
+
+        return 0
+
+    def moveFolder(self, ftp_client, src_path, tgt_path):
+        print "move folder from {} -> {}".format(src_path, tgt_path)
+        files = os.listdir(tgt_path) # list the files at the source directory
+        print "files to move: {}".format(files)
+        os.chdir(tgt_path) # goto the directory
+        if len(files) == 0:
+            print "no files to move"
+        for f in files:
+            print "moving file {}".format(f)
+            source_file = '{}/{}'.format(source_file, f)
+            target_file = '{}/{}'.format(tgt_path, f)
+            print(target_file)
+            if os.path.isfile(target_file):
+                print "{} -> {}".format(source_file, target_file)
+                print colored("move a FILE","cyan")
+                ftp_rel_src_path = os.path.relpath(self.source_file, self.output_root)
+                ftp_rel_tgt_path = os.path.relpath(self.target_file, self.output_root)
+                ftp_client.mv(ftp_rel_src_path, ftp_rel_tgt_path)
+            elif os.path.isdir(target_file):
+                print "{} is dir".format(target_file)
+                ftp_client.mkd(f)
+                ftp_client.cwd(f)
+                self.moveFolder(ftp_client, target_file, target_file)
+        ftp_client.cwd('..')
+        os.chdir('..')
+
+    def to_string(self):
+        return "MoveResponse "+str(self.path)+"\n"
+
+class UploadDirectory(Action):
+
+    def __init__(self, output_src, output_root):
+        self.output_root = output_root
+        self.is_upload = True
+        self.output_tgt = output_root
+        Action.__init__(self, output_src)
+
+    def perform_action(self, sender):
+        print "Upload to this >>"
+        print self.path
+        print "to >>"
+        print self.output_tgt
+        print colored("Upload a folder",'green')
+        self.uploadFolder(sender, self.path, self.output_tgt) # self.path is the source path of the folder at sandBox
+        return 0
+
+    # move files at the remote fs, src_path to tgt_path
+    def uploadFolder(self, ftp_client, src_path, tgt_path):
+        files = os.listdir(src_path)  # list the files at the source directory
+        os.chdir(src_path)  # goto the directory
+        for f in files:
+            target_file = '{}/{}'.format(tgt_path, f)
+            print colored(target_file, 'yellow')
+            if os.path.isfile(target_file):
+                print "{} is file".format(target_file)
+                ftp_client.send(f)
+            elif os.path.isdir(target_file):
+                print "{} is dir".format(target_file)
+                ftp_client.mkd(f)
+                ftp_client.cwd(f)
+                self.uploadFolder(ftp_client, target_file, target_file)
+        ftp_client.cwd('..')
+        os.chdir('..')
+
+
+    def to_string(self):
+        return 0
+
+
+
+
 class GetContentResponse(Action):
     def __init__(self, name, dst, folder):
         Action.__init__(self, name, folder)
@@ -219,39 +405,6 @@ class GetContentResponse(Action):
     def to_string(self):
         return "GetContentResponse "+str(self.path)+"\n"
 
-# def get_action(args, folder):
-#     
-#     action_str = args[0]
-#     name = args[1]
-#     print action_str
-# 
-#     if action_str == "MakeResponse":
-#         size = int(args[2])
-#         action = MakeResponse(name, size, folder)
-#     elif action_str == "GetContentResponse":
-#         dst = args[2]
-#         action = GetContentResponse(name, dst, folder)
-#     elif action_str == "PutContentResponse":
-#         updates = []
-#         modifications = args[2]
-#         i = 0
-#         while i < len(modifications):
-#             start = int(modifications[i])
-#             end = int(modifications[i+1])
-#             updates.append((start, end))
-#             i += 2
-#         action = PutContentResponse(name, updates, folder)
-#     elif action_str == "Unlink":
-#         action = Unlink(name, folder)
-#     elif action_str == "MoveResponse":
-#         tgt = args[2]
-#         action = MoveResponse(name, tgt, folder)
-#     else:
-#         print 'Action Not Found!'
-#     return action
-#         
-### ------------------------- ###
-### ------------------------- ###
 
 if __name__ == '__main__':
     print 'This is the main Program'
@@ -260,9 +413,9 @@ if __name__ == '__main__':
     #MoveFileOrDirectory('../../ouput','').perform_action(ftp_client)
     from ftp_sender import ftp_sender
 
-    server = '192.168.56.101'
-    username = 'vagrant'
-    password = 'vagrant'
-    path = 'stacksync_folder'
+    server = 'localhost'
+    username = 'lab144'
+    password = 'lab144'
+    path = ''
     ftp_client = ftp_sender(server, "21", username, password, path)
-    MoveFileOrDirectory('/home/vagrant/output', '').perform_action(ftp_client)
+    MoveFileOrDirectory('/home/lab144/BenchBox/output', '').perform_action(ftp_client)
