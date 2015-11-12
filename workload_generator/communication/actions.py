@@ -125,11 +125,10 @@ class DeleteFile(Action):
         delete_output_at = os.path.relpath(os.path.dirname(self.path), self.output_root)
         delete_output_filename = os.path.basename(self.path)
         sender.rm(delete_output_filename, delete_output_at)
-
         return 0
 
     def to_string(self):
-        return "Unlink "+str(self.path)+"\n"
+        return "Unlink File"+str(self.path)+"\n"
 
 class DeleteDirectory(Action):
     '''Perform a remove action deleting the file from the FS
@@ -149,7 +148,7 @@ class DeleteDirectory(Action):
         return 0
 
     def to_string(self):
-        return "Unlink "+str(self.path)+"\n"
+        return "Unlink Dir"+str(self.path)+"\n"
 # -------------------------------------------
 class MoveFileOrDirectory(Action):
     def __init__(self, output_src, output_root, output_tgt=None):
@@ -292,7 +291,7 @@ class MoveFile(Action):
         return ftp_abs_path
 
     def to_string(self):
-        return "MoveResponse "+str(self.path)+"\n"
+        return "MoveResponse File"+str(self.path)+"\n"
 
 class MoveDirectory(Action):
     def __init__(self, output_src, output_root, output_tgt=None):
@@ -312,10 +311,14 @@ class MoveDirectory(Action):
             print "is dir "+self.output_tgt
             print colored("Move a folder" , "red")
             self.moveFolder(sender, self.path, self.output_tgt)
+            print sender.ftp.pwd()
+            target_folder = os.path.relpath(self.output_tgt, self.output_root)
+            print colored("Create Folder at: {}".format(target_folder) , "red")
+            sender.mkdir(target_folder)
             print colored("REMOVE FOLDER AFTER moving all the files" , 'red')
             sub_dir = os.path.dirname(os.path.relpath(self.path, self.output_root))
             print sub_dir
-            sender.rm(self.path, sub_dir)
+            sender.rmd(self.path, sub_dir)
 
         return 0
 
@@ -346,7 +349,7 @@ class MoveDirectory(Action):
         os.chdir('..')
 
     def to_string(self):
-        return "MoveResponse "+str(self.path)+"\n"
+        return "MoveResponse Dir"+str(self.path)+"\n"
 
 class UploadDirectory(Action):
 
@@ -385,7 +388,7 @@ class UploadDirectory(Action):
 
 
     def to_string(self):
-        return 0
+        return "Upload Dir"
 
 
 

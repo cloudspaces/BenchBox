@@ -50,7 +50,9 @@ def print_diff_dir(path, tgt_path):
 number = 1
 operations = 1
 files = 10
-move_dirs = 1
+move_dirs = 2
+del_files = 3
+del_dirs = 2
 FS_XXX_FOLDER = '/home/lab144/XXX_folder'
 print FS_SNAPSHOT_PATH
 print STEREOTYPE_RECIPES_PATH
@@ -130,32 +132,38 @@ for i in range(number):
         #print_diff_dir(src_path, tgt_path)
 
 
-        """ TEST DELETE DIRECTORY """
-        src_path = data_generator.delete_file()
-        print "DELETE FILE:::  at ----> {}".format(src_path)
-        actions.DeleteFile(src_path, FS_SNAPSHOT_PATH).perform_action(ftp_client)
+        """ TEST DELETE FILE """
+        for i in range(del_files):
+            src_path = data_generator.delete_file()
+            print "DELETE FILE:::  at ----> {}".format(src_path)
+            actions.DeleteFile(src_path, FS_SNAPSHOT_PATH).perform_action(ftp_client)
+            print_diff_dir(FS_XXX_FOLDER, FS_SNAPSHOT_PATH)
 
-        print_diff_dir(FS_XXX_FOLDER, FS_SNAPSHOT_PATH)
+
+
+
+
+
+
+        """ TEST DELETE DIRECTORY """
+        for i in range(del_dirs):
+            src_path = data_generator.delete_directory()
+            print "DELETE DIRECTORY:::  at ----> to {}".format(src_path)
+            actions.DeleteDirectory(src_path, FS_SNAPSHOT_PATH).perform_action(ftp_client)
+            print_diff_dir(FS_XXX_FOLDER, FS_SNAPSHOT_PATH)
+
+
+
         raw_input()
 
 
-        """ TEST DELETE FILE """
-        src_path = data_generator.delete_directory()
-        print "DELETE DIRECTORY:::  at ----> to {}".format(src_path)
-        actions.DeleteDirectory(src_path, FS_SNAPSHOT_PATH).perform_action(ftp_client)
 
-        print_diff_dir(FS_XXX_FOLDER, FS_SNAPSHOT_PATH)
-
-
-
-
-
-
-'''DANGER! This deletes a directory recursively!'''
+    '''DANGER! This deletes a directory recursively!'''
     '''
     if not DEBUG:
         shutil.rmtree(FS_SNAPSHOT_PATH)
     '''
+    # diff -qr BenchBox/output/ XXX_folder/
 
 if ftp_client:
     ftp_client.close()
