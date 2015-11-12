@@ -13,6 +13,7 @@ base_path = {
     'vagrant': '/home/vagrant/',
     'anna': '/home/anna/CloudSpaces/Dev/BenchBox/',
     'user': '/home/user/workspace/BenchBox/',
+    'lab144': '/home/lab144/BenchBox/',
     'Raul': 'D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\'
 }
 sys.path.append(base_path[username])
@@ -24,8 +25,8 @@ import random
 import os
 
 from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string
-from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH,\
-    DATA_CHARACTERIZATIONS_PATH, FS_SNAPSHOT_PATH,\
+from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH, \
+    DATA_CHARACTERIZATIONS_PATH, FS_SNAPSHOT_PATH, \
     DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH, DEBUG, DATA_GENERATOR_PROPERTIES_DIR
 import time
 from workload_generator.model.data_layer.update_manager import FileUpdateManager
@@ -47,7 +48,7 @@ class DataGenerator(object):
         self.directory_count_distribution = None
         '''Parameters to model files updates'''
         self.file_update_location_probabilities = dict() #Extracted from Tarasov paper, Home dataset
-        self.current_updated_file = None        
+        self.current_updated_file = None
         self.last_update_time = -1
 
     def initialize_from_recipe(self, stereotype_recipe):
@@ -120,7 +121,7 @@ class DataGenerator(object):
 
     def move_file(self):
         src_path = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
-        dest_path = get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH) 
+        dest_path = get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH)
         if src_path == None or dest_path == None:
             print "WARNING: No files or directories to move!"
             return None, None
@@ -131,7 +132,7 @@ class DataGenerator(object):
         delete_fs_node(self.file_system, src_path)
         add_fs_node(self.file_system, dest_path)
         return src_path, dest_path
-    
+
     def move_directory(self):
         src_path = get_empty_directory(self.file_system, FS_SNAPSHOT_PATH)
         if src_path == None:
@@ -144,15 +145,15 @@ class DataGenerator(object):
             dest_path = get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH) + src_path.split(os.sep)[-1]
             trials +=1
             '''Avoid infinite loops'''
-            if trials > 5: 
-                dest_path = None 
+            if trials > 5:
+                dest_path = None
                 break
-                        
+
         if dest_path == None:
             print "WARNING: Not enough distinct directories to move!"
-            return None, None        
-        
-        '''If things are ok, do the move operation'''        
+            return None, None
+
+        '''If things are ok, do the move operation'''
         print "MOVE DIRECTORY: ", src_path, " TO: ", dest_path
         if not DEBUG:
             shutil.move(src_path, dest_path)
@@ -201,11 +202,11 @@ class DataGenerator(object):
             '''2) Select a random file of the given type to update (this is a simple approach, which can be
             sophisticated, if necessary, by adding individual "edit probabilities" to files based on distributions)'''
             self.current_updated_file = get_file_based_on_type_popularity(self.file_system, \
-                            self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
+                                                                          self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
             self.last_update_time = time.time()
-                        
+
         print "FILE TO EDIT: ", self.current_updated_file
-        if self.current_updated_file != None: 
+        if self.current_updated_file != None:
             '''3) Select the type of update to be done (Prepend, Middle or Append)'''
             update_type = get_fitness_proportionate_element(self.file_update_location_probabilities)
             '''4) Select the size of the update to be done (1%, 40% of the content)'''
@@ -220,7 +221,7 @@ class DataGenerator(object):
         return self.current_updated_file
 
 if __name__ == '__main__':
-    
+
     for i in range(10):
         data_generator = DataGenerator()
         data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backupsample")
@@ -235,13 +236,13 @@ if __name__ == '__main__':
             data_generator.create_file()
             data_generator.delete_file()
             data_generator.move_file()
-            data_generator.move_directory() 
-            
-        '''DANGER! This deletes a directory recursively!'''    
+            data_generator.move_directory()
+
+        '''DANGER! This deletes a directory recursively!'''
         if not DEBUG:
-            shutil.rmtree(FS_SNAPSHOT_PATH)       
-        
-    #data_generator.create_file_system_snapshot()
-    #create_file('/home/user/workspace/BenchBox/external/sdgen_characterizations/text', 
-    #                           '10240',
-    #                           '/home/user/workspace/BenchBox/external/sdgen_characterizations/synthetic')
+            shutil.rmtree(FS_SNAPSHOT_PATH)
+
+            #data_generator.create_file_system_snapshot()
+            #create_file('/home/user/workspace/BenchBox/external/sdgen_characterizations/text',
+            #                           '10240',
+            #                           '/home/user/workspace/BenchBox/external/sdgen_characterizations/synthetic')

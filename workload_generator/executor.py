@@ -42,7 +42,8 @@ from workload_generator.model.user_activity.inter_arrivals_manager import InterA
 from workload_generator.model.data_layer.data_generator import DataGenerator
 
 from workload_generator.communication.ftp_sender import ftp_sender
-from workload_generator.communication.actions import CreateFileOrDirectory, UpdateFile, DeleteFileOrDirectory, MoveFileOrDirectory
+from workload_generator.communication.actions import UploadDirectory,\
+    CreateFile, CreateDirectory, UpdateFile, DeleteFile, DeleteDirectory, MoveFile, MoveDirectory
 
 from workload_generator.constants import DEBUG, FS_SNAPSHOT_PATH, STEREOTYPE_RECIPES_PATH, \
     BENCHBOX_IP, CPU_MONITOR_PORT, TO_WAIT_STATIC_MAX, TO_WAIT_STATIC_MIN,\
@@ -165,7 +166,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         '''When the initial file system has been built, migrate it to the sandbox'''
         if not DEBUG:
             # self.data_generator.migrate_file_system_snapshot_to_sandbox("migrate location")
-            action = MoveFileOrDirectory(FS_SNAPSHOT_PATH, FS_SNAPSHOT_PATH)
+            action = UploadDirectory(FS_SNAPSHOT_PATH, FS_SNAPSHOT_PATH)
             action.perform_action(ftp_client)
             print "MoveFileOrDirectory/to/SandBox/DONE"
     '''Do an execution step as a client'''
@@ -192,9 +193,21 @@ class StereotypeExecutorU1(StereotypeExecutor):
     
     def doPutContentResponse(self):
         print colored("doPutContentResponse",'cyan')
-        synthetic_file_name = self.data_generator.create_file()
+
+        if random.random() > 0.25:
+            synthetic_file_name = self.data_generator.create_file()
+            isFile = True
+        else:
+            synthetic_file_name = self.data_generator.create_directory()
+            isFile = False
+
         print "{} :>>> NEW ".format(synthetic_file_name)
-        action = CreateFileOrDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
+
+        if isFile:
+            action = CreateFile(synthetic_file_name, FS_SNAPSHOT_PATH)
+        else:
+            action = CreateDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
+
         print "{} :>>> ACTION".format(action)
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'PutContentResponse')
@@ -222,13 +235,18 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
     def doUnlink(self):
         print colored("doUnlink",'yellow')
-        synthetic_file_name = None
         if random.random() > 0.25:
             synthetic_file_name = self.data_generator.delete_file()
+            isFile = True
         else:
             synthetic_file_name = self.data_generator.delete_directory()
-        if synthetic_file_name:
-            action = DeleteFileOrDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
+            isFile = False
+        if not synthetic_file_name == None:
+            if isFile:
+                action = DeleteFile(synthetic_file_name, FS_SNAPSHOT_PATH)
+            else:
+                action = DeleteDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
+
             '''Get the time to wait for this transition in millis'''
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'Unlink')
             to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
@@ -243,12 +261,18 @@ class StereotypeExecutorU1(StereotypeExecutor):
         print colored("doMoveResponse",'magenta')
         if random.random() > 0.25:
             synthetic_file_name = self.data_generator.move_file()
+            isFile = True
         else:
             synthetic_file_name = self.data_generator.move_directory()
+            isFile = False
         print synthetic_file_name
         (src_mov, tgt_mov) = synthetic_file_name
         if src_mov:
-            action = MoveFileOrDirectory(src_mov, FS_SNAPSHOT_PATH, tgt_mov)
+            if isFile:
+                action = MoveFile(src_mov, FS_SNAPSHOT_PATH, tgt_mov)
+            else:
+                action = MoveDirectory(src_mov, FS_SNAPSHOT_PATH, tgt_mov)
+
             '''Get the time to wait for this transition in millis'''
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'MoveResponse')
             to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
