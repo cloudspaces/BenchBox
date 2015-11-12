@@ -15,7 +15,8 @@ TEMP_PATH = {
     'vagrant': '/home/vagrant/',
     'anna': '/home/anna/CloudSpaces/Dev/BenchBox/',
     'user': '/home/user/workspace/BenchBox/',
-    'Raul': 'D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\'
+    'Raul': 'D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\',
+    'lab144': '/home/lab144/BenchBox/'
 }
 
 PROJECT_PATH = TEMP_PATH[username]
@@ -49,6 +50,7 @@ SNAPSHOT_PATH = {
     'vagrant': PROJECT_PATH + "output",
     'anna': PROJECT_PATH + "output",
     'user': PROJECT_PATH + "output",
+    'lab144': PROJECT_PATH + "output",
     'Raul': "C:\\Users\\Raul\\Desktop\\test"
 }
 
@@ -67,7 +69,7 @@ FS_IMAGE_CONFIG_PATH = PROJECT_PATH + "workload_generator/external/impressions_c
 SANDBOX_IP = '192.168.56.101'
 BENCHBOX_IP = '192.168.56.2'
 CPU_MONITOR_PORT = 11000
-TO_WAIT_STATIC_MAX = 8
+TO_WAIT_STATIC_MAX = 6
 TO_WAIT_STATIC_MIN = 1
 
 # FTP SENDER CONSTANTS
