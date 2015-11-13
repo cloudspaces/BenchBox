@@ -602,25 +602,25 @@ block content
                         // check if an python process is running
                         //
                         break;
-                    case "clientStacksyncUp":
+                    case "clientStackSyncUp":
                         statusCmd = 'hostname; pgrep java > /dev/null; echo $?\?; ';
                         args.target = 'sandBox';
                         // check there is no java process running
                         break;
-                    case "clientStacksyncDown":
+                    case "clientStackSyncDown":
                         statusCmd = 'hostname; pgrep java > /dev/null; [ $? -ne 0 ]; echo $?\?; ';
-                        args.target = 'localhost';
+                        args.target = 'sandBox';
                         // check there is java process running
                         break;
                     case "clientOwncloudUp":
                         statusCmd = 'hostname; echo 0\?; ';
-                        args.target = 'benchBox';
+                        args.target = 'sandBox';
                         break;
                     case "execute":
                     // check if the execute procedure is still running at the benchBox machine.
                     default:
                         console.log(args.cmd);
-                        statusCmd = 'hostname; echo 0\?';
+                        statusCmd = 'hostname; echo $?\?';
                         break;
                 }
 
@@ -635,7 +635,6 @@ block content
                     console.log(itvTimeout);
                     itvTimeout++;
                     if (finish === true) {
-
                         $('#' + statusId).remove();
                         clearInterval(statusItv);
                     }
@@ -820,7 +819,7 @@ block content
                     success: function (data) {
                         console.log("Success, run start!");
                         console.log(data);
-                        $.notify('Success! ' + host.hostname + ' ' + cmd, 'success');
+                        $.notify('Run rpc! ' + host.hostname + ' ' + cmd, 'info');
                     },
                     error: function (err) {
                         console.log(err);
@@ -840,7 +839,7 @@ block content
                 $.ajax({
                     url: 'http://localhost:3000/rpc/status',
                     data: args,
-                    timeout: 6000000, // 6000s ::100min
+                    timeout:  6000000, // 6000s ::100min
                     type: 'GET',
                     success: function (data) {
                         console.log("Success, run start!");

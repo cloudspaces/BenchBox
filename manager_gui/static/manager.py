@@ -22,6 +22,7 @@ from multiprocessing.pool import ThreadPool
 from subprocess import Popen, PIPE
 import traceback, time, sys, os
 import random, numpy
+from termcolor import colored
 from multiprocessing import Pool
 import csv
 import pxssh
@@ -102,7 +103,8 @@ class ManagerOps():
         # print test
         # print 'tell benchBox at dummy host to run Test'
         # str_cmd = './monitor/startMonitor.sh'
-        str_cmd = 'cd /home/vagrant/workload_generator && ./executor.py -o {} -p {} -t {} -f {} -x {} -w {}'.format(test['operations'], test['profile'], test['interval'], test['folder'], test['client'], test['warmup'])
+        str_cmd = 'cd /home/vagrant/workload_generator; ' \
+                  'nohup python executor.py -o {} -p {} -t {} -f {} -x {} -w {} & '.format(test['operations'], test['profile'], test['interval'], test['folder'], test['client'], test['warmup'])
         # print str_cmd
         self.rmibenchBox(h['ip'], h['user'], h['passwd'], str_cmd)
 
@@ -197,6 +199,9 @@ class ManagerOps():
                   "echo '%s' > ss.stacksync.key; " \
                   "echo '%s' > ss.owncloud.key; " \
                   "echo '%s' > hostname; " \
+                  "echo '' > logfile; " \
+                  "echo '' > logfile.b; " \
+                  "echo '' > logfile.s; " \
                   "echo 'Run: clients configuration scripts: '; " \
                   "cd scripts; " \
                   "./config.owncloud.sh; " \
@@ -250,11 +255,11 @@ class ManagerOps():
             'stacksync-ip': args['stacksync-ip'][0],
             'owncloud-ip': args['owncloud-ip'][0]
         }
-        str_cmd = "if [ -d workload_generator ]; then " \
-                  "cd workload_generator;" \
-                  "./executor.py -o {} -p {} -t {} -f {} -x {} -w 1; " \
+        str_cmd = "if [ -d ~/workload_generator ]; then; " \
+                  "cd ~/workload_generator; " \
+                  "python executor.py -o {} -p {} -t {} -f {} -x {} -w 1; " \
                   "fi; ".format(0, 'backupsample', 0, 'stacksync_folder', 'StackSync')
-
+        print str_cmd
         self.rmisandBox(h['ip'], h['user'], h['passwd'], str_cmd)
 
     def tearDown(self, args):
@@ -492,13 +497,17 @@ class ManagerOps():
                 s = pxssh.pxssh()
                 s.login(hostname, login, passwd)
                 s.timeout = 3600  # set timeout to one hour
-                s.sendline('who')
+                s.sendline('whoami')
                 s.prompt()  # match the prompt
-                #s.before
+                print colored(s.before, 'cyan')
                 s.sendline(cmd)  # run a command
-                s.prompt()
+                print s.prompt() # true
+                print colored(s.before, 'blue')
+                print colored(s.readline(), 'red')
+                print colored(s.readlines(), 'green')
                 # s.login('192.168.56.101','vagrant', 'vagrant')
                 last_output = s.before  # # # print everyting before the prompt
+                print colored(last_output, 'blue')
                 s.logout()
                 # # print 'end try'
             except pxssh.ExceptionPxssh, e:
@@ -511,8 +520,18 @@ class ManagerOps():
         #s.before
         print "LAST: OUTPUT"
         print last_output
-        return last_output
-
+        # "handle only the last two lines"
+        replace_n = last_output.replace('\n', '')
+        replace_r = replace_n.replace('\r', '')
+        whole_cmd = replace_r.split(' ')
+        # print replace_n
+        # print replace_r
+        # print whole_cmd
+        print "JOIN COMMAND: "
+        join_cmd = ''.join(whole_cmd[-2:])
+        print "AFTER JOIN "
+        print join_cmd
+        return join_cmd
     # relay ssh
     def rmisandBox(self, hostname, login, passwd, cmd, callback=None):
         sandboxIP = SANDBOX_STATIC_IP
@@ -543,10 +562,13 @@ class ManagerOps():
         if localhost == 'localhost':
             # # print "LOCALHOST_::"
             result = self.rmi(hostname, login, passwd, cmd)
+            print "RMI LOCALHOST RESULT {}: {}".format(localhost, result)
+            """
             str = result
             print result
             result = str.split('\n', 1)  # split once
-            return result[1]
+            """
+            return result
         elif localhost == 'sandBox':
             # # print "SANDBOX_::"
             boxIP = SANDBOX_STATIC_IP
@@ -563,12 +585,10 @@ class ManagerOps():
                   " ".format(boxPass, boxUser, boxIP, cmd)
         # return 'asdf'
         result = self.rmi(hostname, login, passwd, str_cmd)
-        str = result
-        # # print result
-        result = str.split(cmd, 1)
-        # # print "INTO: "
-        # # print result[1]
-        return result[1]
+
+        print "RMI RESULT {}: {}".format(localhost, result)
+
+        return result
 
 
 

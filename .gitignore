@@ -76,6 +76,7 @@ monitor/logger/post-process
 monitor/logger/py_cpu_monitor/*.pyc
 
 
+manager
 
 managerGUI/manager
 managerGUI/synthesize
