@@ -226,7 +226,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             print "no file selected!"
         else:
             action = UpdateFile(synthetic_file_name,FS_SNAPSHOT_PATH)
-            #to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'Sync')
+            to_wait = self.inter_arrivals_manager.get_waiting_time(self.markov_current_state, 'Sync')
             to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
@@ -332,7 +332,7 @@ if __name__ == '__main__':
 
 
     print "Syntetic File System Path:".format(FS_SNAPSHOT_PATH)
-    if opt.warmup is not 0:
+    if int(opt.warmup) is not 0:
         print "only warming up"
         stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(ftp_client)
     else:
@@ -361,15 +361,14 @@ if __name__ == '__main__':
 
         #  operations = 100
         for i in range(operations):
-        # stereotype_executor.execute(sender, parser.get('executor','files_folder'))
-            stereotype_executor.execute()
             print colored("doOps {}/{}".format(i, operations),'red')
+            stereotype_executor.execute()
             # stop monitoring
 
         try:
             monitor.stop_monitor()
         except:
-            print 'Error stoping cpu_monitor'
+            print 'Error stopping cpu_monitor'
 
         print "Finish executing/****************************"
 
