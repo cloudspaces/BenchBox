@@ -28,12 +28,12 @@ node 'benchBox' {
       provider => pip
   }->
   package {
-    ['termcolor']:
+    ['termcolor','pika']:
       ensure   => 'installed',
       provider => pip
   }->
   package {
-    ['simpy']:
+    ['simpy',]:
       ensure   => '2.3',
       provider => pip
   }
@@ -166,7 +166,7 @@ node 'sandBox' {
       ensure    => installed
   }
   ->  package {
-    ['bitarray','thrift']:
+    ['bitarray','thrift', 'pika']:
       ensure   => 'installed',
       provider => pip
   }
