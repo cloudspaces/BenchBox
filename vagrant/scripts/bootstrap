@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -ex
 
 echo "Hello World!"
 echo Bootstrap/START
@@ -11,6 +11,8 @@ echo Bootstrap/START
 # sudo apt-get update --fix-missing
 
 
+# todo
+# check if any of the following dependent list of urls are broken
 
 echo Bootstrap/OK
 echo "End of Bootstrap Script"
