@@ -86,17 +86,6 @@
                         <td class="col-md-2">
                             <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.status">
                             <p class="host-status" ng-show="!editing[$index]">{{host.status}}</p>
-                            <!--
-
-                            <button class="btn btn-xs" ng-click="rpc($index,'setup')" title="Download BenchBox project to the dummy machine">Setup</button>
-                            <button class="btn btn-xs" ng-click="rpc($index,'vagrantUp')" title="pull latest repo & vagrant up/provision">Up</button>
-
-                            <button class="btn btn-xs" ng-click="rpc($index,'vagrantDown')" title="pull latest repo & vagrant down">Down</button>
-                            <button class="btn btn-xs" ng-click="rpc($index,'monitorUp')" title="Run Socket Listener at dummy machine, sandBox">Listen</button>
-                            <button class="btn btn-xs" ng-click="rpc($index,'clientStacksyncUp')" title="Run clientStacksyncUp at dummy machine, sandBox">SSUp</button>
-                            <button class="btn btn-xs" ng-click="rpc($index,'clientStacksyncDown')" title="Run clientStacksyncDown at dummy machine, sandBox">SSDown</button>
-                            <button class="btn btn-xs" ng-click="rpc($index,'clientOwncloudUp')" title="Run clientOwncloudUp at dummy machine, sandBox">OCUp</button>
-                            -->
                         </td>
                     </tr>
                 </tbody>
@@ -156,9 +145,10 @@
     <div class="col-md-10">
             <button class="btn btn-default" ng-click="rpc('test-check','setup')" title="Download BenchBox project to the dummy machine">Setup</button>
 
+
             <button class="btn btn-default" ng-click="rpc('test-check','vagrantUp')" title="Pull latest repo & vagrant up/provision">Up</button>
             <button class="btn btn-default" ng-click="rpc('test-check','vagrantDown')" title="pull latest repo & vagrant down">Down</button>
-
+            <!--
             <button class="btn btn-default pull-right" ng-click="rpc('test-check','tearDown')" title="Clear the shared file system">TearDown</button>
             <button class="btn btn-default pull-right" ng-click="rpc('test-check','warmUp')" title="Startup file system">WarmUp</button>
 
@@ -166,13 +156,13 @@
 
             <button class="btn btn-default pull-right" ng-click="rpc('test-check','client', 'Down')" title="Run clientSSDown at dummy machine, sandBox">SSDown</button>
             <button class="btn btn-default pull-right" ng-click="rpc('test-check','client', 'Up')" title="Run clientSSUp at dummy machine, sandBox">SSUp</button>
-
+            -->
     </div>
 </div>
 
 
 <!-- CREATE -->
-<!--
+
 <div class="row">
     <div class="col-md-2">
         <h5>
@@ -192,43 +182,36 @@
         <button class="btn btn-success btn-block" ng-click="saveHost()">Add Host</button>
     </div>
 </div>
--->
+
 
 
 <hr>
 <!-- EXECUTE -->
+<!--
 <div class="row">
     <div class="col-md-2">
         <h5>
             Execute Args
-            <!--
-            -o 20 -p sync -t 1 -f owncloud_folder -x OwnCloud
-            -->
         </h5>
     </div>
     <div class="col-md-1">
         <input type="text" class="form-control" ng-model="run.testOps" placeholder="-ops" value="10">
-        <!-- <input type="text" class="form-control" placeholder="-o operations {20}"> -->
     </div>
     <div class="col-md-1">
-        <!-- <input type="text" class="form-control" placeholder="-t interval {1}"> -->
         <input type="text" class="form-control" ng-model="run.testItv" placeholder="-itv" value="1">
     </div>
     <div class="col-md-2">
         <input type="text" class="form-control" ng-model="run.testProfile" placeholder="-profile" value="sync">
-        <!-- <input type="text" class="form-control" placeholder="-p profile {sync|cdn}"> -->
     </div>
     <div class="col-md-2">
         <input type="text" class="form-control" ng-model="run.testFolder" placeholder="-folder" value="stacksync_folder">
-        <!-- <input type="text" class="form-control" placeholder="-f folder {stacksync_folder}"> -->
     </div>
     <div class="col-md-2">
-        <!-- <input type="text" class="form-control" placeholder="-x client {StackSync}"> -->
         <input type="text" class="form-control" ng-model="run.testClient" placeholder="-client" value="StackSync">
     </div>
     <div class="col-md-2">
         <button class="btn btn-success btn-block" ng-click="runTest()" title="Run executor at dummy machine, benchBox">Execute</button>
     </div>
 </div>
-
+-->
 

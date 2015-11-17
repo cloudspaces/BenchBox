@@ -31,6 +31,14 @@
         "port": 3000
       }
     },
+    "rabbitmq":{
+      "url": "amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy",
+      "virtual_host": "vvmlshzy",
+      "host": "moose.rmq.cloudamqp.com",
+      "user": "vvmlshzy",
+      "password": "UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas"
+
+    },
     "credentials": {
       "owncloud": [
         {
