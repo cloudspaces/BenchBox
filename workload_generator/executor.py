@@ -13,6 +13,7 @@ import time
 import getpass
 from termcolor import colored
 from metrics.cpu_monitor import CPUMonitor
+from communication import rmq_woker
 
 
 '''
@@ -294,110 +295,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
 if __name__ == '__main__':
 
-
-    hostname = None
-    try:
-        f = open('/vagrant/hostname', 'r')
-        hostname = f.read().splitlines()[0]
-    except Exception as ex:
-        print ex
+    rmqw = rmq_woker()
 
 
-    opt = process_opt()
-    operations = int(opt.ops)
-
-
-    parser = SafeConfigParser()
-
-
-    parser.read('./config.ini')
-
-
-    print 'Logger/OK'
-    # log experiment metadata
-
-    print parser.options('executor')
-    # log = logger(parser.get('executor', 'output') + os.sep + "metadata.log", dict(parser._sections['executor']) )
-    ftp_client = ftp_sender(FTP_SENDER_IP, FTP_SENDER_PORT, FTP_SENDER_USER, FTP_SENDER_PASS, opt.folder)
-    # parser.get('executor','folder')) # root path ftp_client directory :: ~/stacksync_folder
-    # ftp_files = parser.get('executor','files_folder') # relative path to local files :: ./files/demoFiles.txt
-    print 'Markov/OK'
-    stereotype_executor = StereotypeExecutorU1(ftp_client)
-
-    receipt = STEREOTYPE_RECIPES_PATH + opt.profile
-    print receipt
-    stereotype_executor.markov_chain.initialize_from_recipe(receipt)
-    stereotype_executor.data_generator.initialize_from_recipe(receipt)
-    stereotype_executor.inter_arrivals_manager.initialize_from_recipe(receipt)
-
-
-    print "Syntetic File System Path:".format(FS_SNAPSHOT_PATH)
-    if int(opt.warmup) is not 0:
-        print "only warming up"
-        stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(ftp_client)
-    else:
-        stereotype_executor.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
-
-        if opt.profile is not None:
-            profile_type = opt.profile
-        else:
-            with open('/vagrant/profile') as f:
-                profile_type = f.read().split('\n')[0]
-
-        stereotype_executor.markov_chain.calculate_chain_relative_probabilities()
-
-        print 'FTP/OK'
-        worker = None
-        print "Start executing/****************************"
-        try:
-            monitor = CPUMonitor(BENCHBOX_IP, CPU_MONITOR_PORT)
-            interval = int(opt.itv)
-            log_filename = 'local.csv'
-            proc_name = opt.pid  # if its stacksync
-            print interval
-            monitor.start_monitor(interval, log_filename, proc_name, opt.ops, opt.profile, hostname)
-        except:
-            print "Could not connect to SocketListener at sandBox".format(Exception)
-
-        #  operations = 100
-        for i in range(operations):
-            print colored("doOps {}/{}".format(i, operations),'red')
-            stereotype_executor.execute()
-            # stop monitoring
-
-        try:
-            monitor.stop_monitor()
-        except:
-            print 'Error stopping cpu_monitor'
-
-        print "Finish executing/****************************"
-
-
-        """
-        print "Test do operations"
-        loops = 10
-        for ops in range(loops):
-            print "loop {}/{}".format(ops, loops)
-            stereotype_executor.doMoveResponse()
-            stereotype_executor.doSync()
-            stereotype_executor.doPutContentResponse()
-            stereotype_executor.doSync()
-            '''
-            stereotype_executor.doPutContentResponse()
-            stereotype_executor.doSync()
-            stereotype_executor.doUnlink()
-            stereotype_executor.doMoveResponse()
-            stereotype_executor.doPutContentResponse()
-            '''
-        print "Test do operations/DONE"
-
-        print "ClearingProcess/..."
-        """
-        # WarmUp move the output directory to the target
-
-
-    if ftp_client:
-        print "close ftp_client"
-        ftp_client.close()
-
-    print "ClearingProcess/OK"
+    
