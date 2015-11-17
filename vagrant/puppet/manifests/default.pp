@@ -50,6 +50,14 @@ node 'benchBox' {
   class {
     'vim':
   }
+  ->
+  exec {
+  'run message queue boostrap benchBox status':
+  command => '/vagrant/emit_status.py --msg vagrantUp &',
+  user    => 'vagrant',
+  group   =>'vagrant',
+  path    => ['/usr/bin', '/bin/']
+  }
 
 }
 
@@ -203,16 +211,15 @@ node 'sandBox' {
   class{
     "vim":
   }
-/*
-exec {
-  'launch_stacksync_client':
-    command => '/usr/bin/stacksync &',
-  # sudo kill -9 $(ps -ef | grep -i stacksync | grep -v \'grep\' | awk '{print $2}')
-    user    => 'vagrant',
-    group   =>'vagrant',
-    path    => ['/usr/bin', '/bin/']
-}
-*/
+  ->
+  exec {
+    'run messagequeue boostrap sandBox status':
+      command => '/vagrant/emit_status.py --msg vagrantUP &',
+      user    => 'vagrant',
+      group   =>'vagrant',
+      path    => ['/usr/bin', '/bin/']
+  }
+
 }
 
 
