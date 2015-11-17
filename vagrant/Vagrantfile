@@ -2,24 +2,25 @@
 # CHENGLONG ZOU
 # 2015/16
 #
-box = 'debian-7.0-amd64.box' # https://www.dropbox.com/s/si19tbftilcuipz/debian-7.0-amd64.box
+box = 'debian-7.0-amd64.box'
 box_url = box # check if file exists else download from remote path
-box_url = 'https://www.dropbox.com/s/si19tbftilcuipz/debian-7.0-amd64.box' # use this if not found
+box_url = "https://www.dropbox.com/s/sdupbseays0f7ik/debian-7.0-amd64.box" # use this if not found
 box_memory = "1024"
 box_cpu = "1"
 nodes = [
     {:hostname => 'sandBox', :ip => '192.168.56.101', :box => box, :shared_folder=>'../monitor',
      :shared_folder_as=> '/home/vagrant/monitor'}, # :port_fwd=> 5000}, # contains the pc-clients && log monitor
     {:hostname => 'benchBox', :ip => '192.168.56.2', :box => box, :shared_folder=>'../workload_generator',
-     :shared_folder_as=> '/home/vagrant/workload_generator'} # this contains the pc-benchmarking
+     :shared_folder_as=> '/home/vagrant/workload_generator'} ,
+    {:hostname => 'testBox', :ip => '192.168.56.5', :box => box} # this contains the pc-benchmarking
 ]
 Vagrant.configure("2") do |config|
   nodes.each do |node|
     config.vm.define node[:hostname] do |nodeconfig|
       puts "BOX/LOAD"
+      nodeconfig.vm.box_url = box_url
       nodeconfig.vm.box = node[:box]
       nodeconfig.vm.hostname = node[:hostname] # capat: hostnamectl
-      nodeconfig.vm.box_url = box_url
       nodeconfig.vm.network :private_network, ip: node[:ip]
       nodeconfig.vm.provider :virtualbox do |vm|
         vm.customize [
