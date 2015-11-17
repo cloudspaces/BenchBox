@@ -3,18 +3,18 @@ import pika
 import uuid
 import urlparse
 import sys
+import getopt
+import socket
 
+class EmitStatusRpcClient(object):
+    def __init__(self, rmq_url):
 
-class FibonacciRpcClient(object):
-    def __init__(self):
-
-        url_str = 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
+        url_str = rmq_url
         url = urlparse.urlparse(url_str)
 
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=url.hostname, virtual_host=url.path[1:], credentials=pika.PlainCredentials(url.username, url.password)
         ))
-        #'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'))
 
         self.channel = self.connection.channel()
 
@@ -32,7 +32,7 @@ class FibonacciRpcClient(object):
         self.response = None
         self.corr_id = str(uuid.uuid4())
         self.channel.basic_publish(exchange='',
-                                   routing_key='rpc_queue',
+                                   routing_key='status_log',
                                    properties=pika.BasicProperties(
                                        reply_to = self.callback_queue,
                                        correlation_id = self.corr_id,
@@ -44,11 +44,35 @@ class FibonacciRpcClient(object):
 
 if __name__ == '__main__':
     ''' dummy host says hello to the server '''
-    print "Arguments: "
-    args = str(sys.argv)
-    fibonacci_rpc = FibonacciRpcClient()
-    print " [x] Requesting fib(30)"
-    response = fibonacci_rpc.call(args)
+    argv = sys.argv[1:]
+    rmq_url = 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
+    routing_key = 'rpc_queue'
+    print "Arguments: {}".format(argv)
+    try:
+        opts,args = getopt.getopt(argv, "hm:,t:", ["msg=","topic="])
+    except getopt.GetoptError:
+        print '*.py -m <message> -t <topic>'
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt == '-h':
+            sys.exit()
+        elif opt in ("-i", "--msg"):
+            status_msg = arg
+        elif opt in ("-t", "--topic"):
+            topic = arg
+
+
+    # status_msg = opts.msg
+
+    emit_status_rpc = EmitStatusRpcClient(rmq_url)
+    hostname = socket.gethostname()
+    with open('/vagrant/hostname','r') as f:
+        dummyhost = f.read().splitlines()[0]
+    composite_msg="{}.{}.{}".format(dummyhost, hostname, status_msg)
+
+    print " [x] emit: emit_status_rpc.call({})".format(composite_msg)
+    response = emit_status_rpc.call(composite_msg)
     print " [.] Got %r" % (response,)
 
 
