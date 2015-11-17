@@ -19,6 +19,7 @@ from manager_rmq import manager_rmq
 
 
 class manager_rpc(object):
+
     hosts = None
     config = None
 
@@ -37,7 +38,6 @@ class manager_rpc(object):
         output = subprocess.check_output(['bash', '-c', urllib.unquote_plus(name)])
         return output.split('\n')
 
-
     def list(self, name):
         bashCommand = "ls {}".format(name)
         output = subprocess.check_output(['bash', '-c', bashCommand])
@@ -55,7 +55,6 @@ class manager_rpc(object):
                 return True
         return False
 
-
     def rpc(self, url):
         str = urlparse.urlparse(url)
         argslist = urlparse.parse_qs(str.query)
@@ -65,7 +64,6 @@ class manager_rpc(object):
         result = None # None Blocking
         argslist['result'] = result;
         return argslist
-
 
     def status(self, url):
         str = urlparse.urlparse(url)

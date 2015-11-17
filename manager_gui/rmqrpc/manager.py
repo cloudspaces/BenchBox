@@ -88,7 +88,7 @@ if __name__ == "__main__":
     Start handling the initial stage of the chain, this starts the emit_status.py at the dummy machines which
     tells the dummy machines to join its routing:key
     '''
-    startZeroRPC()
+    # startZeroRPC()
     startRabbitMQ(RABBIT_MQ_URL)  # status Feedback queue
     # startRabbitMQ(RABBIT_MQ_URL) # queue
     # print "Finish manager"
