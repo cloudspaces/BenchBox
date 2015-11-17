@@ -11,7 +11,7 @@ var HostSchema = new mongoose.Schema({
     status: {
         type: String,
         default:'idle',
-        enum : ['configuring', 'running', 'executing', 'teardown']
+        enum : ['idle','configuring', 'running', 'executing', 'teardown']
     },
     updated_at: {type: Date, default: Date.now}
 });
