@@ -19,11 +19,17 @@ router.get('/', function(req, res, next) {
     // res.send('respond with a resource');
 });
 
+/* actualizar un compo por get  */
+
 
 /* POST /hosts */
 router.post('/', function(req, res, next) {
+    console.log("create an host")
+    console.log(JSON.stringify(req.body));
     Host.create(req.body, function (err, post) {
-        if (err) return next(err);
+
+        if (err)
+            return next(err);
         res.json(post);
     });
 });

@@ -2,42 +2,24 @@
 # -*- coding: iso-8859-1 -*-
 __author__ = 'anna'
 
-import zerorpc
-import multiprocessing
-from zerorpc import zmq
 import subprocess
-import json
 import urlparse
 import urllib
-import nmap
-
-# manager import
-from ConfigParser import SafeConfigParser
-
-from argparse import ArgumentParser
-import shlex
-# import psycopg2
 import threading
 from multiprocessing.pool import ThreadPool
-from subprocess import Popen, PIPE
-import traceback, time, sys, os
-import random, numpy
-from termcolor import colored
-from multiprocessing import Pool
-import csv
 import pxssh
-import getpass
-from manager_constants import SANDBOX_STATIC_IP, BENCHBOX_STATIC_IP, VAGRANT_DEFAULT_LOGIN
+
+import zerorpc
+import pika
+from termcolor import colored
+
+from manager_gui.rmqrpc.manager_constants import SANDBOX_STATIC_IP, BENCHBOX_STATIC_IP, VAGRANT_DEFAULT_LOGIN, RABBIT_MQ_URL
+
 
 
 
 # importar el init.py
 class ManagerOps():
-    # hosts
-    # credentials
-    # config
-
-    # tenir un fitxer de status, per no torna a repetir proc?s
 
     HOST_RUN_STATUS = {}
     HOST_STATUS = {}
@@ -69,49 +51,25 @@ class ManagerOps():
         else:
             print 'have {}'.format(hostname)
 
+        print "Start Initial Task"
         self.t1downloadBenchBox(host_settings, hostname)
+
+
+        '''
         self.t2installVagrantVBox(host_settings, hostname)
         self.t3downloadVagrantBoxImg(host_settings, hostname)
         self.t4assignStereoTypeToProfile(host_settings, hostname)
         self.t5assignCredentialsToProfile(host_settings, hostname)
         self.t6assignSyncServer(host_settings, hostname)
-
+        '''
         return self.HOST_STATUS[hostname]
 
-    def test(self, args):
-        # print 'Test args'
-        # print args
-        # if self.HOST_STATUS[hostname]
-
-        h = {
-            'ip': args['ip'][0],
-            'passwd': args['login'][0],
-            'user': args['login'][0],
-            'profile': args['profile'][0],
-        }
-
-        # todo choose profile priority default or Execute arguments
-        test = {
-            'folder': args['test[testFolder]'][0],
-            'profile': args['test[testProfile]'][0],
-            'operations': args['test[testOps]'][0],
-            'client': args['test[testClient]'][0],
-            'interval': args['test[testItv]'][0],
-            'warmup': args['test[testWarmUp]'][0]
-        }
-
-        # print test
-        # print 'tell benchBox at dummy host to run Test'
-        # str_cmd = './monitor/startMonitor.sh'
-        str_cmd = 'cd /home/vagrant/workload_generator; ' \
-                  'nohup python executor.py -o {} -p {} -t {} -f {} -x {} -w {} & '.format(test['operations'], test['profile'], test['interval'], test['folder'], test['client'], test['warmup'])
-        # print str_cmd
-        self.rmibenchBox(h['ip'], h['user'], h['passwd'], str_cmd)
-
     def t1downloadBenchBox(self, h, hostname):  # tell all the hosts to download BenchBox
-        if self.HOST_STATUS[hostname].has_key('t1downloadBenchBox'):
-            return True
-        # print 't1downloadBenchBox'
+        print 't1downloadBenchBox'
+        '''
+        Descarregar el repositori de BenchBox i inicialitzar un bootstrap service
+
+        '''
         str_cmd = "" \
                   "echo 'check if Git is installed...'; " \
                   "echo '%s' | sudo -S apt-get install git; " \
@@ -122,15 +80,12 @@ class ManagerOps():
                   "else " \
                   "git clone --recursive https://github.com/CloudSpaces/BenchBox.git; " \
                   "fi;" \
+                  "python vagrant/emit_status.py; " \
+                  "" \
                   "" % h['passwd']
-        # # print str_cmd
 
         self.rmi(h['ip'], h['user'], h['passwd'], str_cmd)  # utilitzar un worker del pool
-        self.HOST_STATUS[hostname]['t1downloadBenchBox'] = True
-        '''
-        version pool
-        '''
-        # print 't1downloadBenchBox/OK: {}'.format(hostname)
+        print 't1downloadBenchBox/OK: {}'.format(hostname)
 
     def t2installVagrantVBox(self, h, hostname):  # tell all the hosts to install VirtualBox and Vagrant
         if self.HOST_STATUS[hostname].has_key('t2installVagrantVBox'):
@@ -499,13 +454,8 @@ class ManagerOps():
                 s.timeout = 3600  # set timeout to one hour
                 s.sendline('whoami')
                 s.prompt()  # match the prompt
-                print colored(s.before, 'cyan')
                 s.sendline(cmd)  # run a command
-                print s.prompt() # true
-                print colored(s.before, 'blue')
-                print colored(s.readline(), 'red')
-                print colored(s.readlines(), 'green')
-                # s.login('192.168.56.101','vagrant', 'vagrant')
+                s.prompt() # true
                 last_output = s.before  # # # print everyting before the prompt
                 print colored(last_output, 'blue')
                 s.logout()
@@ -524,9 +474,6 @@ class ManagerOps():
         replace_n = last_output.replace('\n', '')
         replace_r = replace_n.replace('\r', '')
         whole_cmd = replace_r.split(' ')
-        # print replace_n
-        # print replace_r
-        # print whole_cmd
         print "JOIN COMMAND: "
         join_cmd = ''.join(whole_cmd[-2:])
         print "AFTER JOIN "
@@ -589,8 +536,6 @@ class ManagerOps():
         print "RMI RESULT {}: {}".format(localhost, result)
 
         return result
-
-
 
 class Manager(object):
     hosts = None
@@ -695,7 +640,6 @@ class Manager(object):
         argslist['result'] = result;
         return result
 
-
 def ManagerRPC():
     # print 'ManagerRPC instance'
     s = zerorpc.Server(Manager(), pool_size=4)  # numero de cpu
@@ -704,7 +648,7 @@ def ManagerRPC():
     s.run()
 
 
-def main():
+def startZeroRPC():
     '''
     process = multiprocessing.Process(target=ManagerRPC())
     process.start()
@@ -715,8 +659,66 @@ def main():
     s.bind(server_address)
     s.run()
 
+def startRabbitMQ(rmq_url):
+
+
+    url_str = rmq_url
+    url = urlparse.urlparse(url_str)
+
+    connection = pika.BlockingConnection(pika.ConnectionParameters(
+        host=url.hostname, virtual_host=url.path[1:], credentials=pika.PlainCredentials(url.username, url.password)
+    ))
+
+    ## DECLARATION
+    channel = connection.channel()
+    channel.queue_declare(queue='status_log')
+
+
+    ## ACTION CONTROLLER
+    def fib(n):
+        if n == 0:
+            return 0
+        elif n == 1:
+            return 1
+        else:
+            return fib(n-1) + fib(n-2)
+    def update_status(status):
+        print 'update_status_to: {}'.format(status)
+
+
+
+
+
+
+
+        return 'MANAGER-ACKED: {}'.format(status)
+    def on_request(ch, method, props, body):
+        # body
+
+        print " [.] status(%s)"  % (body,)
+        # response = fib(n)
+
+        response = update_status(body)
+
+        ch.basic_publish(exchange='',
+                         routing_key=props.reply_to,
+                         properties=pika.BasicProperties(correlation_id = \
+                                                             props.correlation_id),
+                         body=str(response))
+        ch.basic_ack(delivery_tag = method.delivery_tag)
+
+    ## CONSUMERS
+    channel.basic_qos(prefetch_count=1)
+    channel.basic_consume(on_request, queue='status_log')
+
+    print " [x] Awaiting RPC requests"
+    channel.start_consuming()
+
+
 
 if __name__ == "__main__":
     # print "Start manager"
-    main()
+    # startZeroRPC()
+    startRabbitMQ(RABBIT_MQ_URL) # status Feedback queue
+    # startRabbitMQ(RABBIT_MQ_URL) # queue
     # print "Finish manager"

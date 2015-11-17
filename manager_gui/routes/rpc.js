@@ -63,7 +63,6 @@ router.get('/status', function (req, res, next) {
     console.log('/rpc/status');
     var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
 
-    console.log("<<<<<<<<<<<<<<<<<<<<<<<<<LETS STATUS");
     try {
         client.invoke('status', fullUrl, function (error, resp, more) {
             if (error) {
@@ -78,7 +77,6 @@ router.get('/status', function (req, res, next) {
         console.log(err.message);
         res.json(err.message)
     };
-    console.log("END STATUS>>>>>>>>>>>>>>>>>>>>>>>>>>");
 });
 
 /* GET manager rpc page. */
@@ -87,7 +85,6 @@ router.get('/start', function (req, res, next) {
         if (error) {
             console.log("Error:", error)
         }
-        //console.log(resp);
 
         res.json(resp)
     });

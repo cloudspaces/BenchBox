@@ -1,11 +1,11 @@
 #!/bin/bash -ex
 
 
-./installVagrantVBox.sh
-./installZeroRPC.sh
-./installNodejs.sh
-./installGraphite.sh up &
-./installMongoBD.sh &
+installers/installVagrantVBox.sh
+installers/installZeroRPC.sh
+installers/installNodejs.sh
+installers/installGraphite.sh up &
+installers/installMongoBD.sh &
 
 
 # init manager-rpc server
