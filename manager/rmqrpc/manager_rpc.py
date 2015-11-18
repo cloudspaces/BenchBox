@@ -23,7 +23,7 @@ class manager_rpc(object):
     hosts = None
     config = None
 
-    ops = manager_rmq()
+    # ops = manager_rmq()
 
     def loadHosts(self):
         print 'loadHosts'
