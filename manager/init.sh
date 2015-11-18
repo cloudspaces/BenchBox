@@ -1,8 +1,13 @@
 #!/bin/bash -ex
 
 
+
+
+
+
 installers/installVagrantVBox.sh
 installers/installZeroRPC.sh
+installers/installRabbitMQ.sh
 installers/installNodejs.sh
 installers/installGraphite.sh up &
 installers/installMongoBD.sh &
@@ -10,7 +15,7 @@ installers/installMongoBD.sh &
 
 # init manager-rpc server
 echo "start manager RPC Server"
-python static/manager.py &
+python rmqrpc/manager.py &
 
 # init node server
 echo "start manager GUI Server"
