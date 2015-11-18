@@ -42,11 +42,19 @@ class EmitStatusRpcClient(object):
             self.connection.process_data_events()
         return self.response
 
+
+class onRequestHandler():
+    def __init__(self):
+        print "hello world"
+
+
 if __name__ == '__main__':
     ''' dummy host says hello to the server '''
     argv = sys.argv[1:]
     rmq_url = 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
     routing_key = 'rpc_queue'
+
+
     print "Arguments: {}".format(argv)
     try:
         opts,args = getopt.getopt(argv, "hm:,t:", ["msg=","topic="])
@@ -67,8 +75,11 @@ if __name__ == '__main__':
 
     emit_status_rpc = EmitStatusRpcClient(rmq_url)
     hostname = socket.gethostname()
-    with open('/vagrant/hostname','r') as f:
-        dummyhost = f.read().splitlines()[0]
+    try:
+        with open('/vagrant/hostname','r') as f:
+            dummyhost = f.read().splitlines()[0]
+    except:
+        dummyhost = hostname
     composite_msg="{}.{}.{}".format(dummyhost, hostname, status_msg)
 
     print " [x] emit: emit_status_rpc.call({})".format(composite_msg)

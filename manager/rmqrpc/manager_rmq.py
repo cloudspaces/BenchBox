@@ -2,18 +2,9 @@
 # -*- coding: iso-8859-1 -*-
 __author__ = 'anna'
 
-import subprocess
-import urlparse
-import urllib
-import threading
-from multiprocessing.pool import ThreadPool
 import pxssh
-
-import zerorpc
-import pika
 from termcolor import colored
 
-from manager_constants import SANDBOX_STATIC_IP, BENCHBOX_STATIC_IP, VAGRANT_DEFAULT_LOGIN, RABBIT_MQ_URL
 
 
 
@@ -25,34 +16,6 @@ class manager_rmq():
 
     def __init__(self):
         print 'manager_rmq instance'
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     def setup(self, args):
@@ -72,28 +35,17 @@ class manager_rmq():
         }
         print host_settings
         hostname = args['hostname'][0]
-        # print hostname
-        if not self.HOST_STATUS.has_key(hostname):
-            # print 'dont have {}'.format(hostname)
-            self.HOST_STATUS[hostname] = {}
-        else:
-            print 'have {}'.format(hostname)
-
         print "Start Initial Task"
 
 
-        '''
 
         self.t1downloadBenchBox(host_settings, hostname)
-
-
-
         self.t2installVagrantVBox(host_settings, hostname)
         self.t3downloadVagrantBoxImg(host_settings, hostname)
         self.t4assignStereoTypeToProfile(host_settings, hostname)
         self.t5assignCredentialsToProfile(host_settings, hostname)
         self.t6assignSyncServer(host_settings, hostname)
-        '''
+
         return self.HOST_STATUS[hostname]
 
     def t1downloadBenchBox(self, h, hostname):  # tell all the hosts to download BenchBox
@@ -163,7 +115,6 @@ class manager_rmq():
                   "echo '%s' > profile; " \
                   "fi; " % h['profile']
 
-        ## print str_cmd
         self.rmi(h['ip'], h['user'], h['passwd'], str_cmd)
         self.HOST_STATUS[hostname]['t4assignStereoTypeToProfile'] = True
 
@@ -190,6 +141,7 @@ class manager_rmq():
         self.HOST_STATUS[hostname]['t5assignCredentialsToProfile'] = True
 
     def t6assignSyncServer(self, h, hostname):
+
         owncloud_ip = h['owncloud-ip']
         stacksync_ip = h['stacksync-ip']
         impala_ip = h['impala-ip']
@@ -211,18 +163,7 @@ class manager_rmq():
 
 
 
-    def warmUp(self, args):
-        print 'warmUP'
-        h = {
-            'ip': args['ip'][0],
-            'passwd': args['login'][0],
-            'user': args['login'][0],
-            'cred_stacksync': args['cred_stacksync'][0],
-            'cred_owncloud': args['cred_owncloud'][0],
-            'profile': args['profile'][0],
-            'stacksync-ip': args['stacksync-ip'][0],
-            'owncloud-ip': args['owncloud-ip'][0]
-        }
+    def warmUp(self, h):
         str_cmd = "if [ -d ~/workload_generator ]; then; " \
                   "cd ~/workload_generator; " \
                   "python executor.py -o {} -p {} -t {} -f {} -x {} -w 1; " \
@@ -230,36 +171,14 @@ class manager_rmq():
         print str_cmd
         self.rmisandBox(h['ip'], h['user'], h['passwd'], str_cmd)
 
-    def tearDown(self, args):
-        print 'TEARDOWN'
-        h = {
-            'ip': args['ip'][0],
-            'passwd': args['login'][0],
-            'user': args['login'][0],
-            'cred_stacksync': args['cred_stacksync'][0],
-            'cred_owncloud': args['cred_owncloud'][0],
-            'profile': args['profile'][0],
-            'stacksync-ip': args['stacksync-ip'][0],
-            'owncloud-ip': args['owncloud-ip'][0]
-        }
+    def tearDown(self, h):
         str_cmd = "if [ -d ~/output ]; then " \
                   "rm -R ~/output; " \
                   "fi; "
 
         self.rmibenchBox(h['ip'], h['user'], h['passwd'], str_cmd)
 
-    def vagrantDown(self, args):
-        h = {
-            'ip': args['ip'][0],
-            'passwd': args['login'][0],
-            'user': args['login'][0],
-            'cred_stacksync': args['cred_stacksync'][0],
-            'cred_owncloud': args['cred_owncloud'][0],
-            'profile': args['profile'][0],
-            'stacksync-ip': args['stacksync-ip'][0],
-            'owncloud-ip': args['owncloud-ip'][0]
-        }
-        hostname = args['hostname'][0]
+    def vagrantDown(self, h):
         str_cmd = "kill -9 $(pgrep ruby); " \
                   "kill -9 $(pgrep vagrant); " \
                   "if [ -d BenchBox ]; then " \
@@ -270,18 +189,7 @@ class manager_rmq():
         # print str_cmd
         self.rmi(h['ip'], h['user'], h['passwd'], str_cmd)
 
-    def vagrantUp(self, args):
-        h = {
-            'ip': args['ip'][0],
-            'passwd': args['login'][0],
-            'user': args['login'][0],
-            'cred_stacksync': args['cred_stacksync'][0],
-            'cred_owncloud': args['cred_owncloud'][0],
-            'profile': args['profile'][0],
-            'stacksync-ip': args['stacksync-ip'][0],
-            'owncloud-ip': args['owncloud-ip'][0]
-        }
-        hostname = args['hostname'][0]
+    def vagrantUp(self, h):
         str_cmd = "" \
                   "if [ -d BenchBox ]; then " \
                   "cd BenchBox;" \
@@ -302,94 +210,56 @@ class manager_rmq():
                   "fi;" \
                   ""
         self.rmi(h['ip'], h['user'], h['passwd'], str_cmd)
-        self.HOST_RUN_STATUS[hostname] = True
 
-    def monitorUp(self, args):
+    def monitorUp(self, h):
 
-        # if self.HOST_STATUS[hostname]
-        h = {
-            'ip': args['ip'][0],
-            'passwd': args['login'][0],
-            'user': args['login'][0],
-            'cred_stacksync': args['cred_stacksync'][0],
-            'cred_owncloud': args['cred_owncloud'][0],
-            'profile': args['profile'][0],
-            'stacksync-ip': args['stacksync-ip'][0],
-            'owncloud-ip': args['owncloud-ip'][0]
-        }
-        hostname = args['hostname'][0]
         str_cmd = './monitor/startMonitor.sh'
         self.rmisandBox(h['ip'], h['user'], h['passwd'], str_cmd)
 
-    def clientStackSyncUp(self, args):
+    def clientStackSyncUp(self, h):
 
-        # if self.HOST_STATUS[hostname]
-        h = {
-            'ip': args['ip'][0],
-            'passwd': args['login'][0],
-            'user': args['login'][0],
-            'cred_stacksync': args['cred_stacksync'][0],
-            'cred_owncloud': args['cred_owncloud'][0],
-            'profile': args['profile'][0],
-            'stacksync-ip': args['stacksync-ip'][0],
-            'owncloud-ip': args['owncloud-ip'][0]
-        }
-        hostname = args['hostname'][0]
+        hostname = h['hostname'][0]
         str_cmd = 'nohup /usr/bin/stacksync &'
         self.rmisandBox(h['ip'], h['user'], h['passwd'], str_cmd)
 
-    def clientStackSyncDown(self, args):
+    def clientStackSyncDown(self, h):
 
-        h = {
-            'ip': args['ip'][0],
-            'passwd': args['login'][0],
-            'user': args['login'][0],
-            'cred_stacksync': args['cred_stacksync'][0],
-            'cred_owncloud': args['cred_owncloud'][0],
-            'profile': args['profile'][0],
-            'stacksync-ip': args['stacksync-ip'][0],
-            'owncloud-ip': args['owncloud-ip'][0]
-        }
-        hostname = args['hostname'][0]
         str_cmd = '/usr/bin/stacksync clear &'
         self.rmisandBox(h['ip'], h['user'], h['passwd'], str_cmd)
 
-    def clientOwnCloudUp(self, args):
-
-        h = {
-            'ip': args['ip'][0],
-            'passwd': args['login'][0],
-            'user': args['login'][0],
-            'cred_stacksync': args['cred_stacksync'][0],
-            'cred_owncloud': args['cred_owncloud'][0],
-            'profile': args['profile'][0],
-            'stacksync-ip': args['stacksync-ip'][0],
-            'owncloud-ip': args['owncloud-ip'][0]
-        }
-
-        hostname = args['hostname'][0]
+    def clientOwnCloudUp(self, h):
 
         str_cmd = 'nohup /vagrant/owncloud.sh &'
         self.rmisandBox(h['ip'], h['user'], h['passwd'], str_cmd)
         # have session at the dummy host
 
-    def requestStatus(self, args):
-        result = None
-        if args['target'] is None:
-            print "no target specified"
-        else:
-            hostname = args['ip'][0]
-            username = args['login'][0]
-            password = username
-            str_cmd = args['status'][0]
 
-            result = self.rmiStatus(hostname, username, password, str_cmd, args['target'][0])
 
-        return result
 
-    def start_node_server(self, h):
-
-        str_cmd = "cd BenchBox/monitor; " \
-                  "nohup /usr/local/bin/npm start & "
-        self.rmi(h['ip'], h['user'], h['passwd'], str_cmd)
+def rmi(self, hostname, login, passwd, cmd, callback=None):
+        while True:
+            try:
+                s = pxssh.pxssh()
+                s.login(hostname, login, passwd)
+                s.timeout = 3600  # set timeout to one hour
+                s.sendline('whoami')
+                s.prompt()  # match the prompt
+                s.sendline(cmd)  # run a command
+                s.prompt() # true
+                last_output = s.before  # # # print everyting before the prompt
+                print colored(last_output, 'blue')
+                s.logout()
+            except pxssh.ExceptionPxssh, e:
+                continue
+            break
+        print "LAST: OUTPUT"
+        print last_output
+        replace_n = last_output.replace('\n', '')
+        replace_r = replace_n.replace('\r', '')
+        whole_cmd = replace_r.split(' ')
+        print "JOIN COMMAND: "
+        join_cmd = ''.join(whole_cmd[-2:])
+        print "AFTER JOIN "
+        print join_cmd
+        return join_cmd
 

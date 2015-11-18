@@ -214,211 +214,12 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 controller: 'HostDetailCtrl'
             });
     }]);
+
 console.log("Home Script loaded");
 
 GLOBAL_VAR = null;
 console.log("Btn controller");
-var statusIdx = 0;
 
-function addStatusScope(args) {
-    // console.log(args);
-    var name = args.ip + ':' + args.cmd;
-    var statusId = "stat_" + statusIdx++;
-    $("#requestStatus").append("<div class='row' id=" + statusId + "><div class='col-md-4'>" + name + " : " + statusId + "</div><div class='col-md-8 stats'>liveRpcFeedBack</div></div>");
-    var statusCmd;
-    // alert(args.cmd)
-    switch (args.cmd) {
-        case "setup":
-            args.target = 'localhost'
-            statusCmd = 'hostname; grep -q ss.*.key; echo $?\?; ';
-            break;
-        case "vagrantUp":
-            args.target = 'localhost';
-            statusCmd = 'hostname; VBoxManage list runningvms | [ $(wc -l) -eq 2 ]; echo $?\?; ';
-            break;
-        case "warmUp":
-            args.target = 'benchBox';
-            statusCmd = 'hostname; [ -d output ]; echo $?\?; '
-            break;
-        case "tearDown":
-            args.target = 'benchBox';
-            statusCmd = 'hostname; [ ! -d output ]; echo $?\?; '
-            break;
-        case "vagrantDown":
-            args.target = 'localhost';
-            statusCmd = 'hostname; VBoxManage list runningvms | [ $(wc -l) -eq 0 ]; echo $?\?; ';
-            break;
-        case "monitorUp":
-            args.target = 'sandBox';
-            statusCmd = 'hostname; pgrep python > /dev/null; echo $?\?; ';
-            // how to check if the sandBox monitor listener is running?
-            // check if an python process is running
-            //
-            break;
-        case "clientStackSyncUp":
-            statusCmd = 'hostname; pgrep java > /dev/null; echo $?\?; ';
-            args.target = 'sandBox';
-            // check there is no java process running
-            break;
-        case "clientStackSyncDown":
-            statusCmd = 'hostname; pgrep java > /dev/null; [ $? -ne 0 ]; echo $?\?; ';
-            args.target = 'sandBox';
-            // check there is java process running
-            break;
-        case "clientOwncloudUp":
-            statusCmd = 'hostname; echo 0\?; ';
-            args.target = 'sandBox';
-            break;
-        case "execute":
-            // check if the execute procedure is still running at the benchBox machine.
-            statusCmd = 'hostname; pgrep python > /dev/null; [ $? -ne 0 ]; echo $?\?; ';
-            args.target = 'benchBox';
-            break;
-        default:
-            console.log(args.cmd);
-            statusCmd = 'hostname; echo $?\?';
-            break;
-    }
-
-    console.log(args);
-    // args.target = 'sandBox';
-
-    var finish = false;
-    var itvTimeout = 0;
-    var itvMax = 1; // 6000 * 3 = 18000 segundos
-    var itvTimer = 3000;
-    var statusItv = setInterval(function () {
-        console.log(itvTimeout);
-        itvTimeout++;
-        if (finish === true) {
-            $('#' + statusId).remove();
-            clearInterval(statusItv);
-        }
-        if (itvTimeout === itvMax) {
-            finish = true;
-            $.notify('ExitTryLimit', 'warn')
-        } else {
-            switch (args.target) {
-                case 'sandBox':
-                    console.warn('sandBox');
-                    rpcStatus(args, statusCmd, statusId, 'sandBox');
-                    break;
-
-                case 'benchBox':
-                    console.warn('benchBox');
-                    rpcStatus(args, statusCmd, statusId, 'benchBox');
-
-                    break;
-                default:
-                    console.warn('localhost');
-                    rpcStatus(args, statusCmd, statusId, 'localhost');
-                    break;
-            }
-
-            var currStatus = $('#' + statusId).children('.stats').text();
-            var notFound = "-1"
-            console.log(currStatus)
-            if (currStatus.indexOf('0?') == notFound) {
-                console.warn('Still not found!');
-                if (currStatus.indexOf('No route to host') == notFound) {
-                    console.log('Waiting' + statusId);
-                } else {
-                    console.error('First setup vagrant up');
-                    $.notify('Require vagrantUp: ' + statusId + args.cmd, 'error');
-                    finish = true;
-                }
-            } else {
-                console.info('StatusId: ' + statusId + ' Completed!');
-                finish = true; // por que se ha encontrado un exit code zero
-                $.notify('SuccessStatus: ' + statusId + args.cmd, 'success');
-            }
-
-        }
-    }, itvTimer);
-}
-
-$('#btnHello').click(
-    function () {
-        console.log("Say hello");
-        $.get('http://localhost:3000/rpc/hello', {}, function (data) {
-            console.log("success hello");
-            console.log(JSON.stringify({data: data}));
-        });
-        console.log("Fin hello");
-    });
-
-
-$('#btnCmd').click(
-    function () {
-
-        console.log("Run cmd");
-
-        $.get('http://localhost:3000/rpc/cmd',
-            {cmd: $('#inputCmd').val()},
-            function (data) {
-                console.log("success hello!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                writeToLogger('loggerFrame', data);
-            });
-        console.log("Success, run cmd!");
-    });
-
-$('#btnStart').click(
-    function () {
-        console.log("Run start");
-        $.ajax({
-            url: 'http://localhost:3000/rpc/start',
-            type: 'GET',
-            success: function () {
-                console.log("Success, run start!");
-            },
-            error: function () {
-
-            }
-        });
-    });
-
-$('#btnGoodbye').click(
-    function () {
-        console.log("Say goodbye");
-        $.ajax({
-            url: 'http://localhost:3000/rpc/goodbye',
-            type: 'GET',
-            success: function () {
-                console.log("Success, say goodbye!");
-            }
-        });
-    });
-
-$('#btnList').click(
-    function () {
-        console.log("Get list");
-        $.ajax({
-            url: 'http://localhost:3000/rpc/list',
-            type: 'GET',
-            success: function (data) {
-                console.log("Success, say list!");
-                console.log(data);
-                writeToLogger('loggerFrame', data);
-            }
-        });
-    });
-
-writeToLogger = function (loggerID, lines) {
-    data = lines;
-    // clear logger content
-    $('#' + loggerID).val('');
-    lines = JSON.parse(data.result);
-
-    // publish new data
-    console.log(lines);
-    console.log("Show");
-    lines.forEach(function (line, idx) {
-        console.log(line);
-        if (line !== '')
-            $('#' + loggerID).val($('#' + loggerID).val() + line + '\n');
-    });
-    $('#' + loggerID).scrollTop($('#' + loggerID)[0].scrollHeight);
-};
 
 
 testConnection = function (ip, port, cb) {
@@ -585,50 +386,7 @@ $.fn.graphite.defaults.url = "https://localhost:8443/renderer/";
 $.fn.graphite.defaults.width = "450";
 $.fn.graphite.defaults.height = "300";
 
-try {
-    /*
-     $('#monitorCPU').graphite({
-     // url: "http://myserver/render/",
-     from: "-1d",
-     target: [
-     "carbon.agents.vagrant-ubuntu-trusty-64-1.memUsage"
-     ],
-     title: "CPUMonitor"
-     });
-     $('#monitorXXX').graphite({
-     // url: "http://myserver/render/",
-     from: "-1hours",
-     target: [
-     "carbon.agents.vagrant-ubuntu-trusty-64-1.cpuUsage"
-     ],
-     title: "XXXMonitor"
-     });
 
-
-     $('#monitorRAM').graphite({
-     // url: "http://myserver/render/",
-     from: "-1hours",
-     target: [
-     "carbon.agents.vagrant-ubuntu-trusty-64-1.memUsage"
-     ],
-     title: "RamMonitor"
-     });
-
-     $('#monitorNET').graphite({
-     // url: "http://myserver/render/",
-     from: "-1hours",
-     colorList: 'red,green',
-     target: [
-     "alias(carbon.agents.vagrant-ubuntu-trusty-64-1.pointsPerUpdate, 'pointsPerUpdate')",
-     "alias(carbon.agents.vagrant-ubuntu-trusty-64-1.updateOperations, 'updateOps')"
-     ],
-     title: "NetworkMonitor"
-     });
-     */
-    console.log("do grephite");
-} catch (err) {
-    console.warn('Error happened', JSON.stringify(err));
-}
 
 $('#btnFixImage').click(function () {
     console.log("btnFixImage")
@@ -649,7 +407,6 @@ $('#btnFixImage').click(function () {
     }
 
 });
-
 
 console.log(GLOBAL_VAR);
 

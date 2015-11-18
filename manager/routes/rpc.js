@@ -15,7 +15,7 @@ router.get('/nmap', function (req, res, next) {
     console.log("NMAP: " + cmd);
     client.invoke('nmap', cmd.split(' ')[1], cmd.split(' ')[0], function (error, resp, more) {
         if (error) {
-            console.error("Error:", error)
+            console.error("NMAP Error:", cmd, error)
         }
         console.log(resp);
         res.json({result: JSON.stringify(resp)})
@@ -25,10 +25,10 @@ router.get('/nmap', function (req, res, next) {
 /* GET manager rpc page. */
 router.get('/cmd', function (req, res, next) {
     var cmd = req.url.split('=')[1].replace(/\+/g, ' ');
-    console.log("COMMAND: " + cmd);
+    console.log("CMD: " + cmd);
     (client.invoke('cmd', cmd, function (error, resp, more) {
         if (error) {
-            console.log("Error:", error)
+            console.log("CMD Error:", cmd, error)
         }
         res.json({result: JSON.stringify(resp)})
     }));

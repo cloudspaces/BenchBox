@@ -35,10 +35,10 @@
                         <td class="col-md-2">
                             logging
                         </td>
-                        <td class="col-md-2">
+                        <td class="col-md-1">
                             user
                         </td>
-                        <td class="col-md-2">
+                        <td class="col-md-3">
                             option
                         </td>
                         <td class="col-md-2">
@@ -67,12 +67,12 @@
                             <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.logging">
                             <p class="host-login" ng-show="!editing[$index]">{{host.logging}}</p>
                         </td>
-                        <td class="col-md-2">
+                        <td class="col-md-1">
                             <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.cred_owncloud">
                             <p class="host-user" ng-show="!editing[$index]">{{host.cred_owncloud}}</p>
                         </td>
 
-                        <td class="col-md-2">
+                        <td class="col-md-3">
                             <button class="btn btn-success btn-xs" ng-show="!editing[$index]" ng-click="edit($index)">edit</button>
                             <button class="btn btn-danger btn-xs" ng-show="!editing[$index]" ng-click="remove($index)">remove</button>
                             <button class="btn btn-warning btn-xs" ng-show="editing[$index]" ng-click="update($index)">update</button>

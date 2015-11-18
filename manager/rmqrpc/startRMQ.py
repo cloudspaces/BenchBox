@@ -49,6 +49,10 @@ class RabbitMqProxy(object):
         print " [x] Awaiting RPC requests"
         channel.start_consuming()
 
+
+# todo : define update rabbitmq task feedback to the manager web-view...
+
+
 def main():
 
     print "RMQ : Init"
