@@ -17,7 +17,6 @@ manager/status
 manager/status/*
 manager/misc
 manager/misc/*
-manager/init.sh
 manager/config
 manager/config/*
 manager/output
@@ -76,11 +75,6 @@ monitor/logger/post-process
 monitor/logger/py_cpu_monitor/*.pyc
 
 
-manager
-
-managerGUI/manager
-managerGUI/synthesize
-# managerGUI/
 
 
 output

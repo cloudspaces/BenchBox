@@ -1,0 +1,74 @@
+var express = require('express');
+var router = express.Router();
+
+var mongoose = require('mongoose');
+var Host = require('../models/Hosts.js');
+
+
+/* GET host listing. */
+router.get('/', function(req, res, next) {
+
+    Host.find(function(err, hosts){
+        if (err) return next(err);
+
+        console.log('found!');
+        // sort corresponds to the order by func
+        res.json(hosts.sort({hostname: 0, user: 0}));
+        //res.json(hosts);
+    });
+    // res.send('respond with a resource');
+});
+
+/* actualizar un compo por get  */
+
+
+/* POST /hosts */
+router.post('/', function(req, res, next) {
+    console.log("create an host")
+    console.log(JSON.stringify(req.body));
+    Host.create(req.body, function (err, post) {
+
+        if (err)
+            return next(err);
+        res.json(post);
+    });
+});
+
+/* GET /hosts/id */
+router.get('/:id', function(req, res, next) {
+    Host.findById(req.params.id, function (err, get) {
+        if (err) return next(err);
+        res.json(get);
+    });
+});
+
+
+/* PUT /hosts/:id */
+router.put('/:id', function(req, res, next) {
+
+    delete req.body._id
+
+    Host.findByIdAndUpdate(req.params.id, req.body, function (err, put) {
+        console.log(JSON.stringify(req.params))
+        console.log(JSON.stringify(req.body))
+
+        if (err)
+        {
+            console.log(err.message);
+            return next(err);
+
+        }
+        res.json(put);
+    });
+});
+
+
+/* DELETE /hosts/:id */
+router.delete('/:id', function(req, res, next) {
+    Host.findByIdAndRemove(req.params.id, req.body, function (err, post) {
+        if (err) return next(err);
+        res.json(post);
+    });
+});
+
+module.exports = router;

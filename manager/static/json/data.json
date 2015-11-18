@@ -1,0 +1,23 @@
+[
+  {
+    "id":"dd27721b-9db7-4dbe-9fca-f86e79eb6a7b",
+    "name":"demo1",
+    "swift_account":"AUTH_47f13d9fe178438580ffb08ddca763a4",
+    "swift_user":"stacksync_230edffc_demo1",
+    "email":"demo1@stacksync.org"
+  },
+  {
+    "id":"d745174c-23d0-4df4-b956-3821691301a8",
+    "name":"demo2",
+    "swift_account":"AUTH_47f13d9fe178438580ffb08ddca763a4",
+    "swift_user":"stacksync_3e456cdc_demo2",
+    "email":"demo2@stacksync.org"
+  },
+  {
+    "id":"9a5f0eff-a290-474d-a818-2c65e957ae10",
+    "name":"demo3",
+    "swift_account":"AUTH_47f13d9fe178438580ffb08ddca763a4",
+    "swift_user":"stacksync_679bc728_demo3",
+    "email":"demo3@stacksync.org"
+  }
+]
