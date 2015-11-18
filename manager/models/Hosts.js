@@ -11,10 +11,26 @@ var HostSchema = new mongoose.Schema({
     status: {
         type: String,
         default:'idle',
-        enum : ['idle','configuring', 'running', 'executing', 'teardown']
+        enum : ['none','configuring','idle', 'running', 'teardown', 'halt']
     },
+    status_benchbox: {
+        type: String,
+        default:'none'
+    },
+    status_sandbox: {
+        type: String,
+        default:'none'
+     },
+
     updated_at: {type: Date, default: Date.now}
 });
-
+/*
+none        : no se sap con esta
+configuring : s'esta configurant
+idle        : no s'esta fent cap operacio
+running     : s'esta executant tests
+teardown    : s'esta recolectant logs
+halt        : la vms esta apagada
+*/
 
 module.exports = mongoose.model('Host', HostSchema);
