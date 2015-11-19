@@ -9,10 +9,9 @@ from manager_constants import RABBIT_MQ_URL
 class RabbitMqProxy(object):
 
     def __init__(self, rmq_url = 'localhost'):
+        self.rmq_url =rmq_url
         if rmq_url == 'localhost':
-            self.rmq_url =rmq_url
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(rmq_url))
-
         else:
             print 'RabbitMQ instance'
             url_str = self.rmq_url
@@ -57,10 +56,9 @@ class RabbitMqProxy(object):
 class AckStatus:
 
     def __init__(self, rmq_url = 'localhost'):
+        self.rmq_url =rmq_url
         if rmq_url == 'localhost':
-            self.rmq_url =rmq_url
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(rmq_url))
-
         else:
             print 'RabbitMQ instance'
             url_str = self.rmq_url
