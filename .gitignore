@@ -58,6 +58,7 @@ vagrant/*.box
 vagrant/profile
 vagrant/ss.*
 vagrant/owncloud.sh
+vagrant/owncloudsync.sh
 vagrant/slaves
 vagrant/slaves/*
 vagrant/slaves/*/*

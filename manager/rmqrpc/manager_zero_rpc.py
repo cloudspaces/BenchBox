@@ -69,7 +69,7 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
               "echo '{}' > log.impala.ip; " \
               "echo '{}' > log.graphite.ip; " \
               "" \
-              "echo '{}' | sudo -S setup.sh; " \
+              "echo '{}' | sudo -S ./setup.sh; " \
               "" \
               "".format(
                         h['passwd'],  h['profile'],
