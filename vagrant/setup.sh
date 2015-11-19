@@ -24,7 +24,7 @@ echo "#3 Install RabbitMQ Pip Pika"
 sudo ./scripts/installPythonPipPika.sh
 
 
-python vagrant/emit_status.py --msg setupFinished;
+python ./emit_status.py --msg setupFinished;
 
 
 fi;

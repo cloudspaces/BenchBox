@@ -6,20 +6,13 @@
 
 echo "Inicializar instalación de dependencias en los Hosts"
 
-if [ -f ~/BenchBox/vagrant/debian-7.0-amd64.box ]; then
+if [ -f ./debian-7.0-amd64.box ]; then
 	echo 'box/OK';
+	ls *.box
 else
 	echo 'no..., check if other path';
+	wget https://www.dropbox.com/s/sdupbseays0f7ik/debian-7.0-amd64.box;
 
-	if [ -f ~/BenchBox/vagrant/scripts/debian-7.0-amd64.box ]; then
-		echo 'box/OK';
-		cp ~/BenchBox/vagrant/scripts/debian-7.0-amd64.box ../
-	else
-		cd vagrant;
-		wget https://www.dropbox.com/s/si19tbftilcuipz/debian-7.0-amd64.box;
-		cp debian-7.0-amd64.box ../
-		cd;
-	fi
 fi
 
 
