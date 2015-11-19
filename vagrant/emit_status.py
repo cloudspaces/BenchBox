@@ -29,9 +29,9 @@ class VagrantHandlers(object):
 
 class EmitStatusRpcClient(object):
     def __init__(self, rmq_url = 'localhost'):
+        self.rmq_url =rmq_url
         if rmq_url == 'localhost':
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(rmq_url))
-            self.rmq_url =rmq_url
         else:
             print 'RabbitMQ instance'
             url_str = self.rmq_url
