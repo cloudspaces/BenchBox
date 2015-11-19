@@ -83,7 +83,7 @@ class AckStatus:
 def main():
 
     print "RMQ : StatusManager Instance"
-    rmp = RabbitMqProxy()
+    rmp = RabbitMqProxy(RABBIT_MQ_URL)
     print "RMQ : start"
     rmp.start()
 

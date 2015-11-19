@@ -123,7 +123,8 @@ class DummyRabbitHandler(object):
 if __name__ == '__main__':
     ''' dummy host says hello to the server '''
     argv = sys.argv[1:]
-    rmq_url = 'localhost'  # 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
+    # rmq_url = 'localhost'  # 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
+    rmq_url = 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
     routing_key = 'rpc_queue'
 
     print "Arguments: {}".format(argv)
