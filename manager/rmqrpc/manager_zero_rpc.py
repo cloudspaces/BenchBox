@@ -49,11 +49,13 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
               "echo 'check if Git is installed...'; " \
               "echo '{}' | sudo -S apt-get install git; " \
               "echo 'check if BenchBox is installed...'; " \
+              "" \
               "if [ -d BenchBox ]; then " \
               "cd BenchBox;" \
               "git pull; " \
               "else " \
               "git clone --recursive https://github.com/CloudSpaces/BenchBox.git; " \
+              "cd BenchBox; " \
               "fi; " \
               "" \
               "cd vagrant; " \

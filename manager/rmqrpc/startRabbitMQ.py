@@ -12,7 +12,7 @@ class RabbitMqProxy(object):
         self.rmq_url =rmq_url
 
     # ACTION CONTROLLER
-    def upate_status(self, status):
+    def update_status(self, status):
         print 'update_status_to: {}'.format(status)
         return 'MANAGER-ACKED: {}'.format(status)
 
