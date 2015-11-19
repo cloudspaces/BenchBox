@@ -2,18 +2,7 @@
 
 
 
-
-if [ "$#" -ne 0 ]; then
-    echo "Illegal number of parameters"
-    echo "use default root directory"
-	DIR=$1
-else
-	echo '../'
-	DIR='..'
-fi
-
-
-if [ ! -f "$DIR/ss.stacksync.ip" ];
+if [ ! -f "ss.stacksync.ip" ];
 then
 echo "File: not found!"
 sync_server_ip=$1 # stacksync server_ip,
@@ -21,21 +10,19 @@ exit;
 else
 echo "File: $2 exists!"
 fi
-# line=($(<"$DIR/ss.stacksync.ip"))
-sync_server_ip=`more "$DIR/ss.stacksync.ip" | awk -F ' ' '{ print $2}' | awk -F ':' '{print $1}'`
-# line=($(<"$DIR/ss.stacksync.ip"))
+
+sync_server_ip=`more "ss.stacksync.ip" | awk -F ' ' '{ print $2}' | awk -F ':' '{print $1}'`
 if [ -z $sync_server_ip ];
 then
 	echo 'user next path'
-	sync_server_ip=($(<"$DIR/ss.stacksync.ip"))
+	sync_server_ip=($(<"ss.stacksync.ip"))
 else
 	echo 'already read once'
 	echo $sync_server_ip
-	# sync_server_ip=($(<"$DIR/ss.stacksync.key"))
 fi
 
 
-if [ ! -f "$DIR/ss.stacksync.key" ];
+if [ ! -f "ss.stacksync.key" ];
 then
 echo "File: not found!"
 exit;
@@ -43,14 +30,13 @@ else
 echo "File: $1 exists!"
 fi
 
-line=($(<"$DIR/ss.stacksync.key"))
+line=($(<"ss.stacksync.key"))
 
 
-mystring="466d654e-31a7-47ba-9085-65f08d8ae863,demo17,AUTH_5e446d39e4294b57831da7ce3dd0d2c2,stacksync_e373c1fd_demo17,demo17@ast.cat"
-mystring=$line
+stacksync_key=$line
 
 
-IFS=',' read -a myarray <<< "$mystring"
+IFS=',' read -a myarray <<< "$stacksync_key"
 
 ID=${myarray[0]}
 USER=${myarray[1]}
@@ -59,8 +45,6 @@ SWIFT_AUTH=${myarray[2]}
 SWIFT_USER=${myarray[3]}
 
 EMAIL=${myarray[4]}
-
-
 
 
 swift_group='stacksync'
@@ -138,7 +122,6 @@ echo "$FILE is empty."
 fi ;
 ls -l $FILE
 echo 'New credentials generated successfully!!'
-# cat $FILE
-mv $FILE ../$FILE
+
 
 
