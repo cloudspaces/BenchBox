@@ -5,23 +5,48 @@ import urlparse
 import sys
 import getopt
 import socket
+import threading
+import subprocess
+
+class VagrantHandlers(object):
+    def __init__(self):
+        print "vagrant handler"
+
+    def up(self):
+        print 'up'
+        print subprocess.check_output(["echo", "Hello World!"])
+
+    """
+    def halt(self):
+        print 'halt'
+
+    def status(self):
+        print 'status'
+
+    def destroy(self):
+        print 'destroy'
+    """
 
 class EmitStatusRpcClient(object):
-    def __init__(self, rmq_url):
-
-        url_str = rmq_url
-        url = urlparse.urlparse(url_str)
-
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host=url.hostname, virtual_host=url.path[1:], credentials=pika.PlainCredentials(url.username, url.password)
-        ))
+    def __init__(self, rmq_url = 'localhost'):
+        if rmq_url == 'localhost':
+            self.connection = pika.BlockingConnection(pika.ConnectionParameters(rmq_url))
+            self.rmq_url =rmq_url
+        else:
+            print 'RabbitMQ instance'
+            url_str = self.rmq_url
+            url = urlparse.urlparse(url_str)
+            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+                host=url.hostname, virtual_host=url.path[1:], credentials=pika.PlainCredentials(url.username, url.password)
+            ))
 
         self.channel = self.connection.channel()
 
         result = self.channel.queue_declare(exclusive=True)
         self.callback_queue = result.method.queue
 
-        self.channel.basic_consume(self.on_response, no_ack=True,
+        self.channel.basic_consume(self.on_response,
+                                   no_ack=True,
                                    queue=self.callback_queue)
 
     def on_response(self, ch, method, props, body):
@@ -40,35 +65,54 @@ class EmitStatusRpcClient(object):
                                    body=str(n))
         while self.response is None:
             self.connection.process_data_events()
+        self.connection.close()
         return self.response
 
-    def close(self):
-        self.connection.close()
 
 class DummyRabbitHandler(object):
+
+    vagrant_ops = VagrantHandlers()
+
     def __init__(self, rmq_url, topic):
         print "Dummy Rabbit Handler"
 
-        self.url_str = rmq_url
-        url = urlparse.urlparse(self.url_str)
+        if rmq_url == 'localhost':
+            self.connection = pika.BlockingConnection(pika.ConnectionParameters(rmq_url))
+            self.rmq_url =rmq_url
+        else:
+            print 'RabbitMQ instance'
+            url_str = self.rmq_url
+            url = urlparse.urlparse(url_str)
+            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+                host=url.hostname, virtual_host=url.path[1:], credentials=pika.PlainCredentials(url.username, url.password)
+            ))
+
         self.topic = topic
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host=url.hostname,
-            virtual_host=url.path[1:],
-            credentials=pika.PlainCredentials(url.username, url.password)
-        ))
-
-
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=self.topic)
 
     def on_request(self, ch, method, props, body):
-        n = body
-        print " [on_request] {} ".format(n)
-        response = "response from: {}".format(n)
+        print " [on_request] {} ".format(body)
+
+
+        # todo implementar els handler vagrantUp i vagrantDown
+        try:
+            toExecute = getattr(self.vagrant_ops, body)
+            print toExecute
+            t = threading.Thread(target=toExecute)
+            # exemple peticion up, al final de vagrant up fer que es executi emit status dins del sandBox i del benchBox
+            # enlloc de que la queue sigui parcial fer que sigui completa dins del sandBox | benchBox, a fora es nomes hostname
+            t.start()
+        except AttributeError as e:
+            # print e.message
+            print "ACK: {}".format(body)
+        # t.join()
+        response = "response from: {}".format(body)
         ch.basic_publish(exchange='',
-                         routing_key=n,
+                         routing_key=body,
+                         properties=pika.BasicProperties(correlation_id=props.correlation_id),
                          body=response)
+        ch.basic_ack(delivery_tag=method.delivery_tag)  # comprar que l'ack coincideix, # msg index
 
     def listen(self):
         self.channel.basic_qos(prefetch_count=1)
@@ -79,9 +123,8 @@ class DummyRabbitHandler(object):
 if __name__ == '__main__':
     ''' dummy host says hello to the server '''
     argv = sys.argv[1:]
-    rmq_url = 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
+    rmq_url = 'localhost'  # 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
     routing_key = 'rpc_queue'
-
 
     print "Arguments: {}".format(argv)
     try:
@@ -101,7 +144,7 @@ if __name__ == '__main__':
     emit_status_rpc = EmitStatusRpcClient(rmq_url)
     hostname = socket.gethostname()
     try:
-        with open('/vagrant/hostname','r') as f:
+        with open('hostname','r') as f:
             dummyhost = f.read().splitlines()[0]
     except:
         dummyhost = hostname
@@ -111,6 +154,8 @@ if __name__ == '__main__':
     response = emit_status_rpc.call(composite_msg)
     print " [.] Got %r" % (response,)
 
-    rmq_status_server = DummyRabbitHandler(rmq_url, topic)
+    ''' crear una cua amb el propi host name de tipus direct '''
+    print "START DummyRabbitStatus Worker"
+    rmq_status_server = DummyRabbitHandler(rmq_url, dummyhost)
     rmq_status_server.listen()
     ''' dummy host does all the following setup operations '''

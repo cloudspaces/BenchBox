@@ -55,6 +55,7 @@ vagrant/db
 vagrant/hostname
 vagrant/config.xml
 vagrant/*.box
+vagrant/emit_task.py
 vagrant/profile
 vagrant/ss.*
 vagrant/owncloud.sh
