@@ -3,5 +3,5 @@
 
 
 echo "Start RPC and RMQ"
-python startRMQ.py &
-python startRPC.py &
+nohop python startRabbitMQ.py
+nohop python startZeroRPC.py

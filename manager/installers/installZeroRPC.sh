@@ -39,6 +39,7 @@ sudo apt-get -y install python-pip
 fi
 sudo pip install pyzmq
 sudo pip install python-nmap
+sudo apt-get install nmap
 # Now we can install ZeroRPC
 sudo pip install zerorpc
 

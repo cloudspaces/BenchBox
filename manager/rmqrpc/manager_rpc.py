@@ -4,15 +4,16 @@ __author__ = 'anna'
 
 import subprocess
 import urllib
+from manager_zero_rpc import ManagerZeroRpc
+import urlparse
+import threading
 
-
-
-class manager_rpc(object):
+class ManagerRpc(object):
 
     hosts = None
     config = None
 
-
+    ops = ManagerZeroRpc()
 
     def cmd(self, name):
         str = urllib.quote_plus(name)
@@ -20,7 +21,6 @@ class manager_rpc(object):
         print 'Request: -> cmd {}'.format(name)
         output = subprocess.check_output(['bash', '-c', urllib.unquote_plus(name)])
         return output.split('\n')
-
 
     def nmap(self, port, ip):
         output = subprocess.check_output(['nmap', '-p', port, ip])
@@ -31,21 +31,17 @@ class manager_rpc(object):
                 return True
         return False
 
+    def rpc(self, url):
+        str = urlparse.urlparse(url)
+        argslist = urlparse.parse_qs(str.query)
+        toExecute = getattr(self.ops, argslist['cmd'][0])
+        t = threading.Thread(target=toExecute, args=(argslist,))
+        t.start()
+        result = "CMD {} Send!".format(argslist['cmd'][0])  # None Blocking
+        argslist['result'] = result;
+        return argslist
 
 '''
-
-traduir a nodejs rabbitmq
-
-def rpc(self, url):
-    str = urlparse.urlparse(url)
-    argslist = urlparse.parse_qs(str.query)
-    toExecute = getattr(self.ops, argslist['cmd'][0])
-    t = threading.Thread(target=toExecute, args=(argslist,))
-    t.start()
-    result = None # None Blocking
-    argslist['result'] = result;
-    return argslist
-
 def status(self, url):
     str = urlparse.urlparse(url)
     argslist = urlparse.parse_qs(str.query)

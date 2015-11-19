@@ -54,7 +54,10 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
               "git pull; " \
               "else " \
               "git clone --recursive https://github.com/CloudSpaces/BenchBox.git; " \
-              "fi;" \
+              "fi; " \
+              "" \
+              "cd vagrant; " \
+              "" \
               "echo '{}' > profile; " \
               "" \
               "echo '{}' > ss.stacksync.key; " \

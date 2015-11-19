@@ -3,14 +3,14 @@
 __author__ = 'anna'
 
 import zerorpc
-from manager_rpc import manager_rpc
+from manager_rpc import ManagerRpc
 
 
 class ZeroRpcServer():
 
     def __init__(self, server_address="tcp://0.0.0.0:4242", pool_size = 10):
         print 'ZeroRPC instance'
-        self.s = zerorpc.Server(manager_rpc(), pool_size=pool_size)  # numero de cpu
+        self.s = zerorpc.Server(ManagerRpc(), pool_size=pool_size)  # numero de cpu
         print 'ZeroRPC bind'
         self.s.bind(server_address)
 

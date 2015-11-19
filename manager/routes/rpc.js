@@ -9,26 +9,51 @@ var client = new zerorpc.Client({
 var requestIndex = 0;
 client.connect('tcp://127.0.0.1:4242');
 
+
+
+/* GET manager rpc/rpc page.
+* None Blocking Wait Response
+* */
+router.get('/rpc', function (req, res, next) {
+    console.log('/rpc/rpc '+requestIndex++);
+    var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    try {
+        client.invoke('rpc', fullUrl, function (error, resp, more) {
+            if (error) {
+                console.log("Error:", error)
+            }
+        });
+    }catch(err){
+        console.log(err.message)
+    };
+    res.json({});
+});
+
+
+
+
 /* GET manager rpc page. */
 router.get('/nmap', function (req, res, next) {
     var cmd = req.url.split('=')[1].replace(/\+/g, ' ');
     console.log("NMAP: " + cmd);
     client.invoke('nmap', cmd.split(' ')[1], cmd.split(' ')[0], function (error, resp, more) {
         if (error) {
-            console.error("NMAP Error:", cmd, error)
+            console.error("Error:", error)
         }
         console.log(resp);
         res.json({result: JSON.stringify(resp)})
     });
 });
 
+
+
 /* GET manager rpc page. */
 router.get('/cmd', function (req, res, next) {
     var cmd = req.url.split('=')[1].replace(/\+/g, ' ');
-    console.log("CMD: " + cmd);
+    console.log("COMMAND: " + cmd);
     (client.invoke('cmd', cmd, function (error, resp, more) {
         if (error) {
-            console.log("CMD Error:", cmd, error)
+            console.log("Error:", error)
         }
         res.json({result: JSON.stringify(resp)})
     }));
