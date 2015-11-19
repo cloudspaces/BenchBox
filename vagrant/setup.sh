@@ -28,5 +28,3 @@ python ./emit_status.py --msg setupFinished;
 
 
 fi;
-
-END

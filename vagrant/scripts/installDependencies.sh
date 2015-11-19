@@ -12,7 +12,6 @@ if [ -f ./debian-7.0-amd64.box ]; then
 else
 	echo 'no..., check if other path';
 	wget https://www.dropbox.com/s/sdupbseays0f7ik/debian-7.0-amd64.box;
-
 fi
 
 
