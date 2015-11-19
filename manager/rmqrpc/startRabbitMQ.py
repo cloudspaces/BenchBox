@@ -10,14 +10,29 @@ class RabbitMqProxy(object):
 
     def __init__(self, rmq_url):
         self.rmq_url =rmq_url
+        print 'RabbitMQ instance'
+        url_str = self.rmq_url
+        url = urlparse.urlparse(url_str)
 
-    # ACTION CONTROLLER
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+            host=url.hostname, virtual_host=url.path[1:], credentials=pika.PlainCredentials(url.username, url.password)
+        ))
+
+        # DECLARATION
+        self.channel = self.connection.channel()
+
+        self.channel.exchange_declare(exchange='direct_logs',
+                                        type='direct')
+
     def update_status(self, status):
         print 'update_status_to: {}'.format(status)
+        hname, vname, queue = status.split('.')
+        self.ack(queue)
         return 'MANAGER-ACKED: {}'.format(status)
 
-    def on_request(self, ch, method, props, body):
 
+    def on_request(self, ch, method, props, body):
+        print ch, method, props
         print " [.] status(%s)"  % (body,)
 
         response = self.update_status(body)
@@ -30,28 +45,24 @@ class RabbitMqProxy(object):
         ch.basic_ack(delivery_tag = method.delivery_tag)
 
     def start(self):
-        print 'RabbitMQ instance'
-        url_str = self.rmq_url
-        url = urlparse.urlparse(url_str)
 
-        connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host=url.hostname, virtual_host=url.path[1:], credentials=pika.PlainCredentials(url.username, url.password)
-        ))
-
-        # DECLARATION
-        channel = connection.channel()
-        channel.queue_declare(queue='status_log')
+        self.channel.queue_declare(queue='status_log')
 
         # CONSUMERS
-        channel.basic_qos(prefetch_count=1)
-        channel.basic_consume(self.on_request, queue='status_log')
+        self.channel.basic_qos(prefetch_count=1)
+        self.channel.basic_consume(self.on_request, queue='status_log')
 
         print " [x] Awaiting RPC requests"
-        channel.start_consuming()
+        self.channel.start_consuming()
 
 
-# todo : define update rabbitmq task feedback to the manager web-view...
-
+    # todo : define update rabbitmq task feedback to the manager web-view...
+    def ack(self, queue):
+        print "ack {} ".format(queue)
+        self.channel.queue_bind(queue=queue)
+        self.channel.basic_publish(exchange='',
+                              routing_key=queue,
+                              body=queue)
 
 def main():
 

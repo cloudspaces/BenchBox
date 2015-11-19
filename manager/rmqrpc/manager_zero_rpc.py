@@ -26,6 +26,8 @@ class ManagerZeroRpc:
             'owncloud-ip': args['owncloud-ip'][0],
             'impala-ip': args['impala-ip'][0],
             'graphite-ip': args['graphite-ip'][0],
+            'rabbit-url': args['graphite-ip'][0],
+            'box-url': None,
             'hostname': args['hostname'][0]
         }
         print "Start Initial Task"
@@ -45,6 +47,9 @@ return 0
 
 def setup_benchbox(h):  # tell all the hosts to download BenchBox
     print 'setupBenchBox'
+
+    # todo append rabbit.mq.url link and as ip file and also vagrant.box.url
+
     str_cmd = "" \
               "echo 'check if Git is installed...'; " \
               "echo '{}' | sudo -S apt-get install git; " \

@@ -42,11 +42,39 @@ class EmitStatusRpcClient(object):
             self.connection.process_data_events()
         return self.response
 
+    def close(self):
+        self.connection.close()
 
-class onRequestHandler():
-    def __init__(self):
-        print "hello world"
+class DummyRabbitHandler(object):
+    def __init__(self, rmq_url, topic):
+        print "Dummy Rabbit Handler"
 
+        self.url_str = rmq_url
+        url = urlparse.urlparse(self.url_str)
+        self.topic = topic
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+            host=url.hostname,
+            virtual_host=url.path[1:],
+            credentials=pika.PlainCredentials(url.username, url.password)
+        ))
+
+
+        self.channel = self.connection.channel()
+        self.channel.queue_declare(queue=self.topic)
+
+    def on_request(self, ch, method, props, body):
+        n = body
+        print " [on_request] {} ".format(n)
+        response = "response from: {}".format(n)
+        ch.basic_publish(exchange='',
+                         routing_key=n,
+                         body=response)
+
+    def listen(self):
+        self.channel.basic_qos(prefetch_count=1)
+        self.channel.basic_consume(self.on_request, queue=self.topic)
+        print " [Consumer] Awaiting RPC requests"
+        self.channel.start_consuming()
 
 if __name__ == '__main__':
     ''' dummy host says hello to the server '''
@@ -57,7 +85,7 @@ if __name__ == '__main__':
 
     print "Arguments: {}".format(argv)
     try:
-        opts,args = getopt.getopt(argv, "hm:,t:", ["msg=","topic="])
+        opts,args = getopt.getopt(argv, "hm:,t:", ["msg=" , "topic="])
     except getopt.GetoptError:
         print '*.py -m <message> -t <topic>'
         sys.exit(2)
@@ -69,9 +97,6 @@ if __name__ == '__main__':
             status_msg = arg
         elif opt in ("-t", "--topic"):
             topic = arg
-
-
-    # status_msg = opts.msg
 
     emit_status_rpc = EmitStatusRpcClient(rmq_url)
     hostname = socket.gethostname()
@@ -86,5 +111,6 @@ if __name__ == '__main__':
     response = emit_status_rpc.call(composite_msg)
     print " [.] Got %r" % (response,)
 
-
+    rmq_status_server = DummyRabbitHandler(rmq_url, topic)
+    rmq_status_server.listen()
     ''' dummy host does all the following setup operations '''

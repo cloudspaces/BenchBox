@@ -24,9 +24,7 @@ echo "#3 Install RabbitMQ Pip Pika"
 sudo ./scripts/installPythonPipPika.sh
 
 
-python ./emit_status.py --msg setupFinished;
-
-python ./dummy_worker.py # inicialitzar la cua del dummyhost, per rebre peticions de vagrant up i vagrant halt
-
+nohup python ./emit_status.py --msg setupFinished --topic `hostname`;
 
 fi;
+

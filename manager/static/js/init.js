@@ -114,32 +114,22 @@ angular.module('app', ['ngRoute', 'ngResource'])
             // console.log($scope)
             if (ss == undefined) {
                 console.log("Not ss cmd")
-
             } else {
                 console.info("ss cmd!")
                 cmd = cmd + $("#ssRadio input[type='radio']:checked")[0].value + ss;
                 console.log(cmd)
             }
-            if (cmd !== 'warmUp') {
-                $('.' + name).each(function () {
-                    // console.log(this)
-                    if ($(this).prop('checked')) {
-                        var checkedId = this.value;
-                        var host = $scope.hosts.filter(function (item) {
-                            return item._id == checkedId
-                        })
-
-
-                        console.log("rpcHost" + cmd, this.name, checkedId, host[0]);
-                        rpcHost(host[0], cmd)
-                        // rpcHost(host[0], cmd, addStatusScope)
-
-                    }
-                })
-            } else {
-                console.log("warmUp" + cmd);
-                $scope.runTest(cmd)
-            }
+            $('.' + name).each(function () {
+                // console.log(this)
+                if ($(this).prop('checked')) {
+                    var checkedId = this.value;
+                    var host = $scope.hosts.filter(function (item) {
+                        return item._id == checkedId
+                    })
+                    console.log("rpcHost" + cmd, this.name, checkedId, host[0]);
+                    rpcHost(host[0], cmd)
+                }
+            })
         };
 
         $scope.checkAll = function (name) {
@@ -159,7 +149,6 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
             console.log($scope.hosts.length);
             var test = $scope.run;
-
 
             if (warmup === undefined) {
                 test.testWarmUp = '0';
