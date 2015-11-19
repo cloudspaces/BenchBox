@@ -27,16 +27,19 @@ fi
 
 # Now install pyzmq: Python bindings for ZeroMQ
 # If you don't already have pip installed:
-dpkg -l python-setuptools
-if [ $? -ne 0 ]
-then
-sudo apt-get -y install python-setuptools
-fi
+
 dpkg -l python-pip
 if [ $? -ne 0 ]
 then
 sudo apt-get -y install python-pip
 fi
+
+dpkg -l python-setuptools
+if [ $? -ne 0 ]
+then
+sudo apt-get -y install python-setuptools
+fi
+
 sudo pip install pyzmq
 sudo pip install python-nmap
 sudo apt-get install nmap
