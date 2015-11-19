@@ -1,21 +1,10 @@
 #!/usr/bin/env bash
 
 
+echo `pwd`
 [ -f owncloudsync.sh ] && rm owncloudsync.sh
-[ -f ../owncloudsync.sh ] && rm ../owncloudsync.sh
 
-if [ "$#" -ne 0 ]; then
-    echo "Illegal number of parameters"
-    echo "use default root directory"
-	DIR=$1
-else
-	echo '../'
-	DIR='..'
-fi
-
-
-
-if [ ! -f "$DIR/ss.owncloud.ip" ];
+if [ ! -f "ss.owncloud.ip" ];
 then
 echo "File: not found!"
 sync_server_ip='192.168.1.240' # owncloud server_ip,
@@ -25,39 +14,33 @@ echo "File: $2 exists!"
 fi
 
 #line=($(<"$DIR/ss.owncloud.ip"))
-sync_server_ip=`more "$DIR/ss.owncloud.ip" | awk -F ' ' '{ print $4}' | awk -F ',' '{print $1}'`
+sync_server_ip=`more "ss.owncloud.ip" | awk -F ' ' '{ print $4}' | awk -F ',' '{print $1}'`
 
 if [ -z $sync_server_ip ];
 then
 	echo 'user next path'
-	sync_server_ip=($(<"$DIR/ss.owncloud.ip"))
+	sync_server_ip=($(<"ss.owncloud.ip"))
 else
 	echo 'already read once'
 	echo $sync_server_ip
-	# sync_server_ip=($(<"$DIR/ss.owncloud.key"))
 fi
 
-if [ ! -f "$DIR/ss.owncloud.key" ];
+if [ ! -f "ss.owncloud.key" ];
 then
-echo "File: not found!"
-exit;
+	echo "File: not found!"
+	exit;
 else
-echo "File: $1 exists!"
+	echo "File: $1 exists!"
+	line=($(<"ss.owncloud.key"))
 fi
 
-line=($(<"$DIR/ss.owncloud.key"))
+owncloud_key=$line
 
 
-mystring="demo0"
-mystring=$line
-
-
-IFS=',' read -a myarray <<< "$mystring"
+IFS=',' read -a myarray <<< "$owncloud_key"
 
 user=${myarray[0]}
 pass=${myarray[0]}
-
-
 
 FILE='owncloudsync.sh'
 
@@ -109,9 +92,9 @@ EOM
 
 
 if [[ -s $FILE ]] ; then
-echo "$FILE has data."
+echo "$FILE CREATED!!!"
 else
-echo "$FILE is empty."
+echo "$FILE FAIL!?."
 fi ;
 
 
@@ -119,7 +102,5 @@ fi ;
 ls -l $FILE
 echo 'New credentials generated successfully!!'
 chmod u+x $FILE
-ls $FILE # assign run credentials
-# cat $FILE
-mv $FILE ../$FILE
+ls $FILE
 
