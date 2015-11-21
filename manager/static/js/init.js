@@ -1,6 +1,6 @@
 console.log("init.js");
 
-
+bugall = null
 angular.module('app', ['ngRoute', 'ngResource'])
 
     //---------------
@@ -35,160 +35,170 @@ angular.module('app', ['ngRoute', 'ngResource'])
     //---------------
 
     // hostDetails.html
-    .controller('HostDetailCtrl', ['$scope', '$routeParams', 'Hosts', '$location', function ($scope,
-                                                                                             $routeParams, Hosts, $location) {
-        $scope.host = Hosts.get({id: $routeParams.id});
+    .controller('HostDetailCtrl', ['$scope', '$routeParams', 'Hosts', '$location',
+        function ($scope, $routeParams, Hosts, $location) {
+            $scope.host = Hosts.get({id: $routeParams.id});
 
-        $scope.update = function () {
-            Hosts.update({id: $scope.host._id}, $scope.host, function () {
-                $location.url('/');
-            });
-        };
-        $scope.remove = function () {
-            Hosts.remove({id: $scope.host._id}, function () {
-                $location.url('/');
-            });
-        };
-    }])
+            $scope.update = function () {
+                Hosts.update({id: $scope.host._id}, $scope.host, function () {
+                    $location.url('/');
+                });
+            };
+            $scope.remove = function () {
+                Hosts.remove({id: $scope.host._id}, function () {
+                    $location.url('/');
+                });
+            };
+        }])
 
     // hosts.html
-    .controller('HostController', ['$scope', 'Hosts', function ($scope, Hosts) {
-        // default test settings
-        $scope.run = {
-            testOps: 10,
-            testItv: 1,
-            testProfile: 'backupsample',
-            testFolder: 'stacksync_folder',
-            testClient: 'StackSync'
-        };
+    .controller('HostController', ['$scope', '$interval', 'Hosts',
+        function ($scope, $interval, Hosts) {
+            // default test settings
+            $scope.run = {
+                testOps: 10,
+                testItv: 1,
+                testProfile: 'backupsample',
+                testFolder: 'stacksync_folder',
+                testClient: 'StackSync'
+            };
 
 
-        // controller actions
-        $scope.editing = []; //  variable
-        $scope.checkedAll = false;
-        // Invocar manager de hosts
-        $scope.hosts = Hosts.query(); // llistat de tots els hosts
+            // controller actions
+            $scope.editing = []; //  variable
+            $scope.checkedAll = false;
+            // Invocar manager de hosts
 
-        $scope.saveHost = function () {
-            console.log('SaveHosts');
-            console.log($scope);
-            var host = new Hosts({
-                hostname: $scope.newHostHostname,
-                ip: $scope.newHostIp,
-                logging: $scope.newHostLogging
-            });
-            host.$save(function () {
-                $scope.hosts.push(host);
-                $scope.newHostHostname = ''; // clear textbox
-                $scope.newHostIp = ''; // clear textbox
-                $scope.newHostLogging = ''; // clear textbox
-            });
-            console.log(host);
-            console.log($scope.hosts);
-        };
+            // initial load
+            $scope.hosts = Hosts.query(); // llistat de tots els hosts
 
-        $scope.save = function () {
-            if (!$scope.newHost || $scope.newHost.length < 1) return;
-            var host = new Hosts({name: $scope.newHost, completed: false});
-            host.$save(function () {
-                $scope.hosts.push(host);
-                $scope.newHost = ''; // clear textbox
-            });
-        };
-        $scope.update = function (index) {
-            var host = $scope.hosts[index];
-            Hosts.update({id: host._id}, host);
-            $scope.editing[index] = false;
-        };
-        $scope.ping = function (index) {
-            var host = $scope.hosts[index];
-            console.log(host);
-            testConnection(host.ip, 22); // port ssh
-            /*
-             Hosts.update({id: host._id}, host);
-             $scope.editing[index] = false;
-             */
-        };
-        $scope.rpc = function (name, cmd, ss) {
-            console.info(name, cmd, ss)
-            // console.log($scope)
-            if (ss == undefined) {
-                console.log("Not ss cmd")
-            } else {
-                console.info("ss cmd!")
-                cmd = cmd + $("#ssRadio input[type='radio']:checked")[0].value + ss;
-                console.log(cmd)
+            $scope.itv_time = 10000;
+            $interval(callAtInterval, $scope.itv_time);
+            function callAtInterval() {
+                $scope.hosts = Hosts.query(); // apaño para hoy
             }
-            $('.' + name).each(function () {
-                // console.log(this)
-                if ($(this).prop('checked')) {
-                    var checkedId = this.value;
-                    var host = $scope.hosts.filter(function (item) {
-                        return item._id == checkedId
-                    })
-                    console.log("rpcHost" + cmd, this.name, checkedId, host[0]);
-                    rpcHost(host[0], cmd)
+
+
+            $scope.saveHost = function () {
+                console.log('SaveHosts');
+                console.log($scope);
+                var host = new Hosts({
+                    hostname: $scope.newHostHostname,
+                    ip: $scope.newHostIp,
+                    logging: $scope.newHostLogging
+                });
+                host.$save(function () {
+                    $scope.hosts.push(host);
+                    $scope.newHostHostname = ''; // clear textbox
+                    $scope.newHostIp = ''; // clear textbox
+                    $scope.newHostLogging = ''; // clear textbox
+                });
+                console.log(host);
+                console.log($scope.hosts);
+            };
+
+            $scope.save = function () {
+                if (!$scope.newHost || $scope.newHost.length < 1) return;
+                var host = new Hosts({name: $scope.newHost, completed: false});
+                host.$save(function () {
+                    $scope.hosts.push(host);
+                    $scope.newHost = ''; // clear textbox
+                });
+            };
+            $scope.update = function (index) {
+                var host = $scope.hosts[index];
+                Hosts.update({id: host._id}, host);
+                $scope.editing[index] = false;
+            };
+            $scope.ping = function (index) {
+                var host = $scope.hosts[index];
+                console.log(host);
+                testConnection(host.ip, 22); // port ssh
+                /*
+                 Hosts.update({id: host._id}, host);
+                 $scope.editing[index] = false;
+                 */
+            };
+            $scope.rpc = function (name, cmd, ss) {
+                console.info(name, cmd, ss)
+                // console.log($scope)
+                if (ss == undefined) {
+                    console.log("Not ss cmd")
+                } else {
+                    console.info("ss cmd!")
+                    cmd = cmd + $("#ssRadio input[type='radio']:checked")[0].value + ss;
+                    console.log(cmd)
                 }
-            })
-        };
+                $('.' + name).each(function () {
+                    // console.log(this)
+                    if ($(this).prop('checked')) {
+                        var checkedId = this.value;
+                        var host = $scope.hosts.filter(function (item) {
+                            return item._id == checkedId
+                        })
+                        console.log("rpcHost" + cmd, this.name, checkedId, host[0]);
+                        rpcHost(host[0], cmd)
+                    }
+                })
+            };
 
-        $scope.checkAll = function (name) {
+            $scope.checkAll = function (name) {
 
-            $scope.checkedAll = !$scope.checkedAll;
-            // console.log($scope.checkedAll );
-            $('.' + name).each(function () {
-                // console.log(this);
-                // (this).prop('checked', $scope.checkedAll);
-                if ($(this).prop('checked') !== $scope.checkedAll)
-                    $(this).trigger('click');
+                $scope.checkedAll = !$scope.checkedAll;
+                // console.log($scope.checkedAll );
+                $('.' + name).each(function () {
+                    // console.log(this);
+                    // (this).prop('checked', $scope.checkedAll);
+                    if ($(this).prop('checked') !== $scope.checkedAll)
+                        $(this).trigger('click');
 
-            });
-        };
+                });
+            };
 
-        $scope.runTest = function (warmup, cb) {
+            $scope.runTest = function (warmup, cb) {
 
-            console.log($scope.hosts.length);
-            var test = $scope.run;
+                console.log($scope.hosts.length);
+                var test = $scope.run;
 
-            if (warmup === undefined) {
-                test.testWarmUp = '0';
-            } else {
-                test.testWarmUp = '1';
-            }
+                if (warmup === undefined) {
+                    test.testWarmUp = '0';
+                } else {
+                    test.testWarmUp = '1';
+                }
 
-            console.log(name)
-            console.log(test)
-            var hosts = $scope.hosts.filter(function (item) {
-                console.log(item);
-                if (item.test)
-                    return item;
-            });
-            console.log(hosts.length);
-            if (hosts.length === 0)
-                $.notify('Warning!, No host checked', 'warn');
-            else
-                $.notify('Request rpcTest forwarded!', 'info');
-            console.log('Hosts!!!');
-            rpcTest(hosts, test);
+                console.log(name)
+                console.log(test)
+                var hosts = $scope.hosts.filter(function (item) {
+                    console.log(item);
+                    if (item.test)
+                        return item;
+                });
+                console.log(hosts.length);
+                if (hosts.length === 0)
+                    $.notify('Warning!, No host checked', 'warn');
+                else
+                    $.notify('Request rpcTest forwarded!', 'info');
+                console.log('Hosts!!!');
+                rpcTest(hosts, test);
 
-        };
+            };
 
-        $scope.edit = function (index) {
-            console.log(index)
-            console.log($scope.editing)
-            $scope.editing[index] = angular.copy($scope.hosts[index]);
-        };
-        $scope.cancel = function (index) {
-            $scope.hosts[index] = angular.copy($scope.editing[index]);
-            $scope.editing[index] = false;
-        };
-        $scope.remove = function (index) {
-            var host = $scope.hosts[index];
-            Hosts.remove({id: host._id}, function () {
-                $scope.hosts.splice(index, 1);
-            });
-        };
-    }])
+            $scope.edit = function (index) {
+                console.log(index)
+                console.log($scope.editing)
+                $scope.editing[index] = angular.copy($scope.hosts[index]);
+            };
+            $scope.cancel = function (index) {
+                $scope.hosts[index] = angular.copy($scope.editing[index]);
+                $scope.editing[index] = false;
+            };
+            $scope.remove = function (index) {
+                var host = $scope.hosts[index];
+                Hosts.remove({id: host._id}, function () {
+                    $scope.hosts.splice(index, 1);
+                });
+            };
+        }])
     //---------------
     // Routes
     //---------------
@@ -208,7 +218,6 @@ console.log("Home Script loaded");
 
 GLOBAL_VAR = null;
 console.log("Btn controller");
-
 
 
 testConnection = function (ip, port, cb) {
@@ -374,7 +383,6 @@ notifyButtonById = function (btnId) {
 $.fn.graphite.defaults.url = "https://localhost:8443/renderer/";
 $.fn.graphite.defaults.width = "450";
 $.fn.graphite.defaults.height = "300";
-
 
 
 $('#btnFixImage').click(function () {

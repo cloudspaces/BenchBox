@@ -10,8 +10,8 @@ var HostSchema = new mongoose.Schema({
     note: {type: String, default:'ast#', enum : ['deim1', 'deim2', 'deim3', 'ast#']},
     status: {
         type: String,
-        default:'idle',
-        enum : ['none','configuring','idle', 'running', 'teardown', 'halt']
+        default:'idle'
+        // enum : ['none','configuring','idle', 'running', 'teardown', 'halt']
     },
     status_benchbox: {
         type: String,

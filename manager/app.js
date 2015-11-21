@@ -6,8 +6,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var memCache = require('memory-cache');
-
+// var statusManager = require('');
 
 var app = express();
 
@@ -23,110 +22,21 @@ function createDBSettings(mongoLabURI) {
     var dbSettings = {},
         regexp = /^mongodb:\/\/(\w+):(\w+)@(\w+):(\w+)\/(\w+)$/,
         matches = regexp.match(mongoLabURI);
-
     dbSettings.dbname = matches[5];
     dbSettings.host = matches[3];
     dbSettings.port = matches[4];
     dbSettings.username = matches[1];
     dbSettings.password = matches[2];
-
     return dbSettings;
 }
-// mongodb://dbuser:dbpass@host:port/dbname
-
-mongoOps = {
-    insertDocuments: function (db, callback) {
-        // Get the documents collection
-        var collection = db.collection('documents');
-        // Insert some documents
-        collection.insert([
-            {a: 1}, {a: 2}, {a: 3}
-        ], function (err, result) {
-            assert.equal(err, null);
-            assert.equal(3, result.result.n);
-            assert.equal(3, result.ops.length);
-            console.log("Inserted 3 documents into the document collection");
-            callback(result);
-        });
-    },
-
-    updateDocument: function (db, callback) {
-        // Get the documents collection
-        var collection = db.collection('documents');
-        // Update document where a is 2, set b equal to 1
-        collection.update({a: 2}
-            , {$set: {b: 1}}, function (err, result) {
-                assert.equal(err, null);
-                assert.equal(1, result.result.n);
-                console.log("Updated the document with the field a equal to 2");
-                callback(result);
-            });
-    }, removeDocument: function (db, callback) {
-        // Get the documents collection
-        var collection = db.collection('documents');
-        // Insert some documents
-        collection.remove({a: 3}, function (err, result) {
-            assert.equal(err, null);
-            assert.equal(1, result.result.n);
-            console.log("Removed the document with the field a equal to 3");
-            callback(result);
-        });
-    }, findDocuments: function (db, callback) {
-        // Get the documents collection
-        var collection = db.collection('documents');
-        // Find some documents
-        collection.find({}).toArray(function (err, docs) {
-            //assert.equal(err, null);
-            //assert.equal(2, docs.length);
-            console.log("Found the following records");
-            console.dir(docs);
-            callback(docs);
-        });
-    }
-};
-
-
-// operations...
-
-/*
-var MongoClient = require('mongodb').MongoClient;
-var assert = require('assert');
-*/
-
-// var url = 'mongodb://test:test@ds055822.mongolab.com:55822/benchbox'
 var url = 'mongodb://localhost:27017/benchbox'
-
-/*
-MongoClient.connect(url, function (err, db) {
-    assert.equal(null, err);
-    console.log("Connected correctly to server");
-
-     // do db operations
-     mongoOps.insertDocuments(db, function () {
-     console.log("Document pushed to the db correctly");
-     mongoOps.updateDocument(db, function () {
-     console.log("Document update correctly");
-     mongoOps.removeDocument(db, function () {
-     console.log("Document removed successfully");
-     mongoOps.findDocuments(db, function() {
-     console.log("Document found!");
-     db.close();
-     });
-     })
-     });
-     });
-
-});
-*/
-
-// another mongodb client
 
 var mongoose = require('mongoose');
 mongoose.connect(url, function (err) {
     if (err) {
-        console.log('connection error', err);
+        console.log('connection to mongoose error!', err);
     } else {
-        console.log('connection successful');
+        console.log('connection to mongoose successful!');
     }
 });
 
@@ -136,20 +46,18 @@ mongoose.connect(url, function (err) {
 // ------------------------------------------------------------------------
 
 /*
-var fs = require('fs');
-var path = require('path');
-var filePath = path.join(__dirname, 'static/json/config.json')
-var obj;
+ var fs = require('fs');
+ var path = require('path');
+ var filePath = path.join(__dirname, 'static/json/config.json')
+ var obj;
 
-fs.readFile(filePath, 'utf8', function(err, data){
+ fs.readFile(filePath, 'utf8', function(err, data){
 
-    if (err) throw err;
-    obj = JSON.parse(data);
-    console.log('configuration', obj);
-});
-*/
-
-
+ if (err) throw err;
+ obj = JSON.parse(data);
+ console.log('configuration', obj);
+ });
+ */
 
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
@@ -178,10 +86,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'static')));
 
-
-
-
-
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 // -- Sessions, -----------------------------------------------------------
@@ -191,8 +95,7 @@ app.use(express.static(path.join(__dirname, 'static')));
 
 app.use(session({
     secret: 'keyboard cat',
-    cookie:
-    {
+    cookie: {
         maxAge: 60000
     },
     resave: true,
@@ -200,7 +103,7 @@ app.use(session({
 }));
 
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     var sess = req.session;
     if (sess.views !== undefined) {
         sess.views++
@@ -209,20 +112,6 @@ app.use(function(req, res, next) {
     }
     next();
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // log the client ip on every request
@@ -249,6 +138,75 @@ app.use('/load', loads);
 app.use('/rpc', rpcs);
 
 
+// ------------------------------------------------------------------------
+// ------------------------------------------------------------------------
+// -- connecting to rabbitmq-server -------------------------------------------
+// ------------------------------------------------------------------------
+// ------------------------------------------------------------------------
+
+var amqp = require('amqplib/callback_api');
+var amqp_url = 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy';
+var amqp_conn = null;
+var manager_queue = 'rpc_queue';
+var hostModel = require('./models/Hosts.js');
+amqp.connect(amqp_url, function (err, conn) {
+    if (err) {
+        console.log('connection rabbitmq error', err);
+    } else {
+        console.log('connection rabbitmq successful!');
+        amqp_conn = conn; // single connection for whole server.
+    }
+    conn.createChannel(function (err, ch) {
+        var q = manager_queue;
+        ch.assertQueue(q, {durable: false}, function (err, q) {
+            console.log(' [x] Awaiting RPC requests at: [' + q.queue + ']');
+        });
+        ch.prefetch(1);
+        ch.consume(q, function rpc_reply(msg) {
+            var host_status = JSON.parse(msg.content)  // nomes el missatge esta en json
+            console.log("[" + msg.properties.replyTo + "] --> [" + msg.fields.consumerTag +
+                "] : host[%s] status(%s) :",
+                host_status.host, host_status.status);
+
+            var status = host_status.status
+            var dummyhost = host_status.host.split('.')[0]
+            var vboxhost = host_status.host.split('.')[1]
+            console.log(status, dummyhost, vboxhost)
+            // fer un ajax request a si mateix o modificar directament ?
+            hostModel.findOne({hostname: dummyhost}, function (err, host) {
+                if (err) {
+                    console.error(err.message)
+                }
+                console.log("FOUND: ", host);
+
+                var status_attr = 'status';
+                if (dummyhost != vboxhost) {
+                    status_attr += '_' + vboxhost
+                }
+                console.log(host)
+                host[status_attr] = status;
+
+                host.save(function (err) {
+                    if (err)
+                        console.log(err.message)
+                })
+            });
+
+            var result = "manager Joined queue " + host_status.host + "! ";
+            var callbackChannel = msg.properties.replyTo;
+            var callbackMsg = new Buffer(result.toString())
+            var callbackProp = {correlationId: msg.properties.correlationId}
+            ch.sendToQueue(callbackChannel, callbackMsg, callbackProp); // send to queue
+            ch.ack(msg); // fer un ack del message
+        });
+    });
+});
+
+
+// ------------------------------------------------------------------------
+// -- setup status update
+// -------------------------------------------------------------------------
+
 
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
@@ -263,8 +221,6 @@ app.use(function (req, res, next) {
     err.status = 404;
     next(err);
 });
-
-
 
 
 // error handlers

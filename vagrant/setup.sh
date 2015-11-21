@@ -24,7 +24,7 @@ echo "#3 Install RabbitMQ Pip Pika"
 sudo ./scripts/installPythonPipPika.sh
 
 
-nohup python ./emit_status.py --msg setupFinished --topic `hostname`;
+nohup python ./prod_status.py --msg setupFinished --topic `hostname`;
 
 fi;
 

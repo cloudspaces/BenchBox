@@ -7,8 +7,9 @@ import getopt
 import socket
 import threading
 import subprocess
-
-class VagrantHandlers(object):
+import time
+import json
+class ActionHandler(object):
     def __init__(self):
         print "vagrant handler"
 
@@ -27,9 +28,9 @@ class VagrantHandlers(object):
         print 'destroy'
     """
 
-class EmitStatusRpcClient(object):
-    def __init__(self, rmq_url = 'localhost'):
-        self.rmq_url =rmq_url
+class ProduceStatus(object):
+    def __init__(self, rmq_url='localhost', queue_name = 'status_manager'):
+        self.rmq_url = rmq_url
         if rmq_url == 'localhost':
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(rmq_url))
         else:
@@ -37,45 +38,45 @@ class EmitStatusRpcClient(object):
             url_str = self.rmq_url
             url = urlparse.urlparse(url_str)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
-                host=url.hostname, virtual_host=url.path[1:], credentials=pika.PlainCredentials(url.username, url.password)
+                host=url.hostname,
+                virtual_host=url.path[1:],
+                credentials=pika.PlainCredentials(url.username, url.password)
             ))
 
         self.channel = self.connection.channel()
 
         result = self.channel.queue_declare(exclusive=True)
         self.callback_queue = result.method.queue
-
         self.channel.basic_consume(self.on_response,
                                    no_ack=True,
                                    queue=self.callback_queue)
 
     def on_response(self, ch, method, props, body):
         if self.corr_id == props.correlation_id:
+            print "OK"
             self.response = body
+        else:
+            print "Not Match corr_id"
 
-    def call(self, n):
+    def call(self, message, new_host):
         self.response = None
         self.corr_id = str(uuid.uuid4())
         self.channel.basic_publish(exchange='',
-                                   routing_key='status_log',
+                                   routing_key='rpc_queue',
                                    properties=pika.BasicProperties(
                                        reply_to = self.callback_queue,
                                        correlation_id = self.corr_id,
                                    ),
-                                   body=str(n))
+                                   body=json.dumps({"host": new_host, "status": message}))
         while self.response is None:
             self.connection.process_data_events()
-        self.connection.close()
         return self.response
 
-
-class DummyRabbitHandler(object):
-
-    vagrant_ops = VagrantHandlers()
-
+class ConsumeAction(object):
+    vagrant_ops = ActionHandler()
     def __init__(self, rmq_url, topic):
         print "Dummy Rabbit Handler"
-        self.rmq_url =rmq_url
+        self.rmq_url = rmq_url
         if rmq_url == 'localhost':
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(rmq_url))
         else:
@@ -119,43 +120,64 @@ class DummyRabbitHandler(object):
         print " [Consumer] Awaiting RPC requests"
         self.channel.start_consuming()
 
-if __name__ == '__main__':
-    ''' dummy host says hello to the server '''
-    argv = sys.argv[1:]
-    # rmq_url = 'localhost'  # 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
-    rmq_url = 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
-    routing_key = 'rpc_queue'
+
+
+def parse_args(argv):
 
     print "Arguments: {}".format(argv)
     try:
-        opts,args = getopt.getopt(argv, "hm:,t:", ["msg=" , "topic="])
+        opts, args = getopt.getopt(argv, "hm:,t:", ["msg=" , "topic="])
     except getopt.GetoptError:
-        print '*.py -m <message> -t <topic>'
+        print '*.py -m <msg> -t <topic>'
         sys.exit(2)
 
+    msg = None
+    top = None
     for opt, arg in opts:
         if opt == '-h':
             sys.exit()
         elif opt in ("-i", "--msg"):
-            status_msg = arg
+            msg = arg
         elif opt in ("-t", "--topic"):
-            topic = arg
+            top = arg
+    print msg, top
+    return msg, top
 
-    emit_status_rpc = EmitStatusRpcClient(rmq_url)
+
+
+if __name__ == '__main__':
+    ''' dummy host says hello to the manager '''
+    status_msg, topic = parse_args(sys.argv[1:])
+
+    # rmq_url = 'localhost'  # 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
+    rmq_url = 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
+    status_exchanger = 'status_exchanger'
+
+    emit_status_rpc = ProduceStatus(rmq_url)
+
     hostname = socket.gethostname()
+
+    if status_msg is None:
+        status_msg = "Hello from {}".format(hostname)
+
+    if topic is None:
+        topic = hostname
+
     try:
-        with open('hostname','r') as f:
+        with open('hostname', 'r') as f:
             dummyhost = f.read().splitlines()[0]
     except:
         dummyhost = hostname
-    composite_msg="{}.{}.{}".format(dummyhost, hostname, status_msg)
 
-    print " [x] emit: emit_status_rpc.call({})".format(composite_msg)
-    response = emit_status_rpc.call(composite_msg)
+    host_queue = "{}.{}".format(dummyhost, hostname)
+    # status_msg
+
+    print " [x] emit: emit_status_rpc.call({})".format(host_queue)
+    response = emit_status_rpc.call(status_msg, host_queue)
     print " [.] Got %r" % (response,)
 
     ''' crear una cua amb el propi host name de tipus direct '''
     print "START DummyRabbitStatus Worker"
-    rmq_status_server = DummyRabbitHandler(rmq_url, dummyhost)
-    rmq_status_server.listen()
+    #rmq_status_server = ConsumeAction(rmq_url, dummyhost)
+    #rmq_status_server.listen()
     ''' dummy host does all the following setup operations '''
