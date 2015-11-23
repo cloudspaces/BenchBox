@@ -86,7 +86,7 @@ class ProduceStatus(object):
 
 class ConsumeAction(object):
     vagrant_ops = ActionHandler()
-    def __init__(self, rmq_url, hostname):
+    def __init__(self, rmq_url, host_queue):
         print "Dummy Peer Worker"
         self.rmq_url = rmq_url
         if rmq_url == 'localhost':
@@ -99,9 +99,9 @@ class ConsumeAction(object):
                 host=url.hostname, virtual_host=url.path[1:], credentials=pika.PlainCredentials(url.username, url.password)
             ))
 
-        self.hostname = hostname
+        self.host_queue = host_queue
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.hostname)
+        self.channel.queue_declare(queue=self.host_queue)
 
     def on_request(self, ch, method, props, body):
         print " [on_request] {} ".format(body)
@@ -123,7 +123,7 @@ class ConsumeAction(object):
 
     def listen(self):
         self.channel.basic_qos(prefetch_count=1)
-        self.channel.basic_consume(self.on_request, queue=self.hostname)
+        self.channel.basic_consume(self.on_request, queue=self.host_queue)
         print " [Consumer] Awaiting RPC requests"
         self.channel.start_consuming()
 
@@ -165,7 +165,7 @@ if __name__ == '__main__':
     hostname = socket.gethostname()
 
     if status_msg is None:
-        status_msg = "Hello from {}".format(hostname)
+        status_msg = "Hello from {} ".format(hostname)
 
     if topic is None:
         topic = hostname
@@ -189,6 +189,6 @@ if __name__ == '__main__':
 
     ''' crear una cua amb el propi host name de tipus direct '''
     print "START DummyRabbitStatus Worker"
-    consumer_rpc = ConsumeAction(rmq_url, dummyhost)
+    consumer_rpc = ConsumeAction(rmq_url, host_queue)
     consumer_rpc.listen()
     ''' dummy host does all the following setup operations '''
