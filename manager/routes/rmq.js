@@ -16,26 +16,48 @@ router.get('/emit', function (req, res, next) {
 
     // connect to the rabbit server
     var amqp_url = req.query['rabbitmq-amqp']
-    amqp.connect(amqp_url, function(err, conn) {
+    amqp.connect(amqp_url, function (err, conn) {
         // create callback channel
-        conn.createChannel(function(err, ch) {
+        conn.createChannel(function (err, ch) {
             var queue_name = '';
             var queue_prop = {exclusive: true};
 
-            ch.assertQueue(queue_name, queue_prop, function(err, q) {
+            ch.assertQueue(queue_name, queue_prop, function (err, q) {
                 // on queue_ready
                 var corr = generateUuid();
                 var cmd = req.query.cmd;
                 var target = req.query.hostname;
-                console.log(' [x] Requesting ['+ cmd +'] to ['+target+']');
+                console.log(' [x] Requesting [' + cmd + '] to [' + target + ']');
 
                 var on_message_prop = {noAck: true}
-                ch.consume(q.queue, function(msg) {
+                ch.consume(q.queue, function (msg) {
                     // on queue_message
                     if (msg.properties.correlationId == corr) {
                         console.log(' [.] Got %s', msg.content.toString());
-                        setTimeout(function()
-                        {
+
+                        // update the dummyhost status
+
+                        hostModel.findOne({hostname: target}, function (err, host) {
+                            if (err) {
+                                console.error(err.message)
+                            } else {
+                                console.log("-INI----------")
+                                console.log(host)
+                                console.log("-FIN----------")
+
+                                var status_attr = 'status'
+                                host[status_attr] = cmd
+
+                                host.save(function (err) {
+                                    if (err)
+                                        console.log(err.message)
+                                })
+                            }
+
+                        })
+
+
+                        setTimeout(function () {
                             conn.close();
                             // process.exit(0)
                         }, 500);

@@ -13,20 +13,32 @@ class ActionHandler(object):
     def __init__(self):
         print "vagrant handler"
 
+    ''' executed at the dummyhost '''
     def up(self):
         print 'up'
         print subprocess.check_output(["echo", "Hello World!"])
 
-    """
-    def halt(self):
-        print 'halt'
+    def vagrantUp(self):
+        print 'vagrantUp'
+        print subprocess.check_output(["vagrant", "up"])
 
-    def status(self):
-        print 'status'
+    def vagrantProvision(self):
+        print 'vagrantProvision'
+        print subprocess.check_output(['vagrant', 'provision'])
 
-    def destroy(self):
-        print 'destroy'
-    """
+
+    ''' executed at the benchBox '''
+    def warmUp(self):
+        # warmup the sandBox filesystem running the executor
+        print 'warmUp'
+        print subprocess.check_output(['echo', 'warmup'])
+
+    ''' executed at the sandBox '''
+    def tearDown(self):
+        # clear the sandBox filesystem and cached files
+        print 'tearDown'
+        print subprocess.check_output(['echo', 'teardown'])
+
 
 class ProduceStatus(object):
     def __init__(self, rmq_url='localhost', queue_name = 'status_manager'):
