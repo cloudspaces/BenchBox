@@ -53,7 +53,7 @@ node 'benchBox' {
   ->
   exec {
   'run message queue boostrap benchBox status':
-  command => '/vagrant/prod_status.py --topic 'benchBox' --msg vagrantUp &',
+  command => '/vagrant/prod_status.py --topic benchBox --msg vagrantUp &',
   user    => 'vagrant',
   group   =>'vagrant',
   path    => ['/usr/bin', '/bin/']
@@ -214,7 +214,7 @@ node 'sandBox' {
   ->
   exec {
     'run messagequeue boostrap sandBox status':
-      command => '/vagrant/prod_status.py --topic 'sandBox' --msg vagrantUP &',
+      command => '/vagrant/prod_status.py --topic sandBox --msg vagrantUP &',
       user    => 'vagrant',
       group   =>'vagrant',
       path    => ['/usr/bin', '/bin/']
