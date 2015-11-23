@@ -30,6 +30,10 @@ class ActionHandler(object):
         print 'vagrantProvision'
         print subprocess.check_output(['vagrant', 'provision'])
 
+    def vagrantStatus(self):
+        print 'vagrantProvision'
+        print subprocess.check_output(['vagrant', 'status'])
+
 
     ''' executed at the benchBox '''
     def warmUp(self):
