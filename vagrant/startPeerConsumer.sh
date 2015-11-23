@@ -10,5 +10,6 @@ if [ -f prod_status.pid ]
     fi
 fi
 echo "#4 Start prod_status"
-nohup python ./prod_status.py --msg setupFinished --topic `hostname` > /dev/null 2>&1 & echo $! > prod_status.pid
+python ./prod_status.py --msg setupFinished --topic `hostname`
+echo $! > prod_status.pid
 
