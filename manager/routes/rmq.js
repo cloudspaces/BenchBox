@@ -25,7 +25,7 @@ router.get('/emit', function (req, res, next) {
             ch.assertQueue(queue_name, queue_prop, function(err, q) {
                 // on queue_ready
                 var corr = generateUuid();
-                var cmd = req.query,cmd;
+                var cmd = req.query.cmd;
                 var target = req.query.hostname;
                 console.log(' [x] Requesting ['+ cmd +'] to ['+target+']');
 
@@ -37,7 +37,7 @@ router.get('/emit', function (req, res, next) {
                         setTimeout(function()
                         {
                             conn.close();
-                            process.exit(0)
+                            // process.exit(0)
                         }, 500);
                     }
                 }, on_message_prop);
