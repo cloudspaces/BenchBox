@@ -125,6 +125,7 @@ var inits = require('./routes/init');
 var homes = require('./routes/home');
 var loads = require('./routes/load');
 var rpcs = require('./routes/rpc');
+var rmqs = require('./routes/rmq');
 
 // api rest
 
@@ -136,6 +137,7 @@ app.use('/hosts', hosts);
 app.use('/init', inits);
 app.use('/load', loads);
 app.use('/rpc', rpcs);
+app.use('/rmq', rmqs);
 
 
 // ------------------------------------------------------------------------

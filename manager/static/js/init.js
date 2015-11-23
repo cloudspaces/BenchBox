@@ -77,25 +77,25 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
 
             function callAtInterval() {
-                Hosts.query(function(items){
+                Hosts.query(function (items) {
                     // console.log(items)
-                    angular.forEach(items, function(item, idx, all){
-                       if($scope.hosts[idx].status === item.status){
-                           // console.log(" [not changed]" + $scope.hosts[idx].status + " : "+ item.status )
-                       }else{
-                           console.log(" [changed]    ")
-                           $scope.hosts[idx].status = item.status
-                       }
+                    angular.forEach(items, function (item, idx, all) {
+                        if ($scope.hosts[idx].status === item.status) {
+                            // console.log(" [not changed]" + $scope.hosts[idx].status + " : "+ item.status )
+                        } else {
+                            console.log(" [changed]    ")
+                            $scope.hosts[idx].status = item.status
+                        }
 
                     })
                 });
                 /*
-                console.log($scope.currHosts)
-                angular.forEach($scope.currHosts, function(item, idx){
-                    console.log(item)
-                    item.status = idx+'IDLE '+ $scope.itv_time++
-                })
-                */
+                 console.log($scope.currHosts)
+                 angular.forEach($scope.currHosts, function(item, idx){
+                 console.log(item)
+                 item.status = idx+'IDLE '+ $scope.itv_time++
+                 })
+                 */
             }
 
 
@@ -157,10 +157,26 @@ angular.module('app', ['ngRoute', 'ngResource'])
                             return item._id == checkedId
                         })
                         console.log("rpcHost" + cmd, this.name, checkedId, host[0]);
-                        rpcHost(host[0], cmd)
+                        if (cmd === 'setup') {
+                            rpcHost(host[0], cmd)
+                        }
                     }
                 })
             };
+
+            $scope.rmq = function (name, cmd) {
+                $('.' + name).each(function () {
+                    // console.log(this)
+                    if ($(this).prop('checked')) {
+                        var checkedId = this.value;
+                        var host = $scope.hosts.filter(function (item) {
+                            return item._id == checkedId
+                        })
+                        console.log("rmqHost: " + cmd, this.name, checkedId, host[0]);
+                        rmqHost(host[0], cmd)
+                    }
+                })
+            }
 
             $scope.checkAll = function (name) {
 
@@ -271,6 +287,37 @@ testConnection = function (ip, port, cb) {
 };
 
 // cmd should be an object
+rmqHost = function (host, cmd, cb) {
+    var args = {
+        ip: host.ip,
+        hostname: host.hostname,
+        login: host.logging,
+        profile: host.profile,
+        cred_stacksync: host.cred_stacksync,
+        cred_owncloud: host.cred_owncloud,
+        cmd: cmd
+    };
+    appendAllParams(args, 'bb-config');
+    appendAllHosts(args, 'bb-hosts');
+    $.ajax({
+        url: 'http://localhost:3000/rmq/emit',
+        data: args,
+        timeout: 6000000, // 6000s ::100min
+        type: 'GET',
+        success: function (data) {
+            console.log("Success, rmq!");
+            console.log(data);
+            $.notify('Run rmq! ' + host.hostname + ' ' + cmd, 'info');
+        },
+        error: function (err) {
+            console.log(err);
+            console.log('rmq, Error ' + host + ' ' + cmd + ' ', err);
+            $.notify('Error! ' + err, 'error');
+        }
+    });
+    if (cb !== undefined)
+        cb(args);
+};
 rpcHost = function (host, cmd, cb) {
     var args = {
         ip: host.ip,
