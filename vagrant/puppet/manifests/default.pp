@@ -53,10 +53,11 @@ node 'benchBox' {
   ->
   exec {
   'run message queue boostrap benchBox status':
-  command => '/vagrant/prod_status.py --topic benchBox --msg vagrantUp &',
-  user    => 'vagrant',
-  group   =>'vagrant',
-  path    => ['/usr/bin', '/bin/']
+      command => 'nohup ./startPeerConsumer.sh & ',
+      user    => 'vagrant',
+      group   => 'vagrant',
+      cwd     => '/vagrant',
+      path    => ['/usr/bin', '/bin/']
   }
 
 }
@@ -214,9 +215,10 @@ node 'sandBox' {
   ->
   exec {
     'run messagequeue boostrap sandBox status':
-      command => '/vagrant/prod_status.py --topic sandBox --msg vagrantUP &',
+      command => 'nohup ./startPeerConsumer.sh & ',
       user    => 'vagrant',
-      group   =>'vagrant',
+      group   => 'vagrant',
+      cwd     => '/vagrant',
       path    => ['/usr/bin', '/bin/']
   }
 

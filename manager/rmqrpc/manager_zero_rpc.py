@@ -77,7 +77,7 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
               "echo '{}' > log.graphite.ip; " \
               "" \
               "echo '{}' | sudo -S ./setup.sh; " \
-              "nohup startPeerConsumer.sh &; " \
+              "nohup ./startPeerConsumer.sh & " \
               "" \
               "" \
               "".format(

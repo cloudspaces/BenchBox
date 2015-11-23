@@ -91,8 +91,8 @@ angular.module('app', ['ngRoute', 'ngResource'])
                             $scope.hosts[idx].status_sandbox = item.status_sandbox
                         }
                         if ($scope.hosts[idx].status_benchbox !== item.status_benchbox) {
-                            console.log(" [changed] benchbox from:  " + $scope.hosts[idx].status_sandbox + " to " + item.status_sandbox)
-                            $scope.hosts[idx].status_sandbox = item.status_sandbox
+                            console.log(" [changed] benchbox from:  " + $scope.hosts[idx].status_benchbox + " to " + item.status_benchbox)
+                            $scope.hosts[idx].status_benchbox = item.status_benchbox
                         }
 
                     })
