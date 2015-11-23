@@ -18,6 +18,10 @@ class ActionHandler(object):
         print 'up'
         print subprocess.check_output(["echo", "Hello World!"])
 
+    def pwd(self):
+        print 'up'
+        print subprocess.check_output(["echo", "Hello World!"])
+
     def vagrantUp(self):
         print 'vagrantUp'
         print subprocess.check_output(["vagrant", "up"])
