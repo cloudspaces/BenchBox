@@ -18,10 +18,11 @@ router.get('/emit', function (req, res, next) {
     var amqp_url = req.query['rabbitmq-amqp']
     amqp.connect(amqp_url, function (err, conn) {
         // create callback channel
+        console.log("createChannel ")
         conn.createChannel(function (err, ch) {
             var queue_name = '';
             var queue_prop = {exclusive: true};
-
+            console.log("assetQueue")
             ch.assertQueue(queue_name, queue_prop, function (err, q) {
                 // on queue_ready
                 var corr = generateUuid();
@@ -29,7 +30,8 @@ router.get('/emit', function (req, res, next) {
                 var target = req.query.hostname;
                 console.log(' [x] Requesting [' + cmd + '] to [' + target + ']');
 
-                var on_message_prop = {noAck: true}
+                var on_message_prop = {noAck: true};
+                console.log("consume");
                 ch.consume(q.queue, function (msg) {
                     // on queue_message
                     if (msg.properties.correlationId == corr) {
@@ -42,7 +44,7 @@ router.get('/emit', function (req, res, next) {
                                 console.error(err.message)
                             } else {
                                 console.log("-INI----------")
-                                console.log(host)
+                                console.log(host);
                                 console.log("-FIN----------")
 
                                 var status_attr = 'status'
