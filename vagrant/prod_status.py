@@ -31,14 +31,20 @@ class ActionHandler(object):
     def warmUp(self):
         # warmup the sandBox filesystem running the executor
         print 'warmUp'
+        str_cmd = "if [ -d ~/workload_generator ]; then; " \
+                  "cd ~/workload_generator; " \
+                  "python executor.py -o {} -p {} -t {} -f {} -x {} -w 1; " \
+                  "fi; ".format(0, 'backupsample', 0, 'stacksync_folder', 'StackSync')
         print subprocess.check_output(['echo', 'warmup'])
 
     ''' executed at the sandBox '''
     def tearDown(self):
         # clear the sandBox filesystem and cached files
         print 'tearDown'
+        str_cmd = "if [ -d ~/output ]; then " \
+                  "rm -R ~/output; " \
+                  "fi; "
         print subprocess.check_output(['echo', 'teardown'])
-
 
 class ProduceStatus(object):
     def __init__(self, rmq_url='localhost', queue_name = 'status_manager'):
@@ -128,6 +134,9 @@ class ConsumeAction(object):
         self.channel.start_consuming()
 
 
+def bash_command(cmd):
+    subprocess.Popen(['/bin/bash', '-c', cmd])
+    # -c command starts to be read from the first non-option argument
 
 def parse_args(argv):
 

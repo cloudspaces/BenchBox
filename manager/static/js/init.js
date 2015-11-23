@@ -83,8 +83,16 @@ angular.module('app', ['ngRoute', 'ngResource'])
                         if ($scope.hosts[idx].status === item.status) {
                             // console.log(" [not changed]" + $scope.hosts[idx].status + " : "+ item.status )
                         } else {
-                            console.log(" [changed]    ")
+                            console.log(" [changed dummyhost] from:  " + $scope.hosts[idx].status + " to " + item.status)
                             $scope.hosts[idx].status = item.status
+                        }
+                        if ($scope.hosts[idx].status_sandbox !== item.status_sandbox) {
+                            console.log(" [changed sandbox] from:  " + $scope.hosts[idx].status_sandbox + " to " + item.status_sandbox)
+                            $scope.hosts[idx].status_sandbox = item.status_sandbox
+                        }
+                        if ($scope.hosts[idx].status_benchbox !== item.status_benchbox) {
+                            console.log(" [changed] benchbox from:  " + $scope.hosts[idx].status_sandbox + " to " + item.status_sandbox)
+                            $scope.hosts[idx].status_sandbox = item.status_sandbox
                         }
 
                     })

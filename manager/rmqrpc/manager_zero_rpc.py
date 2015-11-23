@@ -76,13 +76,13 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
               "echo '{}' > log.impala.ip; " \
               "echo '{}' > log.graphite.ip; " \
               "" \
-              "echo '{}' | sudo -u -S ./setup.sh; " \
+              "echo '{}' | sudo -S ./setup.sh; " \
               "" \
               "".format(
                         h['passwd'],  h['profile'],
                         h['cred_stacksync'], h['cred_owncloud'],  h['hostname'],
                         h['owncloud-ip'], h['stacksync-ip'], h['impala-ip'], h['graphite-ip'],
-                        h['passwd'], h['']
+                        h['passwd']
                         )
     print 'sendQuery...';
     return rmi(h['ip'], h['user'], h['passwd'], str_cmd)  # utilitzar un worker del pool

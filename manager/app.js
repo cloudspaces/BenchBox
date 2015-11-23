@@ -172,7 +172,7 @@ amqp.connect(amqp_url, function (err, conn) {
 
             var status = host_status.status
             var dummyhost = host_status.host.split('.')[0]
-            var vboxhost = host_status.host.split('.')[1]
+            var vboxhost = host_status.host.split('.')[1].toLowerCase()
             console.log(status, dummyhost, vboxhost)
             // fer un ajax request a si mateix o modificar directament ?
             hostModel.findOne({hostname: dummyhost}, function (err, host) {
@@ -192,6 +192,7 @@ amqp.connect(amqp_url, function (err, conn) {
                     if (err)
                         console.log(err.message)
                 })
+                console.log(host)
             });
 
             var result = "manager Joined queue " + host_status.host + "! ";
