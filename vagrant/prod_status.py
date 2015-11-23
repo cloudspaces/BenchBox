@@ -170,11 +170,15 @@ if __name__ == '__main__':
     if topic is None:
         topic = hostname
 
-    try:
-        with open('hostname', 'r') as f:
+    try:  # this means that its a dummyhost
+        with open('./hostname', 'r') as f:
             dummyhost = f.read().splitlines()[0]
-    except:
-        dummyhost = hostname
+
+    except: # this means that its sandBox or benchBox
+        with open('/vagrant/hostname', 'r') as f:
+            dummyhost = f.read().splitlines()[0]
+
+    # dummyhost = hostname
 
     host_queue = "{}.{}".format(dummyhost, hostname)
     # status_msg
