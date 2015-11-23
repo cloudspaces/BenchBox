@@ -17,8 +17,8 @@ sudo ./scripts/installDependencies.sh;
 
 
 echo "#2 AssignCredentialsToProfile"
-./scripts/config.owncloud.sh;
-./scripts/config.stacksync.sh;  # '%s' # h['stacksync-ip']
+sudo ./scripts/config.owncloud.sh;
+sudo ./scripts/config.stacksync.sh;  # '%s' # h['stacksync-ip']
 
 echo "#3 Install RabbitMQ Pip Pika"
 sudo ./scripts/installPythonPipPika.sh
