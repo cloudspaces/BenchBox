@@ -120,11 +120,17 @@ class ConsumeAction(object):
         except AttributeError as e:
             # print e.message
             print "ACK: {}".format(body)
+
         response = "response from: {}".format(body)
-        ch.basic_publish(exchange='',
-                         routing_key=props.reply_to,
-                         properties=pika.BasicProperties(correlation_id=props.correlation_id),
-                         body=response)
+        print props.reply_to
+        print props.correlation_id
+        try:
+            ch.basic_publish(exchange='',
+                             routing_key=props.reply_to,
+                             properties=pika.BasicProperties(correlation_id=props.correlation_id),
+                             body=response)
+        except:
+            print "bypass"
         ch.basic_ack(delivery_tag=method.delivery_tag)  # comprar que l'ack coincideix, # msg index
 
     def listen(self):
