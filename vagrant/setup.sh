@@ -23,8 +23,11 @@ echo "#2 AssignCredentialsToProfile"
 echo "#3 Install RabbitMQ Pip Pika"
 sudo ./scripts/installPythonPipPika.sh
 
-
-python ./prod_status.py --msg setupFinished --topic `hostname`
-
+if [ -f prod_status.pid ]
+then
+line=($(<"prod_status.pid"))
+kill $line
+fi
+nohup python ./prod_status.py --msg setupFinished --topic `hostname` > /dev/null 2>&1 & echo $! > prod_status.pid
 fi;
 
