@@ -84,28 +84,33 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
                         h['owncloud-ip'], h['stacksync-ip'], h['impala-ip'], h['graphite-ip'],
                         h['passwd']
                         )
+    print 'sendQuery...';
     return rmi(h['ip'], h['user'], h['passwd'], str_cmd)  # utilitzar un worker del pool
 
 
 def rmi(hostname, login, passwd, cmd, callback=None):
-        while True:
-            try:
-                s = pxssh.pxssh()
-                s.login(hostname, login, passwd)
-                s.timeout = 3600  # set timeout to one hour
-                s.sendline('whoami')
-                s.prompt()  # match the prompt
-                s.sendline(cmd)  # run a command
-                s.prompt()  # true
-                last_output = s.before  # # # print everyting before the prompt
+    print "sendQuery to: "+hostname, login, passwd
+    rmiTry = 0
+    while True:
+        rmiTry += 1
+        print rmiTry
+        try:
+            s = pxssh.pxssh()
+            s.login(hostname, login, passwd)
+            s.timeout = 3600  # set timeout to one hour
+            s.sendline('whoami')
+            s.prompt()  # match the prompt
+            s.sendline(cmd)  # run a command
+            s.prompt()  # true
+            last_output = s.before  # # # print everyting before the prompt
 
-                s.logout()
-            except pxssh.ExceptionPxssh, e:
-                continue
-            break
-        print "LAST: OUTPUT"
-        print colored(last_output, 'blue')
-        return last_output
+            s.logout()
+        except pxssh.ExceptionPxssh, e:
+            continue
+        break
+    print "LAST: OUTPUT"
+    print colored(last_output, 'blue')
+    return last_output
 
 '''
 replace_n = last_output.replace('\n', '')

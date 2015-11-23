@@ -74,49 +74,44 @@ class ProduceStatus(object):
 
 class ConsumeAction(object):
     vagrant_ops = ActionHandler()
-    def __init__(self, rmq_url, topic):
-        print "Dummy Rabbit Handler"
+    def __init__(self, rmq_url, hostname):
+        print "Dummy Peer Worker"
         self.rmq_url = rmq_url
         if rmq_url == 'localhost':
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(rmq_url))
         else:
-            print 'RabbitMQ instance'
+            print 'Worker instance'
             url_str = self.rmq_url
             url = urlparse.urlparse(url_str)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=url.hostname, virtual_host=url.path[1:], credentials=pika.PlainCredentials(url.username, url.password)
             ))
 
-        self.topic = topic
+        self.hostname = hostname
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.topic)
+        self.channel.queue_declare(queue=self.hostname)
 
     def on_request(self, ch, method, props, body):
         print " [on_request] {} ".format(body)
-
-
         # todo implementar els handler vagrantUp i vagrantDown
         try:
             toExecute = getattr(self.vagrant_ops, body)
             print toExecute
             t = threading.Thread(target=toExecute)
-            # exemple peticion up, al final de vagrant up fer que es executi emit status dins del sandBox i del benchBox
-            # enlloc de que la queue sigui parcial fer que sigui completa dins del sandBox | benchBox, a fora es nomes hostname
             t.start()
         except AttributeError as e:
             # print e.message
             print "ACK: {}".format(body)
-        # t.join()
         response = "response from: {}".format(body)
         ch.basic_publish(exchange='',
-                         routing_key=body,
+                         routing_key=props.reply_to,
                          properties=pika.BasicProperties(correlation_id=props.correlation_id),
                          body=response)
         ch.basic_ack(delivery_tag=method.delivery_tag)  # comprar que l'ack coincideix, # msg index
 
     def listen(self):
         self.channel.basic_qos(prefetch_count=1)
-        self.channel.basic_consume(self.on_request, queue=self.topic)
+        self.channel.basic_consume(self.on_request, queue=self.hostname)
         print " [Consumer] Awaiting RPC requests"
         self.channel.start_consuming()
 
@@ -178,6 +173,6 @@ if __name__ == '__main__':
 
     ''' crear una cua amb el propi host name de tipus direct '''
     print "START DummyRabbitStatus Worker"
-    #rmq_status_server = ConsumeAction(rmq_url, dummyhost)
-    #rmq_status_server.listen()
+    consumer_rpc = ConsumeAction(rmq_url, dummyhost)
+    consumer_rpc.listen()
     ''' dummy host does all the following setup operations '''

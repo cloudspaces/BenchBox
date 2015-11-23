@@ -74,8 +74,28 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
             $scope.itv_time = 10000;
             $interval(callAtInterval, $scope.itv_time);
+
+
             function callAtInterval() {
-                $scope.hosts = Hosts.query(); // apaño para hoy
+                Hosts.query(function(items){
+                    // console.log(items)
+                    angular.forEach(items, function(item, idx, all){
+                       if($scope.hosts[idx].status === item.status){
+                           // console.log(" [not changed]" + $scope.hosts[idx].status + " : "+ item.status )
+                       }else{
+                           console.log(" [changed]    ")
+                           $scope.hosts[idx].status = item.status
+                       }
+
+                    })
+                });
+                /*
+                console.log($scope.currHosts)
+                angular.forEach($scope.currHosts, function(item, idx){
+                    console.log(item)
+                    item.status = idx+'IDLE '+ $scope.itv_time++
+                })
+                */
             }
 
 
