@@ -40,10 +40,8 @@ class ActionHandler(object):
     def warmUp(self):
         # warmup the sandBox filesystem running the executor
         print 'warmUp'
-        str_cmd = "if [ -d ~/workload_generator ]; then; " \
-                  "cd ~/workload_generator; " \
-                  "python executor.py -o {} -p {} -t {} -f {} -x {} -w 1; " \
-                  "fi; ".format(0, 'backupsample', 0, 'stacksync_folder', 'StackSync')
+        str_cmd = "python ~/workload_generator/executor.py -o {} -p {} -t {} -f {} -x {} -w 1 " \
+                  " ".format(0, 'backupsample', 0, 'stacksync_folder', 'StackSync')
         # output = subprocess.check_output(['echo', 'warmup'])
         return bash_command(str_cmd)
     ''' executed at the sandBox '''
@@ -51,10 +49,12 @@ class ActionHandler(object):
     def tearDown(self):
         # clear the sandBox filesystem and cached files
         print 'tearDown'
-        str_cmd = "if [ -d ~/output ]; then " \
-                  "rm -R ~/output; " \
-                  "fi; "
+        str_cmd = "rm -R ~/output "
         return bash_command(str_cmd)
+
+    def execute(self):
+        print 'execute'
+        return bash_command('whoami')
 
 class ProduceStatus(object):
     def __init__(self, rmq_url='localhost', queue_name = 'status_manager'):
