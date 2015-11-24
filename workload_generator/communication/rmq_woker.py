@@ -14,4 +14,4 @@ class rmq_woker():
 #UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas # passwd
 
 
-#amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy
+#amqp://benchbox:benchbox@10.30.236.141/

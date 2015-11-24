@@ -3,7 +3,7 @@ var router = express.Router();
 
 
 var amqp = require('amqplib/callback_api');
-// var amqp_url = 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy';
+// var amqp_url = 'amqp://benchbox:benchbox@10.30.236.141/';
 
 var hostModel = require('../models/Hosts.js');
 

@@ -183,10 +183,10 @@ if __name__ == '__main__':
     ''' dummy host says hello to the manager '''
     status_msg, topic = parse_args(sys.argv[1:])
 
-    # rmq_url = 'localhost'  # 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
-    rmq_url = 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
+    # rmq_url = 'localhost'  # 'amqp://benchbox:benchbox@10.30.236.141/'
+    rmq_url = 'amqp://benchbox:benchbox@10.30.236.141/'
     status_exchanger = 'status_exchanger'
-
+    # amqp://benchbox:benchbox@10.30.236.141/
     emit_status_rpc = ProduceStatus(rmq_url)
 
     hostname = socket.gethostname()
