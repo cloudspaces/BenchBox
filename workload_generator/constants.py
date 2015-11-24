@@ -13,10 +13,9 @@ username = getpass.getuser()
 PROJECT_PATH = None
 TEMP_PATH = {
     'vagrant': '/home/vagrant/',
-    'anna': '/home/anna/CloudSpaces/Dev/BenchBox/',
+    'x': '/home/x/Code/BenchBox/',
     'user': '/home/user/workspace/BenchBox/',
-    'Raul': 'D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\',
-    'lab144': '/home/lab144/BenchBox/'
+    'Raul': 'D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\'
 }
 
 PROJECT_PATH = TEMP_PATH[username]
@@ -48,7 +47,7 @@ DATA_CHARACTERIZATIONS_PATH = PROJECT_PATH + "workload_generator/external/sdgen_
 FS_SNAPSHOT_PATH = None
 SNAPSHOT_PATH = {
     'vagrant': PROJECT_PATH + "output",
-    'anna': PROJECT_PATH + "output",
+    'x': PROJECT_PATH + "output",
     'user': PROJECT_PATH + "output",
     'lab144': PROJECT_PATH + "output",
     'Raul': "C:\\Users\\Raul\\Desktop\\test"
@@ -72,9 +71,11 @@ CPU_MONITOR_PORT = 11000
 TO_WAIT_STATIC_MAX = 6
 TO_WAIT_STATIC_MIN = 1
 
+
 # FTP SENDER CONSTANTS
 
 FTP_SENDER_IP = SANDBOX_IP
 FTP_SENDER_PORT = 21
+FTP_SENDER_INTERFACE = 'eth1'
 FTP_SENDER_USER = 'vagrant'
 FTP_SENDER_PASS = 'vagrant'
