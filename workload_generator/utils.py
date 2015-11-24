@@ -11,10 +11,10 @@ from workload_generator import constants
 def translate_matlab_fitting_to_scipy(fitting, parameters):
     
     if fitting == "generalized extreme value": 
-            fitting = "genextreme"
-            parameters = parameters.replace("k=", "'shape'=-")
-            parameters = parameters.replace("sigma", "'scale'")
-            parameters = parameters.replace("mu", "'loc'") 
+        fitting = "genextreme"
+        parameters = parameters.replace("k=", "'shape'=-")
+        parameters = parameters.replace("sigma", "'scale'")
+        parameters = parameters.replace("mu", "'loc'") 
             
     if fitting == "birnbaumsaunders": 
         fitting = "fatiguelife"
@@ -32,8 +32,12 @@ def translate_matlab_fitting_to_scipy(fitting, parameters):
         parameters = parameters.replace("mu", "'shape'")
         parameters = parameters.replace("lambda", "'scale'")
         
+    if fitting == "lognormal": 
+        fitting = "lognorm"
+        parameters = parameters.replace("sigma", "'scale'")
+        parameters = parameters.replace("mu", "'loc'") 
+    
     #TODO: fittings that sooner or later it would be good to implement
-    if fitting == "lognormal": raise NotImplementedError
     if fitting == "loglogistic": raise NotImplementedError
     if fitting == "logistic": raise NotImplementedError
     
@@ -50,6 +54,8 @@ def get_random_value_from_fitting(function, kv_params):
         return fitting(kv_params['shape'], scale=kv_params['scale']).rvs()
     elif function == "genpareto": 
         return fitting(kv_params['shape'], scale=kv_params['scale'], threshold=kv_params['threshold']).rvs()
+    elif function == "lognorm":
+        return fitting(kv_params['loc'], scale=kv_params['scale']).rvs()
     elif function == "randint": 
         return fitting.rvs(kv_params['low'], kv_params['high'])
     else: 

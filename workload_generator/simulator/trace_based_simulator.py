@@ -19,8 +19,11 @@ def replay_trace():
     users = dict()
     statistics = StatisticsManager(constants.TRACE_REPLAY_OUTPUT)
     initial_time = -1
+    users_set = set()
     for l in open(constants.TRACE_REPLAY_PATH,'r'):
         t,ext,size,tstamp,req_t,node_id, user_id = l.replace('\r','').replace('\n','').split(',')
+        
+        users_set.add(user_id)
         
         if node_id == 'node_id' or node_id == '' or t!='storage_done': continue
         
@@ -54,5 +57,6 @@ def replay_trace():
             users[user_id].last_operation_time = t0_epoch 
             
     statistics.finish_statistics()
+    print len(users_set)
 
 replay_trace()
