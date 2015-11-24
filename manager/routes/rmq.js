@@ -28,7 +28,13 @@ router.get('/emit', function (req, res, next) {
                 var corr = generateUuid();
                 var cmd = req.query.cmd;
                 var target = req.query.hostname;
-                console.log(' [x] Requesting [' + cmd + '] to [' + target + ']');
+                var target_queue = target
+                if (req.query.target_queue !== '') {
+                    target_queue += '.' + req.query.target_queue;
+                }else{
+                    target_queue += '.'+ req.query.hostname;
+                }
+                console.log(' [x] Requesting [' + cmd + '] to [' + target_queue + ']');
 
                 var on_message_prop = {noAck: true};
                 console.log("consume");
@@ -65,7 +71,7 @@ router.get('/emit', function (req, res, next) {
                         }, 500);
                     }
                 }, on_message_prop);
-                ch.sendToQueue(target, // target-hostname
+                ch.sendToQueue(target_queue, // target-hostname
                     // send rpc message to queue
                     new Buffer(cmd.toString()),
                     {

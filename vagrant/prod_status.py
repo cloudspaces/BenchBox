@@ -16,7 +16,8 @@ class ActionHandler(object):
     ''' executed at the dummyhost '''
     def up(self):
         print 'up'
-        print subprocess.check_output(["echo", "Hello World!"])
+        output =  subprocess.check_output(["echo", "Hello World!"])
+        return output
 
     def pwd(self):
         print 'up'
@@ -43,7 +44,8 @@ class ActionHandler(object):
                   "cd ~/workload_generator; " \
                   "python executor.py -o {} -p {} -t {} -f {} -x {} -w 1; " \
                   "fi; ".format(0, 'backupsample', 0, 'stacksync_folder', 'StackSync')
-        print subprocess.check_output(['echo', 'warmup'])
+        output = subprocess.check_output(['echo', 'warmup'])
+        return output
 
     ''' executed at the sandBox '''
     def tearDown(self):
@@ -123,13 +125,15 @@ class ConsumeAction(object):
         try:
             toExecute = getattr(self.vagrant_ops, body)
             print toExecute
-            t = threading.Thread(target=toExecute)
-            t.start()
+            # lo ideal es que aixo no sigui un thread per que les peticions s'atenguin fifo
+            # t = threading.Thread(target=toExecute)
+            output = toExecute()
+            # t.start()
         except AttributeError as e:
             # print e.message
             print "ACK: {}".format(body)
 
-        response = "response from: {}".format(body)
+        response = "{} response: {}: {}".format(self.host_queue, body, output)
         print props.reply_to
         print props.correlation_id
         try:
@@ -203,7 +207,7 @@ if __name__ == '__main__':
 
     # dummyhost = hostname
 
-    host_queue = "{}.{}".format(dummyhost, hostname)
+    host_queue = "{}.{}".format(dummyhost, hostname) # this is the format, that rmq.js target_queue needs!
     # status_msg
 
     print " [x] emit: emit_status_rpc.call({})".format(host_queue)
