@@ -148,12 +148,12 @@ angular.module('app', ['ngRoute', 'ngResource'])
                  */
             };
             $scope.rpc = function (name, cmd, ss) {
-                console.info(name, cmd, ss)
+                console.info(name, cmd, ss);
                 // console.log($scope)
                 if (ss == undefined) {
                     console.log("Not ss cmd")
                 } else {
-                    console.info("ss cmd!")
+                    console.info("ss cmd!");
                     cmd = cmd + $("#ssRadio input[type='radio']:checked")[0].value + ss;
                     console.log(cmd)
                 }
@@ -163,7 +163,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                         var checkedId = this.value;
                         var host = $scope.hosts.filter(function (item) {
                             return item._id == checkedId
-                        })
+                        });
                         console.log("rpcHost" + cmd, this.name, checkedId, host[0]);
                         if (cmd === 'setup') {
                             rpcHost(host[0], cmd)
@@ -173,18 +173,33 @@ angular.module('app', ['ngRoute', 'ngResource'])
             };
 
             $scope.rmq = function (name, cmd) {
-                $('.' + name).each(function () {
-                    // console.log(this)
-                    if ($(this).prop('checked')) {
-                        var checkedId = this.value;
-                        var host = $scope.hosts.filter(function (item) {
-                            return item._id == checkedId
-                        })
-                        console.log("rmqHost: " + cmd, this.name, checkedId, host[0]);
-                        rmqHost(host[0], cmd)
-                    }
+                console.log(arguments);
+                var hosts = Array.prototype.slice.call(arguments, 2); //
+                console.log(hosts);
+
+                hosts.forEach(function (targetHost) {
+                    console.log(targetHost);
+
+                    $('.' + name).each(function () {
+
+
+                        // console.log(this)
+                        if ($(this).prop('checked')) {
+                            var checkedId = this.value;
+                            var host = $scope.hosts.filter(function (item) {
+                                return item._id == checkedId
+                            });
+                            console.log("rmqHost: " + cmd, this.name, checkedId, host[0]);
+                            host[0].rmq_queue = targetHost.toLowerCase()
+                            // console.log(host[0])
+                            rmqHost(host[0], cmd)
+                        }
+
+                    })
+
                 })
-            }
+
+            };
 
             $scope.checkAll = function (name) {
 
@@ -303,7 +318,8 @@ rmqHost = function (host, cmd, cb) {
         profile: host.profile,
         cred_stacksync: host.cred_stacksync,
         cred_owncloud: host.cred_owncloud,
-        cmd: cmd
+        cmd: cmd,
+        target_queue: host.rmq_queue
     };
     appendAllParams(args, 'bb-config');
     appendAllHosts(args, 'bb-hosts');

@@ -16,7 +16,12 @@ class ActionHandler(object):
     ''' executed at the dummyhost '''
     def up(self):
         print 'up'
-        print subprocess.check_output(["echo", "Hello World!"])
+        output =  subprocess.check_output(["echo", "Hello World!"])
+        return output
+
+    def pwd(self):
+        print 'up'
+        print subprocess.check_output(["pwd", "."])
 
     def vagrantUp(self):
         print 'vagrantUp'
@@ -25,6 +30,10 @@ class ActionHandler(object):
     def vagrantProvision(self):
         print 'vagrantProvision'
         print subprocess.check_output(['vagrant', 'provision'])
+
+    def vagrantStatus(self):
+        print 'vagrantProvision'
+        print subprocess.check_output(['vagrant', 'status'])
 
 
     ''' executed at the benchBox '''
@@ -35,7 +44,8 @@ class ActionHandler(object):
                   "cd ~/workload_generator; " \
                   "python executor.py -o {} -p {} -t {} -f {} -x {} -w 1; " \
                   "fi; ".format(0, 'backupsample', 0, 'stacksync_folder', 'StackSync')
-        print subprocess.check_output(['echo', 'warmup'])
+        output = subprocess.check_output(['echo', 'warmup'])
+        return output
 
     ''' executed at the sandBox '''
     def tearDown(self):
@@ -115,13 +125,15 @@ class ConsumeAction(object):
         try:
             toExecute = getattr(self.vagrant_ops, body)
             print toExecute
-            t = threading.Thread(target=toExecute)
-            t.start()
+            # lo ideal es que aixo no sigui un thread per que les peticions s'atenguin fifo
+            # t = threading.Thread(target=toExecute)
+            output = toExecute()
+            # t.start()
         except AttributeError as e:
             # print e.message
             print "ACK: {}".format(body)
 
-        response = "response from: {}".format(body)
+        response = "{} response: {}: {}".format(self.host_queue, body, output)
         print props.reply_to
         print props.correlation_id
         try:
@@ -171,10 +183,10 @@ if __name__ == '__main__':
     ''' dummy host says hello to the manager '''
     status_msg, topic = parse_args(sys.argv[1:])
 
-    # rmq_url = 'localhost'  # 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
-    rmq_url = 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy'
+    # rmq_url = 'localhost'  # 'amqp://benchbox:benchbox@10.30.236.141/'
+    rmq_url = 'amqp://benchbox:benchbox@10.30.236.141/'
     status_exchanger = 'status_exchanger'
-
+    # amqp://benchbox:benchbox@10.30.236.141/
     emit_status_rpc = ProduceStatus(rmq_url)
 
     hostname = socket.gethostname()
@@ -183,7 +195,7 @@ if __name__ == '__main__':
         status_msg = "Hello from {} ".format(hostname)
 
     if topic is None:
-        topic = hostname
+        hostname = topic
 
     try:  # this means that its a dummyhost
         with open('./hostname', 'r') as f:
@@ -195,7 +207,7 @@ if __name__ == '__main__':
 
     # dummyhost = hostname
 
-    host_queue = "{}.{}".format(dummyhost, hostname)
+    host_queue = "{}.{}".format(dummyhost, hostname.lower()) # this is the format, that rmq.js target_queue needs!
     # status_msg
 
     print " [x] emit: emit_status_rpc.call({})".format(host_queue)

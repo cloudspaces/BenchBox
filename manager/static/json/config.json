@@ -32,11 +32,11 @@
       }
     },
     "rabbitmq":{
-      "url": "amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy",
-      "virtual_host": "vvmlshzy",
-      "host": "moose.rmq.cloudamqp.com",
-      "user": "vvmlshzy",
-      "password": "UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas"
+      "url": "amqp://benchbox:benchbox@10.30.236.141/",
+      "virtual_host": "",
+      "host": "10.30.236.141",
+      "user": "benchbox",
+      "password": "benchbox"
 
     },
     "credentials": {

@@ -3,7 +3,7 @@ var router = express.Router();
 
 
 var amqp = require('amqplib/callback_api');
-// var amqp_url = 'amqp://vvmlshzy:UwLCrV2bep7h8qr6k7WhbsxY7kA9_nas@moose.rmq.cloudamqp.com/vvmlshzy';
+// var amqp_url = 'amqp://benchbox:benchbox@10.30.236.141/';
 
 var hostModel = require('../models/Hosts.js');
 
@@ -18,18 +18,26 @@ router.get('/emit', function (req, res, next) {
     var amqp_url = req.query['rabbitmq-amqp']
     amqp.connect(amqp_url, function (err, conn) {
         // create callback channel
+        console.log("createChannel ")
         conn.createChannel(function (err, ch) {
             var queue_name = '';
             var queue_prop = {exclusive: true};
-
+            console.log("assetQueue")
             ch.assertQueue(queue_name, queue_prop, function (err, q) {
                 // on queue_ready
                 var corr = generateUuid();
                 var cmd = req.query.cmd;
                 var target = req.query.hostname;
-                console.log(' [x] Requesting [' + cmd + '] to [' + target + ']');
+                var target_queue = target
+                if (req.query.target_queue !== '') {
+                    target_queue += '.' + req.query.target_queue;
+                }else{
+                    target_queue += '.'+ req.query.hostname;
+                }
+                console.log(' [x] Requesting [' + cmd + '] to [' + target_queue + ']');
 
-                var on_message_prop = {noAck: true}
+                var on_message_prop = {noAck: true};
+                console.log("consume");
                 ch.consume(q.queue, function (msg) {
                     // on queue_message
                     if (msg.properties.correlationId == corr) {
@@ -42,7 +50,7 @@ router.get('/emit', function (req, res, next) {
                                 console.error(err.message)
                             } else {
                                 console.log("-INI----------")
-                                console.log(host)
+                                console.log(host);
                                 console.log("-FIN----------")
 
                                 var status_attr = 'status'
@@ -63,7 +71,7 @@ router.get('/emit', function (req, res, next) {
                         }, 500);
                     }
                 }, on_message_prop);
-                ch.sendToQueue(target, // target-hostname
+                ch.sendToQueue(target_queue, // target-hostname
                     // send rpc message to queue
                     new Buffer(cmd.toString()),
                     {
