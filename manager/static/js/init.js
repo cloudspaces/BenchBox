@@ -190,9 +190,9 @@ angular.module('app', ['ngRoute', 'ngResource'])
                                 return item._id == checkedId
                             });
                             console.log("rmqHost: " + cmd, this.name, checkedId, host[0]);
-                            host[0].rmq_queue = targetHost
-                            console.log(host[0])
-                            // rmqHost(host[0], cmd)
+                            host[0].rmq_queue = targetHost.toLowerCase()
+                            // console.log(host[0])
+                            rmqHost(host[0], cmd)
                         }
 
                     })

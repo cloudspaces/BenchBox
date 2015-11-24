@@ -195,7 +195,7 @@ if __name__ == '__main__':
         status_msg = "Hello from {} ".format(hostname)
 
     if topic is None:
-        topic = hostname
+        hostname = topic
 
     try:  # this means that its a dummyhost
         with open('./hostname', 'r') as f:
@@ -207,7 +207,7 @@ if __name__ == '__main__':
 
     # dummyhost = hostname
 
-    host_queue = "{}.{}".format(dummyhost, hostname) # this is the format, that rmq.js target_queue needs!
+    host_queue = "{}.{}".format(dummyhost, hostname.lower()) # this is the format, that rmq.js target_queue needs!
     # status_msg
 
     print " [x] emit: emit_status_rpc.call({})".format(host_queue)
