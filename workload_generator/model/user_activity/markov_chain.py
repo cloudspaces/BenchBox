@@ -10,6 +10,7 @@ random walk on that graph.
 '''
 import random
 from workload_generator.utils import get_random_value_from_fitting
+from scipy.stats.distributions import genpareto
 
 class SimpleMarkovChain(object):
     
@@ -56,6 +57,8 @@ class SimpleMarkovChain(object):
         if self.current_state == None:
             self.current_state = random.choice(self.chain.keys())
             
+        if self.current_state not in self.chain:
+            print "hola"
         #Fitness proportionate selection of next state
         random_trial = random.random()
         start_range = 0.0
@@ -67,21 +70,22 @@ class SimpleMarkovChain(object):
                 break
             else: start_range += self.chain[self.current_state][k]      
             
-    def initialize_from_recipe(self, file_name):
+    def initialize_from_recipe(self, file_name, discriminator):
         for l in open(file_name, "r"):
-
             model_attribute = l.split(',')[0]
-            if model_attribute == 'chain':
+            if model_attribute == discriminator:
                 state1, state2, num_transitions  = l.split(",")[1:4]
                 self.add_transition(state1, state2, float(num_transitions))
-            elif model_attribute in dir(self):
+            elif discriminator == "state_chain" and model_attribute in dir(self):
                 fitting = l[:-1].split(',')[1]
                 kv_params = eval(l[l.index('{'):])
                 setattr(self, model_attribute, (fitting, kv_params))
-                self.activity_rate = get_random_value_from_fitting(fitting, kv_params)
-                print "Activity rate: ", self.activity_rate
-                from pprint import pprint
-                print "self: ", pprint (vars(self))
+                self.activity_rate = genpareto(1.9149, scale=9.5497e-004, threshold=4.7847e-005).rvs() #get_random_value_from_fitting(fitting, kv_params)
+                self.add_transition('Offline', 'Active', float(self.activity_rate))
+                self.add_transition('Offline', 'Online', float(1.-self.activity_rate))
+                #print "Activity rate: ", self.activity_rate
+                #from pprint import pprint
+                #print "self: ", pprint (vars(self))
 
     def print_states(self):  
         self.printChain(self.chain)

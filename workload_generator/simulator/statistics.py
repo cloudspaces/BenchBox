@@ -13,6 +13,8 @@ class StatisticsManager(object):
         self.operations_per_user = dict()
         self.operations_per_timeslot = dict()
         self.inter_arrivals_per_transition = dict()
+        self.session_per_stereotype = dict()
+        self.users_per_timeslot = dict()
         self.output_dir = output_dir
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)        
@@ -47,10 +49,37 @@ class StatisticsManager(object):
                     + stereotype + "_" + transition + ".dat", "w")            
         print >> self.inter_arrivals_per_transition[stereotype][transition], interarrival 
         
+    def trace_session_length(self, stereotype, process_id, current_state, session_length):
+        if stereotype not in self.session_per_stereotype:
+            self.session_per_stereotype[stereotype] = dict()
+        
+        if current_state not in self.session_per_stereotype[stereotype]:
+            self.session_per_stereotype[stereotype][current_state] = open(self.output_dir 
+                    + stereotype + "_" + current_state + ".dat", "w")       
+            
+        print >> self.session_per_stereotype[stereotype][current_state], session_length
+        
+    def trace_nodes_state_per_timeslot(self, stereotype, process_id, current_state, timestamp, session_len):
+        start_timeslot = int(timestamp/SIMULATION_TIME_SLOT)
+        end_timeslot = int((timestamp+session_len)/SIMULATION_TIME_SLOT)
+        
+        while start_timeslot <= end_timeslot: 
+            if current_state not in self.users_per_timeslot:
+                self.users_per_timeslot[current_state] = dict()              
+            if start_timeslot not in self.users_per_timeslot[current_state]:
+                self.users_per_timeslot[current_state][start_timeslot] = set()             
+            
+            self.users_per_timeslot[current_state][start_timeslot].add(process_id)
+            start_timeslot+=1
+        
     def finish_statistics(self):
         for stereotype in self.inter_arrivals_per_transition.keys():
             for transition in self.inter_arrivals_per_transition[stereotype].keys():
                 self.inter_arrivals_per_transition[stereotype][transition].close()
+        
+        for stereotype in self.session_per_stereotype.keys():
+            for state in self.session_per_stereotype[stereotype].keys():
+                self.session_per_stereotype[stereotype][state].close()
         
         for stereotype in sorted(self.operations_per_timeslot.keys()):
             stereotype_file = open(self.output_dir + stereotype + "_ops_per_timeslot.dat", "w")
@@ -60,6 +89,12 @@ class StatisticsManager(object):
                     to_print += str(self.operations_per_timeslot[stereotype][current_timeslot][operation]) + "\t"
                 print >> stereotype_file, to_print
             stereotype_file.close()
+            
+        for state in sorted(self.users_per_timeslot.keys()):
+            state_file = open(self.output_dir + state + "_users_per_timeslot.dat", "w")
+            for current_timeslot in sorted(self.users_per_timeslot[state].keys()):
+                print >> state_file, len(self.users_per_timeslot[state][current_timeslot])
+            state_file.close()
             
         for stereotype in sorted(self.operations_per_user.keys()):
             stereotype_file = open(self.output_dir + stereotype + "_ops_per_user.dat", "w")
