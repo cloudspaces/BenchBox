@@ -40,14 +40,12 @@ router.get('/emit', function (req, res, next) {
                 console.log("consume");
                 ch.consume(q.queue, function (msg) {
                     // on queue_message
+                    var response = msg.content.toString()
+                    console.log(response)
                     if (msg.properties.correlationId == corr) {
-                        msg.content.data.splice(0, 0, '');
 
-                        var result = msg.content.data.reduce(function(stack, item){
-                            return stack+=String.fromCharCode(item)
-                        })
 
-                        console.log(' [.] Got '+result);
+                        console.log(' [.] Got '+response);
                         // update the dummyhost status
 
                         hostModel.findOne({hostname: target}, function (err, host) {
@@ -55,7 +53,9 @@ router.get('/emit', function (req, res, next) {
                                 console.error(err.message)
                             } else {
                                 console.log("-INI----------")
-                                console.log(host);
+                                console.log(host.status);
+                                console.log(host.status_sandbox);
+                                console.log(host.status_benchbox);
                                 console.log("-FIN----------")
 
                                 var status_attr = 'status'
@@ -70,10 +70,7 @@ router.get('/emit', function (req, res, next) {
                                         console.log(err.message)
                                 })
                             }
-
-                        })
-
-
+                        });
                         setTimeout(function () {
                             conn.close();
                             // process.exit(0)

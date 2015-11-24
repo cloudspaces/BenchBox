@@ -36,7 +36,7 @@ class ActionHandler(object):
         print subprocess.check_output(['vagrant', 'status'])
 
 
-    ''' executed at the benchBox '''
+    ''' executed at the benchBox, nota: el script esta en el directorio root /vagrant'''
     def warmUp(self):
         # warmup the sandBox filesystem running the executor
         print 'warmUp'
@@ -44,17 +44,17 @@ class ActionHandler(object):
                   "cd ~/workload_generator; " \
                   "python executor.py -o {} -p {} -t {} -f {} -x {} -w 1; " \
                   "fi; ".format(0, 'backupsample', 0, 'stacksync_folder', 'StackSync')
-        output = subprocess.check_output(['echo', 'warmup'])
-        return output
-
+        # output = subprocess.check_output(['echo', 'warmup'])
+        return bash_command(str_cmd)
     ''' executed at the sandBox '''
+
     def tearDown(self):
         # clear the sandBox filesystem and cached files
         print 'tearDown'
         str_cmd = "if [ -d ~/output ]; then " \
                   "rm -R ~/output; " \
                   "fi; "
-        print subprocess.check_output(['echo', 'teardown'])
+        return bash_command(str_cmd)
 
 class ProduceStatus(object):
     def __init__(self, rmq_url='localhost', queue_name = 'status_manager'):
@@ -158,7 +158,11 @@ class ConsumeAction(object):
 
 
 def bash_command(cmd):
-    subprocess.Popen(['/bin/bash', '-c', cmd])
+    child = subprocess.Popen(['/bin/bash', '-c', cmd])
+    child.communicate()[0]
+    rc = child.returncode
+    return rc
+
     # -c command starts to be read from the first non-option argument
 
 def parse_args(argv):

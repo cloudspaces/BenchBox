@@ -179,20 +179,20 @@ amqp.connect(amqp_url, function (err, conn) {
                 if (err) {
                     console.error(err.message)
                 }
-                console.log("FOUND: ", host);
+                // console.log("FOUND: ", host);
 
                 var status_attr = 'status';
                 if (dummyhost != vboxhost) {
                     status_attr += '_' + vboxhost
                 }
-                console.log(host)
+                // console.log(host)
                 host[status_attr] = status;
 
                 host.save(function (err) {
                     if (err)
                         console.log(err.message)
                 })
-                console.log(host)
+                // console.log(host)
             });
 
             var result = "manager Joined queue " + host_status.host + "! ";
