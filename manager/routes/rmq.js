@@ -40,11 +40,14 @@ router.get('/emit', function (req, res, next) {
                 console.log("consume");
                 ch.consume(q.queue, function (msg) {
                     // on queue_message
-                    console.log(msg)
-                    console.log(JSON.parse(msg))
                     if (msg.properties.correlationId == corr) {
-                        console.log(' [.] Got '+msg.content.data);
+                        msg.content.data.splice(0, 0, '');
 
+                        var result = msg.content.data.reduce(function(stack, item){
+                            return stack+=String.fromCharCode(item)
+                        })
+
+                        console.log(' [.] Got '+result);
                         // update the dummyhost status
 
                         hostModel.findOne({hostname: target}, function (err, host) {
