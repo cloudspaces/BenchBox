@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-
+var str_decoder = require('string_decoder').StringDecoder;
 
 var amqp = require('amqplib/callback_api');
 // var amqp_url = 'amqp://benchbox:benchbox@10.30.236.141/';
@@ -40,8 +40,10 @@ router.get('/emit', function (req, res, next) {
                 console.log("consume");
                 ch.consume(q.queue, function (msg) {
                     // on queue_message
+                    console.log(msg)
+                    console.log(JSON.parse(msg))
                     if (msg.properties.correlationId == corr) {
-                        console.log(' [.] Got %s', JSON.stringify(msg));
+                        console.log(' [.] Got '+msg.content.data);
 
                         // update the dummyhost status
 
