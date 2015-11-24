@@ -145,7 +145,7 @@ class ConsumeAction(object):
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,
                              properties=pika.BasicProperties(correlation_id=props.correlation_id),
-                             body=response)
+                             body=json.dumps({"response": response}))
         except:
             print "bypass"
         ch.basic_ack(delivery_tag=method.delivery_tag)  # comprar que l'ack coincideix, # msg index

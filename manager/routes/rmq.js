@@ -41,7 +41,7 @@ router.get('/emit', function (req, res, next) {
                 ch.consume(q.queue, function (msg) {
                     // on queue_message
                     if (msg.properties.correlationId == corr) {
-                        console.log(' [.] Got %s', msg.content.toString());
+                        console.log(' [.] Got %s', JSON.stringify(msg));
 
                         // update the dummyhost status
 
@@ -54,7 +54,11 @@ router.get('/emit', function (req, res, next) {
                                 console.log("-FIN----------")
 
                                 var status_attr = 'status'
-                                host[status_attr] = cmd
+                                if(req.query.target_queue !== ''){
+                                    status_attr += '_'+req.query.target_queue
+                                }
+                                status_attr = status_attr.toLowerCase()
+                                host[status_attr] = cmd;
 
                                 host.save(function (err) {
                                     if (err)
