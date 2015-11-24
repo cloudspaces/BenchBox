@@ -100,6 +100,11 @@ class ProduceStatus(object):
             self.connection.process_data_events()
         return self.response
 
+    def close(self):
+        print 'close connection'
+        self.connection.close()
+
+
 class ConsumeAction(object):
     vagrant_ops = ActionHandler()
     def __init__(self, rmq_url, host_queue):
@@ -212,6 +217,7 @@ if __name__ == '__main__':
 
     print " [x] emit: emit_status_rpc.call({})".format(host_queue)
     response = emit_status_rpc.call(status_msg, host_queue)
+    emit_status_rpc.close()
     print " [.] Got %r" % (response,)
 
     ''' crear una cua amb el propi host name de tipus direct '''
