@@ -48,7 +48,7 @@ class ActionHandler(object):
     def tearDown(self):
         # clear the sandBox filesystem and cached files
         print 'tearDown'
-        str_cmd = "pgrep -f executor.py | xargs kill -9"
+        str_cmd = "pgrep -f executor_rmq.py | xargs kill -9"
         return bash_command(str_cmd)
 
     def execute(self):
