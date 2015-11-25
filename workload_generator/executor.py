@@ -13,7 +13,6 @@ import time
 import getpass
 from termcolor import colored
 from metrics.cpu_monitor import CPUMonitor
-from communication import rmq_woker
 from workload_generator.model.user_activity.stereotype_executor import StereotypeExecutor
 
 
@@ -22,7 +21,7 @@ HardCode path for each environment, should be dev, debug, production instead...
 '''
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 home_dir = os.path.expanduser("~")
-hard_dir = '/home/anna/CloudSpaces/Dev/BenchBox'
+hard_dir = '/home/x/Code/BenchBox'
 print curr_dir
 print home_dir
 print hard_dir
@@ -30,7 +29,7 @@ print hard_dir
 username = getpass.getuser()
 
 dev_dir = {
-    'anna': hard_dir,
+    'x': hard_dir,
     'vagrant': home_dir,
     'milax': curr_dir
 }
@@ -157,7 +156,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         print "Wait: {}s".format(to_wait)
         time.sleep(to_wait)
-        action.perform_action(ftp_client)
+        action.perform_action(self.ftp_client)
 
     def doSync(self):
         # TODO: Cheng, you can make use of data_generator.update() to test updating files
@@ -174,7 +173,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
 
-            action.perform_action(ftp_client)
+            action.perform_action(self.ftp_client)
 
     def doUnlink(self):
         print colored("doUnlink",'yellow')
@@ -195,7 +194,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
-            action.perform_action(ftp_client)
+            action.perform_action(self.ftp_client)
         else:
             print "No file selected!"
 
@@ -221,7 +220,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
-            action.perform_action(ftp_client)
+            action.perform_action(self.ftp_client)
         else:
             print "No file selected!"
 
@@ -235,9 +234,26 @@ class StereotypeExecutorU1(StereotypeExecutor):
         #action.perform_action(ftp_client)
 
 
+
+
+class Execute:
+    def __init__(self, args):
+        print "Executor operation consumer: "
+
+    def start(self):
+        print 'start'
+        idx = 0
+        while True:
+            idx+=1
+            print idx
+            time.sleep(1)
+
 if __name__ == '__main__':
 
-    rmqw = rmq_woker()
+    print "executor.py is ran when warmup and its queue remains established... WAITING RPC"
+    opt = process_opt()
+    executor = Execute(opt)
+    Execute.start()
 
 
-    
+
