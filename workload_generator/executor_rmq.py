@@ -144,7 +144,6 @@ class ExecuteRMQ(object):
         url = urlparse.urlparse(rmq_url)
         self.profile = profile
         self.ftp_client = ftp_client
-
         self.actions = Commands(ftp_client, profile)
         # ftp_client.ftp_root = 'stacksync_folder'
 
@@ -162,6 +161,7 @@ class ExecuteRMQ(object):
     def on_request(self, ch, method, props, body):
         print " [on_request] {} ".format(body)
         # todo implementar els handler vagrantUp i vagrantDown
+        output = None
         try:
             toExecute = getattr(self.actions, body)
             print toExecute

@@ -8,7 +8,7 @@ import os
 
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-# hardcode due to no convention with closing slash or not for directory
+# hardcode due to no convention with closing slash or not for directory this may fail if the directory is root
 if os.name == 'posix':
     PROJECT_PATH+= '/'
 else:
