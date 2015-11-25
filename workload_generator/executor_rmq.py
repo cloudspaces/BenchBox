@@ -9,9 +9,11 @@ class Commands(object):
 
     def hello(self):
         print 'hello world'
+        return 'hello world response'
 
     def warmup(self):
         print 'warm up'
+        return 'warm up response'
 
 
 
