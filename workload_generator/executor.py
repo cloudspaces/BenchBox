@@ -27,20 +27,11 @@ def appendParentDir(num, currdir):
         return appendParentDir(num, dirname)
 appendParentDir(1, os.path.dirname(os.path.realpath(__file__)))
 
-from workload_generator.executor_rmq import ExecuteRMQ
-from metrics.cpu_monitor import CPUMonitor
 from workload_generator.model.user_activity.stereotype_executor import StereotypeExecutor
-from workload_generator.model.user_activity.markov_chain import SimpleMarkovChain
-from workload_generator.model.user_activity.inter_arrivals_manager import InterArrivalsManager
-from workload_generator.model.data_layer.data_generator import DataGenerator
-
-from workload_generator.communication.ftp_sender import ftp_sender
 from workload_generator.communication.actions import UploadDirectory,\
     CreateFile, CreateDirectory, UpdateFile, DeleteFile, DeleteDirectory, MoveFile, MoveDirectory
 
 from workload_generator.constants import DEBUG, FS_SNAPSHOT_PATH, TO_WAIT_STATIC_MAX, TO_WAIT_STATIC_MIN
-
-
 
 '''Class that executes remote operations on the Sandbox based on the
 data generation and user activity models. The class is tailored for the

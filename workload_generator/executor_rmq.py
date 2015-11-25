@@ -195,7 +195,7 @@ class ExecuteRMQ(object):
 if __name__ == '__main__':
 
     print "executor.py is ran when warmup and its queue remains established... WAITING RPC"
-    # opt = process_opt()
+
     rmq_url = 'amqp://benchbox:benchbox@10.30.236.141/'
     dummyhost = None
 
