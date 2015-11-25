@@ -233,7 +233,10 @@ if __name__ == '__main__':
     print "executor.py is ran when warmup and its queue remains established... WAITING RPC"
     # opt = process_opt()
     rmq_url = 'amqp://benchbox:benchbox@10.30.236.141/'
-    queue_name = '{}.{}'.format('Joker','executor')
+    dummyhost = None
+    with open('/vagrant/hostname', 'r') as f:
+        dummyhost = f.read().splitlines()[0]
+    queue_name = '{}.{}'.format(dummyhost,'executor')
     executor = ExecuteRMQ(rmq_url, queue_name)
     executor.listen()
     # the executor is a queue listening for actions...
