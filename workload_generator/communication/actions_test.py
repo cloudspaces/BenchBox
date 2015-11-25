@@ -99,7 +99,7 @@ for i in range(number):
         path = data_generator.move_file()
         src_path, tgt_path_local = path
         print 'MOVE_FILE: {} ---> {}'.format(src_path, tgt_path_local)
-        if not src_path == tgt_path:
+        if not src_path == tgt_path_local:
             tgt_path_remote = actions.MoveFile(src_path, FS_SNAPSHOT_PATH, tgt_path_local).perform_action(ftp_client)
             print_diff_file(tgt_path_local, tgt_path_remote)
 
