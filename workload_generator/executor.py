@@ -9,7 +9,6 @@ from argparse import ArgumentParser
 import os, sys
 import random
 import time
-import getpass
 from termcolor import colored
 
 '''

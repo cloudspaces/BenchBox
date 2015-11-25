@@ -156,7 +156,7 @@
 
 
             <button class="btn btn-default pull-right" ng-click="rmq('test-check', 'warmUp',   'benchBox')" title="Startup file system">WarmUp</button>
-            <button class="btn btn-default pull-right" ng-click="rmq('test-check', 'tearDown', 'sandBox')" title="Clear the shared file system">TearDown</button>
+            <button class="btn btn-default pull-right" ng-click="rmq('test-check', 'tearDown', 'benchBox')" title="Clear the shared file system">TearDown</button>
 
 
 
@@ -171,7 +171,7 @@
 
 
 <!-- CREATE -->
-
+<!-- refactor this into  modal view
 <div class="row">
     <div class="col-md-2">
         <h5>
@@ -191,7 +191,7 @@
         <button class="btn btn-success btn-block" ng-click="saveHost()">Add Host</button>
     </div>
 </div>
-
+-->
 
 
 <hr>
@@ -219,7 +219,7 @@
         <input type="text" class="form-control" ng-model="run.testClient" placeholder="-client" value="StackSync">
     </div>
     <div class="col-md-2">
-        <button class="btn btn-success btn-block" ng-click="runTest()" title="Run executor at dummy machine, benchBox">Execute</button>
+        <button class="btn btn-success btn-block" ng-click="rmq('test-check', 'hello', 'executor')" title="Run executor at dummy machine, benchBox">Execute</button>
     </div>
 </div>
 

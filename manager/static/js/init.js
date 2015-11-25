@@ -17,7 +17,6 @@ angular.module('app', ['ngRoute', 'ngResource'])
         };
     })
 
-
     //---------------
     // Factory
     //---------------
@@ -30,6 +29,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
             }
         });
     }])
+
     //---------------
     // Controllers
     //---------------
@@ -63,7 +63,6 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 testClient: 'StackSync'
             };
 
-
             // controller actions
             $scope.editing = []; //  variable
             $scope.checkedAll = false;
@@ -74,7 +73,6 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
             $scope.itv_time = 10000;
             $interval(callAtInterval, $scope.itv_time);
-
 
             function callAtInterval() {
                 Hosts.query(function (items) {
@@ -97,13 +95,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
                     })
                 });
-                /*
-                 console.log($scope.currHosts)
-                 angular.forEach($scope.currHosts, function(item, idx){
-                 console.log(item)
-                 item.status = idx+'IDLE '+ $scope.itv_time++
-                 })
-                 */
+
             }
 
 
@@ -181,8 +173,6 @@ angular.module('app', ['ngRoute', 'ngResource'])
                     console.log(targetHost);
 
                     $('.' + name).each(function () {
-
-
                         // console.log(this)
                         if ($(this).prop('checked')) {
                             var checkedId = this.value;
@@ -191,6 +181,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                             });
                             console.log("rmqHost: " + cmd, this.name, checkedId, host[0]);
                             host[0].rmq_queue = targetHost.toLowerCase()
+                            host[0].test_setup = $scope.run;
                             // console.log(host[0])
                             rmqHost(host[0], cmd)
                         }
@@ -212,34 +203,6 @@ angular.module('app', ['ngRoute', 'ngResource'])
                         $(this).trigger('click');
 
                 });
-            };
-
-            $scope.runTest = function (warmup, cb) {
-
-                console.log($scope.hosts.length);
-                var test = $scope.run;
-
-                if (warmup === undefined) {
-                    test.testWarmUp = '0';
-                } else {
-                    test.testWarmUp = '1';
-                }
-
-                console.log(name)
-                console.log(test)
-                var hosts = $scope.hosts.filter(function (item) {
-                    console.log(item);
-                    if (item.test)
-                        return item;
-                });
-                console.log(hosts.length);
-                if (hosts.length === 0)
-                    $.notify('Warning!, No host checked', 'warn');
-                else
-                    $.notify('Request rpcTest forwarded!', 'info');
-                console.log('Hosts!!!');
-                rpcTest(hosts, test);
-
             };
 
             $scope.edit = function (index) {
@@ -311,6 +274,7 @@ testConnection = function (ip, port, cb) {
 
 // cmd should be an object
 rmqHost = function (host, cmd, cb) {
+
     var args = {
         ip: host.ip,
         hostname: host.hostname,
@@ -319,8 +283,10 @@ rmqHost = function (host, cmd, cb) {
         cred_stacksync: host.cred_stacksync,
         cred_owncloud: host.cred_owncloud,
         cmd: cmd,
-        target_queue: host.rmq_queue
+        target_queue: host.rmq_queue,
+        test: host.test_setup
     };
+
     appendAllParams(args, 'bb-config');
     appendAllHosts(args, 'bb-hosts');
     $.ajax({
@@ -343,6 +309,7 @@ rmqHost = function (host, cmd, cb) {
         cb(args);
 };
 rpcHost = function (host, cmd, cb) {
+
     var args = {
         ip: host.ip,
         hostname: host.hostname,
@@ -351,6 +318,7 @@ rpcHost = function (host, cmd, cb) {
         cred_stacksync: host.cred_stacksync,
         cred_owncloud: host.cred_owncloud,
         cmd: cmd
+
     };
     appendAllParams(args, 'bb-config');
     appendAllHosts(args, 'bb-hosts');
@@ -372,76 +340,6 @@ rpcHost = function (host, cmd, cb) {
     });
     if (cb !== undefined)
         cb(args);
-};
-
-rpcStatus = function (args, cmd, statusId, target) {
-    console.log("rpcStatus");
-    console.log(args, cmd, statusId, target);
-    args.status = cmd;
-    args.target = target;
-
-    $.ajax({
-        url: 'http://localhost:3000/rpc/status',
-        data: args,
-        timeout: 6000000, // 6000s ::100min
-        type: 'GET',
-        success: function (data) {
-            console.log("RESULTS, rpcStatus!");
-            console.log(data);
-            console.log($('#' + statusId))
-            // $('#'+statusId).children('.stats').text(data.result);
-            $('#' + statusId).children('.stats').text(data);
-        },
-        error: function (err) {
-            console.log(err);
-            console.log('pc, Error ' + args + ' ' + cmd + ' ', err);
-            $.notify('Error! ' + err, 'error');
-        }
-    });
-};
-rpcTest = function (hosts, test, cb) {
-    console.log("RunTests ");
-    console.log("Hosts: ", hosts);
-    console.log("Test: ", test);
-
-    hosts.forEach(function (host) {
-        console.log(host);
-        console.log('->');
-        console.log(test);
-        var cmd = 'test';
-        var args = {
-            ip: host.ip,
-            hostname: host.hostname,
-            login: host.logging,
-            profile: host.profile,
-            cred_stacksync: host.cred_stacksync,
-            cred_owncloud: host.cred_owncloud,
-            cmd: 'test',
-            test: test
-        };
-
-        $.ajax({
-            url: 'http://localhost:3000/rpc/rpc',
-            data: args,
-            timeout: 6000000, // 6000s ::100min
-            type: 'GET',
-            success: function (data) {
-                console.log("Success, run test! " + (test));
-                console.log(JSON.stringify(data));
-                $.notify('Success! ' + host.hostname + ' ' + cmd, 'success');
-            },
-            error: function (err) {
-                console.log(err);
-                console.log('pc, Error ' + host + ' ' + cmd + ' ', err);
-                $.notify('Error! ' + err, 'error');
-            }
-        });
-    });
-
-    /*
-     if (cb !== undefined)
-     cb()
-     */
 };
 
 appendAllParams = function (target, className) {
