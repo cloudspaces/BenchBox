@@ -8,6 +8,11 @@ import os
 
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+# hardcode due to no convention with closing slash or not for directory
+if os.name == 'posix':
+    PROJECT_PATH+= '/'
+else:
+    PROJECT_PATH+= '\\'
 '''In debug mode the system works without doing changes in the local file system'''
 DEBUG = False
 
