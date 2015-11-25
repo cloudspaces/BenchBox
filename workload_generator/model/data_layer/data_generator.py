@@ -11,7 +11,7 @@ username = getpass.getuser()
 # parent directory of 'workload_generator' -> /home/vagrant/workload_generator
 base_path = {
     'vagrant': '/home/vagrant/',
-    'anna': '/home/anna/CloudSpaces/Dev/BenchBox/',
+    'x': '/home/x/Code/BenchBox/',
     'user': '/home/user/workspace/BenchBox/',
     'lab144': '/home/lab144/BenchBox/',
     'Raul': 'D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\'

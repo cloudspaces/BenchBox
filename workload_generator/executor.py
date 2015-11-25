@@ -12,9 +12,6 @@ import random
 import time
 import getpass
 from termcolor import colored
-from metrics.cpu_monitor import CPUMonitor
-from workload_generator.model.user_activity.stereotype_executor import StereotypeExecutor
-
 
 '''
 HardCode path for each environment, should be dev, debug, production instead...
@@ -36,8 +33,8 @@ dev_dir = {
 
 sys.path.append(dev_dir[username])
 
-
-
+from metrics.cpu_monitor import CPUMonitor
+from workload_generator.model.user_activity.stereotype_executor import StereotypeExecutor
 from workload_generator.model.user_activity.markov_chain import SimpleMarkovChain
 from workload_generator.model.user_activity.inter_arrivals_manager import InterArrivalsManager
 from workload_generator.model.data_layer.data_generator import DataGenerator
