@@ -38,7 +38,7 @@ class ActionHandler(object):
 
     ''' executed at the benchBox, nota: el script esta en el directorio root /vagrant'''
     def warmUp(self):
-        # warmup the sandBox filesystem running the executor
+        # warmup the sandBox filesystem booting the executor.py
         print 'warmUp'
         str_cmd = "nohup python ~/workload_generator/executor.py &"
         # output = subprocess.check_output(['echo', 'warmup'])

@@ -6,7 +6,6 @@ Created on 30/6/2015
 '''
 from ConfigParser import SafeConfigParser
 from argparse import ArgumentParser
-
 import os, sys
 import random
 import time
@@ -16,23 +15,20 @@ from termcolor import colored
 '''
 HardCode path for each environment, should be dev, debug, production instead...
 '''
-curr_dir = os.path.dirname(os.path.realpath(__file__))
-home_dir = os.path.expanduser("~")
-hard_dir = '/home/x/Code/BenchBox'
-print curr_dir
-print home_dir
-print hard_dir
 
-username = getpass.getuser()
+def appendParentDir(num, currdir):
+    print currdir
+    if num is 0:
+        print 'return value'
+        sys.path.append(currdir)
+        return currdir
+    else:
+        dirname, basename = os.path.split(currdir)
+        num-=1
+        return appendParentDir(num, dirname)
+appendParentDir(1, os.getcwd())
 
-dev_dir = {
-    'x': hard_dir,
-    'vagrant': home_dir,
-    'milax': curr_dir
-}
-
-sys.path.append(dev_dir[username])
-
+from workload_generator.executor_rmq import ExecuteRMQ
 from metrics.cpu_monitor import CPUMonitor
 from workload_generator.model.user_activity.stereotype_executor import StereotypeExecutor
 from workload_generator.model.user_activity.markov_chain import SimpleMarkovChain
@@ -233,24 +229,13 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
 
 
-class Execute:
-    def __init__(self, args):
-        print "Executor operation consumer: "
-
-    def start(self):
-        print 'start'
-        idx = 0
-        while True:
-            idx+=1
-            print idx
-            time.sleep(1)
-
 if __name__ == '__main__':
 
     print "executor.py is ran when warmup and its queue remains established... WAITING RPC"
-    opt = process_opt()
-    executor = Execute(opt)
-    Execute.start()
-
-
+    # opt = process_opt()
+    rmq_url = 'amqp://benchbox:benchbox@10.30.236.141/'
+    queue_name = '{}.{}'.format('Joker','executor')
+    executor = ExecuteRMQ(rmq_url, queue_name)
+    executor.listen()
+    # the executor is a queue listening for actions...
 

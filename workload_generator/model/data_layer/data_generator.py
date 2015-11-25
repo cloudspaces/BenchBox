@@ -6,23 +6,22 @@ Created on 30/6/2015
 import sys
 import shutil
 import getpass
-
-username = getpass.getuser()
-# parent directory of 'workload_generator' -> /home/vagrant/workload_generator
-base_path = {
-    'vagrant': '/home/vagrant/',
-    'x': '/home/x/Code/BenchBox/',
-    'user': '/home/user/workspace/BenchBox/',
-    'lab144': '/home/lab144/BenchBox/',
-    'Raul': 'D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\'
-}
-sys.path.append(base_path[username])
-# issue, this file cannot load utils because its in a parent directory different for each dev-environment,
-# fix this by adding project path to python runner path
-
 import subprocess
 import random
 import os
+
+def appendParentDir(num, currdir):
+    print currdir
+    if num is 0:
+        print 'return value'
+        sys.path.append(currdir)
+        return currdir
+    else:
+        dirname, basename = os.path.split(currdir)
+        num-=1
+        return appendParentDir(num, dirname)
+appendParentDir(3, os.getcwd())
+
 
 from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string
 from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH, \
