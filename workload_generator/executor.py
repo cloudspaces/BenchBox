@@ -25,7 +25,7 @@ def appendParentDir(num, currdir):
         dirname, basename = os.path.split(currdir)
         num-=1
         return appendParentDir(num, dirname)
-appendParentDir(1, os.getcwd())
+appendParentDir(1, os.path.dirname(os.path.realpath(__file__)))
 
 from workload_generator.executor_rmq import ExecuteRMQ
 from metrics.cpu_monitor import CPUMonitor

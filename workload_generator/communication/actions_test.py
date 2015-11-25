@@ -17,7 +17,7 @@ def appendParentDir(num, currdir):
         dirname, basename = os.path.split(currdir)
         num-=1
         return appendParentDir(num, dirname)
-appendParentDir(2, os.getcwd())
+appendParentDir(2, os.path.dirname(os.path.realpath(__file__)))
 
 from workload_generator.constants import STEREOTYPE_RECIPES_PATH, FS_SNAPSHOT_PATH, DEBUG
 from workload_generator.model.data_layer.data_generator import DataGenerator

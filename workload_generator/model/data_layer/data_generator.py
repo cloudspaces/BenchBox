@@ -20,7 +20,7 @@ def appendParentDir(num, currdir):
         dirname, basename = os.path.split(currdir)
         num-=1
         return appendParentDir(num, dirname)
-appendParentDir(3, os.getcwd())
+appendParentDir(3, os.path.dirname(os.path.realpath(__file__)))
 
 
 from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string
