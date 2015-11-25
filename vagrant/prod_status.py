@@ -40,7 +40,7 @@ class ActionHandler(object):
     def warmUp(self):
         # warmup the sandBox filesystem booting the executor.py
         print 'warmUp'
-        str_cmd = "nohup python ~/workload_generator/executor.py &"
+        str_cmd = "nohup python ~/workload_generator/executor.py &> nohup_executor.out& "
         # output = subprocess.check_output(['echo', 'warmup'])
         return bash_command(str_cmd)
     ''' executed at the sandBox '''
