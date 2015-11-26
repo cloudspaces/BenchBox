@@ -60,7 +60,7 @@ class DataGenerator(object):
                     setattr(self, model_attribute, (fitting, kw_params))
                 else:
                     setattr(self, model_attribute, eval(l[l.index('{'):]))
-                    #print "Activity rate: ", self.activity_rate
+                    print "Activity rate: ", self.activity_rate
 
     '''Initialize the file system of the user (delegated to Impressions benchmark)'''
     def create_file_system_snapshot(self):

@@ -57,8 +57,9 @@ class Commands(object):
         print FS_SNAPSHOT_PATH
         print STEREOTYPE_RECIPES_PATH
         receipt = STEREOTYPE_RECIPES_PATH + self.stereotype
+        print receipt
         print 'init markov chain'
-        self.stereotype_executor.markov_chain.initialize_from_recipe(receipt)
+        self.stereotype_executor.operation_chain.initialize_from_recipe(receipt)
         print 'init data gen'
         self.stereotype_executor.data_generator.initialize_from_recipe(receipt)
         print 'init interarrival'
@@ -174,7 +175,7 @@ class ExecuteRMQ(object):
             output = toExecute()
             # t.start()
         except AttributeError as e:
-            # print e.message
+            print e.message
             print "ACK: {}".format(body)
 
         response = "{} response: {}: {}".format(self.queue_name, body, output)
