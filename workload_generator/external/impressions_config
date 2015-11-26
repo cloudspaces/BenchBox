@@ -4,7 +4,7 @@ Randseeds: Direct 10 100000 200000 300000 400000 500000 600000 700000 800000 900
 FScapacity: 1 GB
 FSused: NO GB
 Numfiles: 0 N
-Numdirs: 17 N
+Numdirs: 34 N
 Filesperdir: 10.2 N
 FilesizeDistr: Direct 3 99994 29 0.91 
 FilecountDistr: Direct 2 9.48 2.45663283

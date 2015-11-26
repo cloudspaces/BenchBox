@@ -145,8 +145,8 @@
         </h5>
     </div>
     <div class="col-md-10">
-            <button class="btn btn-success" ng-click="rpc('test-check','setup')" title="Download BenchBox project to the dummy machine">Setup</button>
 
+            <button class="btn btn-success" ng-click="rpc('test-check','setup')" title="Download BenchBox project to the dummy machine">Setup</button>
 
             <button class="btn btn-default" ng-click="rmq('test-check','vagrantUp', '')" title="vagrantUp rpc">vagrantUp</button>
             <button class="btn btn-default" ng-click="rmq('test-check','vagrantProvision', '')" title="vagrantProvision rpc">vagrantProvision</button>
@@ -154,11 +154,8 @@
             <button class="btn btn-default" ng-click="rpc('test-check','vagrantDown')" title="pull latest repo & vagrant down">Down</button>
             -->
 
-
             <button class="btn btn-primary pull-right" ng-click="rmq('test-check', 'warmUp',   'benchBox')" title="Startup file system">WarmUp</button>
             <button class="btn btn-danger pull-right" ng-click="rmq('test-check', 'tearDown', 'benchBox')" title="Clear the shared file system">TearDown</button>
-
-
 
             <!--
             <button class="btn btn-default " ng-click="rpc('test-check','monitorUp')" title="Run Socket Listener at dummy machine, sandBox">Listen</button>
@@ -166,6 +163,7 @@
             <button class="btn btn-default pull-right" ng-click="rpc('test-check','client', 'Down')" title="Run clientSSDown at dummy machine, sandBox">SSDown</button>
             <button class="btn btn-default pull-right" ng-click="rpc('test-check','client', 'Up')" title="Run clientSSUp at dummy machine, sandBox">SSUp</button>
             -->
+
     </div>
 </div>
 
@@ -219,11 +217,21 @@
         <input type="text" class="form-control" ng-model="run.testClient" placeholder="-client" value="StackSync">
     </div>
     <div class="col-md-3">
+        <!--
         <input type="text" class="form-control" ng-model="run.testOperation" placeholder="-rmq_rpc" value="hello">
+        -->
+        <select class="form-control" ng-model="run.testOperation">
+            <option value="hello">--- -rmq_rpc ---</option> <!-- not selected / blank option -->
+            <option value="warmup">warmup</option> <!-- interpolation -->
+            <option value="runtest">runtest</option>
+        </select><br>
     </div>
 
     <div class="col-md-2">
-        <button class="btn btn-success btn-block" ng-click="rmq('test-check', 'hello', 'executor')" title="Run executor at dummy machine, benchBox">Execute</button>
+        <button
+                class="btn btn-success btn-block"
+                ng-click="rmq('test-check', 'execute', 'executor')"
+                title="Run executor at dummy machine, benchBox">Execute</button>
     </div>
 </div>
 

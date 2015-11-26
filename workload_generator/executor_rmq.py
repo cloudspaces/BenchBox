@@ -81,12 +81,15 @@ class Commands(object):
 
     def runtest(self):
         print 'run test'
-        self.stereotype_executor.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
-        # TODO loop
-        operations = 10
-        for i in range(operations):
-            self.stereotype_executor.execute()
-            print colored("doOps {}/{}".format(i, operations), 'red')
+        if self.is_warmup:
+            self.stereotype_executor.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
+            # TODO loop
+            operations = 10
+            for i in range(operations):
+                self.stereotype_executor.execute()
+                print colored("doOps {}/{}".format(i, operations), 'red')
+        else:
+            return 'need warmup 1st!'
         return 'run test response'
 
     def uploadir(self):

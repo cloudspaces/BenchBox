@@ -171,7 +171,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 console.log(hosts);
                 console.log($scope.run.testOperation)
 
-                if($scope.run.testOperation !== 'hello'){
+                if(cmd == 'execute'){
                     cmd = $scope.run.testOperation
                 }
                 hosts.forEach(function (targetHost) {
