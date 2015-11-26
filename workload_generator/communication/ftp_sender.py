@@ -11,7 +11,7 @@ import sys, os
 class ftp_sender():
     def __init__(self, ftp_host, ftp_port, ftp_user, ftp_pass, ftp_root):
         self.ftp = FTP()
-        self.ftp.connect(ftp_host, ftp_port, 0) # socket set timeout 0
+        self.ftp.connect(ftp_host, ftp_port, 604800)  # socket set timeout 1 week timeout
         self.ftp.login(ftp_user, ftp_pass)
         print "......................................Going to root"
         print self.ftp.pwd()
