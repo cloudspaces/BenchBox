@@ -13,6 +13,7 @@ from termcolor import colored
 HardCode path for each environment, should be dev, debug, production instead...
 '''
 
+
 def appendParentDir(num, currdir):
     print currdir
     if num is 0:
@@ -21,28 +22,40 @@ def appendParentDir(num, currdir):
         return currdir
     else:
         dirname, basename = os.path.split(currdir)
-        num-=1
+        num -= 1
         return appendParentDir(num, dirname)
+
+
 appendParentDir(1, os.path.dirname(os.path.realpath(__file__)))
 
 from workload_generator.model.user_activity.stereotype_executor import StereotypeExecutor
-from workload_generator.communication.actions import UploadDirectory,\
+from workload_generator.communication.actions import UploadDirectory, \
     CreateFile, CreateDirectory, UpdateFile, DeleteFile, DeleteDirectory, MoveFile, MoveDirectory
 
-from workload_generator.constants import DEBUG, FS_SNAPSHOT_PATH, TO_WAIT_STATIC_MAX, TO_WAIT_STATIC_MIN
+from workload_generator.communication.ftp_sender import ftp_sender
+from workload_generator.constants import DEBUG, FS_SNAPSHOT_PATH, TO_WAIT_STATIC_MAX, TO_WAIT_STATIC_MIN, \
+    FTP_SENDER_IP, FTP_SENDER_PORT, FTP_SENDER_USER, FTP_SENDER_PASS
 
 '''Class that executes remote operations on the Sandbox based on the
 data generation and user activity models. The class is tailored for the
 available information in the UbuntuOne (U1) trace.'''
-class StereotypeExecutorU1(StereotypeExecutor):
 
-    def __init__(self, ftp_client):
+
+class StereotypeExecutorU1(StereotypeExecutor):
+    def __init__(self):
         StereotypeExecutor.__init__(self)
-        self.ftp_client = ftp_client
+        self.ftp_client = ftp_sender(
+            FTP_SENDER_IP,
+            FTP_SENDER_PORT,
+            FTP_SENDER_USER,
+            FTP_SENDER_PASS,
+            'stacksync_folder'
+        )
+        # el keep alive puede ser por run o por to_wait operation...
 
     def initialize_from_stereotype_recipe(self, stereotype_recipe):
         StereotypeExecutor.initialize_from_stereotype_recipe(self, stereotype_recipe)
-        
+
     def create_fs_snapshot_and_migrate_to_sandbox(self):
         '''Initialize the file system in addition to the models'''
         self.data_generator.create_file_system_snapshot()
@@ -51,9 +64,11 @@ class StereotypeExecutorU1(StereotypeExecutor):
         if not DEBUG:
             # self.data_generator.migrate_file_system_snapshot_to_sandbox("migrate location")
             action = UploadDirectory(FS_SNAPSHOT_PATH, FS_SNAPSHOT_PATH)
-            action.perform_action(self.ftp_client)
+            action.perform_action(self.ftp_client.keep_alive())
             print "MoveFileOrDirectory/to/SandBox/DONE"
+
     '''Do an execution step as a client'''
+
     def execute(self):
         '''Get the next operation to be done'''
         self.operation_chain.next_step_in_random_navigation()
@@ -74,9 +89,9 @@ class StereotypeExecutorU1(StereotypeExecutor):
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'MakeResponse')
         action.perform_action(ftp_client)
     """
-    
+
     def doPutContentResponse(self):
-        print colored("doPutContentResponse",'cyan')
+        print colored("doPutContentResponse", 'cyan')
 
         if random.random() > 0.25:
             synthetic_file_name = self.data_generator.create_file()
@@ -98,26 +113,26 @@ class StereotypeExecutorU1(StereotypeExecutor):
         to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         print "Wait: {}s".format(to_wait)
         time.sleep(to_wait)
-        action.perform_action(self.ftp_client)
+        action.perform_action(self.ftp_client.keep_alive())
 
     def doSync(self):
         # TODO: Cheng, you can make use of data_generator.update() to test updating files
         # self.doPutContentResponse()
-        print colored("doSync",'green')
+        print colored("doSync", 'green')
         synthetic_file_name = self.data_generator.update_file()
         print synthetic_file_name
         if synthetic_file_name is None:
             print "no file selected!"
         else:
-            action = UpdateFile(synthetic_file_name,FS_SNAPSHOT_PATH)
+            action = UpdateFile(synthetic_file_name, FS_SNAPSHOT_PATH)
             # to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'Sync')
             to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
-            action.perform_action(self.ftp_client)
+            action.perform_action(self.ftp_client.keep_alive())
 
     def doUnlink(self):
-        print colored("doUnlink",'yellow')
+        print colored("doUnlink", 'yellow')
         if random.random() > 0.25:
             synthetic_file_name = self.data_generator.delete_file()
             isFile = True
@@ -134,13 +149,13 @@ class StereotypeExecutorU1(StereotypeExecutor):
             to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
-            action.perform_action(self.ftp_client)
+            action.perform_action(self.ftp_client.keep_alive())
         else:
             print "No file selected!"
 
-    #TODO: Needs implementation in data generator first
+    # TODO: Needs implementation in data generator first
     def doMoveResponse(self):
-        print colored("doMoveResponse",'magenta')
+        print colored("doMoveResponse", 'magenta')
         if random.random() > 0.25:
             synthetic_file_name = self.data_generator.move_file()
             isFile = True
@@ -159,17 +174,15 @@ class StereotypeExecutorU1(StereotypeExecutor):
             to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
-            action.perform_action(self.ftp_client)
+            action.perform_action(self.ftp_client.keep_alive())
         else:
             print "No file selected!"
 
-    #TODO: Let's see how we can solve this
+    # TODO: Let's see how we can solve this
     def doGetContentResponse(self):
-        print colored("doGetContentResponse",'blue')
+        print colored("doGetContentResponse", 'blue')
         '''Get the time to wait for this transition in millis'''
         # to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'GetContentResponse')
         to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         print "Wait: {}s".format(to_wait)
-        #action.perform_action(ftp_client)
-
-
+        # action.perform_action(ftp_client)
