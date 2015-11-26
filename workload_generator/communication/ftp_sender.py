@@ -12,7 +12,7 @@ class ftp_sender():
     def __init__(self, ftp_host, ftp_port, ftp_user, ftp_pass, ftp_root):
 
         self.ftp = FTP()
-        self.conn = self.ftp.connect(ftp_host, ftp_port)  # socket set timeout 1 week timeout
+        self.ftp.connect(ftp_host, ftp_port)  # socket set timeout 1 week timeout
         self.ftp.login(ftp_user, ftp_pass)
         print "......................................Going to root"
         print self.ftp.pwd()
@@ -154,13 +154,13 @@ class ftp_sender():
         while True:
             try:
                 print "keep_alive/Try"
-                self.conn.voidcmd("NOOP")
+                self.ftp.voidcmd("NOOP")
                 print "keep_alive/True"
                 break
             except Exception as e:
                 print "keep_alive/False"
                 print e.message
-                self.ftp.connect(self.ftp_host, self.ftp_port)  # socket set timeout 1 week timeout
+                self.ftp.connect(self.ftp_host, self.ftp_port)  # NEEDED # socket set timeout 1 week timeout
                 self.ftp.login(self.ftp_user, self.ftp_pass)
         return self
 
