@@ -16,11 +16,11 @@ def appendParentDir(num, currdir):
         return currdir
     else:
         dirname, basename = os.path.split(currdir)
-        num-=1
+        num -= 1
         return appendParentDir(num, dirname)
+
+
 appendParentDir(1, os.path.dirname(os.path.realpath(__file__)))
-
-
 
 from workload_generator.constants import STEREOTYPE_RECIPES_PATH, FS_SNAPSHOT_PATH, \
     FTP_SENDER_IP, FTP_SENDER_PASS, FTP_SENDER_PORT, FTP_SENDER_USER, DEBUG
@@ -30,25 +30,24 @@ from workload_generator.communication import actions
 from workload_generator.executor import StereotypeExecutorU1
 
 
-
-
+def init_ftp_sender(self):
+    return ftp_sender(
+        FTP_SENDER_IP,
+        FTP_SENDER_PORT,
+        FTP_SENDER_USER,
+        FTP_SENDER_PASS,
+        'stacksync_folder'
+    )
 
 
 class Commands(object):
-
-
     def __init__(self, profile):
         print 'rpc commands'
-        self.ftp_sender = ftp_sender(
-            FTP_SENDER_IP,
-            FTP_SENDER_PORT,
-            FTP_SENDER_USER,
-            FTP_SENDER_PASS,
-            'stacksync_folder'
-        )
+        self.ftp_sender = init_ftp_sender()
         self.is_warmup = False
         self.stereotype = profile  # backupsample
-        self.fs_abs_target_folder = '/home/vagrant/{}'.format(self.ftp_sender.ftp_root) # target ftp_client dir absolute path
+        self.fs_abs_target_folder = '/home/vagrant/{}'.format(
+            self.ftp_sender.ftp_root)  # target ftp_client dir absolute path
         self.stereotype_executor = StereotypeExecutorU1(self.ftp_sender)
         # self.data_generator = DataGenerator()
 
@@ -63,6 +62,7 @@ class Commands(object):
         print 'warm up'
         print FS_SNAPSHOT_PATH
         print STEREOTYPE_RECIPES_PATH
+        self.ftp_sender = init_ftp_sender()
         receipt = STEREOTYPE_RECIPES_PATH + self.stereotype
         print receipt
         '''
@@ -76,8 +76,8 @@ class Commands(object):
         print 'init_stereotype_from_recipe'
         if self.is_warmup is False:
             self.stereotype_executor.initialize_from_stereotype_recipe(receipt)
-        # self.data_generator.initialize_from_recipe(receipt)
-        # self.data_generator.create_file_system_snapshot()
+            # self.data_generator.initialize_from_recipe(receipt)
+            # self.data_generator.create_file_system_snapshot()
             print 'init fs & migrate to sandbox'
             self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
             self.is_warmup = True
@@ -87,6 +87,7 @@ class Commands(object):
 
     def runtest(self):
         print 'run test'
+        self.ftp_sender = init_ftp_sender()
         if self.is_warmup:
             self.stereotype_executor.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
             # TODO loop
@@ -118,13 +119,15 @@ class Commands(object):
         """
         sshpass -p vagrant rsync -rvnc --delete ../output/ vagrant@192.168.56.101:stacksync_folder/
         """
+
     def movefile(self):
         """ TEST MOVE FILE """
         path = self.data_generator.move_file()
         print 'MOVE_FILE: {}'.format(path)
         src_path, tgt_path_local = path
-        if not src_path == tgt_path_local: # not None == None
-            tgt_path_remote = actions.MoveFile(src_path, FS_SNAPSHOT_PATH, tgt_path_local).perform_action(self.ftp_sender)
+        if not src_path == tgt_path_local:  # not None == None
+            tgt_path_remote = actions.MoveFile(src_path, FS_SNAPSHOT_PATH, tgt_path_local).perform_action(
+                self.ftp_sender)
         return 'MOVE_FILE: {} ---> {} | {}'.format(src_path, tgt_path_local, tgt_path_remote)
 
     def movedir(self):
@@ -148,8 +151,6 @@ class Commands(object):
         actions.DeleteFile(src_path, FS_SNAPSHOT_PATH).perform_action(self.ftp_sender)
         return "DELETE FILE:::  at ----> {}".format(src_path)
 
-
-
     def deldir(self):
         """ TEST DELETE DIRECTORY """
         src_path = self.data_generator.delete_directory()
@@ -158,12 +159,7 @@ class Commands(object):
         return "DELETE DIRECTORY:::  at ----> to {}".format(src_path)
 
 
-
-
-
 class ExecuteRMQ(object):
-
-
     def __init__(self, rmq_url='', host_queue='', profile=''):
         print "Executor operation consumer: "
         url = urlparse.urlparse(rmq_url)
@@ -217,7 +213,6 @@ class ExecuteRMQ(object):
 
 
 if __name__ == '__main__':
-
     print "executor.py is ran when warmup and its queue remains established... WAITING RPC"
 
     rmq_url = 'amqp://benchbox:benchbox@10.30.236.141/'
@@ -231,6 +226,6 @@ if __name__ == '__main__':
 
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
-    queue_name = '{}.{}'.format(dummyhost,'executor')
+    queue_name = '{}.{}'.format(dummyhost, 'executor')
     executor = ExecuteRMQ(rmq_url, queue_name, stereotype_receipt)
     executor.listen()
