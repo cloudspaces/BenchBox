@@ -5,10 +5,9 @@ import urlparse
 import sys
 import getopt
 import socket
-import threading
 import subprocess
-import time
 import json
+
 class ActionHandler(object):
     def __init__(self):
         print "vagrant handler"

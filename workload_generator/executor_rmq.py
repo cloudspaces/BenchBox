@@ -37,10 +37,16 @@ from workload_generator.executor import StereotypeExecutorU1
 class Commands(object):
 
 
-    def __init__(self, ftp_sender, profile):
+    def __init__(self, profile):
         print 'rpc commands'
+        self.ftp_sender = ftp_sender(
+            FTP_SENDER_IP,
+            FTP_SENDER_PORT,
+            FTP_SENDER_USER,
+            FTP_SENDER_PASS,
+            'stacksync_folder'
+        )
         self.is_warmup = False
-        self.ftp_sender = ftp_sender
         self.stereotype = profile  # backupsample
         self.fs_abs_target_folder = '/home/vagrant/{}'.format(ftp_sender.ftp_root) # target ftp_client dir absolute path
         self.stereotype_executor = StereotypeExecutorU1(self.ftp_sender)
@@ -73,7 +79,7 @@ class Commands(object):
         # self.data_generator.initialize_from_recipe(receipt)
         # self.data_generator.create_file_system_snapshot()
             print 'init fs & migrate to sandbox'
-            self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(ftp_client)
+            self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(self.ftp_sender)
             self.is_warmup = True
         else:
             print 'already warmed-up'
@@ -162,8 +168,7 @@ class ExecuteRMQ(object):
         print "Executor operation consumer: "
         url = urlparse.urlparse(rmq_url)
         self.profile = profile
-        self.ftp_client = ftp_client
-        self.actions = Commands(ftp_client, profile)
+        self.actions = Commands(profile)
         # ftp_client.ftp_root = 'stacksync_folder'
 
 
@@ -219,13 +224,7 @@ if __name__ == '__main__':
     dummyhost = None
 
     # start the ftp sender
-    ftp_client = ftp_sender(
-        FTP_SENDER_IP,
-        FTP_SENDER_PORT,
-        FTP_SENDER_USER,
-        FTP_SENDER_PASS,
-        'stacksync_folder'
-    )
+
 
     #
     stereotype_receipt = 'backupsample'
@@ -233,5 +232,5 @@ if __name__ == '__main__':
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
     queue_name = '{}.{}'.format(dummyhost,'executor')
-    executor = ExecuteRMQ(rmq_url, queue_name, ftp_client, stereotype_receipt)
+    executor = ExecuteRMQ(rmq_url, queue_name, stereotype_receipt)
     executor.listen()

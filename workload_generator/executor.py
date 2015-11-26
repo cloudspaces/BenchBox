@@ -43,7 +43,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
     def initialize_from_stereotype_recipe(self, stereotype_recipe):
         StereotypeExecutor.initialize_from_stereotype_recipe(self, stereotype_recipe)
         
-    def create_fs_snapshot_and_migrate_to_sandbox(self, ftp_client):
+    def create_fs_snapshot_and_migrate_to_sandbox(self):
         '''Initialize the file system in addition to the models'''
         self.data_generator.create_file_system_snapshot()
         self.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
@@ -51,7 +51,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         if not DEBUG:
             # self.data_generator.migrate_file_system_snapshot_to_sandbox("migrate location")
             action = UploadDirectory(FS_SNAPSHOT_PATH, FS_SNAPSHOT_PATH)
-            action.perform_action(ftp_client)
+            action.perform_action(self.ftp_client)
             print "MoveFileOrDirectory/to/SandBox/DONE"
     '''Do an execution step as a client'''
     def execute(self):
