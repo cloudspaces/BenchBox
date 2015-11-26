@@ -4,8 +4,6 @@ Created on 30/6/2015
 
 @author: Raul
 '''
-from ConfigParser import SafeConfigParser
-from argparse import ArgumentParser
 import os, sys
 import random
 import time
