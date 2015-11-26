@@ -39,6 +39,7 @@ class Commands(object):
 
         # start the monitoring stuff. # todo
         # send to impala always...!!!
+        # sshpass -p vagrant rsync -rvnc --delete ../output/ vagrant@192.168.56.101:stacksync_folder/
 
     def hello(self):
         print 'hello world'
