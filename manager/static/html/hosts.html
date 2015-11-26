@@ -209,15 +209,19 @@
     <div class="col-md-1">
         <input type="text" class="form-control" ng-model="run.testItv" placeholder="-itv" value="1">
     </div>
-    <div class="col-md-2">
+    <div class="col-md-1">
         <input type="text" class="form-control" ng-model="run.testProfile" placeholder="-profile" value="sync">
     </div>
-    <div class="col-md-2">
+    <div class="col-md-1">
         <input type="text" class="form-control" ng-model="run.testFolder" placeholder="-folder" value="stacksync_folder">
     </div>
-    <div class="col-md-2">
+    <div class="col-md-1">
         <input type="text" class="form-control" ng-model="run.testClient" placeholder="-client" value="StackSync">
     </div>
+    <div class="col-md-3">
+        <input type="text" class="form-control" ng-model="run.testOperation" placeholder="-rmq_rpc" value="hello">
+    </div>
+
     <div class="col-md-2">
         <button class="btn btn-success btn-block" ng-click="rmq('test-check', 'hello', 'executor')" title="Run executor at dummy machine, benchBox">Execute</button>
     </div>

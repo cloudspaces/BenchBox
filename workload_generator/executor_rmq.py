@@ -39,6 +39,7 @@ class Commands(object):
 
     def __init__(self, ftp_sender, profile):
         print 'rpc commands'
+        self.is_warmup = False
         self.ftp_sender = ftp_sender
         self.stereotype = profile  # backupsample
         self.fs_abs_target_folder = '/home/vagrant/{}'.format(ftp_sender.ftp_root) # target ftp_client dir absolute path
@@ -58,17 +59,24 @@ class Commands(object):
         print STEREOTYPE_RECIPES_PATH
         receipt = STEREOTYPE_RECIPES_PATH + self.stereotype
         print receipt
+        '''
         print 'init markov chain'
         self.stereotype_executor.operation_chain.initialize_from_recipe(receipt)
         print 'init data gen'
         self.stereotype_executor.data_generator.initialize_from_recipe(receipt)
         print 'init interarrival'
         self.stereotype_executor.inter_arrivals_manager.initialize_from_recipe(receipt)
-
+        '''
+        print 'init_stereotype_from_recipe'
+        if self.is_warmup is False:
+            self.stereotype_executor.initialize_from_stereotype_recipe(receipt)
         # self.data_generator.initialize_from_recipe(receipt)
         # self.data_generator.create_file_system_snapshot()
-        print 'init fs & migrate to sandbox'
-        self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(ftp_client)
+            print 'init fs & migrate to sandbox'
+            self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(ftp_client)
+            self.is_warmup = True
+        else:
+            print 'already warmed-up'
         return 'warm up response'
 
     def runtest(self):
@@ -97,7 +105,10 @@ class Commands(object):
     def createdir(self):
         """ TEST CREATE DIR """
 
-
+    def rsyncdir(self):
+        """
+        sshpass -p vagrant rsync -rvnc --delete ../output/ vagrant@192.168.56.101:stacksync_folder/
+        """
     def movefile(self):
         """ TEST MOVE FILE """
         path = self.data_generator.move_file()

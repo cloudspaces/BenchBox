@@ -60,7 +60,8 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 testItv: 1,
                 testProfile: 'backupsample',
                 testFolder: 'stacksync_folder',
-                testClient: 'StackSync'
+                testClient: 'StackSync',
+                testOperation: 'hello'
             };
 
             // controller actions
@@ -168,7 +169,11 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 console.log(arguments);
                 var hosts = Array.prototype.slice.call(arguments, 2); //
                 console.log(hosts);
+                console.log($scope.run.testOperation)
 
+                if($scope.run.testOperation !== 'hello'){
+                    cmd = $scope.run.testOperation
+                }
                 hosts.forEach(function (targetHost) {
                     console.log(targetHost);
 
@@ -189,6 +194,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                     })
 
                 })
+
 
             };
 

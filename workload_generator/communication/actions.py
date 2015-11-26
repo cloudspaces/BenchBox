@@ -380,6 +380,7 @@ class UploadDirectory(Action):
                 ftp_client.send(f)
             elif os.path.isdir(target_file):
                 print "{} is dir".format(target_file)
+                print "mkd: {}".format(f)
                 ftp_client.mkd(f)
                 ftp_client.cwd(f)
                 self.uploadFolder(ftp_client, target_file, target_file)
