@@ -24,7 +24,7 @@ appendParentDir(1, os.path.dirname(os.path.realpath(__file__)))
 
 from workload_generator.constants import STEREOTYPE_RECIPES_PATH, FS_SNAPSHOT_PATH, \
     FTP_SENDER_IP, FTP_SENDER_PASS, FTP_SENDER_PORT, FTP_SENDER_USER, DEBUG
-from workload_generator.model.data_layer.data_generator import DataGenerator
+# from workload_generator.model.data_layer.data_generator import DataGenerator
 from workload_generator.communication.ftp_sender import ftp_sender
 from workload_generator.communication import actions
 from workload_generator.executor import StereotypeExecutorU1
@@ -48,7 +48,7 @@ class Commands(object):
         )
         self.is_warmup = False
         self.stereotype = profile  # backupsample
-        self.fs_abs_target_folder = '/home/vagrant/{}'.format(ftp_sender.ftp_root) # target ftp_client dir absolute path
+        self.fs_abs_target_folder = '/home/vagrant/{}'.format(self.ftp_sender.ftp_root) # target ftp_client dir absolute path
         self.stereotype_executor = StereotypeExecutorU1(self.ftp_sender)
         # self.data_generator = DataGenerator()
 
@@ -79,7 +79,7 @@ class Commands(object):
         # self.data_generator.initialize_from_recipe(receipt)
         # self.data_generator.create_file_system_snapshot()
             print 'init fs & migrate to sandbox'
-            self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox(self.ftp_sender)
+            self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
             self.is_warmup = True
         else:
             print 'already warmed-up'
@@ -164,7 +164,7 @@ class Commands(object):
 class ExecuteRMQ(object):
 
 
-    def __init__(self, rmq_url='', host_queue='', ftp_client='', profile=''):
+    def __init__(self, rmq_url='', host_queue='', profile=''):
         print "Executor operation consumer: "
         url = urlparse.urlparse(rmq_url)
         self.profile = profile
