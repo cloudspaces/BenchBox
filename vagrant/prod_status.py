@@ -22,7 +22,6 @@ class ActionHandler(object):
         print 'up'
         return subprocess.check_output(["pwd", "."])
 
-
     def vagrantUp(self):
         print 'vagrantUp'
         print subprocess.check_output(["vagrant", "up"])
@@ -46,17 +45,25 @@ class ActionHandler(object):
         str_cmd = "nohup python ~/workload_generator/executor_rmq.py &> nohup_executor_rmq.out& "
         # output = subprocess.check_output(['echo', 'warmup'])
         return bash_command(str_cmd)
-    ''' executed at the sandBox '''
 
     def tearDown(self):
         # clear the sandBox filesystem and cached files
         print 'tearDown'
-        str_cmd = "pgrep -f executor_rmq.py | xargs kill -9"
+        str_cmd = "pgrep -f executor_rmq.py | xargs kill -9 "
+        return bash_command(str_cmd)
+
+    ''' executed at the sandBox '''
+    def monitorUp(self):
+        # start the metrics listener for monitoring
+        print 'monitorUp'
+        str_cmd = "nohup python ~/monitor/monitor_rmq.py &> nohup_monitor_rmq.out& "
+
         return bash_command(str_cmd)
 
     def execute(self):
         print 'execute'
         return bash_command('whoami')
+
 
 class ProduceStatus(object):
     def __init__(self, rmq_url='localhost', queue_name = 'status_manager'):
