@@ -20,19 +20,23 @@ class ActionHandler(object):
 
     def pwd(self):
         print 'up'
-        print subprocess.check_output(["pwd", "."])
+        return subprocess.check_output(["pwd", "."])
+
 
     def vagrantUp(self):
         print 'vagrantUp'
         print subprocess.check_output(["vagrant", "up"])
+        return 'vagrantUp/OK'
 
     def vagrantProvision(self):
         print 'vagrantProvision'
         print subprocess.check_output(['vagrant', 'provision'])
+        return 'vagrantProvision/OK'
 
     def vagrantStatus(self):
         print 'vagrantProvision'
         print subprocess.check_output(['vagrant', 'status'])
+        return 'vagrantProvision/OK'
 
 
     ''' executed at the benchBox, nota: el script esta en el directorio root /vagrant'''
