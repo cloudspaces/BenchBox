@@ -61,7 +61,8 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 testProfile: 'backupsample',
                 testFolder: 'stacksync_folder',
                 testClient: 'StackSync',
-                testOperation: 'hello'
+                testOperation: 'hello',
+                testMonitor: 'hello'
             };
 
             // controller actions
@@ -174,6 +175,24 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 if(cmd == 'execute'){
                     cmd = $scope.run.testOperation
                 }
+
+                // hardcoded queue multiplexing
+                switch (cmd){
+                    case 'executor':
+                        // handle benchBox - execute
+                        cmd = $scope.run.testOperation;
+                        break;
+
+                    case 'monitor':
+                        // handle sandBox - monitor
+                        cmd = $scope.run.testMonitor;
+                        break;
+                    default:
+                        // cmd is cmd xD
+                        break;
+                }
+
+
                 hosts.forEach(function (targetHost) {
                     console.log(targetHost);
 

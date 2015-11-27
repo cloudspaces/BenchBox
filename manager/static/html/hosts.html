@@ -156,6 +156,7 @@
 
             <button class="btn btn-primary pull-right" ng-click="rmq('test-check', 'warmUp',   'benchBox')" title="Startup file system">WarmUp</button>
             <button class="btn btn-danger pull-right" ng-click="rmq('test-check', 'tearDown', 'benchBox')" title="Clear the shared file system">TearDown</button>
+            <button class="btn btn-info pull-right" ng-click="rmq('test-check', 'monitorUp', 'sandBox')" title="Startup monitor real time collection">Monitor</button>
 
             <!--
             <button class="btn btn-default " ng-click="rpc('test-check','monitorUp')" title="Run Socket Listener at dummy machine, sandBox">Listen</button>
@@ -230,10 +231,30 @@
     <div class="col-md-2">
         <button
                 class="btn btn-success btn-block"
-                ng-click="rmq('test-check', 'execute', 'executor')"
+                ng-click="rmq('test-check', 'executor', 'executor')"
                 title="Run executor at dummy machine, benchBox">Execute</button>
     </div>
+
+
 </div>
 
 
+<!-- MONITOR -->
+<div class="row">
+    <div class="col-md-2">
+        <h5>
+            Execute Monitor
+        </h5>
+    </div>
+    <div class="col-md-8">
+        <input type="text" class="form-control" ng-model="run.testMonitor" placeholder="-ops" value="10">
+    </div>
+
+    <div class="col-md-2">
+        <button
+                class="btn btn-success btn-block"
+                ng-click="rmq('test-check', 'monitor', 'monitor')"
+                title="Run monitor at dummy machine, sandBox">Monitor</button>
+    </div>
+</div>
 
