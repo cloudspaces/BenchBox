@@ -151,6 +151,7 @@ var amqp_url = constants.rmq_url;
 var amqp_conn = null;
 var manager_queue = 'rpc_queue';
 var hostModel = require('./models/Hosts.js');
+
 amqp.connect(amqp_url, function (err, conn) {
     if (err) {
         console.log('connection rabbitmq error', err);
