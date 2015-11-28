@@ -67,6 +67,7 @@ vagrant/slaves/*/*
 vagrant/scripts/test
 vagrant/puppet/manifests/test
 vagrant/puppet/manifests/test/*
+vagrant/nohup_executor_rmq.out
 
 
 monitor/logger/test
