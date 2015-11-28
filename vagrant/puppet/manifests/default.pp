@@ -175,7 +175,7 @@ node 'sandBox' {
       ensure    => installed
   }
   ->  package {
-    ['bitarray','thrift', 'pika']:
+    ['bitarray','thrift', 'pika','termcolor']:
       ensure   => 'installed',
       provider => pip
   }
