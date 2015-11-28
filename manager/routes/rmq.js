@@ -3,7 +3,6 @@ var router = express.Router();
 var str_decoder = require('string_decoder').StringDecoder;
 
 var amqp = require('amqplib/callback_api');
-// var amqp_url = 'amqp://benchbox:benchbox@10.30.236.141/';
 
 var hostModel = require('../models/Hosts.js');
 

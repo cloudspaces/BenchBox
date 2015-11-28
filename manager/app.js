@@ -5,7 +5,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var constants = require("./constants");
 // var statusManager = require('');
 
 var app = express();
@@ -147,7 +147,7 @@ app.use('/rmq', rmqs);
 // ------------------------------------------------------------------------
 
 var amqp = require('amqplib/callback_api');
-var amqp_url = 'amqp://benchbox:benchbox@10.30.236.141/';
+var amqp_url = constants.rmq_url;
 var amqp_conn = null;
 var manager_queue = 'rpc_queue';
 var hostModel = require('./models/Hosts.js');
