@@ -27,9 +27,7 @@ class Commands(object):
         self.is_warmup = False
         self.is_running = False
         self.stereotype = profile  # backupsample
-        self.monitor = SocketListener()
-        self.fs_abs_target_folder = '/home/vagrant/{}'.format(self.stereotype_executor.ftp_client.ftp_root)  # target ftp_client dir absolute path
-        self.execute = None
+        self.monitor = None
 
         # self.data_generator = DataGenerator()
 
@@ -41,20 +39,19 @@ class Commands(object):
         print '[HELLO]: hello world'
         return '[HELLO]: hello world response'
 
+    '''
+     init the target personal client and wait, this stage also defines the metrics that
+     are going to be measured
+    '''
     def warmup(self):
         print '[WARMUP]'
-        print FS_SNAPSHOT_PATH
-        print STEREOTYPE_RECIPES_PATH
-        receipt = STEREOTYPE_RECIPES_PATH + self.stereotype
-        print receipt
-        print '[WARMUP]: init_stereotype_from_recipe'
+        print '[WARMUP]: init personal cloud client'
         if self.is_warmup is False:
-            self.stereotype_executor.initialize_from_stereotype_recipe(receipt)
-            print '[WARMUP]: init fs & migrate to sandbox'
-            self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
+            print '[WARMUP]: to warmup '
             self.is_warmup = True
         else:
             print '[WARMUP]: already warmed-up'
+
         return '[WARMUP]: warm up response'
 
     def _test(self):
@@ -66,18 +63,18 @@ class Commands(object):
         if self.is_warmup:
             print '[TEST]: run test'
             self.is_running = True
-            self.stereotype_executor.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
             # TODO loop
             operations = 0
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
-                self.stereotype_executor.execute()
-                # time.sleep(3)
+                time.sleep(3)
                 print colored("[TEST]: INFO {} --> {} // {}".format(time.ctime(time.time()), operations, self.is_running), 'red')
-
         else:
             print '[TEST]: WARNING: need warmup 1st!'
 
+    '''
+     start sending metrics
+    '''
     def start(self):
         print '[START_TEST]'
         if not self.is_warmup:
@@ -89,15 +86,18 @@ class Commands(object):
             # SELF THREAD START
 
             print '[START_TEST]: INFO: instance thread'
-            self.execute = Thread(target=self._test)
-            self.execute.start()
+            self.monitor = Thread(target=self._test)
+            self.monitor.start()
             return '[START_TEST]: SUCCESS: run test response'
 
+    '''
+     halt sending metrics
+    '''
     def stop(self):
         if self.is_running:
             print '[STOP_TEST]: stop test'
             self.is_running = False
-            self.execute.join()
+            self.monitor.join()
             return '[STOP_TEST]: SUCCESS: stop test'
         else:
             return '[STOP_TEST]: WARNING: no test is running'
@@ -109,7 +109,6 @@ class MonitorRMQ(object):
         url = urlparse.urlparse(rmq_url)
         self.profile = profile
         self.actions = Commands(profile)
-
 
         self.queue_name = host_queue
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
@@ -128,10 +127,7 @@ class MonitorRMQ(object):
         try:
             toExecute = getattr(self.actions, body)
             print toExecute
-            # lo ideal es que aixo no sigui un thread per que les peticions s'atenguin fifo
-            # t = threading.Thread(target=toExecute)
             output = toExecute()
-            # t.start()
         except AttributeError as e:
             print e.message
             print "ACK: {}".format(body)
@@ -167,5 +163,5 @@ if __name__ == '__main__':
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
     queue_name = '{}.{}'.format(dummyhost, 'monitor')
-    executor = MonitorRMQ(rmq_url, queue_name, stereotype_receipt)
-    executor.listen()
+    monitor = MonitorRMQ(rmq_url, queue_name, stereotype_receipt)
+    monitor.listen()
