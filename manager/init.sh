@@ -8,10 +8,10 @@
 installers/installVagrantVBox.sh
 installers/installZeroRPC.sh
 installers/installRabbitMQ.sh
+installers/installUserRabbitMQ.sh
 installers/installNodejs.sh
 installers/installGraphite.sh up &
 installers/installMongoBD.sh &
-
 
 # init manager-rpc server
 echo "start manager RPC Server"

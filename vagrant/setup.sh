@@ -23,8 +23,6 @@ sudo ./scripts/config.stacksync.sh;  # '%s' # h['stacksync-ip']
 echo "#3 Install RabbitMQ Pip Pika"
 sudo ./scripts/installPythonPipPika.sh;
 
-echo "#4 Setup rabbitmq-server user"
-sudo ./scripts/installRabbitMQ.sh;
 
 fi;
 
