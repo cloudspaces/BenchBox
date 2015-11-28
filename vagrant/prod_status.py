@@ -201,7 +201,10 @@ if __name__ == '__main__':
     ''' dummy host says hello to the manager '''
     status_msg, topic = parse_args(sys.argv[1:])
 
-    rmq_url = 'amqp://benchbox:benchbox@10.30.236.141/'
+    rmq_url = None
+    with open('rabbitmq','r') as r:
+        rmq_url = r.read().splitlines()[0]
+
     status_exchanger = 'status_exchanger'
     emit_status_rpc = ProduceStatus(rmq_url)
 

@@ -60,6 +60,7 @@ vagrant/profile
 vagrant/ss.*
 vagrant/owncloud.sh
 vagrant/owncloudsync.sh
+vagrant/rabbitmq
 vagrant/slaves
 vagrant/slaves/*
 vagrant/slaves/*/*

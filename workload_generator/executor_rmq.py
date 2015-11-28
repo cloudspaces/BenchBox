@@ -175,7 +175,10 @@ class ExecuteRMQ(object):
 if __name__ == '__main__':
     print "executor.py is ran when warmup and its queue remains established... WAITING RPC"
 
-    rmq_url = 'amqp://benchbox:benchbox@10.30.236.141/'
+    # read the url from path: /vagrant/rmq.url.txt
+    rmq_url = None
+    with open('/vagrant/rabbitmq','r') as r:
+        rmq_url = r.read().splitlines()[0]
     dummyhost = None
 
     # start the ftp sender
