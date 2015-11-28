@@ -65,8 +65,8 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
               "" \
               "cd vagrant; " \
               "" \
-              "echo '{}' > profile; " \
               "echo '{}' > rabbitmq; " \
+              "echo '{}' > profile; " \
               "" \
               "echo '{}' > ss.stacksync.key; " \
               "echo '{}' > ss.owncloud.key; " \
