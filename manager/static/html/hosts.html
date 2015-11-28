@@ -154,8 +154,8 @@
             <button class="btn btn-default" ng-click="rpc('test-check','vagrantDown')" title="pull latest repo & vagrant down">Down</button>
             -->
 
+            <button class="btn btn-danger pull-right" ng-click="rmq('test-check', 'tearDown', 'benchBox', 'sandBox')" title="Clear the shared file system: benchBox & sandBox">TearDown</button>
             <button class="btn btn-primary pull-right" ng-click="rmq('test-check', 'warmUp',   'benchBox')" title="Startup file system: benchBox">Executor</button>
-            <button class="btn btn-danger pull-right" ng-click="rmq('test-check', 'tearDown', 'benchBox')" title="Clear the shared file system: benchBox">TearDown</button>
             <button class="btn btn-info pull-right" ng-click="rmq('test-check', 'monitorUp', 'sandBox')" title="Startup monitor real time collection: sandBox">Monitor</button>
 
             <!--

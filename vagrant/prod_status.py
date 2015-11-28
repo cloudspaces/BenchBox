@@ -11,6 +11,7 @@ import json
 class ActionHandler(object):
     def __init__(self):
         print "vagrant handler"
+        self.hostname = socket.gethostname()
 
     ''' executed at the dummyhost '''
     def up(self):
@@ -49,9 +50,23 @@ class ActionHandler(object):
     def tearDown(self):
         # clear the sandBox filesystem and cached files
         print 'tearDown'
-        str_cmd = "pgrep -f executor_rmq.py | xargs kill -9 "
-        return bash_command(str_cmd)
+        output = ''
+        if self.hostname == 'sandBox':              # todo if sandbox
+            str_cmd = "pgrep -f monitor_rmq.py | xargs kill -9 "  # kill the process
+            output += bash_command(str_cmd)
+            str_cmd = "echo $? "  # run some cleanup script todo
+            output += bash_command(str_cmd)
+        elif self.hostname == 'benchBox':           # todo if benchBox
+            str_cmd = "pgrep -f executor_rmq.py | xargs kill -9 "  # kill the process
+            output += bash_command(str_cmd)
+            str_cmd = "echo $? "  # run some cleanup script todo
+            output += bash_command(str_cmd)
+        else:
+            return 'unhandled hostname: {}'.format(self.hostname)
 
+
+
+        return output
     ''' executed at the sandBox '''
     def monitorUp(self):
         # start the metrics listener for monitoring

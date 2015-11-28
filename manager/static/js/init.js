@@ -168,7 +168,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
             $scope.rmq = function (name, cmd) {
                 console.log(arguments);
-                var hosts = Array.prototype.slice.call(arguments, 2); //
+                var hosts = Array.prototype.slice.call(arguments, 2); // 3r till n are the target hosts
                 console.log(hosts);
                 console.log($scope.run.testOperation)
 
@@ -192,7 +192,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                         break;
                 }
 
-
+                //
                 hosts.forEach(function (targetHost) {
                     console.log(targetHost);
 
