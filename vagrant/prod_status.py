@@ -67,6 +67,7 @@ class ActionHandler(object):
 
 class ProduceStatus(object):
     def __init__(self, rmq_url='localhost', queue_name = 'status_manager'):
+        print 'prod: {}'.format(rmq_url)
         self.rmq_url = rmq_url
         if rmq_url == 'localhost':
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(rmq_url))
@@ -226,7 +227,7 @@ if __name__ == '__main__':
 
     # dummyhost = hostname
 
-    host_queue = "{}.{}".format(dummyhost, hostname.lower()) # this is the format, that rmq.js target_queue needs!
+    host_queue = "{}.{}".format(dummyhost, hostname.lower())  # this is the format, that rmq.js target_queue needs!
     # status_msg
 
     print " [x] emit: emit_status_rpc.call({})".format(host_queue)
