@@ -1,8 +1,15 @@
-__all__ = ['DiskResource.py',
-           'MemoryMonitor.py',
-           'MonitorResource.py',
+__all__ = ['MonitorHDD.py',
+           'MonitorRAM.py',
+           'MonitorCPU.py',
+           'MonitorNET.py',
+           'MonitorResource.py'
            'SocketListener.py',
-           'Monitor.py',
-           'CPUMonitor.py']
+           'Monitor.py']
 
-import DiskResource, MemoryMonitor, MonitorResource, SocketListener, Monitor, CPUMonitor
+import MonitorHDD
+import MonitorRAM
+import MonitorCPU
+import MonitorNET
+import MonitorResource
+import SocketListener
+import Monitor
