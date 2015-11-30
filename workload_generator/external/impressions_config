@@ -1,10 +1,10 @@
-Parent_Path: /home/x/Code/BenchBox/output 1
+Parent_Path: /home/vagrant/output 1
 Actuallogfile: ./logs 0
 Randseeds: Direct 10 100000 200000 300000 400000 500000 600000 700000 800000 900000 100000
 FScapacity: 1 GB
 FSused: NO GB
 Numfiles: 0 N
-Numdirs: 41 N
+Numdirs: 23 N
 Filesperdir: 10.2 N
 FilesizeDistr: Direct 3 99994 29 0.91 
 FilecountDistr: Direct 2 9.48 2.45663283

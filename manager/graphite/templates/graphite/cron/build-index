@@ -1,2 +1,0 @@
-#!/bin/sh
-sudo -u www-data /opt/graphite/bin/build-index.sh
