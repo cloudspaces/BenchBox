@@ -1,3 +1,7 @@
 logger/py_cpu_monitor/log/*.log
 logger/test.sql
 psutil_demo.py
+
+
+log
+stacksync.log
