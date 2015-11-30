@@ -67,7 +67,7 @@ vagrant/scripts/test
 vagrant/puppet/manifests/test
 vagrant/puppet/manifests/test/*
 vagrant/nohup_executor_rmq.out
-vagrant/nohup_monitor_rqm.out
+vagrant/nohup_monitor_rmq.out
 
 
 monitor/logger/test
@@ -77,7 +77,7 @@ monitor/logger/matlab_scripts
 monitor/logger/parser
 monitor/logger/post-process
 monitor/logger/py_cpu_monitor/*.pyc
-
+monitor/*.txt
 
 
 

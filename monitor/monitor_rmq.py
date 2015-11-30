@@ -6,12 +6,31 @@ import urlparse
 import time
 import filecmp
 import shutil
+import subprocess
 
 from threading import Thread
 from termcolor import colored
 # from py_monitor import SocketListener
 
+'''
 
+launch the sync client from here and use psutil to track the personal client resource usage.
+stacksync: /usr/lib/stacksync/StackSync.jar -etc
+
+java -jar Stacksync.jar -d -c /vagrant & echo $!
+
+
+owncloud: ./owncloud_sync.sh
+
+while true; do
+echo 'DoSync'
+    owncloudcmd --httpproxy http://10.30.239.119 -u Xen -p Xen /home/vagrant/owncloud_folder/ http://10.30.239.119
+    echo 'SyncingComplete'
+     sleep $delay
+    # ls -l
+done
+
+'''
 
 class Commands(object):
     # singleton class
@@ -28,6 +47,8 @@ class Commands(object):
         self.is_running = False
         self.stereotype = profile  # backupsample
         self.monitor = None
+        self.sync_client = None
+        self.personale_cloud = 'StackSync'
 
         # self.data_generator = DataGenerator()
 
@@ -65,12 +86,25 @@ class Commands(object):
             self.is_running = True
             # TODO loop
             operations = 0
+
+            # track the sync client pid resources
+
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
                 time.sleep(3)
                 print colored("[TEST]: INFO {} --> {} // {}".format(time.ctime(time.time()), operations, self.is_running), 'red')
         else:
             print '[TEST]: WARNING: need warmup 1st!'
+
+
+    def _pc_client(self):
+        '''
+        This thread will get track the personal client process id
+        '''
+        print "Start: {} ".format(self.personale_cloud)
+        proc = subprocess.Popen("/usr/bin/du folder", stdout=file("1.txt", "ab"))
+        print "PID:", proc.pid
+        print "Return code:", proc.wait()
 
     '''
      start sending metrics
@@ -86,6 +120,10 @@ class Commands(object):
             # SELF THREAD START
 
             print '[START_TEST]: INFO: instance thread'
+
+            self.sync_client = Thread(target=self._pc_client)
+            self.sync_client.start()
+            # self.sync_client.start()
             self.monitor = Thread(target=self._test)
             self.monitor.start()
             return '[START_TEST]: SUCCESS: run test response'
