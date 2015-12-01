@@ -6,6 +6,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var constants = require("./constants");
+var InfluxdbClient = require("influxdb-client");
 // var statusManager = require('');
 
 var app = express();
@@ -204,12 +205,41 @@ amqp.connect(amqp_url, function (err, conn) {
             ch.ack(msg); // fer un ack del message
         });
     });
+
+    // ------------------------------------------------------------------------
+    // -- Metrics RabbitMQ handlers :: forward to influxdb # & impala TODO
+    // -------------------------------------------------------------------------
+
+    conn.createChannel(function(err, ch){
+        var ex = 'metrics';
+        ch.assertExchange(ex, 'fanout', {durable: false});
+
+        ch.assertQueue('', {exclusive: true}, function(err, q){
+            console.log(' ['+ex+'] waiting for connection')
+            ch.bindQueue(q.queue, ex, '');
+            ch.consume(q.queue, function(msg){
+
+                console.log(" ["+ex+"] "+msg.content.toString())
+
+
+
+
+
+
+
+
+            }, {noAck: true})
+
+        })
+
+    })
 });
 
 
 // ------------------------------------------------------------------------
 // -- setup status update
 // -------------------------------------------------------------------------
+
 
 
 // ------------------------------------------------------------------------
