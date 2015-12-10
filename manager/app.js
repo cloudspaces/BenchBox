@@ -6,10 +6,38 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var constants = require("./constants");
-var InfluxdbClient = require("influxdb-client");
-// var statusManager = require('');
+
+var sleep = require('sleep');
+var influx = require('influx');
+
 
 var app = express();
+
+
+// ------------------------------------------------------------------------
+// ------------------------------------------------------------------------
+// -- connecting to influxdb  ---------------------------------------------
+// ------------------------------------------------------------------------
+// ------------------------------------------------------------------------
+
+console.log(constants.influx.influx_conn);
+
+var influxClient = influx(constants.influx.server);
+var influxReady = false;
+influxClient.getDatabaseNames(function(err, arrDBS){
+    if(err) throw err;
+    if(arrDBS.indexOf(constants.influx.influx_conn.database) > -1){
+        console.log("Database ["+constants.influx.influx_conn.database+"] ready!" );
+        influxReady = true;
+        return;
+    }
+
+    influxClient.createDatabase(constants.influx.influx_conn.database, function(err, result){
+        if(err) throw err;
+        console.log("Database created ready");
+        influxReady = true;
+    });
+});
 
 
 // ------------------------------------------------------------------------
@@ -17,7 +45,6 @@ var app = express();
 // -- connecting to mongoserver -------------------------------------------
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
-
 
 function createDBSettings(mongoLabURI) {
     var dbSettings = {},
@@ -30,10 +57,9 @@ function createDBSettings(mongoLabURI) {
     dbSettings.password = matches[2];
     return dbSettings;
 }
-var url = 'mongodb://localhost:27017/benchbox'
 
 var mongoose = require('mongoose');
-mongoose.connect(url, function (err) {
+mongoose.connect(constants.mongodb_url, function (err) {
     if (err) {
         console.log('connection to mongoose error!', err);
     } else {
@@ -153,6 +179,7 @@ var amqp_conn = null;
 var manager_queue = 'rpc_queue';
 var hostModel = require('./models/Hosts.js');
 
+// this chunk of code should go withing a separate file export and required...
 amqp.connect(amqp_url, function (err, conn) {
     if (err) {
         console.log('connection rabbitmq error', err);
@@ -160,10 +187,11 @@ amqp.connect(amqp_url, function (err, conn) {
         console.log('connection rabbitmq successful!');
         amqp_conn = conn; // single connection for whole server.
     }
+
     conn.createChannel(function (err, ch) {
         var q = manager_queue;
         ch.assertQueue(q, {durable: false}, function (err, q) {
-            console.log(' [x] Awaiting RPC requests at: [' + q.queue + ']');
+            console.log(' [' + q.queue + '] Awaiting RPC...');
         });
         ch.prefetch(1);
         ch.consume(q, function rpc_reply(msg) {
@@ -210,36 +238,44 @@ amqp.connect(amqp_url, function (err, conn) {
     // -- Metrics RabbitMQ handlers :: forward to influxdb # & impala TODO
     // -------------------------------------------------------------------------
 
-    conn.createChannel(function(err, ch){
+    conn.createChannel(function (err, ch) {
         var ex = 'metrics';
         ch.assertExchange(ex, 'fanout', {durable: false});
 
-        ch.assertQueue('', {exclusive: true}, function(err, q){
-            console.log(' ['+ex+'] waiting for connection')
+        ch.assertQueue('', {exclusive: true}, function (err, q) {
+            console.log(' [' + ex + '] waiting for connection')
             ch.bindQueue(q.queue, ex, '');
-            ch.consume(q.queue, function(msg){
+            ch.consume(q.queue, function (msg) {
+                console.log(" [" + ex + "] " + msg.content.toString())
 
-                console.log(" ["+ex+"] "+msg.content.toString())
-
-
-
-
-
-
-
+                var point = {attr: "value", time: new Date()};
+                point = {
+                    time: new Date(),
+                    value: Math.floor(Math.random() * 100) + 1,
+                    cpu: Math.floor(Math.random() * 100) + 1,
+                    ram: Math.floor(Math.random() * 100) + 1,
+                    net: Math.floor(Math.random() * 100) + 1,
+                }
+                var tags  = {profile: "cdn", more_tags: "etc"};
+                if(influxReady){
+                    influxClient.writePoint(hostname, point, tags, function(){
+                       console.log("done writting ");
+                       console.log(msg);
+                    });
+                }
 
             }, {noAck: true})
 
         })
 
     })
+
 });
 
 
 // ------------------------------------------------------------------------
 // -- setup status update
 // -------------------------------------------------------------------------
-
 
 
 // ------------------------------------------------------------------------
