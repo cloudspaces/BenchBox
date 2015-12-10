@@ -6,3 +6,6 @@ npm-debug.log
 node_modules/*
 graphite/.vagrant
 nohup_manager.out
+test
+models/Metrics.js
+static/json/influx_line.json
