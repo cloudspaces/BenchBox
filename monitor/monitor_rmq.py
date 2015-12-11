@@ -10,6 +10,11 @@ import subprocess
 
 from threading import Thread
 from termcolor import colored
+import socket
+import random
+import calendar
+import json
+
 # from py_monitor import SocketListener
 
 '''
@@ -31,6 +36,62 @@ echo 'DoSync'
 done
 
 '''
+
+
+
+
+
+
+
+class EmitMetric(object):
+    def __init__(self):
+        url_str = None
+        with open('rabbitmq','r') as r:
+            url_str = r.read().splitlines()[0]
+
+        url = urlparse.urlparse(url_str)
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+            host=url.hostname,
+            virtual_host=url.path[1:],
+            credentials=pika.PlainCredentials(url.username, url.password)
+        ))
+
+        self.channel = self.connection.channel()
+        self.channel.exchange_declare(exchange='metrics', type='fanout')
+
+    def emit(self, tags = '', metrics = ''):
+        # msg = '{} {} {}'.format(key, value, self.tsNow())
+        # msg = '{} {} {}'.format(key, value, self.tsNow())
+
+        if metrics == '':
+            metrics = {'cpu': random.randint(0, 100),
+                       'ram': random.randint(0, 100),
+                       'net': random.randint(0, 100),
+                       'time': calendar.timegm(time.gmtime()) * 1000}
+        if tags == '':
+            tags = {
+                'profile': 'backupsample',
+                'credentials': 'pc_credentials'
+            }
+        data = {
+            'metrics': metrics,
+            'tags': tags
+        }
+
+        msg = json.dumps(data)
+        print msg
+
+        self.channel.basic_publish(
+            exchange='metrics',
+            routing_key=socket.gethostname(),
+            body=msg)
+
+
+
+
+
+
+
 
 class Commands(object):
     # singleton class
@@ -88,10 +149,11 @@ class Commands(object):
             operations = 0
 
             # track the sync client pid resources
-
+            metric_reader = EmitMetric()
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
-                time.sleep(3)
+                metric_reader.emit() # personal cloud name.
+                time.sleep(2)  # delay between metric
                 print colored("[TEST]: INFO {} --> {} // {}".format(time.ctime(time.time()), operations, self.is_running), 'red')
         else:
             print '[TEST]: WARNING: need warmup 1st!'
@@ -120,7 +182,6 @@ class Commands(object):
             # SELF THREAD START
 
             print '[START_TEST]: INFO: instance thread'
-
             self.sync_client = Thread(target=self._pc_client)
             self.sync_client.start()
             # self.sync_client.start()

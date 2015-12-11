@@ -13,6 +13,20 @@ var influx = require('influx');
 
 var app = express();
 
+// ------------------------------------------------------------------------
+// ------------------------------------------------------------------------
+// -- connecting to booting ZeroRPC  ---------------------------------------------
+// ------------------------------------------------------------------------
+// ------------------------------------------------------------------------
+
+/*
+var pythonShell = require('python-shell');
+pythonShell.run('zerorpc/startZeroRPC.py', function(err){
+    if(err) throw err;
+    console.log("Booted ZeroRPC");
+});
+*/
+
 
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
@@ -257,24 +271,36 @@ amqp.connect(amqp_url, function (err, conn) {
                     ram: Math.floor(Math.random() * 100) + 1,
                     net: Math.floor(Math.random() * 100) + 1
                 };
-                var metrics = JSON.parse(msg.content);
+                var data = JSON.parse(msg.content);
+                var metrics = data.metrics;
+                var tags = data.tags;
+                //
+                /*
+                var content = {
+                    metrics : {},
+                    tags: {}
+                };
+                */
+                /*
                 console.log(metrics);
                 console.log(metrics.time);
+                */
+                /*
                 point = {
                     time: metrics.time,
                     cpu: metrics.cpu,
                     ram: metrics.ram,
                     net: metrics.net
-                }
-                // point = JSON.parse(msg.content.toString());
-                // point.time = new Date();
+                };
+                */
+                point = metrics;
                 var hostname = msg.fields.routingKey;
-
-                var tags  = {profile: "cdn", more_tags: "etc"};
+                // var tags  = {profile: "cdn", more_tags: "etc"}; // the profile properties
+                // point.time = new Date();
                 if(influxReady){
                     //                      measurements
                     influxClient.writePoint(hostname, point, tags, function(){
-                       console.log("done writting ");
+                       console.log("done writing");
                        // console.log(msg.content.toString());
                     });
                 }
