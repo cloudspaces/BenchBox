@@ -24,7 +24,7 @@ owncloud: ./owncloud_sync.sh
 
 while true; do
 echo 'DoSync'
-    owncloudcmd --httpproxy http://10.30.239.119 -u Xen -p Xen /home/vagrant/owncloud_folder/ http://10.30.239.119
+    owncloudcmd --httpproxy http://10.30.235.91 -u Xen -p Xen /home/vagrant/owncloud_folder/ http://10.30.235.91
     echo 'SyncingComplete'
      sleep $delay
     # ls -l

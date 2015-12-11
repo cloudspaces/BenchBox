@@ -9,7 +9,7 @@
     },
     "ss": {
       "stacksync": {
-        "ip": "10.30.239.119",
+        "ip": "10.30.235.91",
         "port": 80
       },
       "owncloud": {
@@ -32,9 +32,9 @@
       }
     },
     "rabbitmq":{
-      "url": "amqp://benchbox:benchbox@10.30.236.141/",
+      "url": "amqp://benchbox:benchbox@10.50.234.51/",
       "virtual_host": "",
-      "host": "10.30.236.141",
+      "host": "10.50.234.51",
       "user": "benchbox",
       "password": "benchbox"
 

@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 import pika
+import random
 import uuid
 import urlparse
 import sys
 import time
-
+import json
+import calendar
+import socket
 class EmitMetric(object):
     def __init__(self):
         url_str = None
@@ -24,11 +27,18 @@ class EmitMetric(object):
 
 
     def emit(self, key, value):
+        # msg = '{} {} {}'.format(key, value, self.tsNow())
         msg = '{} {} {}'.format(key, value, self.tsNow())
+        data = {'cpu': random.randint(0, 100),
+                'ram': random.randint(0, 100),
+                'net': random.randint(0, 100),
+                'time': calendar.timegm(time.gmtime())}
+        msg = json.dumps(data)
         print msg
+
         self.channel.basic_publish(
             exchange='metrics',
-            routing_key='Joker',
+            routing_key=socket.gethostname(),
             body=msg)
 
     def tsNow(self):

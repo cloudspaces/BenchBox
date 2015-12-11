@@ -20,7 +20,7 @@ var app = express();
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 
-console.log(constants.influx.influx_conn);
+// console.log(constants.influx.influx_conn);
 
 var influxClient = influx(constants.influx.server);
 var influxReady = false;
@@ -248,19 +248,34 @@ amqp.connect(amqp_url, function (err, conn) {
             ch.consume(q.queue, function (msg) {
                 console.log(" [" + ex + "] " + msg.content.toString())
 
-                var point = {attr: "value", time: new Date()};
+                var point; // = {attr: "value", time: new Date()};
+
                 point = {
                     time: new Date(),
                     value: Math.floor(Math.random() * 100) + 1,
                     cpu: Math.floor(Math.random() * 100) + 1,
                     ram: Math.floor(Math.random() * 100) + 1,
-                    net: Math.floor(Math.random() * 100) + 1,
+                    net: Math.floor(Math.random() * 100) + 1
+                };
+                var metrics = JSON.parse(msg.content);
+                console.log(metrics);
+                console.log(metrics.time);
+                point = {
+                    time: metrics.time,
+                    cpu: metrics.cpu,
+                    ram: metrics.ram,
+                    net: metrics.net
                 }
+                // point = JSON.parse(msg.content.toString());
+                // point.time = new Date();
+                var hostname = msg.fields.routingKey;
+
                 var tags  = {profile: "cdn", more_tags: "etc"};
                 if(influxReady){
+                    //                      measurements
                     influxClient.writePoint(hostname, point, tags, function(){
                        console.log("done writting ");
-                       console.log(msg);
+                       // console.log(msg.content.toString());
                     });
                 }
 

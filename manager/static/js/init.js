@@ -272,7 +272,7 @@ testConnection = function (ip, port, cb) {
     // if i dont need to use the failure  function they recommend me to use post or get
     console.log("Get list");
     $.ajax({
-        url: 'http://localhost:3000/rpc/nmap',
+        url: 'http://localhost:'+location.port+'/rpc/nmap',
         contentType: "application/json; charset=utf-8",
         data: {data: ip + ' ' + port},
         dataType: 'json',
@@ -315,7 +315,7 @@ rmqHost = function (host, cmd, cb) {
     appendAllParams(args, 'bb-config');
     appendAllHosts(args, 'bb-hosts');
     $.ajax({
-        url: 'http://localhost:3000/rmq/emit',
+        url: 'http://localhost:'+location.port+'/rmq/emit',
         data: args,
         timeout: 6000000, // 6000s ::100min
         type: 'GET',
@@ -348,7 +348,7 @@ rpcHost = function (host, cmd, cb) {
     appendAllParams(args, 'bb-config');
     appendAllHosts(args, 'bb-hosts');
     $.ajax({
-        url: 'http://localhost:3000/rpc/rpc',
+        url: 'http://localhost:'+location.port+'/rpc/rpc',
         data: args,
         timeout: 6000000, // 6000s ::100min
         type: 'GET',
