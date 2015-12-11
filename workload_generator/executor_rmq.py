@@ -23,11 +23,11 @@ class Commands(object):
             cls._instance = super(Commands, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
-    def __init__(self, profile):
+    def __init__(self, receipt):
         print '[INIT]: rpc commands'
         self.is_warmup = False
         self.is_running = False
-        self.stereotype = profile  # backupsample
+        self.stereotype = receipt  # backupsample
         self.stereotype_executor = StereotypeExecutorU1()
         self.fs_abs_target_folder = '/home/vagrant/{}'.format(self.stereotype_executor.ftp_client.ftp_root)  # target ftp_client dir absolute path
         self.execute = None
@@ -166,15 +166,33 @@ if __name__ == '__main__':
     with open('/vagrant/rabbitmq','r') as r:
         rmq_url = r.read().splitlines()[0]
     dummyhost = None
-
     # start the ftp sender
-
-
-    #
     stereotype_receipt = 'backupsample'
 
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
     queue_name = '{}.{}'.format(dummyhost, 'executor')
-    executor = ExecuteRMQ(rmq_url, queue_name, stereotype_receipt)
-    executor.listen()
+
+
+
+
+    if len(sys.argv) == 1:  # means no parameters
+        executor = ExecuteRMQ(rmq_url, queue_name, stereotype_receipt)
+        executor.listen()
+    else:
+        profile = "StackSync"
+        actions = Commands(receipt=stereotype_receipt)
+        while True:
+            print 'write command: hello|warmup|start|stop'
+            teclat = raw_input()
+            print teclat
+            try:
+                toExecute = getattr(actions, teclat)
+                print toExecute
+                output = toExecute()
+            except AttributeError as e:
+                print e.message
+                print "ACK: {}".format(teclat)
+            time.sleep(1)
+
+

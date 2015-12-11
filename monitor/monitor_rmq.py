@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import math
 import pika
 import os
 import sys
@@ -70,17 +71,20 @@ class EmitMetric(object):
                        'net': random.randint(0, 100),
                        'time': calendar.timegm(time.gmtime()) * 1000}
         # psutil read metrics
+
         if pid == "":
             print "Sintetic"
         else:
+            print "PID: {} ".format(pid)
             try:
-                if self.personal_cloud == "stacksync":
+                if self.personal_cloud.lower() == "stacksync":
+                    print self.personal_cloud
                     parent_proc = psutil.Process(pid)
                     proc = parent_proc.children()[0]
-                    cpu_usage = proc.cpu_percent(interval=0)
+                    cpu_usage = math.ceil(proc.cpu_percent(0))
                     ram_usage = proc.memory_info().rss
-                    metrics.cpu = cpu_usage
-                    metrics.ram = ram_usage
+                    metrics['cpu'] = cpu_usage
+                    metrics['ram'] = ram_usage
                 elif self.personal_cloud == "owncloud":
                     print "TODO owncloud"
                 elif self.personal_cloud == "etc":
@@ -168,7 +172,7 @@ class Commands(object):
             metric_reader = EmitMetric(self.hostname, self.personal_cloud)  # start the sync client
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
-                metric_reader.emit()  # send metric to rabbit
+                metric_reader.emit(pid=self.sync_proc.pid)  # send metric to rabbit
                 time.sleep(2)  # delay between metric
                 print colored("[TEST]: INFO {} --> {} // {}".format(time.ctime(time.time()), operations, self.is_running), 'red')
         else:
