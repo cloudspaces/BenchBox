@@ -69,6 +69,7 @@ vagrant/puppet/manifests/test/*
 vagrant/nohup_executor_rmq.out
 vagrant/nohup_monitor_rmq.out
 vagrant/emit_metric_test.py
+vagrant/1.txt
 
 monitor/logger/test
 monitor/logger/plots/output

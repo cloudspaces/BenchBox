@@ -80,7 +80,7 @@ class EmitMetric(object):
 
         self.channel.basic_publish(
             exchange='metrics',
-            routing_key=socket.gethostname(),
+            routing_key=self.hostname,
             body=msg)
 
 class Commands(object):
@@ -97,8 +97,9 @@ class Commands(object):
     personal_cloud: stacksync.
     receipt: backupsample
     """
-    def __init__(self, profile, pc=''):
+    def __init__(self, hostname, profile, pc=''):
         print '[INIT]: rpc commands'
+        self.hostname = hostname
         self.is_warmup = False
         self.is_running = False
         self.stereotype = profile  # backupsample
@@ -200,8 +201,8 @@ class MonitorRMQ(object):
         print "Executor operation consumer: "
         url = urlparse.urlparse(rmq_url)
         self.profile = profile
-        self.actions = Commands(profile)
-
+        self.hostname = host_queue.split(".")[0]
+        self.actions = Commands(self.hostname, profile)
         self.queue_name = host_queue
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=url.hostname,
