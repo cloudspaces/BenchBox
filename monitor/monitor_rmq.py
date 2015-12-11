@@ -17,30 +17,6 @@ import random
 import calendar
 import json
 
-# from py_monitor import SocketListener
-
-'''
-
-launch the sync client from here and use psutil to track the personal client resource usage.
-stacksync: /usr/lib/stacksync/StackSync.jar -etc
-
-java -jar Stacksync.jar -d -c /vagrant & echo $!
-
-
-owncloud: ./owncloud_sync.sh
-
-while true; do
-echo 'DoSync'
-    owncloudcmd --httpproxy http://10.30.235.91 -u Xen -p Xen /home/vagrant/owncloud_folder/ http://10.30.235.91
-    echo 'SyncingComplete'
-     sleep $delay
-    # ls -l
-done
-
-'''
-
-
-
 
 
 
