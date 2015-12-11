@@ -9,6 +9,7 @@ import shutil
 import subprocess
 
 from threading import Thread
+import psutil
 from termcolor import colored
 import socket
 import random
@@ -45,7 +46,10 @@ done
 
 class EmitMetric(object):
 
-    def __init__(self):
+    def __init__(self, hostname, personal_cloud):
+        self.personal_cloud = personal_cloud
+        self.hostname = hostname
+
         url_str = None
         with open('rabbitmq','r') as r:
             url_str = r.read().splitlines()[0]
@@ -59,12 +63,30 @@ class EmitMetric(object):
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange='metrics', type='fanout')
 
-    def emit(self, tags='', metrics=''):
+    def emit(self, tags='', metrics='', pid=''):
         if metrics == '':
             metrics = {'cpu': random.randint(0, 100),
                        'ram': random.randint(0, 100),
                        'net': random.randint(0, 100),
                        'time': calendar.timegm(time.gmtime()) * 1000}
+        # psutil read metrics
+        if pid == "":
+            print "Sintetic"
+        else:
+            try:
+                if self.personal_cloud == "stacksync":
+                    parent_proc = psutil.Process(pid)
+                    proc = parent_proc.children()[0]
+                    cpu_usage = proc.cpu_percent(interval=0)
+                    ram_usage = proc.memory_info().rss
+                    metrics.cpu = cpu_usage
+                    metrics.ram = ram_usage
+                elif self.personal_cloud == "owncloud":
+                    print "TODO owncloud"
+                elif self.personal_cloud == "etc":
+                    print "TODO etc"
+            except Exception as e:
+                print e.message
         if tags == '':
             tags = {
                 'profile': 'backup_sample',
@@ -106,9 +128,9 @@ class Commands(object):
         self.monitor = None
         self.sync_client = None
         if pc == '':
-            self.personale_cloud = 'StackSync'        # its not defined
+            self.personal_cloud = 'StackSync'        # its not defined
         else:
-            self.personale_cloud = pc
+            self.personal_cloud = pc
             # todo metric reader class
 
 
@@ -142,12 +164,11 @@ class Commands(object):
             self.is_running = True
             # TODO loop
             operations = 0
-
             # track the sync client pid resources
-            metric_reader = EmitMetric()
+            metric_reader = EmitMetric(self.hostname, self.personal_cloud)  # start the sync client
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
-                metric_reader.emit() # personal cloud name.
+                metric_reader.emit()  # send metric to rabbit
                 time.sleep(2)  # delay between metric
                 print colored("[TEST]: INFO {} --> {} // {}".format(time.ctime(time.time()), operations, self.is_running), 'red')
         else:
@@ -157,10 +178,20 @@ class Commands(object):
         '''
         This thread will get track the personal client process id
         '''
-        print "Start: {} ".format(self.personale_cloud)
-        proc = subprocess.Popen("/usr/bin/du folder", stdout=file("1.txt", "ab"))
-        print "PID:", proc.pid
-        print "Return code:", proc.wait()
+        print "Start: {} ".format(self.personal_cloud)
+        # start the personal cloud client process and register its pid
+        pc_cmd = {
+            'stacksync': "/usr/bin/java -jar /usr/lib/stacksync/Stacksync.jar -d -c /vagrant",
+            'owncloud': ""
+        }
+
+        # create the process
+        str_cmd = pc_cmd[self.personal_cloud.lower()]
+
+        # read the metric may be different for each personal cloud - todo herencia
+        self.sync_proc = subprocess.Popen(str_cmd, shell=True)
+        print "{} --> PID: {}".format(self.personal_cloud, self.sync_proc.pid)
+
 
     '''
      start sending metrics
@@ -191,18 +222,24 @@ class Commands(object):
             print '[STOP_TEST]: stop test'
             self.is_running = False
             self.monitor.join()
+            self.sync_client.join()
+            print self.sync_proc.pid
+            parent = psutil.Process(self.sync_proc.pid)
+            for child in parent.children(recursive=True):  # or parent.children() for recursive=False
+                print child.kill()
+            print parent.kill()
             return '[STOP_TEST]: SUCCESS: stop test'
         else:
             return '[STOP_TEST]: WARNING: no test is running'
 
 
 class MonitorRMQ(object):
-    def __init__(self, rmq_url='', host_queue='', profile=''):
+    def __init__(self, rmq_url='', host_queue='', receipt=''):
         print "Executor operation consumer: "
         url = urlparse.urlparse(rmq_url)
-        self.profile = profile
+        self.profile = receipt
         self.hostname = host_queue.split(".")[0]
-        self.actions = Commands(self.hostname, profile)
+        self.actions = Commands(hostname=self.hostname, profile=receipt)
         self.queue_name = host_queue
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=url.hostname,
@@ -250,11 +287,29 @@ if __name__ == '__main__':
     rmq_url = None
     with open('/vagrant/rabbitmq','r') as r:
         rmq_url = r.read().splitlines()[0]
+    print len(sys.argv)
 
     dummyhost = None
     stereotype_receipt = 'backupsample'
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
     queue_name = '{}.{}'.format(dummyhost, 'monitor')
-    monitor = MonitorRMQ(rmq_url, queue_name, stereotype_receipt)
-    monitor.listen()
+
+    if len(sys.argv) == 1:  # means no parameters
+        monitor = MonitorRMQ(rmq_url=rmq_url, host_queue=queue_name, receipt=stereotype_receipt)
+        monitor.listen()
+    else:
+        profile = "StackSync"
+        actions = Commands(profile=stereotype_receipt, hostname=dummyhost)
+        while True:
+            print 'write command: hello|warmup|start|stop'
+            teclat = raw_input()
+            print teclat
+            try:
+                toExecute = getattr(actions, teclat)
+                print toExecute
+                output = toExecute()
+            except AttributeError as e:
+                print e.message
+                print "ACK: {}".format(teclat)
+            time.sleep(1)

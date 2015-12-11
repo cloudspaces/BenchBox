@@ -83,15 +83,21 @@ angular.module('app', ['ngRoute', 'ngResource'])
                         if ($scope.hosts[idx].status === item.status) {
                             // console.log(" [not changed]" + $scope.hosts[idx].status + " : "+ item.status )
                         } else {
-                            console.log(" [changed dummyhost] from:  " + $scope.hosts[idx].status + " to " + item.status)
+                            var changeDummy = " [changed dummyhost] from:  " + $scope.hosts[idx].status + " to " + item.status;
+                            console.log(changeDummy);
+                            $.notify(changeDummy, 'info');
                             $scope.hosts[idx].status = item.status
                         }
                         if ($scope.hosts[idx].status_sandbox !== item.status_sandbox) {
-                            console.log(" [changed sandbox] from:  " + $scope.hosts[idx].status_sandbox + " to " + item.status_sandbox)
+                            var changeSandBox = " [changed sandbox] from:  " + $scope.hosts[idx].status_sandbox + " to " + item.status_sandbox;
+                            console.log(changeSandBox);
+                            $.notify(changeSandBox, 'info');
                             $scope.hosts[idx].status_sandbox = item.status_sandbox
                         }
                         if ($scope.hosts[idx].status_benchbox !== item.status_benchbox) {
-                            console.log(" [changed] benchbox from:  " + $scope.hosts[idx].status_benchbox + " to " + item.status_benchbox)
+                            var changeBenchBox = " [changed] benchbox from:  " + $scope.hosts[idx].status_benchbox + " to " + item.status_benchbox;
+                            console.log(changeBenchBox);
+                            $.notify(changeBenchBox, 'info');
                             $scope.hosts[idx].status_benchbox = item.status_benchbox
                         }
 
@@ -400,7 +406,7 @@ $.fn.graphite.defaults.height = "300";
 
 
 $('#btnFixImage').click(function () {
-    console.log("btnFixImage")
+    console.log("btnFixImage");
     function openNewBackgroundTab(url) {
         var a = document.createElement("a");
         a.href = url;
@@ -413,7 +419,7 @@ $('#btnFixImage').click(function () {
 
     var url = prompt("Please enter graphite: [ip:port]", "10.30.103.95:8443");
     if (url != null) {
-        console.log('Dispatch openNewWindow')
+        console.log('Dispatch openNewWindow');
         openNewBackgroundTab('https://' + url + '/renderer/?from=-1d&height=300&until=now&width=450&target=carbon.agents.vagrant-ubuntu-trusty-64-1.memUsage&title=CPUMonitor&_t=0.013591398485004902');
     }
 
