@@ -44,6 +44,7 @@ done
 
 
 class EmitMetric(object):
+
     def __init__(self):
         url_str = None
         with open('rabbitmq','r') as r:
@@ -55,14 +56,10 @@ class EmitMetric(object):
             virtual_host=url.path[1:],
             credentials=pika.PlainCredentials(url.username, url.password)
         ))
-
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange='metrics', type='fanout')
 
-    def emit(self, tags = '', metrics = ''):
-        # msg = '{} {} {}'.format(key, value, self.tsNow())
-        # msg = '{} {} {}'.format(key, value, self.tsNow())
-
+    def emit(self, tags='', metrics=''):
         if metrics == '':
             metrics = {'cpu': random.randint(0, 100),
                        'ram': random.randint(0, 100),
@@ -70,7 +67,7 @@ class EmitMetric(object):
                        'time': calendar.timegm(time.gmtime()) * 1000}
         if tags == '':
             tags = {
-                'profile': 'backupsample',
+                'profile': 'backup_sample',
                 'credentials': 'pc_credentials'
             }
         data = {
@@ -86,36 +83,33 @@ class EmitMetric(object):
             routing_key=socket.gethostname(),
             body=msg)
 
-
-
-
-
-
-
-
 class Commands(object):
     # singleton class
-
     _instance = None
+
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super(Commands, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
-    def __init__(self, profile):
+    """
+    profile == receipt
+    personal_cloud: stacksync.
+    receipt: backupsample
+    """
+    def __init__(self, profile, pc=''):
         print '[INIT]: rpc commands'
         self.is_warmup = False
         self.is_running = False
         self.stereotype = profile  # backupsample
         self.monitor = None
         self.sync_client = None
-        self.personale_cloud = 'StackSync'
+        if pc == '':
+            self.personale_cloud = 'StackSync'        # its not defined
+        else:
+            self.personale_cloud = pc
+            # todo metric reader class
 
-        # self.data_generator = DataGenerator()
-
-        # start the monitoring stuff. # todo
-        # send to impala always...!!!
-        # sshpass -p vagrant rsync -rvnc --delete ../output/ vagrant@192.168.56.101:stacksync_folder/
 
     def hello(self):
         print '[HELLO]: hello world'
@@ -157,7 +151,6 @@ class Commands(object):
                 print colored("[TEST]: INFO {} --> {} // {}".format(time.ctime(time.time()), operations, self.is_running), 'red')
         else:
             print '[TEST]: WARNING: need warmup 1st!'
-
 
     def _pc_client(self):
         '''

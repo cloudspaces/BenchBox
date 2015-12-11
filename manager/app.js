@@ -13,20 +13,6 @@ var influx = require('influx');
 
 var app = express();
 
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
-// -- connecting to booting ZeroRPC  ---------------------------------------------
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
-
-/*
-var pythonShell = require('python-shell');
-pythonShell.run('zerorpc/startZeroRPC.py', function(err){
-    if(err) throw err;
-    console.log("Booted ZeroRPC");
-});
-*/
-
 
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
@@ -82,23 +68,6 @@ mongoose.connect(constants.mongodb_url, function (err) {
 });
 
 
-// ------------------------------------------------------------------------
-// -- load file system
-// ------------------------------------------------------------------------
-
-/*
- var fs = require('fs');
- var path = require('path');
- var filePath = path.join(__dirname, 'static/json/config.json')
- var obj;
-
- fs.readFile(filePath, 'utf8', function(err, data){
-
- if (err) throw err;
- obj = JSON.parse(data);
- console.log('configuration', obj);
- });
- */
 
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
@@ -183,7 +152,7 @@ app.use('/rmq', rmqs);
 
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
-// -- connecting to rabbitmq-server -------------------------------------------
+// -- connecting to rabbitmq-server ---------------------------------------
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 
@@ -209,40 +178,36 @@ amqp.connect(amqp_url, function (err, conn) {
         });
         ch.prefetch(1);
         ch.consume(q, function rpc_reply(msg) {
-            var host_status = JSON.parse(msg.content)  // nomes el missatge esta en json
+            var host_status = JSON.parse(msg.content);  // nomes el missatge esta en json
             console.log("[" + msg.properties.replyTo + "] --> [" + msg.fields.consumerTag +
                 "] : host[%s] status(%s) :",
                 host_status.host, host_status.status);
 
-            var status = host_status.status
-            var dummyhost = host_status.host.split('.')[0]
-            var vboxhost = host_status.host.split('.')[1].toLowerCase()
-            console.log(status, dummyhost, vboxhost)
-            // fer un ajax request a si mateix o modificar directament ?
+            var status = host_status.status;
+            var dummyhost = host_status.host.split('.')[0];
+            var vboxhost = host_status.host.split('.')[1].toLowerCase();
+            console.log(status, dummyhost, vboxhost);
             hostModel.findOne({hostname: dummyhost}, function (err, host) {
                 if (err) {
                     console.error(err.message)
                 }
-                // console.log("FOUND: ", host);
 
                 var status_attr = 'status';
                 if (dummyhost != vboxhost) {
                     status_attr += '_' + vboxhost
                 }
-                // console.log(host)
                 host[status_attr] = status;
 
                 host.save(function (err) {
                     if (err)
                         console.log(err.message)
                 })
-                // console.log(host)
             });
 
             var result = "manager Joined queue " + host_status.host + "! ";
             var callbackChannel = msg.properties.replyTo;
-            var callbackMsg = new Buffer(result.toString())
-            var callbackProp = {correlationId: msg.properties.correlationId}
+            var callbackMsg = new Buffer(result.toString());
+            var callbackProp = {correlationId: msg.properties.correlationId};
             ch.sendToQueue(callbackChannel, callbackMsg, callbackProp); // send to queue
             ch.ack(msg); // fer un ack del message
         });
@@ -257,66 +222,33 @@ amqp.connect(amqp_url, function (err, conn) {
         ch.assertExchange(ex, 'fanout', {durable: false});
 
         ch.assertQueue('', {exclusive: true}, function (err, q) {
-            console.log(' [' + ex + '] waiting for connection')
+            console.log(' [' + ex + '] waiting for connection');
             ch.bindQueue(q.queue, ex, '');
             ch.consume(q.queue, function (msg) {
-                console.log(" [" + ex + "] " + msg.content.toString())
-
-                var point; // = {attr: "value", time: new Date()};
-
-                point = {
+                console.log(" [" + ex + "] " + msg.content.toString());
+                /*
+                var point = {
                     time: new Date(),
                     value: Math.floor(Math.random() * 100) + 1,
                     cpu: Math.floor(Math.random() * 100) + 1,
                     ram: Math.floor(Math.random() * 100) + 1,
                     net: Math.floor(Math.random() * 100) + 1
                 };
+                */
                 var data = JSON.parse(msg.content);
                 var metrics = data.metrics;
                 var tags = data.tags;
-                //
-                /*
-                var content = {
-                    metrics : {},
-                    tags: {}
-                };
-                */
-                /*
-                console.log(metrics);
-                console.log(metrics.time);
-                */
-                /*
-                point = {
-                    time: metrics.time,
-                    cpu: metrics.cpu,
-                    ram: metrics.ram,
-                    net: metrics.net
-                };
-                */
-                point = metrics;
+                var point = metrics;
                 var hostname = msg.fields.routingKey;
-                // var tags  = {profile: "cdn", more_tags: "etc"}; // the profile properties
-                // point.time = new Date();
                 if(influxReady){
-                    //                      measurements
                     influxClient.writePoint(hostname, point, tags, function(){
                        console.log("done writing");
-                       // console.log(msg.content.toString());
                     });
                 }
-
-            }, {noAck: true})
-
+            }, {noAck: true}); // ignore if none reached, none blocking queue
         })
-
     })
-
 });
-
-
-// ------------------------------------------------------------------------
-// -- setup status update
-// -------------------------------------------------------------------------
 
 
 // ------------------------------------------------------------------------
@@ -325,7 +257,6 @@ amqp.connect(amqp_url, function (err, conn) {
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     var err = new Error('Not Found');
@@ -333,9 +264,7 @@ app.use(function (req, res, next) {
     next(err);
 });
 
-
 // error handlers
-
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
