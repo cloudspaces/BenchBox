@@ -80,7 +80,7 @@ class SimpleMarkovChain(object):
                 fitting = l[:-1].split(',')[1]
                 kv_params = eval(l[l.index('{'):])
                 setattr(self, model_attribute, (fitting, kv_params))
-                self.activity_rate = genpareto(1.9149, scale=9.5497e-004, threshold=4.7847e-005).rvs() #get_random_value_from_fitting(fitting, kv_params)
+                self.activity_rate = genpareto(1.6837, scale=3.7520e-005, threshold=1.8190e-006).rvs() #get_random_value_from_fitting(fitting, kv_params)
                 self.add_transition('Offline', 'Active', float(self.activity_rate))
                 self.add_transition('Offline', 'Online', float(1.-self.activity_rate))
                 #print "Activity rate: ", self.activity_rate

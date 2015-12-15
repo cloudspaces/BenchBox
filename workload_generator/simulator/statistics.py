@@ -5,7 +5,8 @@ Created on 19/10/2015
 '''
 
 import os
-from workload_generator.constants import SIMULATION_TIME_SLOT
+from workload_generator.constants import SIMULATION_TIME_SLOT,\
+    SIMULATION_DURATION
 
 class StatisticsManager(object):
     
@@ -15,6 +16,7 @@ class StatisticsManager(object):
         self.inter_arrivals_per_transition = dict()
         self.session_per_stereotype = dict()
         self.users_per_timeslot = dict()
+        self.operation_types = set()
         self.output_dir = output_dir
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)        
@@ -31,6 +33,8 @@ class StatisticsManager(object):
             self.operations_per_timeslot[stereotype][current_timeslot][operation] = 0      
             
         self.operations_per_timeslot[stereotype][current_timeslot][operation] += 1
+        
+        self.operation_types.add(operation)
         
         '''User-based operations'''
         if stereotype not in self.operations_per_user:
@@ -82,12 +86,21 @@ class StatisticsManager(object):
                 self.session_per_stereotype[stereotype][state].close()
         
         for stereotype in sorted(self.operations_per_timeslot.keys()):
-            stereotype_file = open(self.output_dir + stereotype + "_ops_per_timeslot.dat", "w")
-            for current_timeslot in sorted(self.operations_per_timeslot[stereotype].keys()):
-                to_print = ""
-                for operation in sorted(self.operations_per_timeslot[stereotype][current_timeslot].keys()):
-                    to_print += str(self.operations_per_timeslot[stereotype][current_timeslot][operation]) + "\t"
-                print >> stereotype_file, to_print
+            stereotype_file = open(self.output_dir + stereotype + "_ops_per_timeslot.dat", "w")            
+            simulation_timeslot_len = int(SIMULATION_DURATION/SIMULATION_TIME_SLOT)
+            for i in range(simulation_timeslot_len):  
+                to_print = dict()
+                if i in self.operations_per_timeslot[stereotype]:      
+                    for operation in sorted(self.operations_per_timeslot[stereotype][i].keys()):
+                        to_print[operation] = self.operations_per_timeslot[stereotype][i][operation]
+                str_output = ''
+                total_per_timeslot = 0
+                for operation in sorted(self.operation_types):
+                    if operation not in to_print:
+                        to_print[operation] = 0
+                    total_per_timeslot += to_print[operation]
+                    str_output += str(to_print[operation]) + "\t"
+                print >> stereotype_file, str_output + "\t" + str(total_per_timeslot)
             stereotype_file.close()
             
         for state in sorted(self.users_per_timeslot.keys()):

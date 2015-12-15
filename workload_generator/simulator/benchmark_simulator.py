@@ -7,7 +7,8 @@ Created on 1/7/2015
 import simpy
 import time
 from workload_generator.constants import SIMULATION_DURATION, \
-                STEREOTYPE_DISTRIBUTION, STEREOTYPE_RECIPES_PATH, NODES
+                STEREOTYPE_DISTRIBUTION, STEREOTYPE_RECIPES_PATH, NODES,\
+    SIMULATION_TIME_SLOT
 from workload_generator.simulator.statistics import StatisticsManager
 from workload_generator import constants
 from workload_generator.model.user_activity.stereotype_executor import StereotypeExecutor
@@ -21,6 +22,8 @@ from workload_generator.model.user_activity.stereotype_executor import Stereotyp
 #TODO: Updates should be better modeled than they are. In fact, we need
 #the distribution of updates per file, and probably the relationship between
 #file updates and file size and content.
+
+index = 0
 
 '''Dummy class to emulate the calls of the real one, for simulation purposes'''
 class SimulatedStereotypeExecutorU1(StereotypeExecutor):
@@ -93,6 +96,11 @@ class BenchmarkingProcess():
 def do_simulation_step(env, node):
     
     while env.now < SIMULATION_DURATION:
+        
+        global index
+        if env.now/SIMULATION_TIME_SLOT > index:
+            print "Simulation time: ", env.now/SIMULATION_TIME_SLOT, "hrs"
+            index+=1
         #print "Proc: ", node.process_id, " Time: ", env.now, node.stereotype
         previous_node_state = node.stereotype_executor.state_chain.previous_state
         node.stereotype_executor.next_operation()
@@ -124,7 +132,8 @@ def do_simulation_step(env, node):
             yield env.timeout(wait_time)
         except (Exception):
             print node.stereotype_executor.operation_chain.previous_state, node.stereotype_executor.operation_chain.current_state
-            print "WARNING: bad call to generator function!"     
+            print "Next action: ", node.stereotype_executor.next_action
+            print "WARNING: bad call to generator function! Wait time:", wait_time     
                   
         if wait_time < 0:
             print node.stereotype_executor.operation_chain.previous_state, node.stereotype_executor.operation_chain.current_state
