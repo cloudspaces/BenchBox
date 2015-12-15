@@ -105,8 +105,9 @@ block content
                 .col-md-2
                     h4 Monitor
                 .col-md-10
-                    p content
-
+                    .embed-responsive.embed-responsive-16by9
+                        iframe.embed-responsive-item(src="http://localhost:3000/dashboard/db/benchbox")
+                    //iframe(src="http://localhost:3000/dashboard-solo/db/benchbox?panelId=3&fullscreen&edit&from=1449831622982&to=1449831742982" height="200" width="300")
 
             #configHosts.tab-pane.fade.in.active
                 .col-md-12

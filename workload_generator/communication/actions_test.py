@@ -3,21 +3,21 @@
 '''
 Testing each of the Ftp_sender action
 '''
-import getpass
 import sys
 import time
 import os
 
-username = getpass.getuser()
-# parent directory of 'workload_generator' -> /home/vagrant/workload_generator
-base_path = {
-    'vagrant': '/home/vagrant/',
-    'anna': '/home/anna/CloudSpaces/Dev/BenchBox/',
-    'user': '/home/user/workspace/BenchBox/',
-    'lab144': '/home/lab144/BenchBox/',
-    'Raul': 'D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\'
-}
-sys.path.append(base_path[username])
+def appendParentDir(num, currdir):
+    print currdir
+    if num is 0:
+        print 'return value'
+        sys.path.append(currdir)
+        return currdir
+    else:
+        dirname, basename = os.path.split(currdir)
+        num-=1
+        return appendParentDir(num, dirname)
+appendParentDir(2, os.path.dirname(os.path.realpath(__file__)))
 
 from workload_generator.constants import STEREOTYPE_RECIPES_PATH, FS_SNAPSHOT_PATH, DEBUG
 from workload_generator.model.data_layer.data_generator import DataGenerator
@@ -99,7 +99,7 @@ for i in range(number):
         path = data_generator.move_file()
         src_path, tgt_path_local = path
         print 'MOVE_FILE: {} ---> {}'.format(src_path, tgt_path_local)
-        if not src_path == tgt_path:
+        if not src_path == tgt_path_local:
             tgt_path_remote = actions.MoveFile(src_path, FS_SNAPSHOT_PATH, tgt_path_local).perform_action(ftp_client)
             print_diff_file(tgt_path_local, tgt_path_remote)
 

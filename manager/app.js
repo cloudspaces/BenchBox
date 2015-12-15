@@ -5,10 +5,39 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var constants = require("./constants");
 
-// var statusManager = require('');
+var sleep = require('sleep');
+var influx = require('influx');
+
 
 var app = express();
+
+
+// ------------------------------------------------------------------------
+// ------------------------------------------------------------------------
+// -- connecting to influxdb  ---------------------------------------------
+// ------------------------------------------------------------------------
+// ------------------------------------------------------------------------
+
+// console.log(constants.influx.influx_conn);
+
+var influxClient = influx(constants.influx.server);
+var influxReady = false;
+influxClient.getDatabaseNames(function(err, arrDBS){
+    if(err) throw err;
+    if(arrDBS.indexOf(constants.influx.influx_conn.database) > -1){
+        console.log("Database ["+constants.influx.influx_conn.database+"] ready!" );
+        influxReady = true;
+        return;
+    }
+
+    influxClient.createDatabase(constants.influx.influx_conn.database, function(err, result){
+        if(err) throw err;
+        console.log("Database created ready");
+        influxReady = true;
+    });
+});
 
 
 // ------------------------------------------------------------------------
@@ -16,7 +45,6 @@ var app = express();
 // -- connecting to mongoserver -------------------------------------------
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
-
 
 function createDBSettings(mongoLabURI) {
     var dbSettings = {},
@@ -29,10 +57,9 @@ function createDBSettings(mongoLabURI) {
     dbSettings.password = matches[2];
     return dbSettings;
 }
-var url = 'mongodb://localhost:27017/benchbox'
 
 var mongoose = require('mongoose');
-mongoose.connect(url, function (err) {
+mongoose.connect(constants.mongodb_url, function (err) {
     if (err) {
         console.log('connection to mongoose error!', err);
     } else {
@@ -41,23 +68,6 @@ mongoose.connect(url, function (err) {
 });
 
 
-// ------------------------------------------------------------------------
-// -- load file system
-// ------------------------------------------------------------------------
-
-/*
- var fs = require('fs');
- var path = require('path');
- var filePath = path.join(__dirname, 'static/json/config.json')
- var obj;
-
- fs.readFile(filePath, 'utf8', function(err, data){
-
- if (err) throw err;
- obj = JSON.parse(data);
- console.log('configuration', obj);
- });
- */
 
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
@@ -142,15 +152,17 @@ app.use('/rmq', rmqs);
 
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
-// -- connecting to rabbitmq-server -------------------------------------------
+// -- connecting to rabbitmq-server ---------------------------------------
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 
 var amqp = require('amqplib/callback_api');
-var amqp_url = 'amqp://benchbox:benchbox@10.30.236.141/';
+var amqp_url = constants.rmq_url;
 var amqp_conn = null;
 var manager_queue = 'rpc_queue';
 var hostModel = require('./models/Hosts.js');
+
+// this chunk of code should go withing a separate file export and required...
 amqp.connect(amqp_url, function (err, conn) {
     if (err) {
         console.log('connection rabbitmq error', err);
@@ -158,57 +170,85 @@ amqp.connect(amqp_url, function (err, conn) {
         console.log('connection rabbitmq successful!');
         amqp_conn = conn; // single connection for whole server.
     }
+
     conn.createChannel(function (err, ch) {
         var q = manager_queue;
         ch.assertQueue(q, {durable: false}, function (err, q) {
-            console.log(' [x] Awaiting RPC requests at: [' + q.queue + ']');
+            console.log(' [' + q.queue + '] Awaiting RPC...');
         });
         ch.prefetch(1);
         ch.consume(q, function rpc_reply(msg) {
-            var host_status = JSON.parse(msg.content)  // nomes el missatge esta en json
+            var host_status = JSON.parse(msg.content);  // nomes el missatge esta en json
             console.log("[" + msg.properties.replyTo + "] --> [" + msg.fields.consumerTag +
                 "] : host[%s] status(%s) :",
                 host_status.host, host_status.status);
 
-            var status = host_status.status
-            var dummyhost = host_status.host.split('.')[0]
-            var vboxhost = host_status.host.split('.')[1].toLowerCase()
-            console.log(status, dummyhost, vboxhost)
-            // fer un ajax request a si mateix o modificar directament ?
+            var status = host_status.status;
+            var dummyhost = host_status.host.split('.')[0];
+            var vboxhost = host_status.host.split('.')[1].toLowerCase();
+            console.log(status, dummyhost, vboxhost);
             hostModel.findOne({hostname: dummyhost}, function (err, host) {
                 if (err) {
                     console.error(err.message)
                 }
-                console.log("FOUND: ", host);
 
                 var status_attr = 'status';
                 if (dummyhost != vboxhost) {
                     status_attr += '_' + vboxhost
                 }
-                console.log(host)
                 host[status_attr] = status;
 
                 host.save(function (err) {
                     if (err)
                         console.log(err.message)
                 })
-                console.log(host)
             });
 
             var result = "manager Joined queue " + host_status.host + "! ";
             var callbackChannel = msg.properties.replyTo;
-            var callbackMsg = new Buffer(result.toString())
-            var callbackProp = {correlationId: msg.properties.correlationId}
+            var callbackMsg = new Buffer(result.toString());
+            var callbackProp = {correlationId: msg.properties.correlationId};
             ch.sendToQueue(callbackChannel, callbackMsg, callbackProp); // send to queue
             ch.ack(msg); // fer un ack del message
         });
     });
+
+    // ------------------------------------------------------------------------
+    // -- Metrics RabbitMQ handlers :: forward to influxdb # & impala TODO
+    // -------------------------------------------------------------------------
+
+    conn.createChannel(function (err, ch) {
+        var ex = 'metrics';
+        ch.assertExchange(ex, 'fanout', {durable: false});
+
+        ch.assertQueue('', {exclusive: true}, function (err, q) {
+            console.log(' [' + ex + '] waiting for connection');
+            ch.bindQueue(q.queue, ex, '');
+            ch.consume(q.queue, function (msg) {
+                // console.log(" [" + ex + "] " + msg.content.toString());
+                /*
+                var point = {
+                    time: new Date(),
+                    value: Math.floor(Math.random() * 100) + 1,
+                    cpu: Math.floor(Math.random() * 100) + 1,
+                    ram: Math.floor(Math.random() * 100) + 1,
+                    net: Math.floor(Math.random() * 100) + 1
+                };
+                */
+                var data = JSON.parse(msg.content);
+                var metrics = data.metrics;
+                var tags = data.tags;
+                var point = metrics;
+                var hostname = msg.fields.routingKey;
+                if(influxReady){
+                    influxClient.writePoint(hostname, point, tags, function(){
+                    //   console.log("done writing");
+                    });
+                }
+            }, {noAck: true}); // ignore if none reached, none blocking queue
+        })
+    })
 });
-
-
-// ------------------------------------------------------------------------
-// -- setup status update
-// -------------------------------------------------------------------------
 
 
 // ------------------------------------------------------------------------
@@ -217,7 +257,6 @@ amqp.connect(amqp_url, function (err, conn) {
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     var err = new Error('Not Found');
@@ -225,9 +264,7 @@ app.use(function (req, res, next) {
     next(err);
 });
 
-
 // error handlers
-
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {

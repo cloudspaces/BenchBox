@@ -4,23 +4,15 @@ Created on 6/7/2015
 @author: Raul
 '''
 import getpass
+import os
 
-'''Raul configuration'''
-PROJECT_PATH = 'D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\' #'/home/user/workspace/BenchBox/'
 
-'''Chenglong configuration'''
-username = getpass.getuser()
-PROJECT_PATH = None
-TEMP_PATH = {
-    'vagrant': '/home/vagrant/',
-    'anna': '/home/anna/CloudSpaces/Dev/BenchBox/',
-    'user': '/home/user/workspace/BenchBox/',
-    'Raul': 'D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\',
-    'lab144': '/home/lab144/BenchBox/'
-}
-
-PROJECT_PATH = TEMP_PATH[username]
-
+PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+# hardcode due to no convention with closing slash or not for directory this may fail if the directory is root
+if os.name == 'posix':
+    PROJECT_PATH+= '/'
+else:
+    PROJECT_PATH+= '\\'
 '''In debug mode the system works without doing changes in the local file system'''
 DEBUG = False
 
@@ -45,12 +37,10 @@ DATA_GENERATOR_PATH = PROJECT_PATH + "workload_generator/external/sdgen.jar"
 DATA_GENERATOR_PROPERTIES_DIR = PROJECT_PATH + "workload_generator/model/data_layer" #/application.properties
 DATA_CHARACTERIZATIONS_PATH = PROJECT_PATH + "workload_generator/external/sdgen_characterizations/"
 
+username = getpass.getuser()
 FS_SNAPSHOT_PATH = None
 SNAPSHOT_PATH = {
-    'vagrant': PROJECT_PATH + "output",
-    'anna': PROJECT_PATH + "output",
-    'user': PROJECT_PATH + "output",
-    'lab144': PROJECT_PATH + "output",
+    username: PROJECT_PATH + "output",
     'Raul': "C:\\Users\\Raul\\Desktop\\test"
 }
 
@@ -72,9 +62,11 @@ CPU_MONITOR_PORT = 11000
 TO_WAIT_STATIC_MAX = 6
 TO_WAIT_STATIC_MIN = 1
 
+
 # FTP SENDER CONSTANTS
 
 FTP_SENDER_IP = SANDBOX_IP
 FTP_SENDER_PORT = 21
+FTP_SENDER_INTERFACE = 'eth1'
 FTP_SENDER_USER = 'vagrant'
 FTP_SENDER_PASS = 'vagrant'

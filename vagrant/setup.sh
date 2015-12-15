@@ -21,7 +21,7 @@ sudo ./scripts/config.owncloud.sh;
 sudo ./scripts/config.stacksync.sh;  # '%s' # h['stacksync-ip']
 
 echo "#3 Install RabbitMQ Pip Pika"
-sudo ./scripts/installPythonPipPika.sh
+sudo ./scripts/installPythonPipPika.sh;
 
 
 fi;

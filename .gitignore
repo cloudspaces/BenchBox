@@ -49,7 +49,6 @@ workload_generator/workload_generator/*
 # ignore this binary as it has to be recompiled foreach machine
 workload_generator/external/impressions
 
-
 vagrant/.*
 vagrant/db
 vagrant/hostname
@@ -60,13 +59,18 @@ vagrant/profile
 vagrant/ss.*
 vagrant/owncloud.sh
 vagrant/owncloudsync.sh
+vagrant/rabbitmq
 vagrant/slaves
 vagrant/slaves/*
 vagrant/slaves/*/*
 vagrant/scripts/test
 vagrant/puppet/manifests/test
 vagrant/puppet/manifests/test/*
-
+vagrant/nohup_executor_rmq.out
+vagrant/nohup_monitor_rmq.out
+vagrant/emit_metric_test.py
+vagrant/1.txt
+vagrant/logs
 
 monitor/logger/test
 monitor/logger/plots/output
@@ -75,7 +79,7 @@ monitor/logger/matlab_scripts
 monitor/logger/parser
 monitor/logger/post-process
 monitor/logger/py_cpu_monitor/*.pyc
-
+monitor/*.txt
 
 
 

@@ -26,7 +26,7 @@ class ManagerZeroRpc:
             'owncloud-ip': args['owncloud-ip'][0],
             'impala-ip': args['impala-ip'][0],
             'graphite-ip': args['graphite-ip'][0],
-            'rabbit-url': args['graphite-ip'][0],
+            'rabbit-url': args['rabbitmq-amqp'][0],
             'box-url': None,
             'hostname': args['hostname'][0]
         }
@@ -65,6 +65,7 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
               "" \
               "cd vagrant; " \
               "" \
+              "echo '{}' > rabbitmq; " \
               "echo '{}' > profile; " \
               "" \
               "echo '{}' > ss.stacksync.key; " \
@@ -80,10 +81,10 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
               "nohup ./startPeerConsumer.sh & " \
               "" \
               "" \
-              "".format(
-                        h['passwd'],  h['profile'],
+              "".format(h['passwd'],
+                        h['rabbit-url'], h['profile'],
                         h['cred_stacksync'], h['cred_owncloud'],  h['hostname'],
-                        h['owncloud-ip'], h['stacksync-ip'], h['impala-ip'], h['graphite-ip'],
+                        h['stacksync-ip'], h['owncloud-ip'], h['impala-ip'], h['graphite-ip'],
                         h['passwd']
                         )
     print 'sendQuery...';

@@ -10,8 +10,9 @@ import sys, os
 #-------------------------------------------------------------------------------
 class ftp_sender():
     def __init__(self, ftp_host, ftp_port, ftp_user, ftp_pass, ftp_root):
+
         self.ftp = FTP()
-        self.ftp.connect(ftp_host, ftp_port)
+        self.ftp.connect(ftp_host, ftp_port)  # socket set timeout 1 week timeout
         self.ftp.login(ftp_user, ftp_pass)
         print "......................................Going to root"
         print self.ftp.pwd()
@@ -20,11 +21,13 @@ class ftp_sender():
         print self.ftp.pwd()
 
         self.ftp_host = ftp_host
+        self.ftp_port = ftp_port
+        self.ftp_user = ftp_user
+        self.ftp_pass = ftp_pass
         self.ftp_root = ftp_root
 
     def send(self, fname, new_name=None, sub_folder=None):
         print ">> {} <<  ".format(self.ftp.pwd())
-
         if sub_folder:
             self.ftp.cwd("~")  # move to home
             if self.ftp_root:
@@ -147,6 +150,19 @@ class ftp_sender():
     def get_ftp_host(self):
         return self.ftp_host
 
+    def keep_alive(self):
+        while True:
+            try:
+                print "keep_alive/Try"
+                self.ftp.voidcmd("NOOP")
+                print "keep_alive/True"
+                break
+            except Exception as e:
+                print "keep_alive/False"
+                print e.message
+                self.ftp.connect(self.ftp_host, self.ftp_port)  # NEEDED # socket set timeout 1 week timeout
+                self.ftp.login(self.ftp_user, self.ftp_pass)
+        return self
 
 if __name__ == '__main__':
 

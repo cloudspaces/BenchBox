@@ -5,13 +5,13 @@ import urlparse
 import sys
 import getopt
 import socket
-import threading
 import subprocess
-import time
 import json
+
 class ActionHandler(object):
     def __init__(self):
         print "vagrant handler"
+        self.hostname = socket.gethostname()
 
     ''' executed at the dummyhost '''
     def up(self):
@@ -21,43 +21,68 @@ class ActionHandler(object):
 
     def pwd(self):
         print 'up'
-        print subprocess.check_output(["pwd", "."])
+        return subprocess.check_output(["pwd", "."])
 
     def vagrantUp(self):
         print 'vagrantUp'
         print subprocess.check_output(["vagrant", "up"])
+        return 'vagrantUp/OK'
 
     def vagrantProvision(self):
         print 'vagrantProvision'
         print subprocess.check_output(['vagrant', 'provision'])
+        return 'vagrantProvision/OK'
 
     def vagrantStatus(self):
         print 'vagrantProvision'
         print subprocess.check_output(['vagrant', 'status'])
+        return 'vagrantProvision/OK'
 
 
-    ''' executed at the benchBox '''
+    ''' executed at the benchBox, nota: el script esta en el directorio root /vagrant'''
     def warmUp(self):
-        # warmup the sandBox filesystem running the executor
+        # warmup the sandBox filesystem booting the executor.py
         print 'warmUp'
-        str_cmd = "if [ -d ~/workload_generator ]; then; " \
-                  "cd ~/workload_generator; " \
-                  "python executor.py -o {} -p {} -t {} -f {} -x {} -w 1; " \
-                  "fi; ".format(0, 'backupsample', 0, 'stacksync_folder', 'StackSync')
-        output = subprocess.check_output(['echo', 'warmup'])
-        return output
+        str_cmd = "nohup python ~/workload_generator/executor_rmq.py &> nohup_executor_rmq.out& "
+        # output = subprocess.check_output(['echo', 'warmup'])
+        return bash_command(str_cmd)
 
-    ''' executed at the sandBox '''
     def tearDown(self):
         # clear the sandBox filesystem and cached files
         print 'tearDown'
-        str_cmd = "if [ -d ~/output ]; then " \
-                  "rm -R ~/output; " \
-                  "fi; "
-        print subprocess.check_output(['echo', 'teardown'])
+        output = ''
+        if self.hostname == 'sandBox':              # todo if sandbox
+            str_cmd = "pgrep -f monitor_rmq.py | xargs kill -9 "  # kill the process
+            output += bash_command(str_cmd)
+            str_cmd = "echo $? "  # run some cleanup script todo
+            output += bash_command(str_cmd)
+        elif self.hostname == 'benchBox':           # todo if benchBox
+            str_cmd = "pgrep -f executor_rmq.py | xargs kill -9 "  # kill the process
+            output += bash_command(str_cmd)
+            str_cmd = "echo $? "  # run some cleanup script todo
+            output += bash_command(str_cmd)
+        else:
+            return 'unhandled hostname: {}'.format(self.hostname)
+
+
+
+        return output
+    ''' executed at the sandBox '''
+    def monitorUp(self):
+        # start the metrics listener for monitoring
+        print 'monitorUp'
+        str_cmd = "nohup python ~/monitor/monitor_rmq.py &> nohup_monitor_rmq.out& "
+
+        return bash_command(str_cmd)
+
+    def execute(self):
+        print 'execute'
+        return bash_command('whoami')
+
 
 class ProduceStatus(object):
     def __init__(self, rmq_url='localhost', queue_name = 'status_manager'):
+        print 'prod: {}'.format(rmq_url)
         self.rmq_url = rmq_url
         if rmq_url == 'localhost':
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(rmq_url))
@@ -158,7 +183,11 @@ class ConsumeAction(object):
 
 
 def bash_command(cmd):
-    subprocess.Popen(['/bin/bash', '-c', cmd])
+    child = subprocess.Popen(['/bin/bash', '-c', cmd])
+    child.communicate()[0]
+    rc = child.returncode
+    return rc
+
     # -c command starts to be read from the first non-option argument
 
 def parse_args(argv):
@@ -188,10 +217,11 @@ if __name__ == '__main__':
     ''' dummy host says hello to the manager '''
     status_msg, topic = parse_args(sys.argv[1:])
 
-    # rmq_url = 'localhost'  # 'amqp://benchbox:benchbox@10.30.236.141/'
-    rmq_url = 'amqp://benchbox:benchbox@10.30.236.141/'
+    rmq_url = None
+    with open('rabbitmq','r') as r:
+        rmq_url = r.read().splitlines()[0]
+
     status_exchanger = 'status_exchanger'
-    # amqp://benchbox:benchbox@10.30.236.141/
     emit_status_rpc = ProduceStatus(rmq_url)
 
     hostname = socket.gethostname()
@@ -212,7 +242,7 @@ if __name__ == '__main__':
 
     # dummyhost = hostname
 
-    host_queue = "{}.{}".format(dummyhost, hostname.lower()) # this is the format, that rmq.js target_queue needs!
+    host_queue = "{}.{}".format(dummyhost, hostname.lower())  # this is the format, that rmq.js target_queue needs!
     # status_msg
 
     print " [x] emit: emit_status_rpc.call({})".format(host_queue)

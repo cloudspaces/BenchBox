@@ -2,8 +2,8 @@
 var express = require('express');
 var router = express.Router();
 var amqp = require('amqplib');
-
-var amqp_server_url = 'amqp://benchbox:benchbox@10.30.236.141/'
+var constants = require('/constants');
+var amqp_server_url = constants.rmq_url;
 
 function fib(n) {
     // Do it the ridiculous, but not most ridiculous, way. For better,

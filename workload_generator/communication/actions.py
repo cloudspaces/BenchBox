@@ -66,10 +66,11 @@ class CreateFile(Action):
             ftp_rel_path = os.path.relpath(os.path.dirname(self.path), self.output_root)  # / == output
             print "send: {} -> to: {}".format(self.path, ftp_rel_path)
             ftp_abs_path = sender.send(self.path, None, ftp_rel_path)
+            print ftp_abs_path
         except Exception as e:
-            print e
+            print e.message
             # TODO return self.size
-        print ftp_abs_path
+
         return ftp_abs_path
     def to_string(self):
         return "MakeResponse " + str(self.path) + "\n"
@@ -380,6 +381,7 @@ class UploadDirectory(Action):
                 ftp_client.send(f)
             elif os.path.isdir(target_file):
                 print "{} is dir".format(target_file)
+                print "mkd: {}".format(f)
                 ftp_client.mkd(f)
                 ftp_client.cwd(f)
                 self.uploadFolder(ftp_client, target_file, target_file)

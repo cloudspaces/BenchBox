@@ -85,9 +85,9 @@
                         </td>
                         <td class="col-md-2">
                             <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.status">
-                            <p class="host-status" ng-show="!editing[$index]">{{host.status}}</p>
-                            <p class="host-status" ng-show="!editing[$index]">{{host.status_benchbox}}</p>
-                            <p class="host-status" ng-show="!editing[$index]">{{host.status_sandbox}}</p>
+                            <p class="host-status" ng-show="!editing[$index]">[D]{{host.status}}</p>
+                            <p class="host-status" ng-show="!editing[$index]">[B]{{host.status_benchbox}}</p>
+                            <p class="host-status" ng-show="!editing[$index]">[S]{{host.status_sandbox}}</p>
                         </td>
                     </tr>
                 </tbody>
@@ -118,26 +118,15 @@
 </div>
 
 <!-- ACTION to Selected Hosts -->
-
+<!--
 <div class="row">
     <div class="col-md-2">
         <h5>
             SS Command:
         </h5>
     </div>
-    <div class="col-md-10">
-        <div id="ssRadio">
-            <label><input type="radio" class="radio-inline" name="ss" value="StackSync" checked><img class="radio-image" src="https://avatars2.githubusercontent.com/u/5880314?v=3&s=200"></label>
-            <label><input type="radio" class="radio-inline" name="ss" value="OwnCloud"><img class="radio-image" src="http://apps.readynas.com/files/o/owncloud/logo-6.0.0-all.png"></label>
-            <label><input type="radio" class="radio-inline" name="ss" value="SugarSync"><img class="radio-image" src="http://smallbiztechnology.com/wp-content/uploads/2011/11/SugarSync200x200.jpg"></label>
-            <label><input type="radio" class="radio-inline" name="ss" value="DropBox"><img class="radio-image" src="http://www.siliconnews.es/wp-content/uploads/2014/01/dropbox-300x250.jpg"></label>
-            <label><input type="radio" class="radio-inline" name="ss" value="Box"><img class="radio-image" src="https://lh4.googleusercontent.com/-n00xivPZeSw/UkIipJZctvI/AAAAAAAABYM/mGPA27NGGdw/s256-no/app_box_256x256.png"></label>
-            <label><input type="radio" class="radio-inline" name="ss" value="OneDrive"><img class="radio-image" src="http://a3.mzstatic.com/us/r30/Purple6/v4/f3/a9/57/f3a957ca-7530-c148-e117-a06be51fa714/icon128-2x.png"></label>
-            <label><input type="radio" class="radio-inline" name="ss" value="GoogleDrive"><img class="radio-image" src="http://tecnologia.starmedia.com/imagenes/2013/01/como-usar-google-drive-almacenar-archivos1.jpg"></label>
-        </div>
-    </div>
 </div>
-
+-->
 <div class="row">
     <div class="col-md-2">
         <h5>
@@ -145,8 +134,8 @@
         </h5>
     </div>
     <div class="col-md-10">
-            <button class="btn btn-default" ng-click="rpc('test-check','setup')" title="Download BenchBox project to the dummy machine">Setup</button>
 
+            <button class="btn btn-success" ng-click="rpc('test-check','setup')" title="Download BenchBox project to the dummy machine">Setup</button>
 
             <button class="btn btn-default" ng-click="rmq('test-check','vagrantUp', '')" title="vagrantUp rpc">vagrantUp</button>
             <button class="btn btn-default" ng-click="rmq('test-check','vagrantProvision', '')" title="vagrantProvision rpc">vagrantProvision</button>
@@ -154,11 +143,9 @@
             <button class="btn btn-default" ng-click="rpc('test-check','vagrantDown')" title="pull latest repo & vagrant down">Down</button>
             -->
 
-
-            <button class="btn btn-default pull-right" ng-click="rmq('test-check', 'warmUp',   'benchBox')" title="Startup file system">WarmUp</button>
-            <button class="btn btn-default pull-right" ng-click="rmq('test-check', 'tearDown', 'sandBox')" title="Clear the shared file system">TearDown</button>
-
-
+            <button class="btn btn-danger pull-right" ng-click="rmq('test-check', 'tearDown', 'benchBox', 'sandBox')" title="Clear the shared file system: benchBox & sandBox">TearDown</button>
+            <button class="btn btn-primary pull-right" ng-click="rmq('test-check', 'warmUp',   'benchBox')" title="Startup file system: benchBox">Executor</button>
+            <button class="btn btn-info pull-right" ng-click="rmq('test-check', 'monitorUp', 'sandBox')" title="Startup monitor real time collection: sandBox">Monitor</button>
 
             <!--
             <button class="btn btn-default " ng-click="rpc('test-check','monitorUp')" title="Run Socket Listener at dummy machine, sandBox">Listen</button>
@@ -166,12 +153,13 @@
             <button class="btn btn-default pull-right" ng-click="rpc('test-check','client', 'Down')" title="Run clientSSDown at dummy machine, sandBox">SSDown</button>
             <button class="btn btn-default pull-right" ng-click="rpc('test-check','client', 'Up')" title="Run clientSSUp at dummy machine, sandBox">SSUp</button>
             -->
+
     </div>
 </div>
 
 
 <!-- CREATE -->
-
+<!-- refactor this into  modal view
 <div class="row">
     <div class="col-md-2">
         <h5>
@@ -191,36 +179,100 @@
         <button class="btn btn-success btn-block" ng-click="saveHost()">Add Host</button>
     </div>
 </div>
-
+-->
 
 
 <hr>
 <!-- EXECUTE -->
-<!--
+
 <div class="row">
     <div class="col-md-2">
         <h5>
             Execute Args
         </h5>
     </div>
+    <!--
     <div class="col-md-1">
         <input type="text" class="form-control" ng-model="run.testOps" placeholder="-ops" value="10">
     </div>
     <div class="col-md-1">
         <input type="text" class="form-control" ng-model="run.testItv" placeholder="-itv" value="1">
     </div>
-    <div class="col-md-2">
+    <div class="col-md-1">
         <input type="text" class="form-control" ng-model="run.testProfile" placeholder="-profile" value="sync">
     </div>
-    <div class="col-md-2">
+    <div class="col-md-1">
         <input type="text" class="form-control" ng-model="run.testFolder" placeholder="-folder" value="stacksync_folder">
     </div>
-    <div class="col-md-2">
+    <div class="col-md-1">
         <input type="text" class="form-control" ng-model="run.testClient" placeholder="-client" value="StackSync">
     </div>
+    -->
+    <div class="col-md-5">
+        <input type="hidden" class="form-control" ng-model="run.testOps" placeholder="-ops" value="10">
+        <input type="hidden" class="form-control" ng-model="run.testItv" placeholder="-itv" value="1">
+        <input type="hidden" class="form-control" ng-model="run.testProfile" placeholder="-profile" value="sync">
+        <input type="hidden" class="form-control" ng-model="run.testFolder" placeholder="-folder" value="stacksync_folder">
+        <input type="hidden" class="form-control" ng-model="run.testClient" placeholder="-client" value="StackSync">
+    </div>
+    <div class="col-md-3">
+        <!--
+        <input type="text" class="form-control" ng-model="run.testOperation" placeholder="-rmq_rpc" value="hello">
+        -->
+        <select class="form-control" ng-model="run.testOperation">
+            <option value="hello">--- -rmq_executor_rpc ---</option>
+            <option value="warmup">warmup</option>
+            <option value="start">start</option>
+            <option value="stop">stop</option>
+        </select>
+
+    </div>
+
     <div class="col-md-2">
-        <button class="btn btn-success btn-block" ng-click="runTest()" title="Run executor at dummy machine, benchBox">Execute</button>
+        <button class="btn btn-success btn-block"
+                ng-click="rmq('test-check', 'executor', 'executor')"
+                title="Run executor at dummy machine, benchBox">Execute</button>
+    </div>
+
+
+</div>
+
+
+<!-- MONITOR -->
+<div class="row">
+    <div class="col-md-2">
+        <h5>
+            Execute Monitor
+        </h5>
+    </div>
+    <div class="col-md-5">
+        <div id="ssRadio">
+            <label><input type="radio" class="radio-inline" name="ss" value="StackSync" checked><img class="radio-image" src="https://avatars2.githubusercontent.com/u/5880314?v=3&s=200"></label>
+            <label><input type="radio" class="radio-inline" name="ss" value="OwnCloud"><img class="radio-image" src="http://apps.readynas.com/files/o/owncloud/logo-6.0.0-all.png"></label>
+            <label><input type="radio" class="radio-inline" name="ss" value="SugarSync"><img class="radio-image" src="http://smallbiztechnology.com/wp-content/uploads/2011/11/SugarSync200x200.jpg"></label>
+            <label><input type="radio" class="radio-inline" name="ss" value="DropBox"><img class="radio-image" src="http://www.siliconnews.es/wp-content/uploads/2014/01/dropbox-300x250.jpg"></label>
+            <label><input type="radio" class="radio-inline" name="ss" value="Box"><img class="radio-image" src="https://lh4.googleusercontent.com/-n00xivPZeSw/UkIipJZctvI/AAAAAAAABYM/mGPA27NGGdw/s256-no/app_box_256x256.png"></label>
+            <label><input type="radio" class="radio-inline" name="ss" value="OneDrive"><img class="radio-image" src="http://a3.mzstatic.com/us/r30/Purple6/v4/f3/a9/57/f3a957ca-7530-c148-e117-a06be51fa714/icon128-2x.png"></label>
+            <label><input type="radio" class="radio-inline" name="ss" value="GoogleDrive"><img class="radio-image" src="http://tecnologia.starmedia.com/imagenes/2013/01/como-usar-google-drive-almacenar-archivos1.jpg"></label>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <!--
+        <input type="text" class="form-control" ng-model="run.testMonitor" placeholder="-ops" value="10">
+        -->
+        <select class="form-control" ng-model="run.testMonitor">
+            <option value="hello">--- -rmq_monitor_rpc ---</option>
+            <option value="warmup">warmup</option>
+            <option value="start">start</option>
+            <option value="stop">stop</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <button
+                class="btn btn-success btn-block"
+                ng-click="rmq('test-check', 'monitor', 'monitor')"
+                title="Run monitor at dummy machine, sandBox">Monitor</button>
     </div>
 </div>
--->
 
