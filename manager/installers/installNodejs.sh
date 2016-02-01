@@ -7,7 +7,7 @@ which curl
 if [ ! $? -eq 0 ]
 	then
 	echo "Installing Curl"
-	sudo apt-get install curl
+	sudo apt-get install -y curl
 else
 	echo "Curl already installed"
 fi

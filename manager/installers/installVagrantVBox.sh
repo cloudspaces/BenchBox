@@ -65,7 +65,7 @@ if which sshpass; then
     echo 'sshpass/OK';
  else
 	echo 'sshpass/no';
-	sudo apt-get install sshpass
+	sudo apt-get -y install sshpass
 fi
 
 

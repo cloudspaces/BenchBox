@@ -8,7 +8,9 @@ echo "Installing python dependent RabbitMQ server with Pika Library"
 
 echo "Install recent version of Erlang"
 
-sudo apt-get install erlang
+# required also erlang =>
+sudo apt-get install -y erlang  erlang-nox  erlang-manpages erlang-doc
+
 
 echo "Download the"
 
