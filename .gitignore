@@ -85,6 +85,7 @@ monitor/*.txt
 
 output
 out
+nohup*.out
 
 # hide or ignore installation packages
 *.deb
