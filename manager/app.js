@@ -7,7 +7,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var constants = require("./constants");
 
-var sleep = require('sleep');
 var influx = require('influx');
 
 
@@ -25,7 +24,9 @@ var app = express();
 var influxClient = influx(constants.influx.server);
 var influxReady = false;
 influxClient.getDatabaseNames(function(err, arrDBS){
-    if(err) throw err;
+
+    if(err)
+        throw err;
     if(arrDBS.indexOf(constants.influx.influx_conn.database) > -1){
         console.log("Database ["+constants.influx.influx_conn.database+"] ready!" );
         influxReady = true;

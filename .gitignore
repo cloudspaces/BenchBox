@@ -23,7 +23,7 @@ manager/output
 manager/hosts
 # manager/*.csv
 test
-
+credentials
 
 # simulator/data
 # simulator/files

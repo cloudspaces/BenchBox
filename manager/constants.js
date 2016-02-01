@@ -6,7 +6,7 @@ function define(name, value) {
 }
 
 define("PI", 3.14);
-define("rmq_url", 'amqp://benchbox:benchbox@10.50.234.51/'); // amqp
+define("rmq_url", 'amqp://benchbox:benchbox@10.30.236.141/'); // amqp
 define("influx", {
     server: {
         host: 'localhost',

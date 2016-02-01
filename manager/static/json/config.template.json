@@ -32,9 +32,9 @@
       }
     },
     "rabbitmq":{
-      "url": "amqp://benchbox:benchbox@10.50.234.51/",
+      "url": "amqp://benchbox:benchbox@10.30.236.141/",
       "virtual_host": "",
-      "host": "10.50.234.51",
+      "host": "10.30.236.141",
       "user": "benchbox",
       "password": "benchbox"
 

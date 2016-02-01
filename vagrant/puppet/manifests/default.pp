@@ -164,8 +164,9 @@ node 'sandBox' {
       mode    => '0644',
       recurse => true
   }->
+  # PIL
   package {
-    ['netifaces','PIL','psutil']:
+    ['netifaces','psutil']:
       ensure   => 'installed',
       provider => pip,
       require  => Package['python-pip']
