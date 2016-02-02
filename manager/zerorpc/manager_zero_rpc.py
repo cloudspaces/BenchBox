@@ -53,6 +53,8 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
     str_cmd = "" \
               "echo 'check if Git is installed...'; " \
               "echo '{}' | sudo -S apt-get install git; " \
+              "echo 'check upgrade pip; " \
+              "sudo pip install --upgrade pip; " \
               "echo 'check if BenchBox is installed...'; " \
               "" \
               "if [ -d BenchBox ]; then " \
