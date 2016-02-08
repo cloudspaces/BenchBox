@@ -1,3 +1,4 @@
+# -*- mode: ruby -*-
 #
 # CHENGLONG ZOU
 # 2015/16
@@ -5,7 +6,7 @@
 box = 'debian-7.0-amd64.box'
 box_sand = 'chenglong/sandbox'
 box_bench = 'chenglong/benchbox'
-box_url = box # check if file exists else download from remote path
+# box_url = box # check if file exists else download from remote path
 # box_url = "https://www.dropbox.com/s/sdupbseays0f7ik/debian-7.0-amd64.box" # use this if not found,
 # but only works with direct download links such as dl.dropbox type, only for pro-dropbox account users
 box_memory = "1024"
@@ -20,7 +21,7 @@ Vagrant.configure("2") do |config|
   nodes.each do |node|
     config.vm.define node[:hostname] do |nodeconfig|
       puts "BOX/LOAD"
-      nodeconfig.vm.box_url = box_url
+      # nodeconfig.vm.box_url = box_url
       nodeconfig.vm.box = node[:box]
       nodeconfig.vm.hostname = node[:hostname] # capat: hostnamectl
       nodeconfig.vm.network :private_network, ip: node[:ip]
