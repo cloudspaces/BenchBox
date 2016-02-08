@@ -71,6 +71,9 @@ vagrant/nohup_monitor_rmq.out
 vagrant/emit_metric_test.py
 vagrant/1.txt
 vagrant/logs
+vagrant/Vagrantfile.rb
+vagrant/Vagrantfile.txt
+
 
 monitor/logger/test
 monitor/logger/plots/output

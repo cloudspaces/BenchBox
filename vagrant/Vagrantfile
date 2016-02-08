@@ -3,15 +3,17 @@
 # 2015/16
 #
 box = 'debian-7.0-amd64.box'
+box_sand = 'chenglong/sandbox'
+box_bench = 'chenglong/benchbox'
 box_url = box # check if file exists else download from remote path
 # box_url = "https://www.dropbox.com/s/sdupbseays0f7ik/debian-7.0-amd64.box" # use this if not found,
 # but only works with direct download links such as dl.dropbox type, only for pro-dropbox account users
 box_memory = "1024"
 box_cpu = "1"
 nodes = [
-    {:hostname => 'sandBox', :ip => '192.168.56.101', :box => box, :shared_folder=>'../monitor',
+    {:hostname => 'sandBox', :ip => '192.168.56.101', :box => box_sand, :shared_folder=>'../monitor',
      :shared_folder_as=> '/home/vagrant/monitor'}, # :port_fwd=> 5000}, # contains the pc-clients && log monitor
-    {:hostname => 'benchBox', :ip => '192.168.56.2', :box => box, :shared_folder=>'../workload_generator',
+    {:hostname => 'benchBox', :ip => '192.168.56.2', :box => box_bench, :shared_folder=>'../workload_generator',
      :shared_folder_as=> '/home/vagrant/workload_generator'}
 ]
 Vagrant.configure("2") do |config|

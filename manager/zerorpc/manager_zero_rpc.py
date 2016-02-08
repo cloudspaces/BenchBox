@@ -11,10 +11,8 @@ class ManagerZeroRpc:
     def __init__(self):
         print 'manager_rmq instance'
 
-
     def setup(self, args):
         print 'ManagerOps {}'.format(args['cmd'][0])
-
         host_settings = {
             'ip': args['ip'][0],
             'passwd': args['login'][0],
@@ -31,7 +29,6 @@ class ManagerZeroRpc:
             'hostname': args['hostname'][0]
         }
         print "Start Initial Task"
-
         return setup_benchbox(host_settings)
 
 '''
@@ -40,25 +37,24 @@ t3downloadVagrantBoxImg(host_settings)
 t4assignStereoTypeToProfile(host_settings)
 t5assignCredentialsToProfile(host_settings)
 t6assignSyncServer(host_settings)
-
 return 0
 '''
 
 
 def setup_benchbox(h):  # tell all the hosts to download BenchBox
     print 'setupBenchBox'
-
     # todo append rabbit.mq.url link and as ip file and also vagrant.box.url
     # "git clone -b development --recursive https://github.com/CloudSpaces/BenchBox.git; " \
-    str_cmd = "" \
+    print "Start setup benchbox"
+    str_cmd = " " \
               "echo 'check if Git is installed...'; " \
               "echo '{}' | sudo -S apt-get install git; " \
-              "echo 'check upgrade pip; " \
-              "sudo pip install --upgrade pip; " \
+              "echo 'check upgrade pip'; " \
+              "echo '{}' | sudo pip install --upgrade pip; " \
               "echo 'check if BenchBox is installed...'; " \
               "" \
               "if [ -d BenchBox ]; then " \
-              "cd BenchBox;" \
+              "cd BenchBox; " \
               "git pull; " \
               "else " \
               "git clone -b development --recursive https://github.com/CloudSpaces/BenchBox.git; " \
@@ -84,12 +80,14 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
               "" \
               "" \
               "".format(h['passwd'],
+                        h['passwd'],
                         h['rabbit-url'], h['profile'],
                         h['cred_stacksync'], h['cred_owncloud'],  h['hostname'],
                         h['stacksync-ip'], h['owncloud-ip'], h['impala-ip'], h['graphite-ip'],
-                        h['passwd']
-                        )
-    print 'sendQuery...';
+                        h['passwd'])
+
+    print 'sendQuery...'
+    print str_cmd
     return rmi(h['ip'], h['user'], h['passwd'], str_cmd)  # utilitzar un worker del pool
 
 
