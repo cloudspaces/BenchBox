@@ -53,7 +53,8 @@ class Commands(object):
         print receipt
         print '[WARMUP]: init_stereotype_from_recipe'
         if self.is_warmup is False:
-            self.stereotype_executor.update_ftp_root_directory(root_dir='Dropbox')
+            sync_directory = body['msg']['test']['testFolder']
+            self.stereotype_executor.update_ftp_root_directory(root_dir=sync_directory)
             self.stereotype_executor.initialize_from_stereotype_recipe(receipt)
             print '[WARMUP]: init fs & migrate to sandbox'
             self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
@@ -138,7 +139,7 @@ class ExecuteRMQ(object):
             print toExecute # la comanda que s'executara
             # lo ideal es que aixo no sigui un thread per que les peticions s'atenguin fifo
             # t = threading.Thread(target=toExecute)
-            print body['cmd'] # esbrinar l'accio a executar
+            print body['cmd']  # esbrinar l'accio a executar
             if body['cmd'] == "warmup":
                 output = toExecute(body)
 
