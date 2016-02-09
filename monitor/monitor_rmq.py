@@ -67,14 +67,20 @@ class EmitMetric(object):
                 elif self.personal_cloud == "dropbox":
                     # how to track dropbox pid???
                     # the pid is contained in a pid file
-
+                    print self.personal_cloud
+                    proc = psutil.Process(pid)
+                    cpu_usage = math.ceil(proc.cpu_percent(0))
+                    ram_usage = proc.memory_info().rss
+                    metrics['cpu'] = cpu_usage
+                    metrics['ram'] = ram_usage
                     print "TODO etc"
             except Exception as e:
                 print e.message
         if tags == '':
             tags = {
                 'profile': 'backup_sample',
-                'credentials': 'pc_credentials'
+                'credentials': 'pc_credentials',
+                'client': self.personal_cloud.lower()
             }
         data = {
             'metrics': metrics,
@@ -128,12 +134,16 @@ class Commands(object):
     '''
     def warmup(self, body):
         print '[WARMUP] {}'.format(body)
+        personal_cloud_candidate = body['msg']['test']['testClient'] # el personal client que cal arrancar
+
         print '[WARMUP]: init personal cloud client'
-        if self.is_warmup is False:
-            print '[WARMUP]: to warmup '
+        if self.is_warmup is False: # or the personal cloud has changed
+            self.personal_cloud = personal_cloud_candidate
+            print '[WARMUP]: to warmup {}'.format(self.personal_cloud)
             self.is_warmup = True
         else:
-            print '[WARMUP]: already warmed-up'
+            # if self.personal_cloud == personal_cloud_candidate: todo @ sino tornar a arrancar
+            print '[WARMUP]: already warmed-up as {}'.format(self.personal_cloud)
 
         return '[WARMUP]: warm up response'
 
