@@ -78,7 +78,7 @@ router.get('/emit', function (req, res, next) {
                 }, on_message_prop);
                 ch.sendToQueue(target_queue, // target-hostname
                     // send rpc message to queue
-                    new Buffer(cmd.toString()),
+                    new Buffer(JSON.stringify({cmd: cmd, msg: req.query})),
                     {
                         correlationId: corr,
                         replyTo: q.queue

@@ -338,7 +338,8 @@ rmqHost = function (host, cmd, cb) {
 
     appendAllParams(args, 'bb-config');
     appendAllHosts(args, 'bb-hosts');
-
+    console.log("ARGS::::::");
+    console.log(args);
     $.ajax({
         url: 'http://localhost:'+location.port+'/rmq/emit',
         data: args,

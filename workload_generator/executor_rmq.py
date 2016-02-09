@@ -41,12 +41,12 @@ class Commands(object):
         # send to impala always...!!!
         # sshpass -p vagrant rsync -rvnc --delete ../output/ vagrant@192.168.56.101:stacksync_folder/
 
-    def hello(self):
-        print '[HELLO]: hello world'
+    def hello(self, body):
+        print '[HELLO]: hello world {}'.format(body)
         return '[HELLO]: hello world response'
 
     def warmup(self):
-        print '[WARMUP]'
+        print '[WARMUP]: {}'.format(body)
         print FS_SNAPSHOT_PATH
         print STEREOTYPE_RECIPES_PATH
         receipt = STEREOTYPE_RECIPES_PATH + self.stereotype
@@ -83,8 +83,8 @@ class Commands(object):
         else:
             print '[TEST]: WARNING: need warmup 1st!'
 
-    def start(self):
-        print '[START_TEST]'
+    def start(self, body):
+        print '[START_TEST]: {}'.format(body)
         if not self.is_warmup:
             return '[START_TEST]: WARNING: require warmup!'
 
@@ -98,9 +98,9 @@ class Commands(object):
             self.execute.start()
             return '[START_TEST]: SUCCESS: run test response'
 
-    def stop(self):
+    def stop(self, body):
         if self.is_running:
-            print '[STOP_TEST]: stop test'
+            print '[STOP_TEST]: stop test {}'.format(body)
             self.is_running = False
             self.execute.join()
             return '[STOP_TEST]: SUCCESS: stop test'

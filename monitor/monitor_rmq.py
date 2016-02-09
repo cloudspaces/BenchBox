@@ -118,16 +118,16 @@ class Commands(object):
             # todo metric reader class
 
 
-    def hello(self):
-        print '[HELLO]: hello world'
+    def hello(self, body):
+        print '[HELLO]: hello world {}'.format(body)
         return '[HELLO]: hello world response'
 
     '''
      init the target personal client and wait, this stage also defines the metrics that
      are going to be measured
     '''
-    def warmup(self):
-        print '[WARMUP]'
+    def warmup(self, body):
+        print '[WARMUP] {}'.format(body)
         print '[WARMUP]: init personal cloud client'
         if self.is_warmup is False:
             print '[WARMUP]: to warmup '
@@ -194,8 +194,8 @@ class Commands(object):
     '''
      start sending metrics
     '''
-    def start(self):
-        print '[START_TEST]'
+    def start(self, body):
+        print '[START_TEST] {}'.format(body)
         if not self.is_warmup:
             return '[START_TEST]: WARNING: require warmup!'
 
@@ -215,9 +215,9 @@ class Commands(object):
     '''
      halt sending metrics
     '''
-    def stop(self):
+    def stop(self, body):
         if self.is_running:
-            print '[STOP_TEST]: stop test'
+            print '[STOP_TEST]: stop test {}'.format(body)
             self.is_running = False
             self.monitor.join()
             self.sync_client.join()
@@ -249,19 +249,19 @@ class MonitorRMQ(object):
         self.channel.queue_declare(queue=self.queue_name)
 
     def on_request(self, ch, method, props, body):
-        print " [on_request] {} ".format(body)
+        print " [on_request] {} ".format(body.cmd)
         print " [on_request] ch {} meth {} props {} body {}".format(ch, method, props, body)
         # todo implementar els handler vagrantUp i vagrantDown
         output = None
         try:
-            toExecute = getattr(self.actions, body)
+            toExecute = getattr(self.actions, body.cmd)
             print toExecute
-            output = toExecute()
+            output = toExecute(body)
         except AttributeError as e:
             print e.message
-            print "ACK: {}".format(body)
+            print "ACK: {}".format(body.cmd)
 
-        response = "{} response: {}: {}".format(self.queue_name, body, output)
+        response = "{} response: {}: {}".format(self.queue_name, body.cmd, output)
         print props.reply_to
         print props.correlation_id
         try:
