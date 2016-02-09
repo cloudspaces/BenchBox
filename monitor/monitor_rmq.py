@@ -54,6 +54,7 @@ class EmitMetric(object):
             print "PID: {} ".format(pid)
             try:
                 if self.personal_cloud.lower() == "stacksync":
+                    #
                     print self.personal_cloud
                     parent_proc = psutil.Process(pid)
                     proc = parent_proc.children()[0]
@@ -63,7 +64,10 @@ class EmitMetric(object):
                     metrics['ram'] = ram_usage
                 elif self.personal_cloud == "owncloud":
                     print "TODO owncloud"
-                elif self.personal_cloud == "etc":
+                elif self.personal_cloud == "dropbox":
+                    # how to track dropbox pid???
+                    # the pid is contained in a pid file
+
                     print "TODO etc"
             except Exception as e:
                 print e.message
@@ -148,7 +152,7 @@ class Commands(object):
             metric_reader = EmitMetric(self.hostname, self.personal_cloud)  # start the sync client
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
-                metric_reader.emit(pid=self.sync_proc.pid)  # send metric to rabbit
+                metric_reader.emit(pid=self.sync_proc_pid)  # send metric to rabbit
                 time.sleep(2)  # delay between metric
                 print colored("[TEST]: INFO {} --> {} // {}".format(time.ctime(time.time()), operations, self.is_running), 'red')
         else:
@@ -162,15 +166,29 @@ class Commands(object):
         # start the personal cloud client process and register its pid
         pc_cmd = {
             'stacksync': "/usr/bin/java -jar /usr/lib/stacksync/Stacksync.jar -d -c /vagrant",
-            'owncloud': ""
+            'owncloud': "",
+            'dropbox': "/home/vagrant/.dropbox-dist/dropboxd" # launch dropbox
         }
 
+        # en el cas de dropbox arrancar el dropboxd ... legir el /home/vagrant/.dropbox/dropbox.pid
+        # instanciar sync_proc
         # create the process
-        str_cmd = pc_cmd[self.personal_cloud.lower()]
+        pc = self.personal_cloud.lower()
+        str_cmd = pc_cmd[pc]
 
         # read the metric may be different for each personal cloud - todo herencia
-        self.sync_proc = subprocess.Popen(str_cmd, shell=True)
-        print "{} --> PID: {}".format(self.personal_cloud, self.sync_proc.pid)
+
+        # get deamon pid
+        if pc == 'dropbox':
+            path_to_pidfile = "/home/vagrant/.dropbox/dropbox.pid"
+            if os.path.exists(path_to_pidfile):
+                pid = int(open(path_to_pidfile).read())
+            self.sync_proc_pid = pid
+        else:
+            self.sync_proc = subprocess.Popen(str_cmd, shell=True)
+            self.sync_proc_pid = self.sync_proc.pid
+
+        print "{} --> PID: {}".format(self.personal_cloud, self.sync_proc_pid)
 
 
     '''
@@ -203,8 +221,8 @@ class Commands(object):
             self.is_running = False
             self.monitor.join()
             self.sync_client.join()
-            print self.sync_proc.pid
-            parent = psutil.Process(self.sync_proc.pid)
+            print self.sync_proc_pid
+            parent = psutil.Process(self.sync_proc_pid)
             for child in parent.children(recursive=True):  # or parent.children() for recursive=False
                 print child.kill()
             print parent.kill()
@@ -232,6 +250,7 @@ class MonitorRMQ(object):
 
     def on_request(self, ch, method, props, body):
         print " [on_request] {} ".format(body)
+        print " [on_request] ch {} meth {} props {} body {}".format(ch, method, props, body)
         # todo implementar els handler vagrantUp i vagrantDown
         output = None
         try:

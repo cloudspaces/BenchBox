@@ -45,7 +45,7 @@ class Commands(object):
         print '[HELLO]: hello world'
         return '[HELLO]: hello world response'
 
-    def warmup(self, ftp_folder):
+    def warmup(self):
         print '[WARMUP]'
         print FS_SNAPSHOT_PATH
         print STEREOTYPE_RECIPES_PATH
@@ -53,7 +53,7 @@ class Commands(object):
         print receipt
         print '[WARMUP]: init_stereotype_from_recipe'
         if self.is_warmup is False:
-            self.stereotype_executor.initialize_ftp_root_directory()
+            self.stereotype_executor.update_ftp_root_directory(root_dir='Dropbox')
             self.stereotype_executor.initialize_from_stereotype_recipe(receipt)
             print '[WARMUP]: init fs & migrate to sandbox'
             self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
@@ -189,7 +189,9 @@ if __name__ == '__main__':
 
 
     if len(sys.argv) == 1:  # means no parameters
+        # DEFAULT: dummy
         executor = ExecuteRMQ(rmq_url, queue_name, stereotype_receipt)
+        # todo fer que stereotype_receipt y personal cloud sigui dinamic
         executor.listen()
     else:
         profile = "StackSync"
