@@ -44,14 +44,18 @@ available information in the UbuntuOne (U1) trace.'''
 class StereotypeExecutorU1(StereotypeExecutor):
     def __init__(self):
         StereotypeExecutor.__init__(self)
-        self.ftp_client = ftp_sender(
-            FTP_SENDER_IP,
-            FTP_SENDER_PORT,
-            FTP_SENDER_USER,
-            FTP_SENDER_PASS,
-            'stacksync_folder'
-        )
+
         # el keep alive puede ser por run o por to_wait operation...
+
+
+    def initialize_ftp_root_directory(self, root_dir):
+        self.ftp_client = ftp_sender(
+                FTP_SENDER_IP,
+                FTP_SENDER_PORT,
+                FTP_SENDER_USER,
+                FTP_SENDER_PASS,
+                root_dir
+        )
 
     def initialize_from_stereotype_recipe(self, stereotype_recipe):
         StereotypeExecutor.initialize_from_stereotype_recipe(self, stereotype_recipe)

@@ -288,5 +288,6 @@ app.use(function (err, req, res, next) {
     });
 });
 
+console.log("\nLINK: \t[ http://localhost:8888/load#/ ]\n\n");
 
 module.exports = app;

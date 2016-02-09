@@ -34,6 +34,7 @@ class EmitMetric(object):
         tags = {
             'profile': 'backupsample',
             'credentials': 'pc_credentials'
+            # 'client': 'stacksync'
         }
         data = {
             'metrics': metrics,

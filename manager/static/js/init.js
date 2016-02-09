@@ -58,9 +58,9 @@ angular.module('app', ['ngRoute', 'ngResource'])
             $scope.run = {
                 testOps: 10,
                 testItv: 1,
-                testProfile: 'backupsample',
-                testFolder: 'stacksync_folder',
-                testClient: 'StackSync',
+                testProfile: 'backupsample', // modificar aixo mitjançant select
+                testFolder: 'stacksync_folder', // modificar aixo mitjançant detector segons testClient
+                testClient: 'StackSync', // modificar aixo en format select
                 testOperation: 'hello',
                 testMonitor: 'hello'
             };
@@ -176,7 +176,25 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 console.log(arguments);
                 var hosts = Array.prototype.slice.call(arguments, 2); // 3r till n are the target hosts
                 console.log(hosts);
-                console.log($scope.run.testOperation)
+                console.log($scope.run.testOperation);
+                console.log($scope.run);
+
+                // setup testFolder
+                switch($scope.run.testClient){
+                    case "StackSync":
+                        $scope.run.testFolder = "stacksync_folder";
+                        break;
+                    case "Dropbox":
+                        $scope.run.testFolder = "Dropbox";
+                        break;
+                    default:
+
+                        console.log("UNHANDLED PERSONAL_CLOUD!!!");
+                        return;
+                        break;
+
+
+                }
 
                 if(cmd == 'execute'){
                     cmd = $scope.run.testOperation
@@ -210,7 +228,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                                 return item._id == checkedId
                             });
                             console.log("rmqHost: " + cmd, this.name, checkedId, host[0]);
-                            host[0].rmq_queue = targetHost.toLowerCase()
+                            host[0].rmq_queue = targetHost.toLowerCase();
                             host[0].test_setup = $scope.run;
                             // console.log(host[0])
                             rmqHost(host[0], cmd)
@@ -237,8 +255,8 @@ angular.module('app', ['ngRoute', 'ngResource'])
             };
 
             $scope.edit = function (index) {
-                console.log(index)
-                console.log($scope.editing)
+                console.log(index);
+                console.log($scope.editing);
                 $scope.editing[index] = angular.copy($scope.hosts[index]);
             };
             $scope.cancel = function (index) {
@@ -320,12 +338,14 @@ rmqHost = function (host, cmd, cb) {
 
     appendAllParams(args, 'bb-config');
     appendAllHosts(args, 'bb-hosts');
+
     $.ajax({
         url: 'http://localhost:'+location.port+'/rmq/emit',
         data: args,
         timeout: 6000000, // 6000s ::100min
         type: 'GET',
         success: function (data) {
+            console.log(args);
             console.log("Success, rmq!");
             console.log(data);
             $.notify('Run rmq! ' + host.hostname + ' ' + cmd, 'info');

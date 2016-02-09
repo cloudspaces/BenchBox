@@ -11,23 +11,23 @@ var hostModel = require('../models/Hosts.js');
 router.get('/emit', function (req, res, next) {
     // parse the request arguments....
     console.log("START REQUEST ----------------------------")
-    console.log(req.query)
+    console.log(req.query);
 
     // connect to the rabbit server
-    var amqp_url = req.query['rabbitmq-amqp']
+    var amqp_url = req.query['rabbitmq-amqp'];
     amqp.connect(amqp_url, function (err, conn) {
         // create callback channel
-        console.log("createChannel ")
+        console.log("createChannel ");
         conn.createChannel(function (err, ch) {
             var queue_name = '';
             var queue_prop = {exclusive: true};
-            console.log("assetQueue")
+            console.log("assertQueue");
             ch.assertQueue(queue_name, queue_prop, function (err, q) {
                 // on queue_ready
                 var corr = generateUuid();
                 var cmd = req.query.cmd;
                 var target = req.query.hostname;
-                var target_queue = target
+                var target_queue = target;
                 if (req.query.target_queue !== '') {
                     target_queue += '.' + req.query.target_queue;
                 }else{
@@ -39,8 +39,8 @@ router.get('/emit', function (req, res, next) {
                 console.log("consume");
                 ch.consume(q.queue, function (msg) {
                     // on queue_message
-                    var response = msg.content.toString()
-                    console.log(response)
+                    var response = msg.content.toString();
+                    console.log(response);
                     if (msg.properties.correlationId == corr) {
 
 
@@ -51,17 +51,17 @@ router.get('/emit', function (req, res, next) {
                             if (err) {
                                 console.error(err.message)
                             } else {
-                                console.log("-INI----------")
+                                console.log("-INI----------");
                                 console.log(host.status);
                                 console.log(host.status_sandbox);
                                 console.log(host.status_benchbox);
-                                console.log("-FIN----------")
+                                console.log("-FIN----------");
 
-                                var status_attr = 'status'
+                                var status_attr = 'status';
                                 if(req.query.target_queue !== ''){
                                     status_attr += '_'+req.query.target_queue
                                 }
-                                status_attr = status_attr.toLowerCase()
+                                status_attr = status_attr.toLowerCase();
                                 host[status_attr] = cmd;
 
                                 host.save(function (err) {
@@ -88,7 +88,7 @@ router.get('/emit', function (req, res, next) {
         });
     });
 
-    console.log("END REQUEST ----------------------------")
+    console.log("END REQUEST ----------------------------");
     res.json({})
 });
 

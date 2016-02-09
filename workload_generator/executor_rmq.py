@@ -29,6 +29,9 @@ class Commands(object):
         self.is_running = False
         self.stereotype = receipt  # backupsample
         self.stereotype_executor = StereotypeExecutorU1()
+
+        # update ftp_root_directory
+
         self.fs_abs_target_folder = '/home/vagrant/{}'.format(self.stereotype_executor.ftp_client.ftp_root)  # target ftp_client dir absolute path
         self.execute = None
 
@@ -42,7 +45,7 @@ class Commands(object):
         print '[HELLO]: hello world'
         return '[HELLO]: hello world response'
 
-    def warmup(self):
+    def warmup(self, ftp_folder):
         print '[WARMUP]'
         print FS_SNAPSHOT_PATH
         print STEREOTYPE_RECIPES_PATH
@@ -50,6 +53,7 @@ class Commands(object):
         print receipt
         print '[WARMUP]: init_stereotype_from_recipe'
         if self.is_warmup is False:
+            self.stereotype_executor.initialize_ftp_root_directory()
             self.stereotype_executor.initialize_from_stereotype_recipe(receipt)
             print '[WARMUP]: init fs & migrate to sandbox'
             self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
@@ -125,15 +129,23 @@ class ExecuteRMQ(object):
         self.channel.queue_declare(queue=self.queue_name)
 
     def on_request(self, ch, method, props, body):
+
         print " [on_request] {} ".format(body)
+        print " [on_request] ch {} meth {} props {} body {}".format(ch, method, props, body)
         # todo implementar els handler vagrantUp i vagrantDown
         output = None
         try:
             toExecute = getattr(self.actions, body)
-            print toExecute
+            print toExecute # la comanda que s'executara
             # lo ideal es que aixo no sigui un thread per que les peticions s'atenguin fifo
             # t = threading.Thread(target=toExecute)
-            output = toExecute()
+            print body # esbrinar l'accio a executar
+            if body == "warmup":
+                output = toExecute()
+            else:
+                output = toExecute()
+
+
             # t.start()
         except AttributeError as e:
             print e.message
