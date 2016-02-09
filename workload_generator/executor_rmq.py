@@ -24,7 +24,7 @@ class Commands(object):
         return cls._instance
 
     def __init__(self, receipt):
-        print '[INIT]: rpc commands'
+        print '[INIT_EXECUTOR_RMQ]: rpc commands'
         self.is_warmup = False
         self.is_running = False
         self.stereotype = receipt  # backupsample
@@ -42,7 +42,7 @@ class Commands(object):
         # sshpass -p vagrant rsync -rvnc --delete ../output/ vagrant@192.168.56.101:stacksync_folder/
 
     def hello(self, body):
-        print '[HELLO]: hello world {}'.format(body)
+        print '[HELLO]: hello world {}'.format(body['cmd'])
         return '[HELLO]: hello world response'
 
     def warmup(self, body):
@@ -131,12 +131,12 @@ class ExecuteRMQ(object):
     def on_request(self, ch, method, props, data):
         body = json.loads(data)
         print " [on_request] {} ".format(body['cmd'])
-        print " [on_request] ch {} meth {} props {} body {}".format(ch, method, props, body['cmd'])
+        # print " [on_request] ch {} meth {} props {} body {}".format(ch, method, props, body['cmd'])
         # todo implementar els handler vagrantUp i vagrantDown
         output = None
         try:
             toExecute = getattr(self.actions, body['cmd'])
-            print toExecute # la comanda que s'executara
+            # print toExecute # la comanda que s'executara
             # lo ideal es que aixo no sigui un thread per que les peticions s'atenguin fifo
             # t = threading.Thread(target=toExecute)
             print body['cmd']  # esbrinar l'accio a executar

@@ -110,7 +110,7 @@ class Commands(object):
     receipt: backupsample
     """
     def __init__(self, hostname, profile, pc=''):
-        print '[INIT]: rpc commands'
+        print '[INIT_MONITOR_RMQ]: rpc commands'
         self.hostname = hostname
         self.is_warmup = False
         self.is_running = False
@@ -125,7 +125,7 @@ class Commands(object):
 
 
     def hello(self, body):
-        print '[HELLO]: hello world {}'.format(body)
+        print '[HELLO]: hello world {}'.format(body['cmd'])
         return '[HELLO]: hello world response'
 
     '''
@@ -261,7 +261,7 @@ class MonitorRMQ(object):
     def on_request(self, ch, method, props, data):
         body = json.loads(data)
         print " [on_request] {} ".format(body['cmd'])
-        print " [on_request] ch {} meth {} props {} body {}".format(ch, method, props, body['cmd'])
+        # print " [on_request] ch {} meth {} props {} body {}".format(ch, method, props, body['cmd'])
         # todo implementar els handler vagrantUp i vagrantDown
         output = None
         try:
