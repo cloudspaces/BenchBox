@@ -92,7 +92,6 @@ class Commands(object):
             return '[START_TEST]: INFO: already running!'
         else:
             # SELF THREAD START
-
             print '[START_TEST]: INFO: instance thread'
             self.execute = Thread(target=self._test)
             self.execute.start()
@@ -130,28 +129,26 @@ class ExecuteRMQ(object):
 
     def on_request(self, ch, method, props, body):
 
-        print " [on_request] {} ".format(body)
-        print " [on_request] ch {} meth {} props {} body {}".format(ch, method, props, body)
+        print " [on_request] {} ".format(body['cmd'])
+        print " [on_request] ch {} meth {} props {} body {}".format(ch, method, props, body['cmd'])
         # todo implementar els handler vagrantUp i vagrantDown
         output = None
         try:
-            toExecute = getattr(self.actions, body)
+            toExecute = getattr(self.actions, body['cmd'])
             print toExecute # la comanda que s'executara
             # lo ideal es que aixo no sigui un thread per que les peticions s'atenguin fifo
             # t = threading.Thread(target=toExecute)
-            print body # esbrinar l'accio a executar
-            if body == "warmup":
-                output = toExecute()
-            else:
-                output = toExecute()
+            print body['cmd'] # esbrinar l'accio a executar
+            if body['cmd'] == "warmup":
+                output = toExecute(body)
 
 
             # t.start()
         except AttributeError as e:
             print e.message
-            print "ACK: {}".format(body)
+            print "ACK: {}".format(body['cmd'])
 
-        response = "{} response: {}: {}".format(self.queue_name, body, output)
+        response = "{} response: {}: {}".format(self.queue_name, body['cmd'], output)
         print props.reply_to
         print props.correlation_id
         try:

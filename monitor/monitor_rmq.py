@@ -249,19 +249,19 @@ class MonitorRMQ(object):
         self.channel.queue_declare(queue=self.queue_name)
 
     def on_request(self, ch, method, props, body):
-        print " [on_request] {} ".format(body.cmd)
-        print " [on_request] ch {} meth {} props {} body {}".format(ch, method, props, body)
+        print " [on_request] {} ".format(body['cmd'])
+        print " [on_request] ch {} meth {} props {} body {}".format(ch, method, props, body['cmd'])
         # todo implementar els handler vagrantUp i vagrantDown
         output = None
         try:
-            toExecute = getattr(self.actions, body.cmd)
+            toExecute = getattr(self.actions, body['cmd'])
             print toExecute
             output = toExecute(body)
         except AttributeError as e:
             print e.message
-            print "ACK: {}".format(body.cmd)
+            print "ACK: {}".format(body['cmd'])
 
-        response = "{} response: {}: {}".format(self.queue_name, body.cmd, output)
+        response = "{} response: {}: {}".format(self.queue_name, body['cmd'], output)
         print props.reply_to
         print props.correlation_id
         try:
