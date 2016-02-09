@@ -11,7 +11,7 @@ from termcolor import colored
 
 from constants import STEREOTYPE_RECIPES_PATH, FS_SNAPSHOT_PATH
 from executor import StereotypeExecutorU1
-
+import json
 
 
 class Commands(object):
@@ -45,7 +45,7 @@ class Commands(object):
         print '[HELLO]: hello world {}'.format(body)
         return '[HELLO]: hello world response'
 
-    def warmup(self):
+    def warmup(self, body):
         print '[WARMUP]: {}'.format(body)
         print FS_SNAPSHOT_PATH
         print STEREOTYPE_RECIPES_PATH
@@ -127,8 +127,8 @@ class ExecuteRMQ(object):
 
         self.channel.queue_declare(queue=self.queue_name)
 
-    def on_request(self, ch, method, props, body):
-
+    def on_request(self, ch, method, props, data):
+        body = json.loads(data)
         print " [on_request] {} ".format(body['cmd'])
         print " [on_request] ch {} meth {} props {} body {}".format(ch, method, props, body['cmd'])
         # todo implementar els handler vagrantUp i vagrantDown

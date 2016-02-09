@@ -248,7 +248,8 @@ class MonitorRMQ(object):
 
         self.channel.queue_declare(queue=self.queue_name)
 
-    def on_request(self, ch, method, props, body):
+    def on_request(self, ch, method, props, data):
+        body = json.loads(data)
         print " [on_request] {} ".format(body['cmd'])
         print " [on_request] ch {} meth {} props {} body {}".format(ch, method, props, body['cmd'])
         # todo implementar els handler vagrantUp i vagrantDown
