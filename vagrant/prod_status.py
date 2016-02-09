@@ -149,7 +149,8 @@ class ConsumeAction(object):
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=self.host_queue)
 
-    def on_request(self, ch, method, props, body):
+    def on_request(self, ch, method, props, data):
+        body = json.loads(data)
         print " [on_request] {} ".format(body.cmd)
         # todo implementar els handler vagrantUp i vagrantDown
         try:
