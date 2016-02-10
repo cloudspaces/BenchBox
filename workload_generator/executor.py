@@ -44,13 +44,7 @@ available information in the UbuntuOne (U1) trace.'''
 class StereotypeExecutorU1(StereotypeExecutor):
     def __init__(self):
         StereotypeExecutor.__init__(self)
-        self.ftp_client = ftp_sender(
-                FTP_SENDER_IP,
-                FTP_SENDER_PORT,
-                FTP_SENDER_USER,
-                FTP_SENDER_PASS,
-                'stacksync_folder'  # per defecte ...
-        )
+        self.ftp_client = None
         # el keep alive puede ser por run o por to_wait operation...
 
     """
@@ -58,9 +52,16 @@ class StereotypeExecutorU1(StereotypeExecutor):
     Aquest metode es crida quan hiha un warm up en el cas de executor per que el
     benchbox sapigui a quin directory s'ha sincronitzar els fitchers
     """
-    def update_ftp_root_directory(self, root_dir):
+    def initialize_ftp_client_by_directory(self, root_dir):
         # update fto_client_root directory
-        self.ftp_client.ftp_root = root_dir
+        print "Init ftp_client and its root directory {}".format(root_dir)
+        self.ftp_client = ftp_sender(
+                FTP_SENDER_IP,
+                FTP_SENDER_PORT,
+                FTP_SENDER_USER,
+                FTP_SENDER_PASS,
+                root_dir  # per defecte ...
+        )
 
 
     def initialize_from_stereotype_recipe(self, stereotype_recipe):

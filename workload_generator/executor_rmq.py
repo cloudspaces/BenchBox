@@ -27,12 +27,13 @@ class Commands(object):
         print '[INIT_EXECUTOR_RMQ]: rpc commands'
         self.is_warmup = False
         self.is_running = False
+        self.sync_directory = None # stacksync_folder, Dropbox, ....
         self.stereotype = receipt  # backupsample
         self.stereotype_executor = StereotypeExecutorU1()
 
         # update ftp_root_directory
 
-        self.fs_abs_target_folder = '/home/vagrant/{}'.format(self.stereotype_executor.ftp_client.ftp_root)  # target ftp_client dir absolute path
+        self.fs_abs_target_folder = None
         self.execute = None
 
         # self.data_generator = DataGenerator()
@@ -46,15 +47,17 @@ class Commands(object):
         return '[HELLO]: hello world response'
 
     def warmup(self, body):
-        print '[WARMUP]: {}'.format(body)
+        print '[WARMUP]: {} '.format(body)
         print FS_SNAPSHOT_PATH
         print STEREOTYPE_RECIPES_PATH
         receipt = STEREOTYPE_RECIPES_PATH + self.stereotype
         print receipt
         print '[WARMUP]: init_stereotype_from_recipe'
         if self.is_warmup is False:
-            sync_directory = body['msg']['test']['testFolder']
-            self.stereotype_executor.update_ftp_root_directory(root_dir=sync_directory)
+            self.sync_directory = body['msg']['test']['testFolder']
+            self.stereotype_executor.initialize_ftp_client_by_directory(root_dir=self.sync_directory)
+            self.fs_abs_target_folder = '/home/vagrant/{}'.format(self.sync_directory)  # target ftp_client dir absolute path
+
             self.stereotype_executor.initialize_from_stereotype_recipe(receipt)
             print '[WARMUP]: init fs & migrate to sandbox'
             self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
@@ -79,7 +82,7 @@ class Commands(object):
                 operations += 1  # executant de forma indefinida...
                 self.stereotype_executor.execute()
                 # time.sleep(3)
-                print colored("[TEST]: INFO {} --> {} // {}".format(time.ctime(time.time()), operations, self.is_running), 'red')
+                print colored("[TEST]: INFO {} --> {} // {} // {} ".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory), 'red')
 
         else:
             print '[TEST]: WARNING: need warmup 1st!'
@@ -116,8 +119,6 @@ class ExecuteRMQ(object):
         url = urlparse.urlparse(rmq_url)
         self.profile = profile
         self.actions = Commands(profile)
-
-
         self.queue_name = host_queue
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=url.hostname,
