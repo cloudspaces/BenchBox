@@ -118,6 +118,8 @@ class Commands(object):
         self.stereotype = profile  # backupsample
         self.monitor = None
         self.sync_client = None
+        self.sync_proc_pid = None
+        self.sync_proc = None
         if pc == '':
             self.personal_cloud = 'StackSync'        # its not defined
         else:
@@ -162,7 +164,7 @@ class Commands(object):
             operations = 0
             # track the sync client pid resources
             metric_reader = EmitMetric(self.hostname, self.personal_cloud)  # start the sync client
-            while self.is_running:
+            while self.is_warmup and self.is_running and self.sync_proc_pid is not None:
                 operations += 1  # executant de forma indefinida...
                 metric_reader.emit(pid=self.sync_proc_pid)  # send metric to rabbit
                 time.sleep(2)  # delay between metric
@@ -217,7 +219,7 @@ class Commands(object):
                 try:
                     pid = int(subprocess.check_output(['pidof','java']).replace('\n',''))
                 except Exception as e:
-                    time.sleep(3) # wait stacksync to quit or start
+                    time.sleep(3)  # wait stacksync to quit or start
                     print e.message
             self.sync_proc_pid = pid
 
