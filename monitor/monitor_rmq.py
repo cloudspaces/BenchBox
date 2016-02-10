@@ -191,9 +191,21 @@ class Commands(object):
         # get deamon pid
         if pc == 'dropbox':
             self.sync_proc = subprocess.Popen(str_cmd, shell=True) # forgot tu lauch dropbox
+
+            pid = None
+            while pid == None or pid == '':
+                try:
+                    pid = int(subprocess.check_output(['pidof','dropbox']).replace('\n',''))
+                except Exception as e:
+                    print e.message
+            # do until a pid is found otherwise read dropbox.pid and check if the pid is running...
+            # and dont continue until the pid from dropbox.pid is found, match...
+
+            """
             path_to_pidfile = "/home/vagrant/.dropbox/dropbox.pid"
             if os.path.exists(path_to_pidfile):
                 pid = int(open(path_to_pidfile).read())
+            """
             self.sync_proc_pid = pid
         else:
             self.sync_proc = subprocess.Popen(str_cmd, shell=True)
