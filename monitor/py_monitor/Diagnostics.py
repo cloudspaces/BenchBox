@@ -137,6 +137,8 @@ class PerformanceCounter:
             path = '/stacksync_folder'
         elif self.processName == 'OwnCloud':
             path = '/owncloud_folder'
+        elif self.processName == 'Dropbox':
+            path = '/Dropbox'
         self.diskPath = home + path
 
     def get_size(self, path = '.'):

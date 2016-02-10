@@ -190,6 +190,7 @@ class Commands(object):
 
         # get deamon pid
         if pc == 'dropbox':
+            self.sync_proc = subprocess.Popen(str_cmd, shell=True) # forgot tu lauch dropbox
             path_to_pidfile = "/home/vagrant/.dropbox/dropbox.pid"
             if os.path.exists(path_to_pidfile):
                 pid = int(open(path_to_pidfile).read())
