@@ -26,7 +26,7 @@ class EmitMetric(object):
     def __init__(self, hostname, personal_cloud):
         self.personal_cloud = personal_cloud
         self.hostname = hostname
-
+        self.proc = None
         url_str = None
         with open('rabbitmq','r') as r:
             url_str = r.read().splitlines()[0]
@@ -48,7 +48,8 @@ class EmitMetric(object):
                        'time': calendar.timegm(time.gmtime()) * 1000}
         # psutil read metrics
 
-        if pid == "":
+        if pid == "" or self.proc is None:
+            self.proc = psutil.Process(pid)
             print "Sintetic"
         else:
             print "PID: {} [{}]".format(pid, self.personal_cloud.lower())
@@ -56,9 +57,10 @@ class EmitMetric(object):
                 if self.personal_cloud.lower() == "stacksync":
                     #
                     print self.personal_cloud
-                    parent_proc = psutil.Process(pid)
+                    #parent_proc = psutil.Process(pid)
                     # proc = parent_proc.children()[0]
-                    proc = parent_proc
+                    #proc = parent_proc
+                    proc = self.proc
                     cpu_usage = math.ceil(proc.cpu_percent(0))
                     ram_usage = proc.memory_info().rss
                     metrics['cpu'] = cpu_usage
@@ -69,7 +71,8 @@ class EmitMetric(object):
                     # how to track dropbox pid???
                     # the pid is contained in a pid file
                     print self.personal_cloud
-                    proc = psutil.Process(pid)
+                    #proc = psutil.Process(pid)
+                    proc = self.proc
                     cpu_usage = math.ceil(proc.cpu_percent(0))
                     ram_usage = proc.memory_info().rss
                     metrics['cpu'] = cpu_usage
