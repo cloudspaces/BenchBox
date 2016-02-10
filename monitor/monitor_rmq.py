@@ -57,7 +57,8 @@ class EmitMetric(object):
                     #
                     print self.personal_cloud
                     parent_proc = psutil.Process(pid)
-                    proc = parent_proc.children()[0]
+                    # proc = parent_proc.children()[0]
+                    proc = parent_proc
                     cpu_usage = math.ceil(proc.cpu_percent(0))
                     ram_usage = proc.memory_info().rss
                     metrics['cpu'] = cpu_usage
@@ -134,13 +135,14 @@ class Commands(object):
     '''
     def warmup(self, body):
         print '[WARMUP] {}'.format(body)
-        personal_cloud_candidate = body['msg']['test']['testClient'] # el personal client que cal arrancar
+        personal_cloud_candidate = body['msg']['test']['testClient']  # el personal client que cal arrancar
 
         print '[WARMUP]: init personal cloud client'
-        if self.is_warmup is False: # or the personal cloud has changed
+        if self.is_warmup is False:  # or the personal cloud has changed
             self.personal_cloud = personal_cloud_candidate
             print '[WARMUP]: to warmup {}'.format(self.personal_cloud)
             self.is_warmup = True
+            # todo @ kill existing java process
         else:
             # if self.personal_cloud == personal_cloud_candidate: todo @ sino tornar a arrancar
             print '[WARMUP]: already warmed-up as {}'.format(self.personal_cloud)
@@ -177,7 +179,7 @@ class Commands(object):
         pc_cmd = {
             'stacksync': "/usr/bin/java -jar /usr/lib/stacksync/Stacksync.jar -d -c /vagrant",
             'owncloud': "",
-            'dropbox': "/home/vagrant/.dropbox-dist/dropboxd" # launch dropbox
+            'dropbox': "/home/vagrant/.dropbox-dist/dropboxd"  # launch dropbox
         }
 
         # en el cas de dropbox arrancar el dropboxd ... legir el /home/vagrant/.dropbox/dropbox.pid
@@ -208,8 +210,15 @@ class Commands(object):
             """
             self.sync_proc_pid = pid
         else:
-            self.sync_proc = subprocess.Popen(str_cmd, shell=True)
-            self.sync_proc_pid = self.sync_proc.pid
+            ## if its already running what do i do?
+            self.sync_proc = subprocess.Popen(str_cmd, shell=True) # executar el process
+            pid = None
+            while pid == None or pid == '':
+                try:
+                    pid = int(subprocess.check_output(['pidof','java']).replace('\n',''))
+                except Exception as e:
+                    print e.message
+            self.sync_proc_pid = pid
 
         print "{} --> PID: {}".format(self.personal_cloud, self.sync_proc_pid)
 
