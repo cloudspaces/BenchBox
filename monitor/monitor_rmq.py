@@ -237,6 +237,7 @@ class Commands(object):
             for child in parent.children(recursive=True):  # or parent.children() for recursive=False
                 print child.kill()
             print parent.kill()
+            self.is_warmup = False
             return '[STOP_TEST]: SUCCESS: stop test'
         else:
             return '[STOP_TEST]: WARNING: no test is running'
