@@ -217,6 +217,7 @@ class Commands(object):
                 try:
                     pid = int(subprocess.check_output(['pidof','java']).replace('\n',''))
                 except Exception as e:
+                    time.sleep(3) # wait stacksync to quit or start
                     print e.message
             self.sync_proc_pid = pid
 
