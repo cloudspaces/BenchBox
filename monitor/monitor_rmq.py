@@ -280,8 +280,9 @@ class MonitorRMQ(object):
         output = None
         try:
             toExecute = getattr(self.actions, body['cmd'])
-            print toExecute
+            print "ExecuteIn  : {}".format(body['cmd'])
             output = toExecute(body)
+            print "ExecuteOut : {}".format(output)
         except AttributeError as e:
             print e.message
             print "ACK: {}".format(body['cmd'])

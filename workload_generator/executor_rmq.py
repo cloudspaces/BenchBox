@@ -141,11 +141,9 @@ class ExecuteRMQ(object):
             # print toExecute # la comanda que s'executara
             # lo ideal es que aixo no sigui un thread per que les peticions s'atenguin fifo
             # t = threading.Thread(target=toExecute)
-            print body['cmd']  # esbrinar l'accio a executar
-            if body['cmd'] == "warmup":
-                output = toExecute(body)
-
-
+            print "ExecuteIn  : {}".format(body['cmd'])
+            output = toExecute(body)
+            print "ExecuteOut : {}".format(output)
             # t.start()
         except AttributeError as e:
             print e.message
