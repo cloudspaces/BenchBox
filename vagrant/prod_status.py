@@ -151,10 +151,10 @@ class ConsumeAction(object):
 
     def on_request(self, ch, method, props, data):
         body = json.loads(data)
-        print " [on_request] {} ".format(body.cmd)
+        print " [on_request] {} ".format(body['cmd'])
         # todo implementar els handler vagrantUp i vagrantDown
         try:
-            toExecute = getattr(self.vagrant_ops, body.cmd)
+            toExecute = getattr(self.vagrant_ops, body['cmd'])
             print toExecute
             # lo ideal es que aixo no sigui un thread per que les peticions s'atenguin fifo
             # t = threading.Thread(target=toExecute)
@@ -162,9 +162,9 @@ class ConsumeAction(object):
             # t.start()
         except AttributeError as e:
             # print e.message
-            print "ACK: {}".format(body.cmd)
+            print "ACK: {}".format(body['cmd'])
 
-        response = "{} response: {}: {}".format(self.host_queue, body.cmd, output)
+        response = "{} response: {}: {}".format(self.host_queue, body['cmd'], output)
         print props.reply_to
         print props.correlation_id
         try:

@@ -44,6 +44,10 @@ block content
                         a(data-toggle='pill' href='#configHosts') Hosts
                     li
                         a(data-toggle='pill' href='#configMonitor') Monitor
+                    li
+                        a(data-toggle='pill' href='#configRabbit') RabbitMQ
+                    li
+                        a(data-toggle='pill' href='#configInflux') InfluxDB
         hr
         .row.tab-content.frame-fixed-size
             #configManager.tab-pane.fade
@@ -108,6 +112,19 @@ block content
                     .embed-responsive.embed-responsive-16by9
                         iframe.embed-responsive-item(src="http://localhost:3000/dashboard/db/benchbox")
                     //iframe(src="http://localhost:3000/dashboard-solo/db/benchbox?panelId=3&fullscreen&edit&from=1449831622982&to=1449831742982" height="200" width="300")
+            #configRabbit.tab-pane.fade
+                .col-md-2
+                    h4 RabbitMQ Manager
+                .col-md-10
+                    .embed-responsive.embed-responsive-16by9
+                        iframe.embed-responsive-item(src="http://localhost:15672/#/")
+
+            #configInflux.tab-pane.fade
+                .col-md-2
+                    h4 Influx Manager
+                .col-md-10
+                    .embed-responsive.embed-responsive-16by9
+                        iframe.embed-responsive-item(src="http://localhost:8083")
 
             #configHosts.tab-pane.fade.in.active
                 .col-md-12
