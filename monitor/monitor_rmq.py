@@ -51,7 +51,7 @@ class EmitMetric(object):
         if pid == "":
             print "Sintetic"
         else:
-            print "PID: {} ".format(pid)
+            print "PID: {} [{}]".format(pid, self.personal_cloud.lower())
             try:
                 if self.personal_cloud.lower() == "stacksync":
                     #
@@ -62,9 +62,9 @@ class EmitMetric(object):
                     ram_usage = proc.memory_info().rss
                     metrics['cpu'] = cpu_usage
                     metrics['ram'] = ram_usage
-                elif self.personal_cloud == "owncloud":
+                elif self.personal_cloud.lower() == "owncloud":
                     print "TODO owncloud"
-                elif self.personal_cloud == "dropbox":
+                elif self.personal_cloud.lower() == "dropbox":
                     # how to track dropbox pid???
                     # the pid is contained in a pid file
                     print self.personal_cloud
@@ -164,7 +164,7 @@ class Commands(object):
                 operations += 1  # executant de forma indefinida...
                 metric_reader.emit(pid=self.sync_proc_pid)  # send metric to rabbit
                 time.sleep(2)  # delay between metric
-                print colored("[TEST]: INFO {} --> {} // {}".format(time.ctime(time.time()), operations, self.is_running), 'red')
+                print colored("[TEST]: INFO {} --> {} // {} // {}".format(time.ctime(time.time()), operations, self.is_running, self.sync_proc_pid), 'red')
         else:
             print '[TEST]: WARNING: need warmup 1st!'
 
