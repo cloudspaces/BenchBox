@@ -94,7 +94,7 @@ class EmitMetric(object):
 
         # assign the network usage metric
 
-        if self.prev_metric is None:
+        if self.prev_metric is not None:
             # do nothing because its the first emit ant there are no previous metric to compare
             # last_net = self.prev_metric['metrics']['net']
             last_time = self.prev_metric['metrics']['time']
