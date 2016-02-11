@@ -25,6 +25,14 @@ class EmitMetric(object):
 
     def __init__(self, hostname, personal_cloud):
         self.personal_cloud = personal_cloud
+
+        pc_folders = {
+            'stacksync': 'stacksync_folder',
+            'dropbox': 'Dropbox'
+        }
+
+        self.personal_folder = pc_folders[self.personal_cloud]
+
         self.hostname = hostname
         self.proc = None
         self.prev_metric = None # keep track of last emited metric
@@ -56,6 +64,7 @@ class EmitMetric(object):
                        'errout': 0,
                        'dropin': 0,
                        'dropout': 0,
+                       'disk' : 0,
                        'time': calendar.timegm(time.gmtime()) * 1000}
         # psutil read metrics
 
@@ -109,6 +118,11 @@ class EmitMetric(object):
                 # elapsed_net = (curr_net-last_net) # some unit
                 metrics[key] = (value - getattr(self.prev_net_counter, key)) / elapsed_time  # unit is seconds
             self.prev_net_counter = curr_net_counter
+
+        # assign hard drive usage metric
+        proc = subprocess.Popen(['/usr/bin/du', '-ks', '/home/vagrant/{}'.format(self.personal_folder)], stdout=subprocess.PIPE)
+        tmp = proc.stdout.read()
+        metrics['disk'] = int(tmp.split('\t')[0])  # kilo bytes cast string to int
 
         if tags == '':
             tags = {
