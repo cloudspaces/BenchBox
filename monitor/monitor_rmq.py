@@ -107,7 +107,8 @@ class EmitMetric(object):
             for key, value in curr_net_counter.__dict__.items():
                 # print key, value
                 # elapsed_net = (curr_net-last_net) # some unit
-                metrics[key] = (value - self.prev_metric['metrics'][key]) / elapsed_time  # unit is seconds
+                metrics[key] = (value - self.prev_net_counter[key]) / elapsed_time  # unit is seconds
+            self.prev_net_counter = curr_net_counter
 
         if tags == '':
             tags = {
@@ -119,7 +120,6 @@ class EmitMetric(object):
             'metrics': metrics,
             'tags': tags
         }
-        self.prev_net_counter = curr_net_counter
         self.prev_metric = data  # update the last emited metric
 
         msg = json.dumps(data)
