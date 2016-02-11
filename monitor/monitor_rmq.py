@@ -31,7 +31,7 @@ class EmitMetric(object):
             'dropbox': 'Dropbox'
         }
 
-        self.personal_folder = pc_folders[self.personal_cloud]
+        self.personal_folder = pc_folders[self.personal_cloud.lower()]
 
         self.hostname = hostname
         self.proc = None
