@@ -27,9 +27,12 @@ class EmitMetric(object):
         self.personal_cloud = personal_cloud
         self.hostname = hostname
         self.proc = None
+        self.prev_metric = None # keep track of last emited metric
         url_str = None
         with open('rabbitmq','r') as r:
             url_str = r.read().splitlines()[0]
+
+        self.prev_net_counter = psutil.net_io_counters(pernic=True)['eth0']  # 10.0.2.15 static for each sandBox
 
         url = urlparse.urlparse(url_str)
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
@@ -44,7 +47,15 @@ class EmitMetric(object):
         if metrics == '':
             metrics = {'cpu': random.randint(0, 100),
                        'ram': random.randint(0, 100),
-                       'net': random.randint(0, 100),
+                       'net': 0,
+                       'bytes_sent': 0,
+                       'bytes_recv': 0,
+                       'packets_sent': 0,
+                       'packets_recv': 0,
+                       'errin': 0,
+                       'errout': 0,
+                       'dropin': 0,
+                       'dropout': 0,
                        'time': calendar.timegm(time.gmtime()) * 1000}
         # psutil read metrics
 
@@ -80,9 +91,27 @@ class EmitMetric(object):
                     print "TODO etc"
             except Exception as e:
                 print e.message
+
+        # assign the network usage metric
+
+        if self.prev_metric is None:
+            # do nothing because its the first emit ant there are no previous metric to compare
+            # last_net = self.prev_metric['metrics']['net']
+            last_time = self.prev_metric['metrics']['time']
+
+            curr_net_counter = psutil.net_io_counters(pernic=True)['eth0']  # read the bytes from somewhere
+            curr_time = metrics['time']
+
+            elapsed_time = (curr_time-last_time) / 1000  # segons
+
+            for key, value in curr_net_counter.__dict__.items():
+                # print key, value
+                # elapsed_net = (curr_net-last_net) # some unit
+                metrics[key] = (value - self.prev_metric['metrics'][key]) / elapsed_time  # unit is seconds
+
         if tags == '':
             tags = {
-                'profile': 'backup_sample',
+                'profile': 'backup_sample',  # todo @ update this field from the args of rabbitmq
                 'credentials': 'pc_credentials',
                 'client': self.personal_cloud.lower()
             }
@@ -90,6 +119,8 @@ class EmitMetric(object):
             'metrics': metrics,
             'tags': tags
         }
+        self.prev_net_counter = curr_net_counter
+        self.prev_metric = data  # update the last emited metric
 
         msg = json.dumps(data)
         print msg
