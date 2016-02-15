@@ -8,7 +8,7 @@ import time
 import filecmp
 import shutil
 import subprocess
-
+import signal
 from threading import Thread
 import psutil
 from termcolor import colored
@@ -16,9 +16,16 @@ import socket
 import random
 import calendar
 import json
+import fcntl
 
 
-
+def lockFile(lockfile):
+    fp = open(lockfile, 'w')
+    try:
+        fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except IOError:
+        return False
+    return True
 
 
 class EmitMetric(object):
@@ -387,6 +394,23 @@ if __name__ == '__main__':
     queue_name = '{}.{}'.format(dummyhost, 'monitor')
 
     if len(sys.argv) == 1:  # means no parameters
+
+
+        # use file look
+        if not lockFile("/tmp/monitor_rmq.lock"):
+            with open('/tmp/monitor_rmq.pid', 'r') as f:
+                first_line = f.readline()
+            last_pid = first_line
+            print "kill_last_pid: {}".format(last_pid)
+            os.kill(last_pid, signal.SIGTERM) # kill previous if exists
+            # sys.exit(0)
+
+        # update the current pid file
+        with open('/tmp/monitor_rmq.pid', 'w') as fpid:
+            curr_pid = os.getpid()
+            fpid.write(curr_pid)
+            #
+
         monitor = MonitorRMQ(rmq_url=rmq_url, host_queue=queue_name, receipt=stereotype_receipt)
         monitor.listen()
     else:

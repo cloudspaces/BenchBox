@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import fcntl
 import pika
 import os
 import sys
@@ -6,6 +7,8 @@ import urlparse
 import time
 import filecmp
 import shutil
+import signal
+
 from threading import Thread
 from termcolor import colored
 
@@ -13,6 +16,13 @@ from constants import STEREOTYPE_RECIPES_PATH, FS_SNAPSHOT_PATH
 from executor import StereotypeExecutorU1
 import json
 
+def lockFile(lockfile):
+    fp = open(lockfile, 'w')
+    try:
+        fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except IOError:
+        return False
+    return True
 
 class Commands(object):
     # singleton class
@@ -27,7 +37,7 @@ class Commands(object):
         print '[INIT_EXECUTOR_RMQ]: rpc commands'
         self.is_warmup = False
         self.is_running = False
-        self.sync_directory = None # stacksync_folder, Dropbox, ....
+        self.sync_directory = None  # stacksync_folder, Dropbox, ....
         self.stereotype = receipt  # backupsample
         self.stereotype_executor = StereotypeExecutorU1()
 
@@ -190,6 +200,22 @@ if __name__ == '__main__':
 
     if len(sys.argv) == 1:  # means no parameters
         # DEFAULT: dummy
+
+        # use file look
+        if not lockFile("/tmp/executor_rmq.lock"):
+            with open('/tmp/monitor_rmq.pid', 'r') as f:
+                first_line = f.readline()
+            last_pid = first_line
+            print "kill_last_pid: {}".format(last_pid)
+            os.kill(last_pid, signal.SIGTERM) # kill previous if exists
+            # sys.exit(0)
+
+        # update the current pid file
+        with open('/tmp/monitor_rmq.pid', 'w') as fpid:
+            curr_pid = os.getpid()
+            fpid.write(curr_pid)
+            #
+
         executor = ExecuteRMQ(rmq_url, queue_name, stereotype_receipt)
         # todo fer que stereotype_receipt y personal cloud sigui dinamic
         executor.listen()
