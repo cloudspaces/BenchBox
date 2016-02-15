@@ -167,16 +167,16 @@ class ExecuteRMQ(object):
         try:
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,
-                             properties=pika.BasicProperties(
-                                     correlation_id=props.correlation_id),
+                             # properties=pika.BasicProperties(correlation_id=props.correlation_id),
                              body=response)
         except:
             print "bypass"
         ch.basic_ack(delivery_tag=method.delivery_tag)  # comprar que l'ack coincideix, # msg index
 
     def listen(self):
-        self.channel.basic_qos(prefetch_count=1)
+        # self.channel.basic_qos(prefetch_count=10)
         self.channel.basic_consume(self.on_request,
+                                   no_ack=True,
                                    queue=self.queue_name)
         print " [Consumer] Awaiting RPC requests"
         self.channel.start_consuming()
