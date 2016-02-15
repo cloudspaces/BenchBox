@@ -213,7 +213,7 @@ if __name__ == '__main__':
         # update the current pid file
         with open('/tmp/monitor_rmq.pid', 'w') as fpid:
             curr_pid = os.getpid()
-            fpid.write(curr_pid)
+            fpid.write(str(curr_pid))
             #
 
         executor = ExecuteRMQ(rmq_url, queue_name, stereotype_receipt)

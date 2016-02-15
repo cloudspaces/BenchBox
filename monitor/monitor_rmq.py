@@ -408,7 +408,7 @@ if __name__ == '__main__':
         # update the current pid file
         with open('/tmp/monitor_rmq.pid', 'w') as fpid:
             curr_pid = os.getpid()
-            fpid.write(curr_pid)
+            fpid.write(str(curr_pid))
             #
 
         monitor = MonitorRMQ(rmq_url=rmq_url, host_queue=queue_name, receipt=stereotype_receipt)
