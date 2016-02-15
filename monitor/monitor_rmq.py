@@ -126,7 +126,7 @@ class EmitMetric(object):
 
         if tags == '':
             tags = {
-                'profile': 'backup_sample',  # todo @ update this field from the args of rabbitmq
+                'profile': profile,  # todo @ update this field from the args of rabbitmq
                 'credentials': 'pc_credentials',
                 'client': self.personal_cloud.lower()
             }
@@ -163,7 +163,7 @@ class Commands(object):
         self.hostname = hostname
         self.is_warmup = False
         self.is_running = False
-        self.stereotype = profile  # backupsample
+        self.stereotype = profile  # backupsample # todo @ update this to load profiles dynamically
         self.monitor = None
         self.sync_client = None
         self.sync_proc_pid = None
@@ -191,6 +191,11 @@ class Commands(object):
         if self.is_warmup is False:  # or the personal cloud has changed
             self.personal_cloud = personal_cloud_candidate
             print '[WARMUP]: to warmup {}'.format(self.personal_cloud)
+
+
+            # update self.streotype
+            self.stereotype = body['msg']['test']['testProfile']  # if its defined then this will be loaded
+
             self.is_warmup = True
             # todo @ kill existing java process
         else:
