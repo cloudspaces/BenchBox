@@ -61,6 +61,7 @@ class Commands(object):
             print receipt
             self.stereotype_executor.initialize_from_stereotype_recipe(receipt)
             print '[WARMUP]: init fs & migrate to sandbox'
+            # always
             self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
             self.is_warmup = True
         else:
