@@ -99,6 +99,7 @@ class ProduceStatus(object):
         self.channel = self.connection.channel()
 
         result = self.channel.queue_declare(exclusive=True)
+
         self.callback_queue = result.method.queue
         self.channel.basic_consume(self.on_response,
                                    no_ack=True,
@@ -142,7 +143,9 @@ class ConsumeAction(object):
             url_str = self.rmq_url
             url = urlparse.urlparse(url_str)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
-                host=url.hostname, virtual_host=url.path[1:], credentials=pika.PlainCredentials(url.username, url.password)
+                host=url.hostname,
+                    virtual_host=url.path[1:],
+                    credentials=pika.PlainCredentials(url.username, url.password)
             ))
 
         self.host_queue = host_queue
@@ -151,7 +154,7 @@ class ConsumeAction(object):
 
     def on_request(self, ch, method, props, data):
         body = json.loads(data)
-        print " [on_request] {} ".format(body['cmd'])
+        print " [on_request] {} => {}".format(body['cmd'], self.host_queue)
         # todo implementar els handler vagrantUp i vagrantDown
         try:
             toExecute = getattr(self.vagrant_ops, body['cmd'])
