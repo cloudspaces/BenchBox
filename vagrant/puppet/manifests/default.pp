@@ -9,6 +9,9 @@ node 'benchBox' {
       frequency => 'daily',
     },
   }->
+  class {
+    'benchbox':
+  }
   /*
   class {
     'git':
@@ -43,11 +46,9 @@ node 'benchBox' {
     'python-scipy':
       ensure   => 'installed',
   }
-  ->
-  class {
-    'benchbox':
-  }
-  ->
+
+
+
   class {
     'vim':
   }
