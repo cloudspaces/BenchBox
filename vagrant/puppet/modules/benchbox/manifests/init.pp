@@ -27,7 +27,8 @@ class benchbox{
       command => 'make && mv impressions ../impressions',
       path    => ['/usr/bin/', '/bin/'],
       cwd     => '/home/vagrant/workload_generator/external/impressions-code',
-      onlyif  => '[ ! -e "/usr/bin/stacksync" ]'
+      # onlyif  => '[ ! -e "/usr/bin/stacksync" ]'
+      onlyif  => '[ ! -e "/home/vagrant/workload_generator/external/impressions" ]'
   }
 
 
