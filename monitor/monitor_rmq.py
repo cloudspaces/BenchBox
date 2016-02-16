@@ -58,7 +58,7 @@ class EmitMetric(object):
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange='metrics', type='fanout')
 
-    def emit(self, tags='', metrics='', pid=''):
+    def emit(self, tags='', metrics='', pid='', receipt=''):
         if metrics == '':
             metrics = {'cpu': random.randint(0, 100),
                        'ram': random.randint(0, 100),
@@ -133,7 +133,7 @@ class EmitMetric(object):
 
         if tags == '':
             tags = {
-                'profile': profile,  # todo @ update this field from the args of rabbitmq
+                'profile': receipt,  # todo @ update this field from the args of rabbitmq
                 'credentials': 'pc_credentials',
                 'client': self.personal_cloud.lower()
             }
@@ -216,7 +216,7 @@ class Commands(object):
             metric_reader = EmitMetric(hostname=self.hostname, personal_cloud=self.personal_cloud)  # start the sync client
             while self.is_warmup and self.is_running and self.sync_proc_pid is not None:
                 operations += 1  # executant de forma indefinida...
-                metric_reader.emit(pid=self.sync_proc_pid)  # send metric to rabbit
+                metric_reader.emit(pid=self.sync_proc_pid, receipt=self.stereotype)  # send metric to rabbit
                 time.sleep(2)  # delay between metric
                 print colored("[TEST]: INFO {} --> {} // {} // {}".format(time.ctime(time.time()), operations, self.is_running, self.sync_proc_pid), 'red')
         else:
