@@ -19,13 +19,28 @@ import json
 import fcntl
 
 
-def lockFile(lockfile):
-    fp = open(lockfile, 'w')
-    try:
-        fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    except IOError:
-        return False
-    return True
+def singleton(lockfile="executor_rmq.pid"):
+    if os.path.exists(lockfile):
+
+        # read the pid
+        with open(lockfile, 'r') as f:
+            first_line = f.readline()
+            print first_line
+
+        last_pid = first_line
+        print "kill_last_pid: {}".format(last_pid)
+        print last_pid
+        try:
+            # kill last pid
+            os.kill(int(last_pid), signal.SIGTERM)  # kill previous if exists
+        except Exception as e:
+            print e.message
+            print "warning not valid pid"
+
+    # update/store current pid
+    with open(lockfile, 'w') as f:
+        f.write(str(os.getpid()))
+
 
 
 class EmitMetric(object):
@@ -386,18 +401,8 @@ if __name__ == '__main__':
 
     if len(sys.argv) == 1:  # means no parameters
         # use file look
-        if not lockFile("/tmp/monitor_rmq.lock"):
-            with open('/tmp/monitor_rmq.pid', 'r') as f:
-                first_line = f.readline()
-            last_pid = first_line
-            print "kill_last_pid: {}".format(last_pid)
-            os.kill(last_pid, signal.SIGTERM)  # kill previous if exists
-            # sys.exit(0)
+        singleton()
 
-        # update the current pid file
-        with open('/tmp/monitor_rmq.pid', 'w') as fpid:
-            curr_pid = os.getpid()
-            fpid.write(str(curr_pid))
         monitor = MonitorRMQ(rmq_url=rmq_url, host_queue=queue_name)
         monitor.listen()
     else:
