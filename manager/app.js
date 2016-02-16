@@ -226,7 +226,8 @@ amqp.connect(amqp_url, function (err, conn) {
             console.log(' [' + ex + '] waiting for connection');
             ch.bindQueue(q.queue, ex, '');
             ch.consume(q.queue, function (msg) {
-                // console.log(" [" + ex + "] " + msg.content.toString());
+                console.log(" [" + ex + "] " + msg.content.toString());
+                ch.ack(msg);
                 /*
                 var point = {
                     time: new Date(),
@@ -243,10 +244,10 @@ amqp.connect(amqp_url, function (err, conn) {
                 var hostname = msg.fields.routingKey;
                 if(influxReady){
                     influxClient.writePoint(hostname, point, tags, function(){
-                    //   console.log("done writing");
+                       console.log("done writing");
                     });
                 }
-            }, {noAck: true}); // ignore if none reached, none blocking queue
+            }, {noAck: false}); // ignore if none reached, none blocking queue
         })
     })
 });

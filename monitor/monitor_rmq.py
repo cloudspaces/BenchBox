@@ -88,7 +88,7 @@ class EmitMetric(object):
                     # proc = parent_proc.children()[0]
                     #proc = parent_proc
                     proc = self.proc
-                    cpu_usage = math.ceil(proc.cpu_percent(0))
+                    cpu_usage = int(math.ceil(proc.cpu_percent(0)))
                     ram_usage = proc.memory_info().rss
                     metrics['cpu'] = cpu_usage
                     metrics['ram'] = ram_usage
@@ -100,7 +100,7 @@ class EmitMetric(object):
                     print self.personal_cloud
                     #proc = psutil.Process(pid)
                     proc = self.proc
-                    cpu_usage = math.ceil(proc.cpu_percent(0))
+                    cpu_usage = int(math.ceil(proc.cpu_percent(None)))
                     ram_usage = proc.memory_info().rss
                     metrics['cpu'] = cpu_usage
                     metrics['ram'] = ram_usage
@@ -135,7 +135,7 @@ class EmitMetric(object):
             tags = {
                 'profile': receipt,  # todo @ update this field from the args of rabbitmq
                 'credentials': 'pc_credentials',
-                'client': self.personal_cloud.lower()
+                'client': self.personal_cloud.lower(),
             }
         data = {
             'metrics': metrics,
