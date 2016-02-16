@@ -176,7 +176,7 @@ class ExecuteRMQ(object):
     def listen(self):
         # self.channel.basic_qos(prefetch_count=10)
         self.channel.basic_consume(self.on_request,
-                                   no_ack=True,
+                                   no_ack=False,
                                    queue=self.queue_name)
         print " [Consumer] Awaiting RPC requests"
         self.channel.start_consuming()
