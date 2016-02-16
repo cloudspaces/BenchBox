@@ -165,21 +165,17 @@ class Commands(object):
     personal_cloud: stacksync.
     receipt: backupsample
     """
-    def __init__(self, hostname, profile, pc=''):
+    def __init__(self, hostname):
         print '[INIT_MONITOR_RMQ]: rpc commands'
         self.hostname = hostname
         self.is_warmup = False
         self.is_running = False
-        self.stereotype = profile  # backupsample # todo @ update this to load profiles dynamically
-        self.monitor = None
-        self.sync_client = None
+        self.stereotype = None      # backupsample # todo @ update this to load profiles dynamically
+        self.monitor = None         # monitor_process => experimento
+        self.sync_client = None     # sync_client process
         self.sync_proc_pid = None
         self.sync_proc = None
-        if pc == '':
-            self.personal_cloud = 'StackSync'        # its not defined
-        else:
-            self.personal_cloud = pc
-            # todo metric reader class
+        self.personal_cloud = None  # personal cloud
 
 
     def hello(self, body):
@@ -192,18 +188,12 @@ class Commands(object):
     '''
     def warmup(self, body):
         print '[WARMUP] {}'.format(body)
-        personal_cloud_candidate = body['msg']['test']['testClient']  # el personal client que cal arrancar
-
         print '[WARMUP]: init personal cloud client'
         if self.is_warmup is False:  # or the personal cloud has changed
-            self.personal_cloud = personal_cloud_candidate
-            print '[WARMUP]: to warmup {}'.format(self.personal_cloud)
-
-
-            # update self.streotype
+            self.personal_cloud = body['msg']['test']['testClient']
             self.stereotype = body['msg']['test']['testProfile']  # if its defined then this will be loaded
-
             self.is_warmup = True
+            print '[WARMUP]: to warmup {}'.format(self.personal_cloud)
             # todo @ kill existing java process
         else:
             # if self.personal_cloud == personal_cloud_candidate: todo @ sino tornar a arrancar
@@ -223,7 +213,7 @@ class Commands(object):
             # TODO loop
             operations = 0
             # track the sync client pid resources
-            metric_reader = EmitMetric(self.hostname, self.personal_cloud)  # start the sync client
+            metric_reader = EmitMetric(hostname=self.hostname, personal_cloud=self.personal_cloud)  # start the sync client
             while self.is_warmup and self.is_running and self.sync_proc_pid is not None:
                 operations += 1  # executant de forma indefinida...
                 metric_reader.emit(pid=self.sync_proc_pid)  # send metric to rabbit
@@ -328,12 +318,11 @@ class Commands(object):
 
 
 class MonitorRMQ(object):
-    def __init__(self, rmq_url='', host_queue='', receipt=''):
+    def __init__(self, rmq_url='', host_queue=''):
         print "Executor operation consumer: "
         url = urlparse.urlparse(rmq_url)
-        self.profile = receipt
         self.hostname = host_queue.split(".")[0]
-        self.actions = Commands(hostname=self.hostname, profile=receipt)
+        self.actions = Commands(hostname=self.hostname)
         self.queue_name = host_queue
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
             # heartbeat_interval=10,
@@ -396,28 +385,24 @@ if __name__ == '__main__':
     queue_name = '{}.{}'.format(dummyhost, 'monitor')
 
     if len(sys.argv) == 1:  # means no parameters
-
-
         # use file look
         if not lockFile("/tmp/monitor_rmq.lock"):
             with open('/tmp/monitor_rmq.pid', 'r') as f:
                 first_line = f.readline()
             last_pid = first_line
             print "kill_last_pid: {}".format(last_pid)
-            os.kill(last_pid, signal.SIGTERM) # kill previous if exists
+            os.kill(last_pid, signal.SIGTERM)  # kill previous if exists
             # sys.exit(0)
 
         # update the current pid file
         with open('/tmp/monitor_rmq.pid', 'w') as fpid:
             curr_pid = os.getpid()
             fpid.write(str(curr_pid))
-            #
-
-        monitor = MonitorRMQ(rmq_url=rmq_url, host_queue=queue_name, receipt=stereotype_receipt)
+        monitor = MonitorRMQ(rmq_url=rmq_url, host_queue=queue_name)
         monitor.listen()
     else:
         profile = "StackSync"
-        actions = Commands(profile=stereotype_receipt, hostname=dummyhost)
+        actions = Commands(hostname=dummyhost)
         while True:
             print 'write command: hello|warmup|start|stop'
             teclat = raw_input()
