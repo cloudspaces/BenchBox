@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 __author__ = 'anna'
 
-import pxssh
+from pexpect import pxssh
 from termcolor import colored
 
 
