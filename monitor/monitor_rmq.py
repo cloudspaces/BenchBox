@@ -68,7 +68,7 @@ class EmitMetric(object):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=url.hostname,
             heartbeat_interval=10,
-            virtual_host=url.path[1:],
+            virtual_host=url.epath[1:],
             credentials=pika.PlainCredentials(url.username, url.password)
         ))
         self.channel = self.connection.channel()
@@ -355,7 +355,7 @@ class MonitorRMQ(object):
         ))
         self.channel = self.connection.channel()
 
-        self.channel.queue_declare(queue=self.queue_name)
+        self.channel.queue_declare(queue=self.queue_name,exclusive=True)
 
     def on_request(self, ch, method, props, data):
         body = json.loads(data)

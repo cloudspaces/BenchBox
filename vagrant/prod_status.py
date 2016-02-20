@@ -150,7 +150,7 @@ class ConsumeAction(object):
 
         self.host_queue = host_queue
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.host_queue)
+        self.channel.queue_declare(queue=self.host_queue, exclusive=True)
 
     def on_request(self, ch, method, props, data):
         body = json.loads(data)
