@@ -148,7 +148,7 @@ class EmitMetric(object):
         metrics['disk'] = int(tmp.split('\t')[0])  # kilo bytes cast string to int
 
         # assign add folder num of files metric
-        proc_find = subprocess.Popen('/usr/bin/find {} -type f'.format(self.personal_folder).split(), stdout=subprocess.PIPE)
+        proc_find = subprocess.Popen('/usr/bin/find /home/vagrant/{} -type f'.format(self.personal_folder).split(), stdout=subprocess.PIPE)
         proc_wc = subprocess.Popen('/usr/bin/wc -l'.split(), stdin=proc_find.stdout, stdout=subprocess.PIPE)
         num_files = proc_wc.communicate()[0]
         metrics['files'] = int(num_files.split('\t')[0])  # count numero of files in the sync directory
