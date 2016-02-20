@@ -150,6 +150,7 @@ class ExecuteRMQ(object):
         self.queue_name = host_queue
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=url.hostname,
+            heartbeat_interval=10,
             virtual_host=url.path[1:],
             credentials=pika.PlainCredentials(url.username, url.password)
         ))
