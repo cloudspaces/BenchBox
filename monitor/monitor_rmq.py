@@ -67,6 +67,7 @@ class EmitMetric(object):
         url = urlparse.urlparse(url_str)
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=url.hostname,
+            heartbeat_interval=10,
             virtual_host=url.path[1:],
             credentials=pika.PlainCredentials(url.username, url.password)
         ))
