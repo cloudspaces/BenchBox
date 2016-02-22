@@ -19,7 +19,7 @@ import json
 import fcntl
 
 
-def singleton(lockfile="executor_rmq.pid"):
+def singleton(lockfile="monitor_rmq.pid"):
     if os.path.exists(lockfile):
 
         # read the pid

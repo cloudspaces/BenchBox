@@ -17,7 +17,7 @@ from executor import StereotypeExecutorU1
 import json
 
 
-def singleton(lockfile="monitor_rmq.pid"):
+def singleton(lockfile="executor_rmq.pid"):
     if os.path.exists(lockfile):
 
         # read the pid
