@@ -156,7 +156,7 @@ class ExecuteRMQ(object):
         ))
         self.channel = self.connection.channel()
 
-        self.channel.queue_declare(queue=self.queue_name, exclusive=True)
+        self.channel.queue_declare(queue=self.queue_name)
 
     def on_request(self, ch, method, props, data):
         body = json.loads(data)
