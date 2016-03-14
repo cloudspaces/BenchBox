@@ -354,7 +354,7 @@ class MonitorRMQ(object):
             credentials=pika.PlainCredentials(url.username, url.password)
         ))
         self.channel = self.connection.channel()
-
+        self.channel.basic_qos(prefetch_count=1)
         self.channel.queue_declare(queue=self.queue_name)
 
     def on_request(self, ch, method, props, data):

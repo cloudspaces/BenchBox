@@ -103,7 +103,7 @@ class ProduceStatus(object):
             ))
 
         self.channel = self.connection.channel()
-
+        self.channel.basic_qos(prefetch_count=1)
         result = self.channel.queue_declare()
 
         self.callback_queue = result.method.queue
@@ -156,6 +156,7 @@ class ConsumeAction(object):
 
         self.host_queue = host_queue
         self.channel = self.connection.channel()
+        self.channel.basic_qos(prefetch_count=1)
         self.channel.queue_declare(queue=self.host_queue)
 
     def on_request(self, ch, method, props, data):
@@ -186,7 +187,6 @@ class ConsumeAction(object):
         ch.basic_ack(delivery_tag=method.delivery_tag)  # comprar que l'ack coincideix, # msg index
 
     def listen(self):
-        self.channel.basic_qos(prefetch_count=1)
         self.channel.basic_consume(self.on_request, queue=self.host_queue)
         print " [Consumer] Awaiting RPC requests"
         self.channel.start_consuming()

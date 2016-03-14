@@ -155,7 +155,7 @@ class ExecuteRMQ(object):
             credentials=pika.PlainCredentials(url.username, url.password)
         ))
         self.channel = self.connection.channel()
-
+        self.channel.basic_qos(prefetch_count=1)
         self.channel.queue_declare(queue=self.queue_name)
 
     def on_request(self, ch, method, props, data):
@@ -190,7 +190,6 @@ class ExecuteRMQ(object):
         ch.basic_ack(delivery_tag=method.delivery_tag)  # comprar que l'ack coincideix, # msg index
 
     def listen(self):
-        # self.channel.basic_qos(prefetch_count=10)
         self.channel.basic_consume(self.on_request,
                                    no_ack=False,
                                    queue=self.queue_name)
