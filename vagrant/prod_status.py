@@ -23,6 +23,12 @@ class ActionHandler(object):
         print 'up'
         return subprocess.check_output(["pwd", "."])
 
+    def vagrantStart(self):
+        print 'vagrantStart'
+        self.vagrantUp()
+        self.vagrantProvision()
+        print 'vagrantStart/OK'
+
     def vagrantUp(self):
         print 'vagrantUp'
         print subprocess.check_output(["vagrant", "up"])
@@ -98,7 +104,7 @@ class ProduceStatus(object):
 
         self.channel = self.connection.channel()
 
-        result = self.channel.queue_declare(exclusive=True)
+        result = self.channel.queue_declare()
 
         self.callback_queue = result.method.queue
         self.channel.basic_consume(self.on_response,
@@ -150,7 +156,7 @@ class ConsumeAction(object):
 
         self.host_queue = host_queue
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.host_queue, exclusive=True)
+        self.channel.queue_declare(queue=self.host_queue)
 
     def on_request(self, ch, method, props, data):
         body = json.loads(data)
