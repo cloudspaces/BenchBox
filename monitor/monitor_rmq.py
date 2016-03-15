@@ -286,9 +286,18 @@ class Commands(object):
                 pid = int(open(path_to_pidfile).read())
             """
             self.sync_proc_pid = pid
-        else:
+        elif pc == 'stacksync':
+            # 1st
+            ## kill all stacksync running clients
+            pstring = "java"
+            for line in os.popen("ps ax | grep " + pstring + " | grep -v grep"):
+                fields = line.split()
+                pid = fields[0]
+                os.kill(int(pid), signal.SIGKILL)
+
+            # 2nd
             ## if its already running what do i do?
-            self.sync_proc = subprocess.Popen(str_cmd, shell=True) # executar el process
+            self.sync_proc = subprocess.Popen(str_cmd, shell=True)  # executar el process
             pid = None
             while pid == None or pid == '':
                 try:
@@ -297,6 +306,9 @@ class Commands(object):
                     time.sleep(3)  # wait stacksync to quit or start
                     print e.message
             self.sync_proc_pid = pid
+
+        else:
+            print "{} is not handled!".format(pc)
 
         print "{} --> PID: {}".format(self.personal_cloud, self.sync_proc_pid)
 
