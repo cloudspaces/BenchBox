@@ -295,14 +295,15 @@ class Commands(object):
                 pid = fields[0]
                 os.kill(int(pid), signal.SIGKILL)
 
-            time.sleep(3)
+            time.sleep(2)
             # 2nd
             ## if its already running what do i do?
             self.sync_proc = subprocess.Popen(str_cmd, shell=True)  # executar el process
+            time.sleep(3)
             pid = None
             while pid == None or pid == '':
                 try:
-                    pid = int(subprocess.check_output(['pidof','java']).replace('\n',''))
+                    pid = int(subprocess.check_output(['pgrep','java']).replace('\n',''))
                 except Exception as e:
                     time.sleep(3)  # wait stacksync to quit or start
                     print e.message
@@ -330,6 +331,7 @@ class Commands(object):
             print '[START_TEST]: INFO: instance thread'
             self.sync_client = Thread(target=self._pc_client)
             self.sync_client.start()
+            time.sleep(2) # wait the personal cloud to load before running metric collection or update pid dynamically
             # self.sync_client.start()
             self.monitor = Thread(target=self._test)
             self.monitor.start()
