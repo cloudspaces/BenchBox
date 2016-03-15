@@ -295,6 +295,7 @@ class Commands(object):
                 pid = fields[0]
                 os.kill(int(pid), signal.SIGKILL)
 
+            time.sleep(3)
             # 2nd
             ## if its already running what do i do?
             self.sync_proc = subprocess.Popen(str_cmd, shell=True)  # executar el process
