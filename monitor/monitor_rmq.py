@@ -178,7 +178,6 @@ class EmitMetric(object):
 class Commands(object):
     # singleton class
     _instance = None
-    executor_state = "Unknown"  # state +  time
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super(Commands, cls).__new__(cls, *args, **kwargs)
@@ -200,7 +199,7 @@ class Commands(object):
         self.sync_proc_pid = None
         self.sync_proc = None
         self.personal_cloud = None  # personal cloud
-
+        self.executor_state = "Unknown"  # state +  time
 
     def hello(self, body):
         print '[HELLO]: hello world {}'.format(body['cmd'])

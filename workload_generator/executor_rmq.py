@@ -41,7 +41,6 @@ def singleton(lockfile="executor_rmq.pid"):
 
 class Commands(object):
     # singleton class
-    monitor_state = "Unknown"
     _instance = None
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -55,6 +54,8 @@ class Commands(object):
         self.sync_directory = None  # stacksync_folder, Dropbox, ....
         self.stereotype = receipt  # backupsample
         self.stereotype_executor = StereotypeExecutorU1()
+
+        self.monitor_state = "Unknown"
 
         # update ftp_root_directory
 
