@@ -15,7 +15,7 @@ from termcolor import colored
 from constants import STEREOTYPE_RECIPES_PATH, FS_SNAPSHOT_PATH
 from executor import StereotypeExecutorU1
 import json
-
+import datetime
 
 def singleton(lockfile="executor_rmq.pid"):
     if os.path.exists(lockfile):
@@ -41,7 +41,7 @@ def singleton(lockfile="executor_rmq.pid"):
 
 class Commands(object):
     # singleton class
-
+    monitor_state = "Unknown"
     _instance = None
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -89,6 +89,7 @@ class Commands(object):
             # always
             self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
             self.is_warmup = True
+            self.monitor_state = "executor Warmup Done!"
         else:
             print '[WARMUP]: already warmed-up'
         return '[WARMUP]: warm up response'
@@ -126,6 +127,7 @@ class Commands(object):
             print '[START_TEST]: INFO: instance thread'
             self.execute = Thread(target=self._test)
             self.execute.start()
+            self.monitor_state = "executor Running!"
             return '[START_TEST]: SUCCESS: run test response'
 
     def stop(self, body):
@@ -134,9 +136,13 @@ class Commands(object):
             self.is_running = False
             self.is_warmup = False
             self.execute.join()
+            self.monitor_state = "executor Stopped!"
             return '[STOP_TEST]: SUCCESS: stop test'
         else:
             return '[STOP_TEST]: WARNING: no test is running'
+
+    def keepalive(self, body):
+        return "{} -> {}".format(datetime.datetime.now().isoformat(), self.monitor_state)
 
 
 
@@ -183,7 +189,6 @@ class ExecuteRMQ(object):
         try:
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,
-                             # properties=pika.BasicProperties(correlation_id=props.correlation_id),
                              body=response)
         except:
             print "bypass"

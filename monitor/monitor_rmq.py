@@ -2,6 +2,7 @@
 import math
 import pika
 import os
+import datetime
 import sys
 import urlparse
 import time
@@ -177,7 +178,7 @@ class EmitMetric(object):
 class Commands(object):
     # singleton class
     _instance = None
-
+    executor_state = "Unknown"  # state +  time
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super(Commands, cls).__new__(cls, *args, **kwargs)
@@ -217,6 +218,8 @@ class Commands(object):
             self.stereotype = body['msg']['test']['testProfile']  # if its defined then this will be loaded
             self.is_warmup = True
             print '[WARMUP]: to warmup {}'.format(self.personal_cloud)
+            self.executor_state = "monitor Warmup Done!"
+
             # todo @ kill existing java process
         else:
             # if self.personal_cloud == personal_cloud_candidate: todo @ sino tornar a arrancar
@@ -318,6 +321,7 @@ class Commands(object):
             # self.sync_client.start()
             self.monitor = Thread(target=self._test)
             self.monitor.start()
+            self.executor_state = "monitor Capturing... "
             return '[START_TEST]: SUCCESS: run test response'
 
     '''
@@ -335,10 +339,13 @@ class Commands(object):
                 print child.kill()
             print parent.kill()
             self.is_warmup = False
+            self.executor_state = "monitor stop Capturing... "
             return '[STOP_TEST]: SUCCESS: stop test'
         else:
             return '[STOP_TEST]: WARNING: no test is running'
 
+    def keepalive(self, body):
+        return "{} -> {}".format(datetime.datetime.now().isoformat(), self.executor_state)
 
 class MonitorRMQ(object):
     def __init__(self, rmq_url='', host_queue=''):
