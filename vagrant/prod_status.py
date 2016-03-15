@@ -98,6 +98,7 @@ class ProduceStatus(object):
             url = urlparse.urlparse(url_str)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=url.hostname,
+                heartbeat_interval=5,
                 virtual_host=url.path[1:],
                 credentials=pika.PlainCredentials(url.username, url.password)
             ))
@@ -150,6 +151,7 @@ class ConsumeAction(object):
             url = urlparse.urlparse(url_str)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=url.hostname,
+                    heartbeat_interval=5,
                     virtual_host=url.path[1:],
                     credentials=pika.PlainCredentials(url.username, url.password)
             ))
@@ -191,7 +193,9 @@ class ConsumeAction(object):
         print " [Consumer] Awaiting RPC requests"
         self.channel.start_consuming()
 
-
+"""
+Run bash command and return output
+"""
 def bash_command(cmd):
     child = subprocess.Popen(['/bin/bash', '-c', cmd])
     child.communicate()[0]

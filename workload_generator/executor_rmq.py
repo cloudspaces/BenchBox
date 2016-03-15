@@ -39,7 +39,9 @@ def singleton(lockfile="executor_rmq.pid"):
     with open(lockfile, 'w') as f:
         f.write(str(os.getpid()))
 
+
 class Commands(object):
+
     # singleton class
     _instance = None
     def __new__(cls, *args, **kwargs):
