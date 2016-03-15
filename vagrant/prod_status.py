@@ -91,7 +91,10 @@ class ProduceStatus(object):
         print 'prod: {}'.format(rmq_url)
         self.rmq_url = rmq_url
         if rmq_url == 'localhost':
-            self.connection = pika.BlockingConnection(pika.ConnectionParameters(rmq_url))
+            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+                    host=rmq_url,
+                    heartbeat_interval=5
+            ))
         else:
             print 'RabbitMQ instance'
             url_str = self.rmq_url
@@ -144,7 +147,10 @@ class ConsumeAction(object):
         print "Dummy Peer Worker"
         self.rmq_url = rmq_url
         if rmq_url == 'localhost':
-            self.connection = pika.BlockingConnection(pika.ConnectionParameters(rmq_url))
+            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+                    host=rmq_url,
+                    heartbeat_interval=5
+            ))
         else:
             print 'Worker instance'
             url_str = self.rmq_url
@@ -182,6 +188,7 @@ class ConsumeAction(object):
         try:
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,
+
                              properties=pika.BasicProperties(correlation_id=props.correlation_id),
                              body=response)
         except:
