@@ -193,7 +193,11 @@ class ConsumeAction(object):
                              body=response)
         except:
             print "bypass"
-        ch.basic_ack(delivery_tag=method.delivery_tag)  # comprar que l'ack coincideix, # msg index
+
+        try:
+            ch.basic_ack(delivery_tag=method.delivery_tag)  # comprar que l'ack coincideix, # msg index
+        except:
+            print "the sender has been rebooted, so the response will never reach as their id are dynamically changing every time the node server reboots"
 
     def listen(self):
         self.channel.basic_consume(self.on_request, queue=self.host_queue)
