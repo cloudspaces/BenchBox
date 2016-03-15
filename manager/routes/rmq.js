@@ -10,7 +10,7 @@ var hostModel = require('../models/Hosts.js');
 // produce action
 router.get('/emit', function (req, res, next) {
     // parse the request arguments....
-    console.log("START REQUEST ----------------------------")
+    console.log("START REQUEST ----------------------------");
     console.log(req.query);
 
     // connect to the rabbit server
@@ -42,11 +42,8 @@ router.get('/emit', function (req, res, next) {
                     var response = msg.content.toString();
                     console.log(response);
                     if (msg.properties.correlationId == corr) {
-
-
                         console.log(' [.] Got '+response);
                         // update the dummyhost status
-
                         hostModel.findOne({hostname: target}, function (err, host) {
                             if (err) {
                                 console.error(err.message)
@@ -68,6 +65,44 @@ router.get('/emit', function (req, res, next) {
                                     if (err)
                                         console.log(err.message)
                                 })
+                            }
+                        });
+                        setTimeout(function () {
+                            conn.close();
+                            // process.exit(0)
+                        }, 500);
+                    }else{
+                        console.log("no corr id");
+                        hostModel.findOne({hostname: req.query.hostname}, function (err, host) {
+                            if (err) {
+                                console.error(err.message)
+                            } else {
+                                console.log("-INI----------");
+                                console.log(host.status);
+                                console.log(host.status_sandbox);
+                                console.log(host.status_benchbox);
+                                console.log("-FIN----------");
+
+                                var status_attr = 'status';
+                                switch(req.query.target_queue){
+                                    case "monitor":
+                                        status_attr+='_sandbox';
+                                        break;
+                                    case "executor":
+                                        status_attr+='_benchbox';
+                                        break;
+                                    default:
+                                        console.err("unhandled case");
+                                        break;
+                                }
+
+                                status_attr = status_attr.toLowerCase();
+                                host[status_attr] = cmd;
+                                host.save(function (err) {
+                                    if (err)
+                                        console.log(err.message)
+                                })
+
                             }
                         });
                         setTimeout(function () {
