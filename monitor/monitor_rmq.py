@@ -68,7 +68,7 @@ class EmitMetric(object):
         url = urlparse.urlparse(url_str)
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=url.hostname,
-            heartbeat_interval=10,
+            heartbeat_interval=5,
             virtual_host=url.path[1:],
             credentials=pika.PlainCredentials(url.username, url.password)
         ))
@@ -354,7 +354,7 @@ class MonitorRMQ(object):
         self.actions = Commands(hostname=self.hostname)
         self.queue_name = host_queue
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
-            heartbeat_interval=10,
+            heartbeat_interval=5,
             host=url.hostname,
             virtual_host=url.path[1:],
             credentials=pika.PlainCredentials(url.username, url.password)
