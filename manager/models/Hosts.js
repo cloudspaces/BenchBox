@@ -7,7 +7,7 @@ var HostSchema = new mongoose.Schema({
     profile: {type: String, default:'sync', enum : ['sync', 'idle', 'cdn', 'backup', 'regular']},
     cred_stacksync: {type: String, default:'None'},
     cred_owncloud: {type: String, default:'None'},
-    note: {type: String, default:'ast#', enum : ['deim1', 'deim2', 'deim3', 'ast#']},
+    note: {type: String, default:'ast#'},
     status: {
         type: String,
         default:'idle'
