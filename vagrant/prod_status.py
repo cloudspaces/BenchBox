@@ -8,6 +8,15 @@ import socket
 import subprocess
 import json
 
+import os
+import signal
+
+def check_kill_process(pstring):
+    for line in os.popen("ps ax | grep " + pstring + " | grep -v grep"):
+        fields = line.split()
+        pid = fields[0]
+        os.kill(int(pid), signal.SIGKILL)
+
 class ActionHandler(object):
     def __init__(self):
         print "vagrant handler"
@@ -48,39 +57,45 @@ class ActionHandler(object):
     ''' executed at the benchBox, nota: el script esta en el directorio root /vagrant'''
     def warmUp(self):
         # warmup the sandBox filesystem booting the executor.py
-        print 'warmUp'
-        str_cmd = "nohup python ~/workload_generator/executor_rmq.py &> nohup_executor_rmq.out& "
-        # output = subprocess.check_output(['echo', 'warmup'])
-        return bash_command(str_cmd)
-
+        output =  ""
+        try:
+            print 'warmUp'
+            str_cmd = "nohup python ~/workload_generator/executor_rmq.py &> nohup_executor_rmq.out& "
+            # output = subprocess.check_output(['echo', 'warmup'])
+            output = bash_command(str_cmd)
+        except:
+            print "something failed"
+        finally:
+            return output
     def tearDown(self):
         # clear the sandBox filesystem and cached files
         print 'tearDown'
-        output = ''
-        if self.hostname == 'sandBox':              # todo if sandbox
-            str_cmd = "pgrep -f monitor_rmq.py | xargs kill -9 "  # kill the process
-            output += bash_command(str_cmd)
-            str_cmd = "echo $? "  # run some cleanup script todo
-            output += bash_command(str_cmd)
-        elif self.hostname == 'benchBox':           # todo if benchBox
-            str_cmd = "pgrep -f executor_rmq.py | xargs kill -9 "  # kill the process
-            output += bash_command(str_cmd)
-            str_cmd = "echo $? "  # run some cleanup script todo
-            output += bash_command(str_cmd)
-        else:
-            return 'unhandled hostname: {}'.format(self.hostname)
+        try:
+            output = ''
+            if self.hostname == 'sandBox':              # todo if sandbox
+                check_kill_process("monitor_rmq.py")
+            elif self.hostname == 'benchBox':           # todo if benchBox
+                check_kill_process("executor_rmq.py")
+                # aprovechar el metodo que habia en github
+            else:
+                return 'unhandled hostname: {}'.format(self.hostname)
+        except:
+            print "something failed"
+        finally:
+            return output
 
-
-
-        return output
     ''' executed at the sandBox '''
     def monitorUp(self):
         # start the metrics listener for monitoring
-        print 'monitorUp'
-        str_cmd = "nohup python ~/monitor/monitor_rmq.py &> nohup_monitor_rmq.out& "
-
-        return bash_command(str_cmd)
-
+        output = ""
+        try:
+            print 'monitorUp'
+            str_cmd = "nohup python ~/monitor/monitor_rmq.py &> nohup_monitor_rmq.out& "
+            output = bash_command(str_cmd)
+        except:
+            print "something failed"
+        finally:
+            return output
     def execute(self):
         print 'execute'
         return bash_command('whoami')
