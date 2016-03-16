@@ -245,9 +245,7 @@ class Commands(object):
             # track the sync client pid resources
             metric_reader = EmitMetric(hostname=self.hostname, personal_cloud=self.personal_cloud)  # start the sync client
 
-
-
-            while self.is_warmup and self.is_running and self.sync_proc_pid is not None:
+            while self.is_warmup and self.is_running and self.sync_proc is not None:
                 operations += 1  # executant de forma indefinida...
                 metric_reader.emit(pid=self.sync_proc_pid, receipt=self.stereotype)  # send metric to rabbit
                 time.sleep(2)  # delay between metric
@@ -295,7 +293,7 @@ class Commands(object):
             if os.path.exists(path_to_pidfile):
                 pid = int(open(path_to_pidfile).read())
             """
-            self.sync_proc_pid = self.sync_proc.pid
+            self.sync_proc_pid = pid
         elif pc == 'stacksync':
             # 1st
             ## kill all stacksync running clients
@@ -316,7 +314,7 @@ class Commands(object):
                     print "failed reading stacksync pid..."
                     print e.message
 
-            self.sync_proc_pid = self.sync_proc.pid
+            self.sync_proc_pid = pid
 
         else:
             print "{} is not handled!".format(pc)
