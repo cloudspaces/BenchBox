@@ -51,7 +51,9 @@ class EmitMetric(object):
         :param proc: the syncronization client process.
         :return:
         """
-
+        print "Emit with pid: {}".format(pid)
+        if pid is None:
+            return False
         metrics = {'cpu': 0,
                    'ram': 1,
                    'net': 2,
@@ -72,7 +74,7 @@ class EmitMetric(object):
         except Exception as ex:
             print "sync client is not running! {}".format(pid)
             print ex.message
-            return False # exit as the process is not alive.
+            return False  # exit as the process is not alive.
 
         print "PID: {} [{}]".format(pid, self.personal_cloud.lower())
         try:
