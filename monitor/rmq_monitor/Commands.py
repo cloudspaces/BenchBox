@@ -28,7 +28,7 @@ class Commands(object):
         self.hostname = hostname
 
         self.is_running = False     # state flag
-
+        self.client_running = False
         self.stereotype = None      # backupsample
         self.monitor = None         # monitor_process => experimento
         self.sync_client = None     # sync_client process
@@ -67,7 +67,7 @@ class Commands(object):
         # define metric reader with [hostname & sync client name]
         while self.is_running:
             operations += 1
-            metric_reader.emit(self.sync_proc_pid)  # send metric to rabbit
+            self.client_running = metric_reader.emit(self.sync_proc_pid)  # send metric to rabbit
             time.sleep(2)  # delay between metric
             print colored("[TEST]: INFO {} --> {} // {} //"
                           "".format(time.ctime(time.time()), operations, self.is_running), 'red')
@@ -81,38 +81,38 @@ class Commands(object):
         :return:
         """
         pc_cmd = {
-            'stacksync': "/usr/bin/java -jar /usr/lib/stacksync/Stacksync.jar -d -c /vagrant",
+            #'stacksync': "/usr/bin/java -jar /usr/lib/stacksync/Stacksync.jar -d -c /vagrant",
+            'stacksync': "/usr/bin/stacksync",
             'owncloud': "",
             'dropbox': "/home/vagrant/.dropbox-dist/dropboxd"  # launch dropbox
         }
         str_cmd = pc_cmd[self.personal_cloud.lower()]
 
+        pc_pid = {
+            'stacksync': "java",
+            'owncloud': "",
+            'dropbox': "dropbox"
+        }
+        str_pid = pc_pid[self.personal_cloud.lower()]
+
         while self.is_running:
-            pid = None
-            while pid is None:
-                time.sleep(3)
-                if self.personal_cloud.lower() == 'dropbox':
-                    pid = int(subprocess.check_output(['pidof','dropbox']).replace('\n',''))
-                elif self.personal_cloud.lower() == 'stacksync':
-                    pid = int(subprocess.check_output(['pgrep','java']).replace('\n',''))
-                elif self.personal_cloud.lower() == 'owncloud':
-                    pid = int(subprocess.check_output(['pgrep','owncloud']).replace('\n',''))
-                else:
-                    print "misc client"
-
-                if pid is None:
-                    self.sync_proc = subprocess.Popen(str_cmd, shell=True)
-                else:
-                    try:
-
-                        p = psutil.Process(pid)
-                    except:
-                        print "{} None valid pid".format(pid)
-                        pid = None
-
-            self.sync_proc_pid = pid
+            # check if client is running
             time.sleep(5)
-
+            if self.client_running is False:
+                # call client && update pid
+                while self.client_running is False:
+                    self.sync_proc = subprocess.Popen(str_cmd, shell=True)
+                    time.sleep(3)
+                    try:
+                        for proc in psutil.process_iter():
+                            if proc.name() == str_pid:
+                                self.client_running = True
+                                self.sync_proc_pid = proc.pid
+                                break
+                        psutil.Process(self.sync_proc_pid)
+                    except Exception as ex:
+                        print ex.message
+                        print "couldn't load the pc"
             # every 5 seconds checks if the target personal cloud client is running
 
     def start(self, body):

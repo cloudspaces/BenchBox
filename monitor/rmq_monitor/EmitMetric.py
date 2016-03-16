@@ -70,8 +70,9 @@ class EmitMetric(object):
         try:
             self.proc = psutil.Process(pid)
         except Exception as ex:
+            print "sync client is not running! {}".format(pid)
             print ex.message
-            return 0 # exit as the process is not alive.
+            return False # exit as the process is not alive.
 
         print "PID: {} [{}]".format(pid, self.personal_cloud.lower())
         try:
@@ -144,5 +145,5 @@ class EmitMetric(object):
                 routing_key=self.hostname,
                 body=msg)
 
-
+        return True
 
