@@ -77,7 +77,7 @@ class EmitMetric(object):
         try:
             if self.personal_cloud.lower() == "stacksync":
                 # todo lookup for stacksync process here => using psutil
-                cpu_usage = int(math.ceil(self.proc.get_cpu_percent(None)))
+                cpu_usage = int(math.ceil(self.proc.cpu_percent(None)))
                 ram_usage = self.proc.memory_info().rss
                 metrics['cpu'] = cpu_usage
                 metrics['ram'] = ram_usage
@@ -85,7 +85,7 @@ class EmitMetric(object):
                 print "TODO owncloud"
             elif self.personal_cloud.lower() == "dropbox":
                 # todo lookup for dropbox process here => using psutil
-                cpu_usage = int(math.ceil(self.proc.get_cpu_percent(None)))
+                cpu_usage = int(math.ceil(self.proc.cpu_percent(None)))
                 ram_usage = self.proc.memory_info().rss
                 metrics['cpu'] = cpu_usage
                 metrics['ram'] = ram_usage
