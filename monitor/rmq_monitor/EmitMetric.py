@@ -77,7 +77,7 @@ class EmitMetric(object):
         try:
             if self.personal_cloud.lower() == "stacksync":
                 # todo lookup for stacksync process here => using psutil
-                cpu_usage = int(math.ceil(self.proc.cpu_percent(None)))
+                cpu_usage = int(math.ceil(self.proc.get_cpu_percent(None)))
                 ram_usage = self.proc.memory_info().rss
                 metrics['cpu'] = cpu_usage
                 metrics['ram'] = ram_usage
@@ -85,7 +85,7 @@ class EmitMetric(object):
                 print "TODO owncloud"
             elif self.personal_cloud.lower() == "dropbox":
                 # todo lookup for dropbox process here => using psutil
-                cpu_usage = int(math.ceil(self.proc.cpu_percent(None)))
+                cpu_usage = int(math.ceil(self.proc.get_cpu_percent(None)))
                 ram_usage = self.proc.memory_info().rss
                 metrics['cpu'] = cpu_usage
                 metrics['ram'] = ram_usage
@@ -107,10 +107,10 @@ class EmitMetric(object):
             self.prev_net_counter = curr_net_counter
         # assign hard drive usage metric
         drive_usage_cmd =['/usr/bin/du', '-ks', '/home/vagrant/{}'.format(self.personal_folder)]
-        proc = subprocess.Popen(drive_usage_cmd, stdout=subprocess.PIPE)
-        tmp = proc.stdout.read()
+        drive_usage_output = subprocess.Popen(drive_usage_cmd, stdout=subprocess.PIPE)
+        drive_usage = drive_usage_output.stdout.read()
         try:
-            metrics['disk'] = int(tmp.split('\t')[0])  # kilo bytes cast string to int
+            metrics['disk'] = int(drive_usage.split('\t')[0])  # kilo bytes cast string to int
         except:
             print "invalid literal for... memory unit"
             metrics['disk'] = 1
