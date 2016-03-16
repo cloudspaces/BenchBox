@@ -108,7 +108,7 @@ class EmitMetric(object):
         # assign hard drive usage metric
         drive_usage_cmd =['/usr/bin/du', '-ks', '/home/vagrant/{}'.format(self.personal_folder)]
         proc = subprocess.Popen(drive_usage_cmd, stdout=subprocess.PIPE)
-        tmp = self.proc.stdout.read()
+        tmp = proc.stdout.read()
         try:
             metrics['disk'] = int(tmp.split('\t')[0])  # kilo bytes cast string to int
         except:
