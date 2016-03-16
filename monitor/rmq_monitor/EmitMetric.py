@@ -70,7 +70,7 @@ class EmitMetric(object):
                    'time': calendar.timegm(time.gmtime()) * 1000}
         # psutil read metrics
         try:
-            if pid == self.proc.pid:
+            if self.proc is not None and pid == self.proc.pid:
                 print "Same pid"
                 # Noop
             else:
