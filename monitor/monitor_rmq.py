@@ -94,7 +94,11 @@ class EmitMetric(object):
         # psutil read metrics
 
         if pid == "" or self.proc is None:
-            self.proc = psutil.Process(pid)
+            while True:
+                try:
+                    self.proc = psutil.Process(pid)
+                except:
+                    print "Syncronization client still not running!"
             print "Sintetic"
         else:
             print "PID: {} [{}]".format(pid, self.personal_cloud.lower())
@@ -232,7 +236,6 @@ class Commands(object):
         Aixo ha d'executarse en un thread com a bucle infinit
         :return:
         '''
-        time.sleep(5)
         print '[TEST]: run'
         if self.is_warmup:
             print '[TEST]: run test'
@@ -241,6 +244,9 @@ class Commands(object):
             operations = 0
             # track the sync client pid resources
             metric_reader = EmitMetric(hostname=self.hostname, personal_cloud=self.personal_cloud)  # start the sync client
+
+
+
             while self.is_warmup and self.is_running and self.sync_proc_pid is not None:
                 operations += 1  # executant de forma indefinida...
                 metric_reader.emit(pid=self.sync_proc_pid, receipt=self.stereotype)  # send metric to rabbit
