@@ -153,11 +153,10 @@ class Commands(object):
             self.executor_state = "monitor stop Capturing... "
             return '[STOP_TEST]: SUCCESS: stop test'
         else:
-            return '[STOP_TEST]: WARNING: no test is running'
             pc_cmd = {
                 'stacksync': "java",
                 'owncloud': "",
-                'dropbox': "dropbox"  # launch dropbox
+                'dropbox': "dropbox"
             }
             str_cmd = pc_cmd[self.personal_cloud.lower()]
             pstring = str_cmd
@@ -165,6 +164,7 @@ class Commands(object):
                 fields = line.split()
                 proc_pid = fields[0]
                 os.kill(int(proc_pid), signal.SIGKILL)
+            return '[STOP_TEST]: WARNING: no test is running'
 
     def keepalive(self, body):
         return "{} -> {}".format(datetime.datetime.now().isoformat(), self.executor_state)

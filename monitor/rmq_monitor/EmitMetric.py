@@ -70,7 +70,13 @@ class EmitMetric(object):
                    'time': calendar.timegm(time.gmtime()) * 1000}
         # psutil read metrics
         try:
-            self.proc = psutil.Process(pid)
+            if pid == self.proc.pid:
+                print "Same pid"
+                # Noop
+            else:
+                self.proc = psutil.Process(pid)
+                # Update the pid
+
         except Exception as ex:
             print "sync client is not running! {}".format(pid)
             print ex.message
