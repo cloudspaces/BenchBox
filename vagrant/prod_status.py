@@ -53,6 +53,11 @@ class ActionHandler(object):
         print subprocess.check_output(['vagrant', 'status'])
         return 'vagrantProvision/OK'
 
+    def vagrantDestroy(self):
+        print 'vagrantDestroy'
+        print subprocess.check_output(['vagrant', 'destroy', '-f']) # vagrant destroy -f # force yes
+        return 'vagrantDestroy/OK'
+
 
     ''' executed at the benchBox, nota: el script esta en el directorio root /vagrant'''
     def warmUp(self):
