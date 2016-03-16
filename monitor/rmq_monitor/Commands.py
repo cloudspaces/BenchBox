@@ -69,7 +69,7 @@ class Commands(object):
             operations += 1
             metric_reader.emit(self.sync_proc_pid)  # send metric to rabbit
             time.sleep(2)  # delay between metric
-            print colored("[TEST]: INFO {} --> {} // {} // {}"
+            print colored("[TEST]: INFO {} --> {} // {} //"
                           "".format(time.ctime(time.time()), operations, self.is_running), 'red')
         print "QUIT emit metrics!!!"
 
@@ -144,10 +144,12 @@ class Commands(object):
             self.is_running = False
             self.monitor.join()
             self.sync_client.join()
+            """
             parent = psutil.Process(self.sync_proc_pid)
             for child in parent.children(recursive=True):  # or parent.children() for recursive=False
                 print child.kill()
             print parent.kill()
+            """
             self.executor_state = "monitor stop Capturing... "
             return '[STOP_TEST]: SUCCESS: stop test'
         else:
