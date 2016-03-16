@@ -196,7 +196,8 @@ class Commands(object):
         self.stereotype = None      # backupsample # todo @ update this to load profiles dynamically
         self.monitor = None         # monitor_process => experimento
         self.sync_client = None     # sync_client process
-        self.sync_proc_pid = None
+        self.sync_proc_pid = None   # GATHER THE SYNC PID FROM SYNC PROC
+
         self.sync_proc = None
         self.personal_cloud = None  # personal cloud
         self.executor_state = "Unknown"  # state +  time
@@ -231,6 +232,7 @@ class Commands(object):
         Aixo ha d'executarse en un thread com a bucle infinit
         :return:
         '''
+        time.sleep(5)
         print '[TEST]: run'
         if self.is_warmup:
             print '[TEST]: run test'
@@ -244,6 +246,8 @@ class Commands(object):
                 metric_reader.emit(pid=self.sync_proc_pid, receipt=self.stereotype)  # send metric to rabbit
                 time.sleep(2)  # delay between metric
                 print colored("[TEST]: INFO {} --> {} // {} // {}".format(time.ctime(time.time()), operations, self.is_running, self.sync_proc_pid), 'red')
+
+            print "QUIT TESTING!!!"
         else:
             print '[TEST]: WARNING: need warmup 1st!'
 
@@ -285,29 +289,28 @@ class Commands(object):
             if os.path.exists(path_to_pidfile):
                 pid = int(open(path_to_pidfile).read())
             """
-            self.sync_proc_pid = pid
+            self.sync_proc_pid = self.sync_proc.pid
         elif pc == 'stacksync':
             # 1st
             ## kill all stacksync running clients
             pstring = "java"
             for line in os.popen("ps ax | grep " + pstring + " | grep -v grep"):
                 fields = line.split()
-                pid = fields[0]
-                os.kill(int(pid), signal.SIGKILL)
+                proc_pid = fields[0]
+                os.kill(int(proc_pid), signal.SIGKILL)
 
-            time.sleep(2)
             # 2nd
             ## if its already running what do i do?
             self.sync_proc = subprocess.Popen(str_cmd, shell=True)  # executar el process
-            time.sleep(3)
             pid = None
             while pid == None or pid == '':
                 try:
                     pid = int(subprocess.check_output(['pgrep','java']).replace('\n',''))
                 except Exception as e:
-                    time.sleep(3)  # wait stacksync to quit or start
+                    print "failed reading stacksync pid..."
                     print e.message
-            self.sync_proc_pid = pid
+
+            self.sync_proc_pid = self.sync_proc.pid
 
         else:
             print "{} is not handled!".format(pc)
@@ -331,9 +334,9 @@ class Commands(object):
             print '[START_TEST]: INFO: instance thread'
             self.sync_client = Thread(target=self._pc_client)
             self.sync_client.start()
-            time.sleep(2) # wait the personal cloud to load before running metric collection or update pid dynamically
             # self.sync_client.start()
             self.monitor = Thread(target=self._test)
+            # this has to wait ultil the previous thread has launched the clients
             self.monitor.start()
             self.executor_state = "monitor Capturing... "
             return '[START_TEST]: SUCCESS: run test response'
