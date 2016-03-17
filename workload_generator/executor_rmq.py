@@ -8,7 +8,8 @@ import time
 import signal
 import json
 
-from rmq_executor import Commands
+from rmq_executor.Commands import Commands
+
 
 def singleton(lockfile="executor_rmq.pid"):
     if os.path.exists(lockfile):
