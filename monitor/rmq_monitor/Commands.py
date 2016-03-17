@@ -142,6 +142,8 @@ class Commands(object):
         if self.is_running:
             print '[STOP_TEST]: stop test {}'.format(body)
             self.is_running = False
+            self.sync_proc_pid = None
+            self.sync_proc = None
             self.monitor.join()
             self.sync_client.join()
             """
