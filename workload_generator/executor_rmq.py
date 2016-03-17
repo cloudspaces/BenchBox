@@ -7,23 +7,19 @@ import urlparse
 import time
 import signal
 import json
-
-
+import datetime
 
 from threading import Thread
 from constants import STEREOTYPE_RECIPES_PATH, FS_SNAPSHOT_PATH
 from executor import StereotypeExecutorU1
-import datetime
 from termcolor import colored
 
 def singleton(lockfile="executor_rmq.pid"):
     if os.path.exists(lockfile):
-
         # read the pid
         with open(lockfile, 'r') as f:
             first_line = f.readline()
             print first_line
-
         last_pid = first_line
         print "kill_last_pid: {}".format(last_pid)
         print last_pid
@@ -33,14 +29,12 @@ def singleton(lockfile="executor_rmq.pid"):
         except Exception as e:
             print e.message
             print "warning not valid pid"
-
     # update/store current pid
     with open(lockfile, 'w') as f:
         f.write(str(os.getpid()))
 
 
 class Commands(object):
-
     # singleton class
     _instance = None
     def __new__(cls, *args, **kwargs):
@@ -55,14 +49,10 @@ class Commands(object):
         self.sync_directory = None  # stacksync_folder, Dropbox, ....
         self.stereotype = receipt  # backupsample
         self.stereotype_executor = StereotypeExecutorU1()
-
         self.monitor_state = "Unknown"
-
         # update ftp_root_directory
-
         self.fs_abs_target_folder = None
         self.execute = None
-
         # self.data_generator = DataGenerator()
 
         # start the monitoring stuff. # todo
@@ -113,7 +103,6 @@ class Commands(object):
                 self.stereotype_executor.execute()
                 # time.sleep(3)
                 print colored("[TEST]: INFO {} --> {} // {} // {} ".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory), 'red')
-
         else:
             print '[TEST]: WARNING: need warmup 1st!'
 
@@ -121,7 +110,6 @@ class Commands(object):
         print '[START_TEST]: {}'.format(body)
         if not self.is_warmup:
             return '[START_TEST]: WARNING: require warmup!'
-
         if self.is_running:
             return '[START_TEST]: INFO: already running!'
         else:
@@ -147,9 +135,15 @@ class Commands(object):
         return "{} -> {}".format(datetime.datetime.now().isoformat(), self.monitor_state)
 
 
-
 class ExecuteRMQ(object):
     def __init__(self, rmq_url='', host_queue='', profile=''):
+        """
+        This class contains the rabbitmq request handlers, that will call Commands contained in Commands class
+        :param rmq_url: url where the rabbitmq server is hosted
+        :param host_queue: queue name of the benchbox.executor
+        :param profile: refers to the user stereotype to use
+        :return:
+        """
         print "Executor operation consumer: "
         url = urlparse.urlparse(rmq_url)
         self.profile = profile
@@ -168,25 +162,21 @@ class ExecuteRMQ(object):
     def on_request(self, ch, method, props, data):
         body = json.loads(data)
         print " [on_request] {} ".format(body['cmd'])
-        # print " [on_request] ch {} meth {} props {} body {}".format(ch, method, props, body['cmd'])
-        # todo implementar els handler vagrantUp i vagrantDown
-        output = None
+        executor_output = None
         try:
-            toExecute = getattr(self.actions, body['cmd'])
+            executor_requested_command = getattr(self.actions, body['cmd'])
+            # convertir en executor threads, simular multiples ediciones de manera simultanea
             # print toExecute # la comanda que s'executara
             # lo ideal es que aixo no sigui un thread per que les peticions s'atenguin fifo
             # t = threading.Thread(target=toExecute)
-            print "ExecuteIn  : {}".format(body['cmd'])
-            output = toExecute(body)
-            print "ExecuteOut : {}".format(output)
+            print "requestCommand  : {}".format(body['cmd'])
+            executor_output = executor_requested_command(body)
+            print "requestCommand : {}".format(executor_output)
             # t.start()
-        except AttributeError as e:
-            print e.message
+        except AttributeError as ex:
+            print ex.message
             print "ACK: {}".format(body['cmd'])
-
-        response = "{} response: {}: {}".format(self.queue_name, body['cmd'], output)
-        print props.reply_to
-        print props.correlation_id
+        response = "{} response: {}: {}".format(self.queue_name, body['cmd'], executor_output)
         try:
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,
@@ -204,7 +194,6 @@ class ExecuteRMQ(object):
 
 if __name__ == '__main__':
     print "executor.py is ran when warmup and its queue remains established... WAITING RPC"
-
     # read the url from path: /vagrant/rmq.url.txt
     rmq_url = None
     with open('/vagrant/rabbitmq','r') as r:
@@ -212,21 +201,13 @@ if __name__ == '__main__':
     dummyhost = None
     # start the ftp sender
     stereotype_receipt = 'backupsample'
-
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
     queue_name = '{}.{}'.format(dummyhost, 'executor')
-
-
-
-
     if len(sys.argv) == 1:  # means no parameters
         # DEFAULT: dummy
-
         # use file look
         singleton()
-
-
         executor = ExecuteRMQ(rmq_url, queue_name, stereotype_receipt)
         # todo fer que stereotype_receipt y personal cloud sigui dinamic
         executor.listen()

@@ -6,12 +6,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var constants = require("./constants");
-
 var influx = require('influx');
 
-
 var app = express();
-
 
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
@@ -19,22 +16,18 @@ var app = express();
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 
-// console.log(constants.influx.influx_conn);
-
 var influxClient = influx(constants.influx.server);
 var influxReady = false;
-influxClient.getDatabaseNames(function(err, arrDBS){
-
-    if(err)
+influxClient.getDatabaseNames(function (err, arrDBS) {
+    if (err)
         throw err;
-    if(arrDBS.indexOf(constants.influx.influx_conn.database) > -1){
-        console.log("Database ["+constants.influx.influx_conn.database+"] ready!" );
+    if (arrDBS.indexOf(constants.influx.influx_conn.database) > -1) {
+        console.log("Database [" + constants.influx.influx_conn.database + "] ready!");
         influxReady = true;
         return;
     }
-
-    influxClient.createDatabase(constants.influx.influx_conn.database, function(err, result){
-        if(err) throw err;
+    influxClient.createDatabase(constants.influx.influx_conn.database, function (err, result) {
+        if (err) throw err;
         console.log("Database created ready");
         influxReady = true;
     });
@@ -67,7 +60,6 @@ mongoose.connect(constants.mongodb_url, function (err) {
         console.log('connection to mongoose successful!');
     }
 });
-
 
 
 // ------------------------------------------------------------------------
@@ -103,7 +95,6 @@ app.use(express.static(path.join(__dirname, 'static')));
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 
-
 app.use(session({
     secret: 'keyboard cat',
     cookie: {
@@ -112,7 +103,6 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }));
-
 
 app.use(function (req, res, next) {
     var sess = req.session;
@@ -125,9 +115,7 @@ app.use(function (req, res, next) {
 });
 
 
-// log the client ip on every request
-
-
+// log the client ip at every request
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var todos = require('./routes/todos');
@@ -139,7 +127,6 @@ var rpcs = require('./routes/rpc');
 var rmqs = require('./routes/rmq');
 
 // api rest
-
 app.use('/', routes);
 app.use('/users', users);
 app.use('/todos', todos);
@@ -149,7 +136,6 @@ app.use('/init', inits);
 app.use('/load', loads);
 app.use('/rpc', rpcs);
 app.use('/rmq', rmqs);
-
 
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
@@ -171,7 +157,6 @@ amqp.connect(amqp_url, function (err, conn) {
         console.log('connection rabbitmq successful!');
         amqp_conn = conn; // single connection for whole server.
     }
-
     conn.createChannel(function (err, ch) {
         var q = manager_queue;
         ch.assertQueue(q, {durable: false}, function (err, q) {
@@ -180,31 +165,34 @@ amqp.connect(amqp_url, function (err, conn) {
         ch.prefetch(1);
         ch.consume(q, function rpc_reply(msg) {
             var host_status = JSON.parse(msg.content);  // nomes el missatge esta en json
-            console.log("[" + msg.properties.replyTo + "] --> [" + msg.fields.consumerTag +
-                "] : host[%s] status(%s) :",
+            console.log("" +
+                "[" + msg.properties.replyTo + "] --> " +
+                "[" + msg.fields.consumerTag + "] " +
+                ": host[%s] status(%s) :",
                 host_status.host, host_status.status);
-
             var status = host_status.status;
             var dummyhost = host_status.host.split('.')[0];
             var vboxhost = host_status.host.split('.')[1].toLowerCase();
             console.log(status, dummyhost, vboxhost);
             hostModel.findOne({hostname: dummyhost}, function (err, host) {
                 if (err) {
+                    console.log("Find one failed");
                     console.error(err.message)
                 }
-
                 var status_attr = 'status';
                 if (dummyhost != vboxhost) {
                     status_attr += '_' + vboxhost
                 }
+                console.log('status_old:    ' + host[status_attr]);
                 host[status_attr] = status;
-
+                console.log('status_updated: ' + status);
                 host.save(function (err) {
-                    if (err)
+                    if (err) {
+                        console.log("Save one failed");
                         console.log(err.message)
+                    }
                 })
             });
-
             var result = "manager Joined queue " + host_status.host + "! ";
             var callbackChannel = msg.properties.replyTo;
             var callbackMsg = new Buffer(result.toString());
@@ -221,30 +209,20 @@ amqp.connect(amqp_url, function (err, conn) {
     conn.createChannel(function (err, ch) {
         var ex = 'metrics';
         ch.assertExchange(ex, 'fanout', {durable: false});
-
         ch.assertQueue('', {exclusive: true}, function (err, q) {
             console.log(' [' + ex + '] waiting for connection');
             ch.bindQueue(q.queue, ex, '');
             ch.consume(q.queue, function (msg) {
-                console.log(" [" + ex + "] " + msg.content.toString());
+                // console.log(" [" + ex + "] " + msg.content.toString());
                 ch.ack(msg);
-                /*
-                var point = {
-                    time: new Date(),
-                    value: Math.floor(Math.random() * 100) + 1,
-                    cpu: Math.floor(Math.random() * 100) + 1,
-                    ram: Math.floor(Math.random() * 100) + 1,
-                    net: Math.floor(Math.random() * 100) + 1
-                };
-                */
                 var data = JSON.parse(msg.content);
                 var metrics = data.metrics;
                 var tags = data.tags;
                 var point = metrics;
                 var hostname = msg.fields.routingKey;
-                if(influxReady){
-                    influxClient.writePoint(hostname, point, tags, function(){
-                       console.log("done writing");
+                if (influxReady) {
+                    influxClient.writePoint(hostname, point, tags, function () {
+                        console.log("done writing [" + hostname+ "] ",metrics);
                     });
                 }
             }, {noAck: false}); // ignore if none reached, none blocking queue
