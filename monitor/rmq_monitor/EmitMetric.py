@@ -70,30 +70,19 @@ class EmitMetric(object):
                    'time': calendar.timegm(time.gmtime()) * 1000}
         # psutil read metrics
         try:
-            if self.proc is not None and pid == self.proc.pid:
-                print "Same pid"
-                # Noop
+            self.proc = psutil.Process(pid)
+            process_name = None
+
+            if self.personal_cloud.lower() == "stacksync":
+                process_name = "java"
+            elif self.personal_cloud.lower() == "dropbox":
+                process_name = "dropbox"
+
+            if process_name == self.proc.name():
+                print "OKEY match {} == {}".format(self.proc.name(), process_name)
             else:
-                # Check if process name match personal client process name
-                process_name = None
-                if self.personal_cloud.lower() == "stacksync":
-                    process_name = "java"
-                elif self.personal_cloud.lower() == "dropbox":
-                    process_name = "dropbox"
-
-                self.proc = psutil.Process(pid)
-                if process_name == self.proc.name():
-                    print "OKEY"
-                else:
-                    print "sync client does not match"
-                    return False
-
-                    # Correcto
-
-                # Update the pid
-
-
-
+                print "sync client does not match"
+                return False
 
         except Exception as ex:
             print "sync client is not running! {}".format(pid)
