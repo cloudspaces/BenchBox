@@ -74,8 +74,26 @@ class EmitMetric(object):
                 print "Same pid"
                 # Noop
             else:
+                # Check if process name match personal client process name
+                process_name = None
+                if self.personal_cloud.lower() == "stacksync":
+                    process_name = "java"
+                elif self.personal_cloud.lower() == "dropbox":
+                    process_name = "dropbox"
+
                 self.proc = psutil.Process(pid)
+                if process_name == self.proc.name():
+                    print "OKEY"
+                else:
+                    print "sync client does not match"
+                    return False
+
+                    # Correcto
+
                 # Update the pid
+
+
+
 
         except Exception as ex:
             print "sync client is not running! {}".format(pid)
