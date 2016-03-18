@@ -128,7 +128,7 @@ class ProduceStatus(object):
 
         self.channel = self.connection.channel()
         self.channel.basic_qos(prefetch_count=1)
-        result = self.channel.queue_declare()
+        result = self.channel.queue_declare(durable=False, auto_delete=True)
 
         self.callback_queue = result.method.queue
         self.channel.basic_consume(self.on_response,
@@ -167,10 +167,14 @@ class ConsumeAction(object):
         print "Dummy Peer Worker"
         self.rmq_url = rmq_url
         if rmq_url == 'localhost':
+            """
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
                     host=rmq_url,
                     heartbeat_interval=5
             ))
+            """
+            # Async consumer
+
         else:
             print 'Worker instance'
             url_str = self.rmq_url
@@ -186,6 +190,12 @@ class ConsumeAction(object):
         self.channel = self.connection.channel()
         self.channel.basic_qos(prefetch_count=1)
         self.channel.queue_declare(queue=self.host_queue)
+
+
+
+
+
+
 
     def on_request(self, ch, method, props, data):
         body = json.loads(data)
@@ -220,9 +230,14 @@ class ConsumeAction(object):
             print "the sender has been rebooted, so the response will never reach as their id are dynamically changing every time the node server reboots"
 
     def listen(self):
-        self.channel.basic_consume(self.on_request, queue=self.host_queue)
+        self.channel.basic_consume(self.on_request,
+                                   queue=self.host_queue,
+                                   no_ack=True)
         print " [Consumer] Awaiting RPC requests"
         self.channel.start_consuming()
+
+
+
 
 """
 Run bash command and return output
@@ -297,6 +312,13 @@ if __name__ == '__main__':
 
     ''' crear una cua amb el propi host name de tipus direct '''
     print "START DummyRabbitStatus Worker"
-    consumer_rpc = ConsumeAction(rmq_url, host_queue)
-    consumer_rpc.listen()
+    while True:
+        try:
+            consumer_rpc = ConsumeAction(rmq_url, host_queue)
+            consumer_rpc.listen()
+        except Exception as ex:
+            print "{} prod_status Consumer exception".format(ex.message)
+
+
+
     ''' dummy host does all the following setup operations '''
