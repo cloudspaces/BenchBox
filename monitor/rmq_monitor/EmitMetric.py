@@ -84,10 +84,11 @@ class EmitMetric(object):
             elif self.personal_cloud.lower() == "owncloud":
                 process_name = "owncloudcmd"
                 self.proc = psutil.Process(pid) #.children()[0]
-            if process_name == self.proc.name() or "sleep" == self.proc.name():
+
+            if process_name == self.proc.name() or "owncloudcmd" == process_name:
                 print "OKEY match {} == {}".format(self.proc.name(), process_name)
             else:
-                print "sync client does not match"
+                print "sync client does not match: {}".format(process_name)
                 return False
 
         except Exception as ex:
