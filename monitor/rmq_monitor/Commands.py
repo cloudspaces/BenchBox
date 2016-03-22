@@ -82,18 +82,19 @@ class Commands(object):
         """
         pc_cmd = {
             #'stacksync': "/usr/bin/java -jar /usr/lib/stacksync/Stacksync.jar -d -c /vagrant",
+            # owncloudcmd --httpproxy http://10.30.232.183 -u demo10 -p demo10 /home/vagrant/owncloud_folder/ http://10.30.232.183
             'stacksync': "/usr/bin/stacksync",
-            'owncloud': "",
+            'owncloud': "/vagrant/owncloudsync.sh",
             'dropbox': "/home/vagrant/.dropbox-dist/dropboxd"  # launch dropbox
         }
         str_cmd = pc_cmd[self.personal_cloud.lower()]
 
         pc_pid = {
             'stacksync': "java",
-            'owncloud': "",
+            'owncloud': "owncloudsync",
             'dropbox': "dropbox"
         }
-        str_pid = pc_pid[self.personal_cloud.lower()]
+        proc_name = pc_pid[self.personal_cloud.lower()]  # get the process name to be tracked
 
         while self.is_running:
             # check if client is running
@@ -104,12 +105,22 @@ class Commands(object):
                     self.sync_proc = subprocess.Popen(str_cmd, shell=True)
                     time.sleep(3)
                     try:
-                        for proc in psutil.process_iter():
-                            if proc.name() == str_pid:
-                                self.client_running = True
-                                self.sync_proc_pid = proc.pid
-                                break
-                        psutil.Process(self.sync_proc_pid)
+                        if proc_name == "owncloudsync":
+                            self.client_running = True
+                            self.sync_proc_pid = psutil.Process(self.sync_proc.pid).children()[0].pid
+                            # cojer el pid del script
+                            # elif proc_name == "boxsync":
+                            # psutil.Process(self.sync_proc_pid).children()[0].children()[0]
+                            # el primer children es el script
+                            # el segundo children corresponde lo que hay en el bucle infinito del script
+                            # sleep/owncloudcmd
+                        else:
+                            for proc in psutil.process_iter():
+                                if proc.name() == proc_name:
+                                    self.client_running = True
+                                    self.sync_proc_pid = proc.pid
+                                    break
+                            psutil.Process(self.sync_proc_pid)
                     except Exception as ex:
                         print ex.message
                         print "couldn't load the pc"
@@ -157,7 +168,7 @@ class Commands(object):
         else:
             pc_cmd = {
                 'stacksync': "java",
-                'owncloud': "",
+                'owncloud': "owncloudsync.sh",
                 'dropbox': "dropbox"
             }
             str_cmd = pc_cmd[self.personal_cloud.lower()]

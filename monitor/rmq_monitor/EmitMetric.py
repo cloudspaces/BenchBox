@@ -16,19 +16,21 @@ class EmitMetric(object):
     def __init__(self, hostname="", personal_cloud="", receipt=""):
 
         self.personal_cloud = personal_cloud
-        self.receipt=receipt
+        self.receipt = receipt
         pc_folders = {
             'stacksync': 'stacksync_folder',
-            'dropbox': 'Dropbox'
+            'dropbox': 'Dropbox',
+            'owncloud': 'owncloud_folder'
         }
 
         self.personal_folder = pc_folders[self.personal_cloud.lower()]
 
         self.hostname = hostname
         self.proc = None
-        self.prev_metric = None # keep track of last emited metric
+        self.prev_metric = None  # keep track of last emited metric
         url_str = None
-        with open('rabbitmq','r') as r:
+
+        with open('rabbitmq', 'r') as r:
             url_str = r.read().splitlines()[0]
 
         self.prev_net_counter = psutil.net_io_counters(pernic=True)['eth0']  # 10.0.2.15 static for each sandBox
@@ -70,15 +72,19 @@ class EmitMetric(object):
                    'time': calendar.timegm(time.gmtime()) * 1000}
         # psutil read metrics
         try:
-            self.proc = psutil.Process(pid)
+            # self.proc = psutil.Process(pid)
             process_name = None
 
             if self.personal_cloud.lower() == "stacksync":
+                self.proc = psutil.Process(pid)
                 process_name = "java"
             elif self.personal_cloud.lower() == "dropbox":
+                self.proc = psutil.Process(pid)
                 process_name = "dropbox"
-
-            if process_name == self.proc.name():
+            elif self.personal_cloud.lower() == "owncloud":
+                process_name = "owncloudcmd"
+                self.proc = psutil.Process(pid) #.children()[0]
+            if process_name == self.proc.name() or "sleep" == self.proc.name():
                 print "OKEY match {} == {}".format(self.proc.name(), process_name)
             else:
                 print "sync client does not match"
@@ -98,7 +104,10 @@ class EmitMetric(object):
                 metrics['cpu'] = cpu_usage
                 metrics['ram'] = ram_usage
             elif self.personal_cloud.lower() == "owncloud":
-                print "TODO owncloud"
+                cpu_usage = int(math.ceil(self.proc.cpu_percent(0)))
+                ram_usage = self.proc.memory_info().rss
+                metrics['cpu'] = cpu_usage
+                metrics['ram'] = ram_usage
             elif self.personal_cloud.lower() == "dropbox":
                 # todo lookup for dropbox process here => using psutil
                 cpu_usage = int(math.ceil(self.proc.cpu_percent(0)))
