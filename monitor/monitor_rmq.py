@@ -114,8 +114,13 @@ if __name__ == '__main__':
     queue_name = '{}.{}'.format(dummyhost, 'monitor')
     if len(sys.argv) == 1:
         singleton()  # apply singleton
-        monitor = MonitorRMQ(rmq_url=rmq_url, host_queue=queue_name)
-        monitor.listen()
+        while True:
+            try:
+                monitor = MonitorRMQ(rmq_url=rmq_url, host_queue=queue_name)
+                monitor.listen()
+            except Exception as ex:
+                print ex.message
+                print "Some connection exception happened..."
     """
     else:
         profile = "StackSync"

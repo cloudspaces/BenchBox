@@ -208,9 +208,15 @@ if __name__ == '__main__':
         # DEFAULT: dummy
         # use file look
         singleton()
-        executor = ExecuteRMQ(rmq_url, queue_name, stereotype_receipt)
-        # todo fer que stereotype_receipt y personal cloud sigui dinamic
-        executor.listen()
+        while True:
+            try:
+                executor = ExecuteRMQ(rmq_url, queue_name, stereotype_receipt)
+            # todo fer que stereotype_receipt y personal cloud sigui dinamic
+                executor.listen()
+            except Exception as ex:
+                print ex.message
+                print "Some connection exception happened..."
+
     else:
         profile = "StackSync"
         actions = Commands(receipt=stereotype_receipt)
