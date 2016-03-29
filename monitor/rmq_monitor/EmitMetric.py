@@ -90,17 +90,12 @@ class EmitMetric(object):
                 self.proc = psutil.Process(pid)
 
 
-            if process_name == self.proc.name() or "owncloudcmd" == process_name:
-                print "OKEY owncloudcmd match {} == {}".format(self.proc.name(), process_name)
+            if process_name == self.proc.name() or "owncloudcmd" == process_name  or "megacmd" == process_name:
+                print "OKEY  match {} == {}".format(self.proc.name(), process_name)
             else:
-                print "sync owncloudcmd client does not match: {}".format(process_name)
+                print "sync  client does not match: {}".format(process_name)
                 return False
 
-            if process_name == self.proc.name() or "megacmd" == process_name:
-                print "OKEY megacmd match {} == {}".format(self.proc.name(), process_name)
-            else:
-                print "sync megacmd client does not match: {}".format(process_name)
-                return False
 
 
         except Exception as ex:
