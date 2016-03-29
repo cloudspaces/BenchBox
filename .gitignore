@@ -3,7 +3,8 @@
 *.iml
 */*.iml
 .idea
-
+*.py.old
+*.log.*
 
 # do not upload boxes or the repo will get corrupted becuase of its size
 *.box
