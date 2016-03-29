@@ -12,7 +12,7 @@ cat > $FILE <<- EOM
 #!/usr/bin/env bash
 
 
-if [ ! -f $megaPidFile]
+if [ ! -f $megaPidFile ]
 then
         echo 'Run the client [MEGA]'
 else
