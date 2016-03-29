@@ -112,12 +112,12 @@ class EmitMetric(object):
                 metrics['cpu'] = cpu_usage
                 metrics['ram'] = ram_usage
             elif self.personal_cloud.lower() == "owncloud":
-                cpu_usage = int(math.ceil(self.proc.children()[0].cpu_percent(0)))
+                cpu_usage = int(math.ceil(self.proc.children()[0].cpu_percent(interval=1)))
                 ram_usage = self.proc.children()[0].memory_info().rss
                 metrics['cpu'] = cpu_usage
                 metrics['ram'] = ram_usage
             elif self.personal_cloud.lower() == "mega":
-                cpu_usage = int(math.ceil(self.proc.children()[0].cpu_percent(0)))
+                cpu_usage = int(math.ceil(self.proc.children()[0].cpu_percent(interval=1)))
                 ram_usage = self.proc.children()[0].memory_info().rss
                 metrics['cpu'] = cpu_usage
                 metrics['ram'] = ram_usage
