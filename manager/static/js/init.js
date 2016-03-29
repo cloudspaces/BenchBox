@@ -1,6 +1,6 @@
 console.log("init.js");
 
-bugall = null
+bugall = null;
 angular.module('app', ['ngRoute', 'ngResource'])
 
     //---------------
@@ -61,8 +61,8 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 testProfile: 'backupsample', // modificar aixo mitjançant select
                 testFolder: 'stacksync_folder', // modificar aixo mitjançant detector segons testClient
                 testClient: 'StackSync', // modificar aixo en format select
-                testOperation: 'hello',
-                testMonitor: 'hello'
+                testOperation: 'keepalive', // default monitor operation
+                testMonitor: 'keepalive' // default execute operation
             };
 
             // controller actions
@@ -77,6 +77,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
             $interval(callAtInterval, $scope.itv_time);
 
             function callAtInterval() {
+
                 Hosts.query(function (items) {
                     // console.log(items)
                     angular.forEach(items, function (item, idx, all) {
@@ -85,24 +86,29 @@ angular.module('app', ['ngRoute', 'ngResource'])
                         } else {
                             var changeDummy = " [changed dummyhost] from:  " + $scope.hosts[idx].status + " to " + item.status;
                             console.log(changeDummy);
-                            $.notify(changeDummy, 'info');
+                            $.notify(changeDummy, 'success');
                             $scope.hosts[idx].status = item.status
                         }
                         if ($scope.hosts[idx].status_sandbox !== item.status_sandbox) {
                             var changeSandBox = " [changed sandbox] from:  " + $scope.hosts[idx].status_sandbox + " to " + item.status_sandbox;
                             console.log(changeSandBox);
-                            $.notify(changeSandBox, 'info');
+                            $.notify(changeSandBox, 'success');
                             $scope.hosts[idx].status_sandbox = item.status_sandbox
                         }
                         if ($scope.hosts[idx].status_benchbox !== item.status_benchbox) {
                             var changeBenchBox = " [changed] benchbox from:  " + $scope.hosts[idx].status_benchbox + " to " + item.status_benchbox;
                             console.log(changeBenchBox);
-                            $.notify(changeBenchBox, 'info');
+                            $.notify(changeBenchBox, 'success');
                             $scope.hosts[idx].status_benchbox = item.status_benchbox
                         }
 
                     })
                 });
+
+
+                // emit keepalive requests
+
+
 
             }
 
@@ -172,12 +178,18 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 })
             };
 
+            /**
+             * Name is the name of the DOM element where to lookup for target hosts
+             * Cmd => indica que subcola de rabbit va a ejecutar las operaciones.
+             * @param name, [test-check|]
+             * @param cmd, [setup|vagrantUp|vagrantProvision]
+             */
             $scope.rmq = function (name, cmd) {
                 console.log(arguments);
                 var hosts = Array.prototype.slice.call(arguments, 2); // 3r till n are the target hosts
-                console.log(hosts);
-                console.log($scope.run.testOperation);
-                console.log($scope.run);
+                //console.log(hosts);
+                //console.log($scope.run.testOperation);
+                //console.log($scope.run);
 
                 // setup testFolder
                 switch($scope.run.testClient){
@@ -187,29 +199,33 @@ angular.module('app', ['ngRoute', 'ngResource'])
                     case "Dropbox":
                         $scope.run.testFolder = "Dropbox";
                         break;
+                    case "OwnCloud":
+                        $scope.run.testFolder = "owncloud_folder";
+                        break;
+                    case "Mega":
+                        $scope.run.testFolder = "mega_folder";
+                        break;
                     default:
-
                         console.log("UNHANDLED PERSONAL_CLOUD!!!");
                         return;
                         break;
-
-
                 }
+                console.log($scope.run.testClient);
+                console.log($scope.run.testFolder);
 
                 if(cmd == 'execute'){
-                    cmd = $scope.run.testOperation
+                    cmd = $scope.run.testOperation; // esto no existe.
                 }
 
                 // hardcoded queue multiplexing
                 switch (cmd){
                     case 'executor':
                         // handle benchBox - execute
-                        cmd = $scope.run.testOperation;
+                        cmd = $scope.run.testOperation; // hello / warmup / start / stop
                         break;
-
                     case 'monitor':
                         // handle sandBox - monitor
-                        cmd = $scope.run.testMonitor;
+                        cmd = $scope.run.testMonitor;   // hello / warmup / start / stop
                         break;
                     default:
                         // cmd is cmd xD
@@ -338,18 +354,18 @@ rmqHost = function (host, cmd, cb) {
 
     appendAllParams(args, 'bb-config');
     appendAllHosts(args, 'bb-hosts');
-    console.log("ARGS::::::");
-    console.log(args);
+    //console.log("ARGS::::::");
+    //console.log(args);
     $.ajax({
         url: 'http://localhost:'+location.port+'/rmq/emit',
         data: args,
         timeout: 6000000, // 6000s ::100min
         type: 'GET',
         success: function (data) {
-            console.log(args);
+            //console.log(args);
             console.log("Success, rmq!");
             console.log(data);
-            $.notify('Run rmq! ' + host.hostname + ' ' + cmd, 'info');
+            $.notify('Success rmq: ['+args.target_queue+"] " + host.hostname + ' ' + cmd, 'success');
         },
         error: function (err) {
             console.log(err);
