@@ -20,8 +20,8 @@ class EmitMetric(object):
         pc_folders = {
             'stacksync': 'stacksync_folder',
             'dropbox': 'Dropbox',
-            'owncloud': 'owncloud_folder'
-            'mega:' 'mega_folder'
+            'owncloud': 'owncloud_folder',
+            'mega': 'mega_folder'
         }
 
         self.personal_folder = pc_folders[self.personal_cloud.lower()]
