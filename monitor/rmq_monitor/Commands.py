@@ -85,14 +85,16 @@ class Commands(object):
             # owncloudcmd --httpproxy http://10.30.232.183 -u demo10 -p demo10 /home/vagrant/owncloud_folder/ http://10.30.232.183
             'stacksync': "/usr/bin/stacksync",
             'owncloud': "/vagrant/owncloudsync.sh",
-            'dropbox': "/home/vagrant/.dropbox-dist/dropboxd"  # launch dropbox
+            'dropbox': "/home/vagrant/.dropbox-dist/dropboxd",  # launch dropbox
+            'mega': "/vagrant/megasync.sh"
         }
         str_cmd = pc_cmd[self.personal_cloud.lower()]
 
         pc_pid = {
             'stacksync': "java",
             'owncloud': "owncloudsync",
-            'dropbox': "dropbox"
+            'dropbox': "dropbox",
+            'mega': "megasync"
         }
         proc_name = pc_pid[self.personal_cloud.lower()]  # get the process name to be tracked
 
@@ -114,6 +116,9 @@ class Commands(object):
                             # el primer children es el script
                             # el segundo children corresponde lo que hay en el bucle infinito del script
                             # sleep/owncloudcmd
+                        elif proc_name == "megasync":
+                            self.client_running = True
+                            self.sync_proc_pid = psutil.Process(self.sync_proc.pid).children()[0].pid
                         else:
                             for proc in psutil.process_iter():
                                 if proc.name() == proc_name:
@@ -169,7 +174,8 @@ class Commands(object):
             pc_cmd = {
                 'stacksync': "java",
                 'owncloud': "owncloudsync.sh",
-                'dropbox': "dropbox"
+                'dropbox': "dropbox",
+                'mega': "megasync.sh"
             }
             str_cmd = pc_cmd[self.personal_cloud.lower()]
             pstring = str_cmd

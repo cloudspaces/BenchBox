@@ -21,6 +21,7 @@ class EmitMetric(object):
             'stacksync': 'stacksync_folder',
             'dropbox': 'Dropbox',
             'owncloud': 'owncloud_folder'
+            'mega:' 'mega_folder'
         }
 
         self.personal_folder = pc_folders[self.personal_cloud.lower()]
@@ -84,12 +85,23 @@ class EmitMetric(object):
             elif self.personal_cloud.lower() == "owncloud":
                 process_name = "owncloudcmd"
                 self.proc = psutil.Process(pid) #.children()[0]
+            elif self.personal_cloud.lower() == 'mega':
+                process_name = "mega"
+                self.proc = psutil.Process(pid)
+
 
             if process_name == self.proc.name() or "owncloudcmd" == process_name:
-                print "OKEY match {} == {}".format(self.proc.name(), process_name)
+                print "OKEY owncloudcmd match {} == {}".format(self.proc.name(), process_name)
             else:
-                print "sync client does not match: {}".format(process_name)
+                print "sync owncloudcmd client does not match: {}".format(process_name)
                 return False
+
+            if process_name == self.proc.name() or "megacmd" == process_name:
+                print "OKEY megacmd match {} == {}".format(self.proc.name(), process_name)
+            else:
+                print "sync megacmd client does not match: {}".format(process_name)
+                return False
+
 
         except Exception as ex:
             print "sync client is not running! {}".format(pid)
@@ -105,6 +117,11 @@ class EmitMetric(object):
                 metrics['cpu'] = cpu_usage
                 metrics['ram'] = ram_usage
             elif self.personal_cloud.lower() == "owncloud":
+                cpu_usage = int(math.ceil(self.proc.children()[0].cpu_percent(0)))
+                ram_usage = self.proc.children()[0].memory_info().rss
+                metrics['cpu'] = cpu_usage
+                metrics['ram'] = ram_usage
+            elif self.personal_cloud.lower() == "mega":
                 cpu_usage = int(math.ceil(self.proc.children()[0].cpu_percent(0)))
                 ram_usage = self.proc.children()[0].memory_info().rss
                 metrics['cpu'] = cpu_usage
