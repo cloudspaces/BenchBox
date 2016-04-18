@@ -1,40 +1,9 @@
 #!/usr/bin/env python
-import psutil
+import psutil, os, json, pcapy, socket, time, traceback, sys
 import netifaces as ni
-import time, traceback, sys
-import pcapy
+from impacket.ImpactDecoder import EthDecoder
 from threading import Thread
 
-
-'''
-
-probar en local:
-
-PARTE 1
-
-1r lanzar cliente stacksync
-
-2n lanzar cliente dropbox
-
-PARTE 2
-
-encontrar la pid de stacksync y dropbox
-
-PARTE 3
-
-distinguir que puertos utilizan cada personalcloud para gestionar los datos y metadatos,
-poner un contador de paquetes y sumador de bytes.
-... no se sabe
-
-PARTE 4
-
-entre start y stop generar nueva cabecera pcap por timestamp, client, profile, hostname.
-
-PARTE 5
-
-
-
-'''
 #-------------------------------------------------------------------------------
 # Thread to capture the packets
 #-------------------------------------------------------------------------------
@@ -109,3 +78,4 @@ if __name__ == '__main__':
     while not worker.stop(): pass
 
     print "py_metadata.py/END"
+
