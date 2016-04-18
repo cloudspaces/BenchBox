@@ -10,8 +10,62 @@ from threading import Thread
 from time import gmtime, strftime
 
 # global variable
+global packet_index, transport_dict, network_dict, traffic_flow_dict, ip2hostname_cache
+global my_ip, my_iface
+
+my_iface = "eth0"
 
 
+def get_time():
+    return strftime("%Y-%m-%d %H:%M:%S", gmtime())
+
+
+def get_epoch_ms():
+    return int(time.time()) *1000
+
+
+def is_root():
+    if os.getuid() == 0:
+        print("r00thless!!! ")
+    else:
+        print("Cannot run as a mortal. ")
+        sys.exit()
+
+
+def sizeof_fmt(num, suffix='B'):
+    for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f%s%s" % (num, unit, suffix)
+        num /= 1024.0
+    return "%.1f%s%s" % (num, 'Yi', suffix)
+
+
+def get_hostname_by_ip(ip):
+    global ip2hostname_cache
+    if ip in ip2hostname_cache:
+        hostname = ip2hostname_cache[ip]
+    else:  # cache it
+        try:
+            hostname = socket.gethostbyaddr(ip)[0]
+        except:
+            print ip
+            # use whois to resolve this
+            result = whois.whois(ip)
+            emails = ''.join(result.emails)
+            ip2hostname_cache[ip] = emails  # cannot be resolved, avoid resolving it again
+            return emails
+        ip2hostname_cache[ip] = hostname
+    return hostname
+
+
+def add_flow(src_host, dst_host, size):
+    global traffic_flow_dict
+    key = "{}_{}".format(src_host, dst_host)
+    if key in traffic_flow_dict:
+        traffic_flow_dict[key]['hit'] += 1
+        traffic_flow_dict[key]['size'] += size
+    else:
+        traffic_flow_dict[key] = {"hit": 0, "size": 0}
 
 
 """
@@ -36,32 +90,53 @@ class ReportAdapter(Thread):
         self.exit = True
 
 
-class TrafficMonitor(Thread):
-    def __init__(self, iface="eth0", read_timeout=100, promiscuous=False, max_bytes=1024, packet_limit=-1, client="stacksync", server="serveip"):
+'''
+filter, given: client type
 
+filter packet information
+
+parsePacket()
+
+'''
+
+"""
+Thread que extrea metainformacion de los paquetes y los clasifica segun cual sea el cliente de sincronizacion
+"""
+
+
+class FilterAdapter(object):
+    def __init__(self, client="stacksync", server_ip="10.30.235.91", ):
+        self.client = client
+        self.server_ip = server_ip
+
+    def parse_packet(self, packet):
+        data_type = "data|metadata|notify"
+        datagram_size = 0
+        print "parse and classify information type"
+
+        if self.client == "stacksync":
+            print "Report Stacksync"
+        elif self.client == "dropbox":
+            print "Report Dropbox"
+        return data_type, datagram_size
+
+
+class TrafficMonitor(Thread):
+    def __init__(self, iface="eth0", read_timeout=100, promiscuous=False, max_bytes=1024, packet_limit=-1):
 
         Thread.__init__(self)
-
         # pcapy.findalldevs() @ displays available network interfaces
-        self.sync_server_ip = server
-        self.desktop_client = client
         self.decoder = EthDecoder()
         self.max_bytes = max_bytes
         self.promiscuous = promiscuous  # not capture all the network traffice only the trafice toward current host
         self.read_timeout = read_timeout  # in milliseconds
         self.interface = iface
-        self.traffic_flow_dict = {}
-        self.packet_index
-        self.transport_dict
-        self.network_dict
-        self.traffic_flow_dict
-        self.ip2hostname_cache        #
-        self.my_ip = ni.ifaddresses()[2][0]['addr']
-        self.my_iface
+
+        #
 
         self.traffic_counter_old = {
             "idx": -1,
-            "epoch": self.get_epoch_ms(),
+            "epoch": get_epoch_ms(),
             "total_up": {
                 "c": 0,
                 "size": 0
@@ -113,7 +188,7 @@ class TrafficMonitor(Thread):
 
         self.traffic_counter = {
             "idx": -1,
-            "epoch": self.get_epoch_ms(),
+            "epoch": get_epoch_ms(),
             "total_up": {
                 "c": 0,
                 "size": 0
@@ -177,31 +252,30 @@ class TrafficMonitor(Thread):
 
             }
         }
-
         # desktop client
-        # setup capture
-        self.pc = pcapy.open_live(self.interface, self.max_bytes, self.promiscuous, self.read_timeout)
+        # setup capturer
+        self.pc = pcapy.open_live("eth0", max_bytes, promiscuous, read_timeout)
         # self.notify_worker = None  # tread that will submit network information to the manager through rabbitmq
         self.notify_worker = None
         # setup filter
+
+
+        self.desktop_client = "stacksync"
 
         # filter_ips = {
         #     "dropbox": ["10.30.236.141"],
         #     "stacksync": ["10.30.235.91", "10.30.236.141"]
         # }
-
         filter_ips = {
-            "dropbox": [self.my_ip],
-            "stacksync": [self.sync_server_ip, self.my_ip]
+            "dropbox": [my_ip],
+            "stacksync": ["10.30.235.91", my_ip]
         }
 
         # filter_ports = ["443", "5672", "5000", "8080"]  # stacksync ports
 
         filter_ports = {
-            "dropbox": ["443"],  # ssl connection, serverside data and metadata
-            "stacksync": ["5672",   # rabbit
-                          "5000",   # login
-                          "8080"]   # data => swift
+            "dropbox": ["443"],
+            "stacksync": ["5672", "5000", "8080"]
         }
 
         filter_opts = {
@@ -213,35 +287,11 @@ class TrafficMonitor(Thread):
         }
         filter = filter_opts[self.desktop_client]
         print filter
+        # filter = "(port " + " || port ".join(filter_ports) + ") && (host " + " || host ".join(filter_ips) + ")"  # filter
+
         self.pc.setfilter(filter)
         self.register = False
-        self.pc.loop(packet_limit, self.__on_recv_pkts)  # infinite loop capturing and updating packet counters
-
-    def get_hostname_by_ip(self, ip):
-        if ip in self.ip2hostname_cache:
-            hostname = self.ip2hostname_cache[ip]
-        else:  # cache it
-            try:
-                hostname = socket.gethostbyaddr(ip)[0]
-            except:
-                # use whois to resolve this
-                result = whois.whois(ip)
-                emails = ''.join(result.emails)
-                self.ip2hostname_cache[ip] = emails  # cannot be resolved, avoid resolving it again
-                print ip, emails    # unresolvable ip => into email (support)
-            return emails
-            self.ip2hostname_cache[ip] = hostname
-        return hostname
-
-
-    def add_flow(self, src_host, dst_host, size):
-        key = "{}_{}".format(src_host, dst_host)
-        if key in self.traffic_flow_dict:
-            self.traffic_flow_dict[key]['hit'] += 1
-            self.traffic_flow_dict[key]['size'] += size
-        else:
-            self.traffic_flow_dict[key] = {"hit": 0, "size": 0}
-
+        self.pc.loop(packet_limit, self.__on_recv_pkts)
 
     def start_capture(self, interval=5, client="dropbox"):
         # depending the client we will apply one filter or another
@@ -313,7 +363,7 @@ class TrafficMonitor(Thread):
         return stats["data_rate"], stats["meta_rate"]
 
     def __on_recv_pkts(self, ip_header, data):
-
+        global packet_index
 
         # print ip_header
         # print "<<<<"
@@ -328,12 +378,12 @@ class TrafficMonitor(Thread):
         # print packet_type.__class__.__name__
         src_ip = packet_type.get_ip_src()
         dst_ip = packet_type.get_ip_dst()
-        src_host = self.get_hostname_by_ip(packet_type.get_ip_src())
-        dst_host = self.get_hostname_by_ip(packet_type.get_ip_dst())
+        src_host = get_hostname_by_ip(packet_type.get_ip_src())
+        dst_host = get_hostname_by_ip(packet_type.get_ip_dst())
 
         # print "get_header_size: {}".format(packet_type.get_header_size())  # ip header size, always 20 bytes
         # print "get_size: {}".format(packet_type.get_size())
-        self.add_flow(src_host, dst_host, ether_packet.get_size())
+        add_flow(src_host, dst_host, ether_packet.get_size())
 
         # TCP OR UDP
         packet_protocol = packet_type.child()
@@ -380,16 +430,16 @@ class TrafficMonitor(Thread):
         ## classifica data & metadata per stacksync
         # print src_host, src_port, dst_host, dst_port, my_ip, src_ip, dst_ip
 
-        self.packet_index += 1
+        packet_index += 1
 
         if self.desktop_client == "stacksync":  # private clouds you can distinguish by static_IP:static_PORT
             # print "is stacksync"
             flow = None
-            if src_ip == self.my_ip:
+            if src_ip == my_ip:
                 self.traffic_counter["total_up"]["size"] += total_size
                 self.traffic_counter["total_up"]["c"] += 1
                 flow = "up"
-            elif dst_ip == self.my_ip:
+            elif dst_ip == my_ip:
                 self.traffic_counter["total_up"]["size"] += total_size
                 self.traffic_counter["total_up"]["c"] += 1
                 flow = "down"
@@ -498,7 +548,7 @@ class TrafficMonitor(Thread):
         desc = "{0: >20}:{1: >6}   ~>>>{2: >10}>>>~   {3: >20}:{4: >6} {5: >5}".format(src_host, src_port, total_size,
                                                                                        dst_host, dst_port, flow)
         stat = "{0: >20}={1:>8} >> meta [{2: >10}/{3: >10}] data[{4: >10}/{5: >10}] total[{6: >10}/{7: >10}]".format(
-            self.packet_index, self.get_time(),
+            packet_index, get_time(),
             self.traffic_counter["meta_up"]["size"],
             self.traffic_counter["meta_down"]["size"],
             self.traffic_counter["data_up"]["size"],
@@ -523,7 +573,7 @@ class TrafficMonitor(Thread):
         dst_key = "{}:{}".format(dst_host, dst_host)
         src_key = "{}:{}".format(src_host, src_port)
 
-        if src_host == self.my_ip:
+        if src_host == my_ip:
             if src_key in self.traffic_port["client_out_port"]:
                 self.traffic_port["client_out_port"][src_key] += 1
             else:
@@ -534,7 +584,7 @@ class TrafficMonitor(Thread):
             else:
                 self.traffic_port["server_out_port"][src_key] = 1
 
-        if dst_host == self.my_ip:
+        if dst_host == my_ip:
             if dst_key in self.traffic_port["client_in_port"]:
                 self.traffic_port["client_in_port"][dst_key] += 1
             else:
@@ -546,6 +596,8 @@ class TrafficMonitor(Thread):
                 self.traffic_port["server_in_port"][dst_key] = 1
 
         # print self.traffic_port
+
+
         # print self.traffic_counter
 
         '''
@@ -557,49 +609,39 @@ class TrafficMonitor(Thread):
         # print ip2hostname_cache
         # print traffic_flow_dict
         # print ">>>>"
-        self.traffic_counter['epoch'] = self.get_epoch_ms()
-        self.traffic_counter['idx'] = self.packet_index
+        self.traffic_counter['epoch'] = get_epoch_ms()
+        self.traffic_counter['idx'] = packet_index
 
         print self.notify_stats()
-
-    @staticmethod
-    def get_time():
-        return strftime("%Y-%m-%d %H:%M:%S", gmtime())
-
-    def get_epoch_ms(self):
-        return int(time.time()) *1000
-
-    def is_root(self):
-        if os.getuid() == 0:
-            print("r00thless!!! ")
-        else:
-            print("Cannot run as a mortal. ")
-            sys.exit()
-
-    def sizeof_fmt(self, num, suffix='B'):
-        for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
-            if abs(num) < 1024.0:
-                return "%3.1f%s%s" % (num, unit, suffix)
-            num /= 1024.0
-        return "%.1f%s%s" % (num, 'Yi', suffix)
-
 
 # -------------------------------------------------------------------------------
 # Main
 # -------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    is_root()
 
-    my_iface = "eth0"
     packet_index = 0
+
+    network_dict = {}  # type of layer one => IP, ARP, ICMP, IPX...     # internet
+    transport_dict = {}  # type of layer two => TCP, UDP, SPX           # host to host
+
     # size_dict = {"hit": 0, "size": 0}      # size_dict[source] = [counter, size]
+
+    traffic_flow_dict = {}  # traffic flow [src-host, dst-host] = #
+    ip2hostname_cache = {}  # caching resolved ip to hostname
 
     skip_list = {
         '10.30.1.2': 'elrecerca.recerca.intranet.urv.es',
         '10.30.234.119': 'dhcp30-234-119.recerca.intranet.urv.es',
         '10.30.1.108': 'srect.recerca.intranet.urv.es'
     }
+
     # setup network setting
+    my_ip = ni.ifaddresses(my_iface)[2][0]['addr']
+
     tm = TrafficMonitor()
     tm.start_capture()
+
+
     # envez de un bucle de print tener la opcion de print cuando se tecla
