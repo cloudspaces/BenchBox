@@ -148,7 +148,10 @@ class Commands(object):
             self.is_running = True
             # SELF THREAD START
             self.personal_cloud = body['msg']['test']['testClient']
-            self.personal_cloud_ip = body['msg']['stacksync-ip']
+            try:
+                self.personal_cloud_ip = body['msg']['{}-ip'.format(self.personal_cloud.lower())]
+            except:
+                print "Its not private cloud"
             self.stereotype = body['msg']['test']['testProfile']  # if its defined then this will be loaded
             print '[START_TEST]: INFO: instance thread'
             self.sync_client = Thread(target=self._pc_client)
