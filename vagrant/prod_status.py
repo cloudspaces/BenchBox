@@ -65,7 +65,7 @@ class ActionHandler(object):
         output =  ""
         try:
             print 'warmUp'
-            str_cmd = "nohup python ~/workload_generator/executor_rmq.py &> nohup_executor_rmq.out& "
+            str_cmd = "sudo nohup python ~/workload_generator/executor_rmq.py &> nohup_executor_rmq.out& "
             # output = subprocess.check_output(['echo', 'warmup'])
             output = bash_command(str_cmd)
         except:
