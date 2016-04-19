@@ -23,7 +23,9 @@ class EmitMetric(object):
             'owncloud': 'owncloud_folder',
             'mega': 'mega_folder'
         }
-        self.traffic_monitor = TrafficMonitor(client=self.personal_cloud.lower())
+
+        # when capturing from private sync server's its server ip must be forwarded
+        self.traffic_monitor = TrafficMonitor(client=self.personal_cloud.lower(), server=None)
         self.traffic_monitor.run() # intermediari que arranca trafficMonitor i permet realitzar get stats sobre la marcha o reiniciar el monitoreig
         self.personal_folder = pc_folders[self.personal_cloud.lower()]
 
@@ -96,8 +98,6 @@ class EmitMetric(object):
             else:
                 print "sync client does not match: {}".format(process_name)
                 return False
-
-
 
         except Exception as ex:
             print "sync client is not running! {}".format(pid)
