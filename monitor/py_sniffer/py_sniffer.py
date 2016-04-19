@@ -582,8 +582,6 @@ if __name__ == '__main__':
     '''
 
     # setup network setting
-    reporter = ReportAdapter()
-    reporter.run() # intermediari que arranca trafficMonitor i permet realitzar get stats sobre la marcha o reiniciar el monitoreig
 
     print "end"
 
