@@ -18,46 +18,37 @@ from time import gmtime, strftime
 Thread que envia metainformacion de los paquetes por rabbit al manager
 """
 
-
-class ReportAdapter(Thread):
-    def __init__(self, client="dropbox", interval=5):
-        self.client = client
-        self.interval = interval
-        self.exit = False
-
-    def run(self):
-        iteration = 0
-        while not self.exit:
-            print "Emit rabbit messages > [{}]{} ".format(self.client, iteration)
-            time.sleep(self.interval)
-            iteration += 1
-
-    def exit(self):
-        self.exit = True
+# meter todo lo relacionado al reporter aqui?
+# como implementar el enlace de datos?
 
 
 class TrafficMonitor(Thread):
-    def __init__(self, iface="eth0", read_timeout=100, promiscuous=False, max_bytes=1024, packet_limit=-1, client="stacksync", server="serveip"):
+    def __init__(self, iface="eth0", read_timeout=100, promiscuous=False, max_bytes=1024, packet_limit=-1, client="stacksync", server="server_ip", reporter=False):
 
-
+        # to_ms # means buffering and lowering the amount of reads until filling the buffer or the timeout occurs instead of reading inmediately
         Thread.__init__(self)
-
         # pcapy.findalldevs() @ displays available network interfaces
-        self.sync_server_ip = server
-        self.desktop_client = client
-        self.decoder = EthDecoder()
-        self.max_bytes = max_bytes
+        self.is_reporter = reporter     # enable reporting thread to get values on under demand
+        self.sync_server_ip = server    # private syncronization server IP
+        self.desktop_client = client    # syncronization service name
+        self.decoder = EthDecoder()     # packet decoder
+        self.max_bytes = max_bytes      # maximum bytes ?
         self.promiscuous = promiscuous  # not capture all the network traffice only the trafice toward current host
         self.read_timeout = read_timeout  # in milliseconds
         self.interface = iface
         self.traffic_flow_dict = {}
-        self.packet_index
-        self.transport_dict
-        self.network_dict
-        self.traffic_flow_dict
-        self.ip2hostname_cache        #
-        self.my_ip = ni.ifaddresses()[2][0]['addr']
-        self.my_iface
+        self.packet_index = 0
+        self.transport_dict = {}
+        self.network_dict = {}
+        self.traffic_flow_dict = {}
+        self.ip2hostname_cache = {}    #
+        self.packet_limit = packet_limit
+        try:
+            self.my_ip = ni.ifaddresses(iface)[2][0]['addr']
+        except KeyError:
+            print "Interface not found!"
+            sys.exit()
+
 
         self.traffic_counter_old = {
             "idx": -1,
@@ -180,15 +171,14 @@ class TrafficMonitor(Thread):
 
         # desktop client
         # setup capture
+        self.is_root()
         self.pc = pcapy.open_live(self.interface, self.max_bytes, self.promiscuous, self.read_timeout)
         # self.notify_worker = None  # tread that will submit network information to the manager through rabbitmq
         self.notify_worker = None
         # setup filter
 
-        # filter_ips = {
-        #     "dropbox": ["10.30.236.141"],
-        #     "stacksync": ["10.30.235.91", "10.30.236.141"]
-        # }
+        # snaplen specifies the maximum number of bytes to capture.
+        # If this value is less than the size of a packet that is captured, only the first snaplen bytes of that packet will be captured and provided as packet data. A value of 65535
 
         filter_ips = {
             "dropbox": [self.my_ip],
@@ -205,17 +195,19 @@ class TrafficMonitor(Thread):
         }
 
         filter_opts = {
-            "dropbox": "(host " + " && host ".join(filter_ips[self.desktop_client]) + ")",  # filter
+            "dropbox": "(port " + " || port ".join(filter_ports[self.desktop_client]) + ") && "
+                    "(host " + " && host ".join(filter_ips[self.desktop_client]) + ")",  # filter
             "stacksync": "(port " + " || port ".join(
                     filter_ports[self.desktop_client]) + ") && (host " + " || host ".join(
                     filter_ips[self.desktop_client]) + ")"  # filter
 
         }
         filter = filter_opts[self.desktop_client]
+        print ""
+        print "filter: "
         print filter
+        print ""
         self.pc.setfilter(filter)
-        self.register = False
-        self.pc.loop(packet_limit, self.__on_recv_pkts)  # infinite loop capturing and updating packet counters
 
     def get_hostname_by_ip(self, ip):
         if ip in self.ip2hostname_cache:
@@ -229,10 +221,9 @@ class TrafficMonitor(Thread):
                 emails = ''.join(result.emails)
                 self.ip2hostname_cache[ip] = emails  # cannot be resolved, avoid resolving it again
                 print ip, emails    # unresolvable ip => into email (support)
-            return emails
+                return emails
             self.ip2hostname_cache[ip] = hostname
         return hostname
-
 
     def add_flow(self, src_host, dst_host, size):
         key = "{}_{}".format(src_host, dst_host)
@@ -242,52 +233,47 @@ class TrafficMonitor(Thread):
         else:
             self.traffic_flow_dict[key] = {"hit": 0, "size": 0}
 
+    def cancel(self):
+        '''
+        Cancels this thread class
+        :return:
+        '''
+        self.cancelled = True
 
-    def start_capture(self, interval=5, client="dropbox"):
-        # depending the client we will apply one filter or another
+    def run(self, interval=5, client="dropbox"):
+        print "START CAPTURE"
         self.register = True
-        if self.notify_worker is None:
-            self.notify_worker = ReportAdapter(client=client, interval=interval)
-            self.notify_worker.start()
+        # depending the client we will apply one filter or another
+        self.pc.loop(self.packet_limit, self.__on_recv_pkts)  # infinite loop capturing and updating packet counters
+        print "Capturing"
 
     def stop_capture(self):
         self.register = False
         print "Wait notify_worker.join()"
-        self.notify_worker.exit()
-        self.notify_worker.join()
-        print "Notify worker terminated!"
-        self.notify_worker = None
 
     def update_traffic_counter_old(self):
         self.traffic_counter_old = copy.deepcopy(self.traffic_counter)
 
     def notify_stats(self):
         # todo report the stats over time since the last interval
-
         # elapsed time
-
         if self.traffic_counter["epoch"] == self.traffic_counter_old["epoch"]:
             print self.traffic_counter_old['idx'], self.traffic_counter['idx'], (self.traffic_counter["epoch"] - self.traffic_counter_old["epoch"])
             return None
         # otherwise compute diff
         elapsed_time = float(self.traffic_counter["epoch"] - self.traffic_counter_old["epoch"]) # have to cast this to float
         print elapsed_time
-        #print self.traffic_counter
-        #print self.traffic_counter_old
         # SIZE
         # data rate
-
         print self.traffic_counter["data_up"]["size"], self.traffic_counter_old["data_up"]["size"], elapsed_time
         data_up_size_rate = (self.traffic_counter["data_up"]["size"] - self.traffic_counter_old["data_up"]["size"]) / elapsed_time
         data_down_size_rate = (self.traffic_counter["data_down"]["size"] - self.traffic_counter_old["data_down"]["size"]) /elapsed_time
         # meta data rate
         meta_up_size_rate = (self.traffic_counter["meta_up"]["size"] - self.traffic_counter_old["meta_up"]["size"]) /elapsed_time
         meta_down_size_rate = (self.traffic_counter["meta_down"]["size"] - self.traffic_counter_old["meta_down"]["size"])/elapsed_time
-
         # PACKET
         data_up_c_rate = (self.traffic_counter["data_up"]["c"] - self.traffic_counter_old["data_up"]["c"]) /elapsed_time
         data_down_c_rate = (self.traffic_counter["data_down"]["c"] - self.traffic_counter_old["data_down"]["c"]) /elapsed_time
-
         meta_up_c_rate = (self.traffic_counter["meta_up"]["c"] - self.traffic_counter_old["meta_up"]["c"]) /elapsed_time
         meta_down_c_rate = (self.traffic_counter["meta_down"]["c"] - self.traffic_counter_old["meta_down"]["c"]) /elapsed_time
         stats = {
@@ -304,13 +290,9 @@ class TrafficMonitor(Thread):
                 "pack_down": meta_down_c_rate,
             }, "time": self.traffic_counter["epoch"]            # create timestamp
         }
-
-
         # self.traffic_counter_old = self.traffic_counter[:]
         self.update_traffic_counter_old()
-
-
-        return stats["data_rate"], stats["meta_rate"]
+        return stats
 
     def __on_recv_pkts(self, ip_header, data):
 
@@ -547,7 +529,6 @@ class TrafficMonitor(Thread):
 
         # print self.traffic_port
         # print self.traffic_counter
-
         '''
         if self.register:
             print "packet received - REGISTERED"
@@ -560,23 +541,24 @@ class TrafficMonitor(Thread):
         self.traffic_counter['epoch'] = self.get_epoch_ms()
         self.traffic_counter['idx'] = self.packet_index
 
-        print self.notify_stats()
-
     @staticmethod
     def get_time():
         return strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
-    def get_epoch_ms(self):
-        return int(time.time()) *1000
+    @staticmethod
+    def get_epoch_ms():
+        return int(time.time()) * 1000
 
-    def is_root(self):
+    @staticmethod
+    def is_root():
         if os.getuid() == 0:
             print("r00thless!!! ")
         else:
             print("Cannot run as a mortal. ")
             sys.exit()
 
-    def sizeof_fmt(self, num, suffix='B'):
+    @staticmethod
+    def sizeof_fmt(num, suffix='B'):
         for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
             if abs(num) < 1024.0:
                 return "%3.1f%s%s" % (num, unit, suffix)
@@ -590,16 +572,35 @@ class TrafficMonitor(Thread):
 
 if __name__ == '__main__':
 
-    my_iface = "eth0"
-    packet_index = 0
     # size_dict = {"hit": 0, "size": 0}      # size_dict[source] = [counter, size]
-
+    '''
     skip_list = {
         '10.30.1.2': 'elrecerca.recerca.intranet.urv.es',
         '10.30.234.119': 'dhcp30-234-119.recerca.intranet.urv.es',
         '10.30.1.108': 'srect.recerca.intranet.urv.es'
     }
+    '''
+
     # setup network setting
-    tm = TrafficMonitor()
-    tm.start_capture()
+    reporter = ReportAdapter()
+    reporter.run() # intermediari que arranca trafficMonitor i permet realitzar get stats sobre la marcha o reiniciar el monitoreig
+
+    print "end"
+
+
     # envez de un bucle de print tener la opcion de print cuando se tecla
+
+
+    # filter_ips = {
+    #     "dropbox": ["10.30.236.141"],
+    #     "stacksync": ["10.30.235.91", "10.30.236.141"]
+    # }
+
+
+
+    '''
+    snaplen specifies the maximum number (max_bytes) of bytes to capture.
+    If this value is less than the size of a packet that is captured,
+    only the first snaplen bytes of that packet will be captured and provided as packet data.
+    A value of 65535
+    '''
