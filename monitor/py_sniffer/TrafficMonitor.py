@@ -263,6 +263,7 @@ class TrafficMonitor(Thread):
     def notify_stats(self):
         # todo report the stats over time since the last interval
         # elapsed time
+        '''
         if self.traffic_counter["epoch"] == self.traffic_counter_old["epoch"]:
             print self.traffic_counter_old['idx'], self.traffic_counter['idx'], (self.traffic_counter["epoch"] - self.traffic_counter_old["epoch"])
             return {
@@ -279,12 +280,14 @@ class TrafficMonitor(Thread):
                     "pack_down": 0,
                 }, "time": self.traffic_counter["epoch"]            # create timestamp
             }
+        '''
         # otherwise compute diff
         elapsed_time = float(self.traffic_counter["epoch"] - self.traffic_counter_old["epoch"]) # have to cast this to float
         # print elapsed_time
         # SIZE
         # data rate
         # print self.traffic_counter["data_up"]["size"], self.traffic_counter_old["data_up"]["size"], elapsed_time
+        '''
         data_up_size_rate = ((self.traffic_counter["data_up"]["size"] - self.traffic_counter_old["data_up"]["size"]) / elapsed_time) * 1000
         data_down_size_rate = ((self.traffic_counter["data_down"]["size"] - self.traffic_counter_old["data_down"]["size"]) /elapsed_time ) * 1000
         # meta data rate
@@ -295,6 +298,19 @@ class TrafficMonitor(Thread):
         data_down_c_rate =((self.traffic_counter["data_down"]["c"] - self.traffic_counter_old["data_down"]["c"]) /elapsed_time) * 1000
         meta_up_c_rate = ((self.traffic_counter["meta_up"]["c"] - self.traffic_counter_old["meta_up"]["c"]) /elapsed_time) * 1000
         meta_down_c_rate = ((self.traffic_counter["meta_down"]["c"] - self.traffic_counter_old["meta_down"]["c"]) /elapsed_time) * 1000
+        '''
+        # just get the increment of each notify
+        data_up_size_rate = (self.traffic_counter["data_up"]["size"] - self.traffic_counter_old["data_up"]["size"])
+        data_down_size_rate = (self.traffic_counter["data_down"]["size"] - self.traffic_counter_old["data_down"]["size"])
+        # meta data rate
+        meta_up_size_rate =(self.traffic_counter["meta_up"]["size"] - self.traffic_counter_old["meta_up"]["size"])
+        meta_down_size_rate = (self.traffic_counter["meta_down"]["size"] - self.traffic_counter_old["meta_down"]["size"])
+        # PACKET
+        data_up_c_rate = (self.traffic_counter["data_up"]["c"] - self.traffic_counter_old["data_up"]["c"])
+        data_down_c_rate =(self.traffic_counter["data_down"]["c"] - self.traffic_counter_old["data_down"]["c"])
+        meta_up_c_rate = (self.traffic_counter["meta_up"]["c"] - self.traffic_counter_old["meta_up"]["c"])
+        meta_down_c_rate = (self.traffic_counter["meta_down"]["c"] - self.traffic_counter_old["meta_down"]["c"])
+
         stats = {
             "data_rate": {
                 "size_up": data_up_size_rate,
