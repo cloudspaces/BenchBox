@@ -21,9 +21,9 @@ Thread que envia metainformacion de los paquetes por rabbit al manager
 
 class TrafficMonitor(Thread):
 
-    def __init__(self, iface="eth0", read_timeout=100, promiscuous=False, max_bytes=1024, packet_limit=-1, client="dropbox", server="server_ip", reporter=False):
+    def __init__(self, iface="eth0", read_timeout=100, promiscuous=False, max_bytes=65535, packet_limit=-1, client="dropbox", server=None, reporter=False):
 
-        if client == "stacksync" and server == "server_ip":
+        if client.lower() == "stacksync" and server is None:
             print "server='server_ip' is required!"
             sys.exit()
         super(TrafficMonitor, self).__init__()
@@ -285,16 +285,16 @@ class TrafficMonitor(Thread):
         # SIZE
         # data rate
         # print self.traffic_counter["data_up"]["size"], self.traffic_counter_old["data_up"]["size"], elapsed_time
-        data_up_size_rate = (self.traffic_counter["data_up"]["size"] - self.traffic_counter_old["data_up"]["size"]) / elapsed_time
-        data_down_size_rate = (self.traffic_counter["data_down"]["size"] - self.traffic_counter_old["data_down"]["size"]) /elapsed_time
+        data_up_size_rate = ((self.traffic_counter["data_up"]["size"] - self.traffic_counter_old["data_up"]["size"]) / elapsed_time) * 1000
+        data_down_size_rate = ((self.traffic_counter["data_down"]["size"] - self.traffic_counter_old["data_down"]["size"]) /elapsed_time ) * 1000
         # meta data rate
-        meta_up_size_rate = (self.traffic_counter["meta_up"]["size"] - self.traffic_counter_old["meta_up"]["size"]) /elapsed_time
-        meta_down_size_rate = (self.traffic_counter["meta_down"]["size"] - self.traffic_counter_old["meta_down"]["size"])/elapsed_time
+        meta_up_size_rate = ((self.traffic_counter["meta_up"]["size"] - self.traffic_counter_old["meta_up"]["size"]) /elapsed_time) * 1000
+        meta_down_size_rate = ((self.traffic_counter["meta_down"]["size"] - self.traffic_counter_old["meta_down"]["size"])/elapsed_time) * 1000
         # PACKET
-        data_up_c_rate = (self.traffic_counter["data_up"]["c"] - self.traffic_counter_old["data_up"]["c"]) /elapsed_time
-        data_down_c_rate = (self.traffic_counter["data_down"]["c"] - self.traffic_counter_old["data_down"]["c"]) /elapsed_time
-        meta_up_c_rate = (self.traffic_counter["meta_up"]["c"] - self.traffic_counter_old["meta_up"]["c"]) /elapsed_time
-        meta_down_c_rate = (self.traffic_counter["meta_down"]["c"] - self.traffic_counter_old["meta_down"]["c"]) /elapsed_time
+        data_up_c_rate = ((self.traffic_counter["data_up"]["c"] - self.traffic_counter_old["data_up"]["c"]) /elapsed_time) * 1000
+        data_down_c_rate =((self.traffic_counter["data_down"]["c"] - self.traffic_counter_old["data_down"]["c"]) /elapsed_time) * 1000
+        meta_up_c_rate = ((self.traffic_counter["meta_up"]["c"] - self.traffic_counter_old["meta_up"]["c"]) /elapsed_time) * 1000
+        meta_down_c_rate = ((self.traffic_counter["meta_down"]["c"] - self.traffic_counter_old["meta_down"]["c"]) /elapsed_time) * 1000
         stats = {
             "data_rate": {
                 "size_up": data_up_size_rate,
