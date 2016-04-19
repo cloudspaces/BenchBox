@@ -1,6 +1,5 @@
 import calendar
 import json
-import random
 import urlparse
 
 import math
@@ -9,6 +8,7 @@ import pika
 import time
 
 import subprocess
+from py_sniffer.TrafficMonitor import TrafficMonitor
 
 
 class EmitMetric(object):
@@ -23,7 +23,8 @@ class EmitMetric(object):
             'owncloud': 'owncloud_folder',
             'mega': 'mega_folder'
         }
-
+        self.traffic_monitor = TrafficMonitor(client=self.personal_cloud.lower())
+        self.traffic_monitor.run() # intermediari que arranca trafficMonitor i permet realitzar get stats sobre la marcha o reiniciar el monitoreig
         self.personal_folder = pc_folders[self.personal_cloud.lower()]
 
         self.hostname = hostname
@@ -71,6 +72,7 @@ class EmitMetric(object):
                    'disk': 0,
                    'files': 0,
                    'time': calendar.timegm(time.gmtime()) * 1000}
+
         # psutil read metrics
         try:
             # self.proc = psutil.Process(pid)
@@ -88,7 +90,6 @@ class EmitMetric(object):
             elif self.personal_cloud.lower() == 'mega':
                 process_name = "megacmd"
                 self.proc = psutil.Process(pid)
-
 
             if process_name == self.proc.name() or "owncloudcmd" == process_name  or "megacmd" == process_name:
                 print "OKEY match {} == {}".format(self.proc.name(), process_name)
@@ -160,6 +161,29 @@ class EmitMetric(object):
         num_files = proc_wc.communicate()[0]
         metrics['files'] = int(num_files.split('\t')[0])
 
+
+        net_stats = self.traffic_monitor.notify_stats()
+        # z = dict(x.items() + y.items()) => metrics
+        # envez de esto dict join
+
+        metrics['data_rate_size_up'] = net_stats['data_rate']['size_up']
+        metrics['data_rate_size_down'] = net_stats['data_rate']['size_up']
+        metrics['data_rate_pack_up'] = net_stats['data_rate']['size_up']
+        metrics['data_rate_pack_down'] = net_stats['data_rate']['size_up']
+        metrics['meta_rate_size_up'] = net_stats['data_rate']['size_up']
+        metrics['meta_rate_size_down'] = net_stats['data_rate']['size_up']
+        metrics['meta_rate_pack_up'] = net_stats['data_rate']['size_up']
+        metrics['meta_rate_pack_down'] = net_stats['data_rate']['size_up']
+
+        '''
+        {'data_rate':
+             {'size_up': 0.471, 'pack_down': 0.00175, 'pack_up': 0.00225, 'size_down': 0.612},
+         'meta_rate':
+             {'size_up': 0.0, 'pack_down': 0.0, 'pack_up': 0.0, 'size_down': 0.0},
+         'time': 1461065156000
+        }
+        '''
+
         tags = ''
         if tags == '':
             tags = {
@@ -173,7 +197,6 @@ class EmitMetric(object):
             'tags': tags
         }
         self.prev_metric = data  # update the last emited metric
-
         msg = json.dumps(data)
         print msg
 
