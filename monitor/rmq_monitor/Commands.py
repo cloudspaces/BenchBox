@@ -26,7 +26,6 @@ class Commands(object):
         """
         print '[INIT_MONITOR_RMQ]: rpc commands'
         self.hostname = hostname
-
         self.is_running = False     # state flag
         self.client_running = False
         self.stereotype = None      # backupsample
@@ -35,6 +34,7 @@ class Commands(object):
         self.sync_proc_pid = None   # GATHER THE SYNC PID FROM SYNC PROC, actively updated by _pc_client
         self.sync_proc = None
         self.personal_cloud = None  # personal cloud
+        self.personal_cloud_ip = None
         self.executor_state = "Unknown"  # state +  time
 
     def hello(self, body):
@@ -61,7 +61,10 @@ class Commands(object):
         operations = 0
         metric_reader = EmitMetric(
                 hostname=self.hostname,
-                personal_cloud=self.personal_cloud,
+                personal_cloud={
+                    "name": self.personal_cloud,
+                    "ip": self.personal_cloud_ip
+                },
                 receipt=self.stereotype)
 
         # define metric reader with [hostname & sync client name]
@@ -145,7 +148,8 @@ class Commands(object):
             self.is_running = True
             # SELF THREAD START
             self.personal_cloud = body['msg']['test']['testClient']
-            self.stereotype     = body['msg']['test']['testProfile']  # if its defined then this will be loaded
+            self.personal_cloud_ip = body['msg']['stacksync-ip']
+            self.stereotype = body['msg']['test']['testProfile']  # if its defined then this will be loaded
             print '[START_TEST]: INFO: instance thread'
             self.sync_client = Thread(target=self._pc_client)
             self.sync_client.start()

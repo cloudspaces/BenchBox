@@ -15,7 +15,8 @@ class EmitMetric(object):
 
     def __init__(self, hostname="", personal_cloud="", receipt=""):
 
-        self.personal_cloud = personal_cloud
+        self.personal_cloud_ip = personal_cloud["ip"]
+        self.personal_cloud = personal_cloud["name"]
         self.receipt = receipt
         pc_folders = {
             'stacksync': 'stacksync_folder',
@@ -25,14 +26,14 @@ class EmitMetric(object):
         }
 
         # when capturing from private sync server's its server ip must be forwarded
-        self.traffic_monitor = TrafficMonitor(client=self.personal_cloud.lower(), server=None)
+        self.traffic_monitor = TrafficMonitor(client=self.personal_cloud.lower(), server=self.personal_cloud_ip)
         self.traffic_monitor.run() # intermediari que arranca trafficMonitor i permet realitzar get stats sobre la marcha o reiniciar el monitoreig
         self.personal_folder = pc_folders[self.personal_cloud.lower()]
 
         self.hostname = hostname
         self.proc = None
         self.prev_metric = None  # keep track of last emited metric
-        url_str = None
+        self.url_str = None
 
         with open('rabbitmq', 'r') as r:
             url_str = r.read().splitlines()[0]
