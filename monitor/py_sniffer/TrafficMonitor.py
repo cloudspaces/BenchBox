@@ -265,7 +265,20 @@ class TrafficMonitor(Thread):
         # elapsed time
         if self.traffic_counter["epoch"] == self.traffic_counter_old["epoch"]:
             print self.traffic_counter_old['idx'], self.traffic_counter['idx'], (self.traffic_counter["epoch"] - self.traffic_counter_old["epoch"])
-            return None
+            return {
+                "data_rate": {
+                    "size_up": 0,
+                    "size_down": 0,
+                    "pack_up": 0,
+                    "pack_down": 0
+                },
+                "meta_rate": {
+                    "size_up": 0,
+                    "size_down": 0,
+                    "pack_up": 0,
+                    "pack_down": 0,
+                }, "time": self.traffic_counter["epoch"]            # create timestamp
+            }
         # otherwise compute diff
         elapsed_time = float(self.traffic_counter["epoch"] - self.traffic_counter_old["epoch"]) # have to cast this to float
         # print elapsed_time
