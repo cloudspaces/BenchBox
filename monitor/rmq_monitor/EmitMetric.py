@@ -167,13 +167,13 @@ class EmitMetric(object):
         # envez de esto dict join
 
         metrics['data_rate_size_up'] = net_stats['data_rate']['size_up']
-        metrics['data_rate_size_down'] = net_stats['data_rate']['size_up']
-        metrics['data_rate_pack_up'] = net_stats['data_rate']['size_up']
-        metrics['data_rate_pack_down'] = net_stats['data_rate']['size_up']
-        metrics['meta_rate_size_up'] = net_stats['data_rate']['size_up']
-        metrics['meta_rate_size_down'] = net_stats['data_rate']['size_up']
-        metrics['meta_rate_pack_up'] = net_stats['data_rate']['size_up']
-        metrics['meta_rate_pack_down'] = net_stats['data_rate']['size_up']
+        metrics['data_rate_size_down'] = net_stats['data_rate']['size_down']
+        metrics['data_rate_pack_up'] = net_stats['data_rate']['pack_up']
+        metrics['data_rate_pack_down'] = net_stats['data_rate']['pack_down']
+        metrics['meta_rate_size_up'] = net_stats['meta_rate']['size_up']
+        metrics['meta_rate_size_down'] = net_stats['meta_rate']['size_down']
+        metrics['meta_rate_pack_up'] = net_stats['meta_rate']['pack_up']
+        metrics['meta_rate_pack_down'] = net_stats['meta_rate']['pack_down']
 
         '''
         {'data_rate':
