@@ -203,6 +203,16 @@ amqp.connect(amqp_url, function (err, conn) {
     });
 
     // ------------------------------------------------------------------------
+    // -- Metrics monitoring Network
+    // ------------------------------------------------------------------------
+
+    /*
+    conn.createChannel(function(err, ch){
+        # sparated channel for network and other metrics... will duplicate the server channel usage
+    });
+    */
+
+    // ------------------------------------------------------------------------
     // -- Metrics RabbitMQ handlers :: forward to influxdb # & impala TODO
     // -------------------------------------------------------------------------
 
@@ -222,7 +232,23 @@ amqp.connect(amqp_url, function (err, conn) {
                 var hostname = msg.fields.routingKey;
                 if (influxReady) {
                     influxClient.writePoint(hostname, point, tags, function () {
-                        console.log("done writing [" + hostname+ "] ",metrics);
+                        console.log("done writing [" + hostname+ "]: cpu["+metrics.cpu +"] ram["+metrics.ram+"], hdd["+metrics.disk+"], net[out("+metrics.bytes_sent+")/in("+metrics.bytes_recv+")]");
+
+                        /*
+                        { files: 1,
+                            dropin: 0,
+                            dropout: 0,
+                            ram: 171581440,
+                            disk: 336,
+                            packets_sent: 2,
+                            bytes_recv: 152,
+                            packets_recv: 2,
+                            bytes_sent: 324,
+                            errout: 0,
+                            errin: 0,
+                            net: 2,
+                            cpu: 0 }
+                        */
                     });
                 }
             }, {noAck: false}); // ignore if none reached, none blocking queue
