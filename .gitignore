@@ -98,3 +98,13 @@ nohup*.out
 test.py
 npm-debug.log
 
+logs/*
+HELLOMEGA
+*.pid
+*.ip
+workload_generator/user_stereotypes/receipt_dataset
+workload_generator/user_stereotypes/filesize.csv
+workload_generator/user_stereotypes/backupsample_old.txt
+workload_generator/fitting
+.debris
+manager/Vagrantfile.old.rb
