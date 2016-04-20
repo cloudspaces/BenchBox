@@ -34,7 +34,6 @@ router.get('/emit', function (req, res, next) {
                     target_queue += '.'+ req.query.hostname;
                 }
                 console.log(' [x] Requesting [' + cmd + '] to [' + target_queue + ']');
-
                 var on_message_prop = {noAck: true};
                 console.log("consume");
                 ch.consume(q.queue, function (msg) {
@@ -97,7 +96,7 @@ router.get('/emit', function (req, res, next) {
                                 }
 
                                 status_attr = status_attr.toLowerCase();
-                                host[status_attr] = cmd;
+                                host[status_attr] = response;
                                 host.save(function (err) {
                                     if (err)
                                         console.log(err.message)
