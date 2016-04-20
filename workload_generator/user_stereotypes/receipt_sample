@@ -1,0 +1,34 @@
+state_chain,Online,Offline,1,lognorm,{'scale':1099.92799769,'loc':2.8638}
+state_chain,Offline,Online,1,lognorm,{'scale':7269.91588275,'loc':2.0881}
+state_chain,Offline,Active,1,lognorm,{'scale':7269.91588275,'loc':2.0881}
+state_chain,Active,Offline,1,lognorm,{'scale':1099.92799769,'loc':2.8638}
+operation_chain,MoveResponse,MoveResponse,1401,invgauss,{'shape':1363.32646109922,'scale':0.101918365352736}
+operation_chain,MoveResponse,PutContentResponse,719,genextreme,{'shape':-2.11992852538215,'scale':3.2980052810641,'loc':1.54615519456346}
+operation_chain,MoveResponse,Unlink,398,genpareto,{'shape':3.02809764917398,'scale':0.0664626786932026,'threshold':0.0279999999328978}
+operation_chain,PutContentResponse,MoveResponse,789,genextreme,{'shape':-3.45248397723402,'scale':24.7987682442144,'loc':7.19504059331674}
+operation_chain,PutContentResponse,PutContentResponse,56203,genextreme,{'shape':-1.87110387302981,'scale':0.38096890778117,'loc':0.199634595057584}
+operation_chain,PutContentResponse,Unlink,978,genpareto,{'shape':5.59532304512292,'scale':0.430467922602313,'threshold':0.00499999988823778}
+operation_chain,Unlink,MoveResponse,318,genpareto,{'shape':4.05974572112893,'scale':0.230971524365217,'threshold':0.0200000000185978}
+operation_chain,Unlink,PutContentResponse,1053,genpareto,{'shape':3.13573091706067,'scale':0.746839394368102,'threshold':0.00100000016390778}
+operation_chain,Unlink,Unlink,18057,genpareto,{'shape':0.949044501927819,'scale':0.0508355787457194,'threshold':0.0249999999068978}
+activity_distribution,genpareto,{'shape':3.02809764917398,'scale':0.0664626786932026,'threshold':0.027999999932897}
+file_update_location_probabilities,{'B':0.38, 'E': 0.03, 'M': 0.08, 'BE': 0.1, 'BM': 0.11, 'ME': 0.01, 'BEM': 0.29}
+directory_count_distribution,randint,{'low':1,'high':50}
+
+file_size_distribution,audio,genpareto,{'shape':3.776394061,'scale':67176.96527,'threshold':-2.220446049e-15}
+file_size_distribution,application,genextreme,{'shape':-2.175808047,'scale':7600.106019,'loc':3420.754429}
+file_size_distribution,chemical,genextreme,{'shape':-3.357263465,'scale':6444.227397,'loc':1915.617574}
+file_size_distribution,image,genextreme,{'shape':-2.576589721,'scale':10463.33809,'loc':4039.572743}
+file_size_distribution,message,genpareto,{'shape':2.194836697,'scale':4794.324632,'threshold':-2.220446049e-15}
+file_size_distribution,text,genpareto,{'shape':1.233440844,'scale':2869.775258,'threshold':-2.220446049e-15}
+file_size_distribution,video,genpareto,{'shape':2.363544621,'scale':2469412.755,'threshold':-2.220446049e-1}
+
+
+
+stereotype_file_types_probabilities,{'Pics': 0.1,'Code': 0.5,'Docs': 0.2,'Media': 0.05,'Applications': 0.05,'Compressed': 0.1}
+stereotype_file_types_extensions,{'Pics': ['.jpg', '.png'],'Code': ['.java', '.py'],'Docs': ['.log', '.csv'],'Media': ['.avi', '.mp3'],'Applications': ['.exe', '.bin'],'Compressed': ['.rar', '.zip']}
+file_types_sizes,{'Pics': ('norm' ,{'loc':102400, 'scale':10}),'Code':('norm' ,{'loc':51200,'scale':1}), 'Docs': ('norm' ,{'loc':51200,'scale':5}),'Media': ('norm',{'loc':2048000,'scale':200}),'Applications': ('norm' ,{'loc':153600,'scale':15}), 'Compressed': ('norm' ,{'loc':122880,'scale':12})}
+
+
+
+

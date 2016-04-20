@@ -1,0 +1,145 @@
+
+
+
+
+
+
+
+---------------------------------------
+stereotype_file_types_probabilities,
+{
+'Pics': 0.1,
+'Code': 0.5,
+'Docs': 0.2,
+'Media': 0.05,
+'Applications': 0.05,
+'Compressed': 0.1
+}
+-->
+multipart,dist
+image,0.318184864723
+application,0.31448561506
+text,0.204121891455
+audio,0.0289866497737
+chemical,0.00545266671363
+video,0.00304377990721
+message,0.00116355295711
+>>>>>>>>>>>>>>>>>>>>>>>>
+
+--
+
+
+stereotype_file_types_probabilities,
+{
+'image' : 0.318184864723,
+'application' : 0.31448561506,
+'text' : 0.204121891455,
+'audio' : 0.0289866497737,
+'chemical' : 0.00545266671363,
+'video' : 0.00304377990721,
+'message' : 0.00116355295711
+}
+<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+-----------------------------------------
+stereotype_file_types_extensions,{
+'Pics': ['.jpg', '.png'],
+'Code': ['.java', '.py'],
+'Docs': ['.log', '.csv'],
+'Media': ['.avi', '.mp3'],
+'Applications': ['.exe', '.bin'],
+'Compressed': ['.rar', '.zip']
+}
+-->
+none_multipart,dist = [APLICATION]
+x-httpd-php,0.265214450928
+pdf,0.212374142787
+javascript,0.185988208228
+java-vm,0.171411075929
+xml,0.165012122128
+
+none_multipart,dist = [AUDIO]
+mpeg,0.682155985954
+ogg,0.114991873185
+x-wav,0.0965604262122
+basic,0.0774743006428
+midi,0.0288174140062
+
+none_multipart,dist = [CHEMICAL]
+x-pdb,0.388533305423
+x-cache,0.298848446302
+x-cdx,0.150611737743
+x-cif,0.122803768916
+x-mdl-rdfile,0.0392027416156
+
+none_multipart,dist = [IMAGE]
+jpeg,0.482100794921
+png,0.382208319089
+gif,0.095159577779
+tiff,0.0211725091045
+svg+xml,0.0193587991057
+
+none_multipart,dist = [MESSAGE]			: ELETRONIC TEXT MESSAGES ... ???
+rfc822,1.0
+
+none_multipart,dist = [TEXT]
+html,0.371765075773
+plain,0.249434414201
+x-chdr,0.147820551535
+x-csrc,0.121766014487
+x-java,0.109213944004
+
+none_multipart,dist = [VIDEO]
+mp4,0.492878635908
+x-msvideo,0.216960882648
+quicktime,0.120245737212
+3gpp,0.0889568706118
+x-flv,0.0809578736209
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+stereotype_file_type_extensions,{
+'application' : ['x-httpd-php','pdf','javascript','java-vm','xml'],
+'audio' : ['mpeg','ogg','x-wav','basic','midi'],
+'chemical' : ['x-pdb','x-cache','x-cdx','x-cif','x-mdl-rdfile'],
+'image' : ['jpeg','png','gif','tiff','svg+xml'],
+'message' : ['rfc822'],
+'text' : ['html','plain','x-chdr','x-csrc','x-java'],
+'video' : ['mp4','x-msvideo','quicktime','3gpp','x-flv']
+}
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+--------------------------------------------------------------
+file_types_sizes,
+{
+'Pics': ('norm' ,{'loc':102400, 'scale':10}),
+'Code':('norm' ,{'loc':51200,'scale':1}),
+'Docs': ('norm' ,{'loc':51200,'scale':5}),
+'Media': ('norm',{'loc':2048000,'scale':200}),
+'Applications': ('norm' ,{'loc':153600,'scale':15}),
+'Compressed': ('norm' ,{'loc':122880,'scale':12})
+}
+
+
+file_size_distribution,audio,genpareto,{'shape':3.776394061,'scale':67176.96527,'threshold':-2.220446049e-15}
+file_size_distribution,application,genextreme,{'shape':-2.175808047,'scale':7600.106019,'loc':3420.754429}
+file_size_distribution,chemical,genextreme,{'shape':-3.357263465,'scale':6444.227397,'loc':1915.617574}
+file_size_distribution,image,genextreme,{'shape':-2.576589721,'scale':10463.33809,'loc':4039.572743}
+file_size_distribution,message,genpareto,{'shape':2.194836697,'scale':4794.324632,'threshold':-2.220446049e-15}
+file_size_distribution,text,genpareto,{'shape':1.233440844,'scale':2869.775258,'threshold':-2.220446049e-15}
+file_size_distribution,video,genpareto,{'shape':2.363544621,'scale':2469412.755,'threshold':-2.220446049e-1}
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+file_type_sizes,{
+'audio': ('genpareto', {'shape':3.776394061,'scale':67176.96527,'threshold':-2.220446049e-15}),
+'application': ('genextreme', ,{'shape':-2.175808047,'scale':7600.106019,'loc':3420.754429}),
+'chemical': ('genextreme', {'shape':-3.357263465,'scale':6444.227397,'loc':1915.617574}),
+'image': ('genextreme', {'shape':-2.576589721,'scale':10463.33809,'loc':4039.572743}),
+'message': ('genpareto',{'shape':2.194836697,'scale':4794.324632,'threshold':-2.220446049e-15}),
+'text': ('genpareto', {'shape':1.233440844,'scale':2869.775258,'threshold':-2.220446049e-15}),
+'video': ('genpareto', {'shape':2.363544621,'scale':2469412.755,'threshold':-2.220446049e-1})
+}
