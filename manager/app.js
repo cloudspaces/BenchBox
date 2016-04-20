@@ -125,6 +125,7 @@ var homes = require('./routes/home');
 var loads = require('./routes/load');
 var rpcs = require('./routes/rpc');
 var rmqs = require('./routes/rmq');
+var influxQuery = require('./routes/influx');
 
 // api rest
 app.use('/', routes);
@@ -136,6 +137,7 @@ app.use('/init', inits);
 app.use('/load', loads);
 app.use('/rpc', rpcs);
 app.use('/rmq', rmqs);
+app.use('/influx', influxQuery);
 
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------

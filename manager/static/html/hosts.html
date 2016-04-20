@@ -80,8 +80,9 @@
                             <a href="#/{{host._id}}">
                                 <button class="btn btn-xs btn-info" ng-show="!editing[host._id]">more</button>
                             </a>
-
                             <button class="btn btn-xs" ng-click="ping($index)">Ping</button>
+                            <button class="btn btn-xs" ng-click="getMetrics($index)">Download</button>
+                            <button class="btn btn-xs" ng-click="resetMetrics($index)">Reset</button>
                         </td>
                         <td class="col-md-5">
                             <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.status">
