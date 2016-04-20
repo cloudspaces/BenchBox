@@ -246,13 +246,16 @@
 
         <select ng-model="run.testProfile">
             <option ng-value="default">backupsample</option>
+            <option ng-value="backupsample">backupsample</option>
+            <option ng-value="cdnsample">cndsample</option>
+            <option ng-value="regularsample">samplesample</option>
+            <option ng-value="syncsample">syncsample</option>
         </select>
-
-
         <select ng-model="run.testClient" >
-
             <option ng-value="stacksync">StackSync</option>
             <option ng-value="dropbox">Dropbox</option>
+            <option ng-value="owncloud">OwnCloud</option>
+            <option ng-value="megasync">Mega</option>
         </select>
 
 
@@ -262,7 +265,9 @@
         <input type="text" class="form-control" ng-model="run.testOperation" placeholder="-rmq_rpc" value="hello">
         -->
         <select class="form-control" ng-model="run.testOperation">
+            <!--
             <option value="hello">--- hello ---</option>
+            -->
             <option value="keepalive">--- -rmq_executor_rpc status ---</option>
             <option value="warmup">warmup</option>
             <option value="start">start</option>
@@ -310,9 +315,13 @@
         <input type="text" class="form-control" ng-model="run.testMonitor" placeholder="-ops" value="10">
         -->
         <select class="form-control" ng-model="run.testMonitor">
+            <!--
             <option value="hello">--- hello ---</option>
+            -->
             <option value="keepalive">--- -rmq_monitor_rpc status ---</option>
+            <!--
             <option value="warmup">warmup</option>
+            -->
             <option value="start">start</option>
             <option value="stop">stop</option>
             <!--
