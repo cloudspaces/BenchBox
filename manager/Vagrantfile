@@ -6,7 +6,13 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure(2) do |config|
-  config.vm.box = "debian/jessie64"
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+  config.vm.box = "chenglong/manager"
   config.vm.hostname = "manager"
   config.vm.network "forwarded_port", guest: 8888, host: 8888 # manager web interface
   config.vm.network "forwarded_port", guest: 5672, host: 5672 # rabbitmq
