@@ -16,23 +16,41 @@ var app = express();
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 
-var influxClient = influx(constants.influx.server);
-var influxReady = false;
-influxClient.getDatabaseNames(function (err, arrDBS) {
+// need to run two server clients two databases otherwise the grafana plots will be too complicated
+
+var influxClientMetrics = influx(constants.influx.client_metrics);
+var influxServerMetrics = influx(constants.influx.server_metrics);
+var influxClientMetricsReady = false;
+var influxServerMetricsReady = false;
+influxClientMetrics.getDatabaseNames(function (err, arrDBS) {
     if (err)
         throw err;
-    if (arrDBS.indexOf(constants.influx.influx_conn.database) > -1) {
-        console.log("Database [" + constants.influx.influx_conn.database + "] ready!");
-        influxReady = true;
+    if (arrDBS.indexOf(constants.influx.client_metrics.database) > -1) {
+        console.log("Database [" + constants.influx.client_metrics.database + "] ready!");
+        influxClientMetricsReady = true;
         return;
     }
-    influxClient.createDatabase(constants.influx.influx_conn.database, function (err, result) {
+    influxClientMetrics.createDatabase(constants.influx.client_metrics.database, function (err, result) {
         if (err) throw err;
         console.log("Database created ready");
-        influxReady = true;
+        influxClientMetricsReady = true;
     });
 });
 
+influxServerMetrics.getDatabaseNames(function (err, arrDBS) {
+    if (err)
+        throw err;
+    if (arrDBS.indexOf(constants.influx.server_metrics.database) > -1) {
+        console.log("Database [" + constants.influx.server_metrics.database + "] ready!");
+        influxServerMetricsReady = true;
+        return;
+    }
+    influxServerMetrics.createDatabase(constants.influx.server_metrics.database, function (err, result) {
+        if (err) throw err;
+        console.log("Database created ready");
+        influxServerMetricsReady = true;
+    });
+});
 
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
@@ -153,12 +171,14 @@ var hostModel = require('./models/Hosts.js');
 
 // this chunk of code should go withing a separate file export and required...
 amqp.connect(amqp_url, function (err, conn) {
+    console.log(amqp_url)
     if (err) {
         console.log('connection rabbitmq error', err);
     } else {
         console.log('connection rabbitmq successful!');
         amqp_conn = conn; // single connection for whole server.
     }
+
     conn.createChannel(function (err, ch) {
         var q = manager_queue;
         ch.assertQueue(q, {durable: false}, function (err, q) {
@@ -205,14 +225,40 @@ amqp.connect(amqp_url, function (err, conn) {
     });
 
     // ------------------------------------------------------------------------
-    // -- Metrics monitoring Network
+    // -- Metrics monitoring Sync server metrics
     // ------------------------------------------------------------------------
 
-    /*
+
     conn.createChannel(function(err, ch){
-        # sparated channel for network and other metrics... will duplicate the server channel usage
+        // sparated channel for network and other metrics... will duplicate the server channel usage
+        var ex = 'sync_server';
+        ch.assertExchange(ex, 'fanout', {durable: false});
+        ch.assertQueue('', {exclusive:true}, function(err, q){
+            console.log(" ["+ex+"] waiting for server metric connection")
+            ch.bindQueue(q.queue, ex, '');
+            ch.consume(q.queue, function(msg){
+                ch.ack(msg);
+                var data = JSON.parse(msg.content);
+                console.log(data);
+
+                var metrics = data.metrics;
+                var tags = data.tags;
+                var point = metrics;
+                var hostname = msg.fields.routingKey; // measurement goes here
+
+                if (influxServerMetricsReady){
+                    console.log("write server metrics to influx");
+                    // write server metrics
+                    influxServerMetrics.writePoint(hostname, point, tags, function () {
+                        // succeed write back
+                    });
+                }
+            }, {noAck: false}); // ignore if none reached, none blocking queue
+        })
+
     });
-    */
+
+
 
     // ------------------------------------------------------------------------
     // -- Metrics RabbitMQ handlers :: forward to influxdb # & impala TODO
@@ -222,7 +268,7 @@ amqp.connect(amqp_url, function (err, conn) {
         var ex = 'metrics';
         ch.assertExchange(ex, 'fanout', {durable: false});
         ch.assertQueue('', {exclusive: true}, function (err, q) {
-            console.log(' [' + ex + '] waiting for connection');
+            console.log(' [' + ex + '] waiting for client metric connection');
             ch.bindQueue(q.queue, ex, '');
             ch.consume(q.queue, function (msg) {
                 // console.log(" [" + ex + "] " + msg.content.toString());
@@ -232,8 +278,8 @@ amqp.connect(amqp_url, function (err, conn) {
                 var tags = data.tags;
                 var point = metrics;
                 var hostname = msg.fields.routingKey;
-                if (influxReady) {
-                    influxClient.writePoint(hostname, point, tags, function () {
+                if (influxClientMetricsReady) {
+                    influxClientMetrics.writePoint(hostname, point, tags, function () {
                         console.log("done writing [" + hostname+ "]: cpu["+metrics.cpu +"] ram["+metrics.ram+"], hdd["+metrics.disk+"], net[out("+metrics.bytes_sent+")/in("+metrics.bytes_recv+")]");
 
                         /*
