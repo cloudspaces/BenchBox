@@ -30,6 +30,10 @@
                 <label for="cred_owncloud">owncloud:</label>
                 <input type="text" class="form-control" id='cred_owncloud' value="{{host.cred_owncloud}}" ng-model="host.cred_owncloud">
             </div>
+            <div class="form-group">
+                <label for="cred_dropbox">dropbox:</label>
+                <input type="text" class="form-control" id='cred_dropbox' value="{{host.cred_dropbox}}" ng-model="host.cred_dropbox">
+            </div>
             <button class="btn btn-primary" ng-click="update()">Update</button>
             <button class="btn btn-danger" ng-click="remove()">Remove</button>
             <button class="btn btn-warning" onclick="window.history.back();">Cancel</button>
