@@ -6,7 +6,7 @@ var HostSchema = new mongoose.Schema({
     logging: {type: String, default: 'milax'},
     profile: {type: String, default:'sync', enum : ['sync', 'idle', 'cdn', 'backup', 'regular']},
     cred_stacksync: {type: String, default:'None'},
-    cred_owncloud: {type: String, default:'user:pass'},
+    cred_owncloud: {type: String, default:'[user:pass] or just user'},
     cred_dropbox:{type:String,default: 'email:pass'},
     note: {type: String, default:'ast#'},
     status: {

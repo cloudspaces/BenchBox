@@ -19,6 +19,7 @@ class ManagerZeroRpc:
             'user': args['login'][0],
             'cred_stacksync': args['cred_stacksync'][0],
             'cred_owncloud': args['cred_owncloud'][0],
+            'cred_dropbox': args['cred_dropbox'][0],
             'profile': args['profile'][0],
             'stacksync-ip': args['stacksync-ip'][0],
             'owncloud-ip': args['owncloud-ip'][0],

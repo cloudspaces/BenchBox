@@ -412,6 +412,7 @@ rmqHost = function (host, cmd, cb) {
         profile: host.profile,
         cred_stacksync: host.cred_stacksync,
         cred_owncloud: host.cred_owncloud,
+        cred_dropbox: host.cred_dropbox,
         cmd: cmd,
         target_queue: host.rmq_queue,
         test: host.test_setup
@@ -450,6 +451,7 @@ rpcHost = function (host, cmd, cb) {
         profile: host.profile,
         cred_stacksync: host.cred_stacksync,
         cred_owncloud: host.cred_owncloud,
+        cred_dropbox: host.cred_dropbox,
         cmd: cmd
 
     };
