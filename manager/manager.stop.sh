@@ -7,6 +7,12 @@ sudo service grafana-server stop
 echo 'Stop rabbit-mq server'
 sudo service rabbitmq-server stop
 
+echo 'Stop mongodb server'
+sudo service mongodb force-stop
+
+echo 'Stop influx-db server'
+sudo service influxdb stop
+
 
 echo 'Stop the zeroRPC server'
 # python zerorpc/startZeroRPC.py &
