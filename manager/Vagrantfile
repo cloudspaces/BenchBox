@@ -5,17 +5,33 @@
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
-Vagrant.configure(2) do |config|
-  # The most common configuration options are documented and commented below.
-  # For a complete reference, please see the online documentation at
-  # https://docs.vagrantup.com.
 
-  # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "chenglong/manager"
-  config.vm.hostname = "manager"
-  config.vm.network "forwarded_port", guest: 8888, host: 8888 # manager web interface
-  config.vm.network "forwarded_port", guest: 5672, host: 5672 # rabbitmq
-  config.vm.network "forwarded_port", guest: 15672, host: 15672 # webinterface rabbitmq
-  config.vm.network "forwarded_port", guest: 3000, host: 3000 # grafana server
+$script = <<SCRIPT
+echo "I am provisioning... Manager node"
+echo `pwd`
+date > /etc/vagrant_provisioned_at
+echo "Start manager services"
+/vagrant/manager.start.sh
+
+SCRIPT
+
+Vagrant.configure(2) do |config|
+    # The most common configuration options are documented and commented below.
+    # For a complete reference, please see the online documentation at
+    # https://docs.vagrantup.com.
+
+    # Every Vagrant development environment requires a box. You can search for
+    # boxes at https://atlas.hashicorp.com/search.
+    config.vm.box = "chenglong/manager"
+    config.vm.hostname = "manager"
+    config.vm.network "forwarded_port", guest: 8888, host: 8888 # manager web interface
+    config.vm.network "forwarded_port", guest: 5672, host: 5672 # rabbitmq
+    config.vm.network "forwarded_port", guest: 15672, host: 15672 # webinterface rabbitmq
+    config.vm.network "forwarded_port", guest: 3000, host: 3000 # grafana server
+    config.vm.network "forwarded_port", guest: 18083, host: 8083 # webinterface influxdb
+    config.vm.network "forwarded_port", guest: 8086, host: 8086 # listens in port 8083 (web) and 8086 (HTTP API).
+
+    config.vm.provision "shell", inline: $script
+
+
 end

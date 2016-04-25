@@ -5,18 +5,39 @@ echo 'Start the grafana server'
 sudo service grafana-server start
 
 echo 'Start rabbit-mq server'
-sudo service rabbitmq-server restart
+sudo service rabbitmq-server start
 
 echo 'Stop mongodb server'
-sudo service mongodb restart
+sudo service mongodb start
 
 echo 'Stop influx-db server'
-sudo service influxdb restart
+sudo service influxdb start
 
 echo 'Start the zeroRPC server'
-python zerorpc/startZeroRPC.py &
+if [ "`hostname`" = "manager" ]
+then
+echo "Change to vagrant directory"
+cd /vagrant
+else
+echo "No change"
+fi
 
+
+
+echo `pwd`
+
+line=$(ps aux | grep -v grep |  grep zerorpc | awk '{print $2}')
+if [ -z "$line" ]
+    then
+    echo "No results"
+    else
+    echo "Have result"
+    kill -9 $line
+fi
+
+python zerorpc/startZeroRPC.py &
 echo 'Start the nodeManager server'
+
 npm start
 
 echo 'Start/OK'
