@@ -49,7 +49,7 @@ workload_generator/external/impressions-code/*.o
 workload_generator/workload_generator/*
 # ignore this binary as it has to be recompiled foreach machine
 workload_generator/external/impressions
-
+vagrant/ls
 vagrant/.*
 vagrant/db
 vagrant/hostname
@@ -58,6 +58,7 @@ vagrant/*.box
 vagrant/emit_task.py
 vagrant/profile
 vagrant/ss.*
+vagrant/*.out
 vagrant/owncloud.sh
 vagrant/owncloudsync.sh
 vagrant/rabbitmq
