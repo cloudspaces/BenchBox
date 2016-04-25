@@ -395,7 +395,7 @@ class TrafficMonitor(Thread):
         # print self.desktop_client
 
         ## classifica data & metadata per stacksync
-        # print src_host, src_port, dst_host, dst_port, my_ip, src_ip, dst_ip
+        # print src_host, src_port, dst_host, dst_port, src_ip, dst_ip
 
         self.packet_index += 1
 
@@ -460,7 +460,7 @@ class TrafficMonitor(Thread):
                 self.traffic_counter["total_down"]["c"] += 1
                 flow = "down"
 
-            if flow is None:  #
+            if flow is None:  # else: unknown flow
                 return flow
 
             # print "the flow is: {}".format(flow)
@@ -470,9 +470,12 @@ class TrafficMonitor(Thread):
                     # im download from server == data down
                     self.traffic_counter["data_down"]["size"] += total_size
                     self.traffic_counter["data_down"]["c"] += 1
-                elif "dropbox" in src_host:
+                elif "ec" in src_host:
                     self.traffic_counter["meta_down"]["size"] += total_size
                     self.traffic_counter["meta_down"]["c"] += 1
+                elif "dropbox" in src_host:
+                    self.traffic_counter["data_down"]["size"] += total_size
+                    self.traffic_counter["data_down"]["c"] += 1
                 elif "amazonaws" in src_host:
                     self.traffic_counter["data_down"]["size"] += total_size
                     self.traffic_counter["data_down"]["c"] += 1
@@ -486,10 +489,13 @@ class TrafficMonitor(Thread):
                     # im download from server == data down
                     self.traffic_counter["data_up"]["size"] += total_size
                     self.traffic_counter["data_up"]["c"] += 1
-                elif "dropbox" in dst_host:
+                elif "ec" in dst_host:
                     self.traffic_counter["meta_up"]["size"] += total_size
                     self.traffic_counter["meta_up"]["c"] += 1
-                elif "amazon" in dst_host:
+                elif "dropbox" in dst_host:
+                    self.traffic_counter["data_up"]["size"] += total_size
+                    self.traffic_counter["data_up"]["c"] += 1
+                elif "amazonaws" in dst_host:
                     self.traffic_counter["data_up"]["size"] += total_size
                     self.traffic_counter["data_up"]["c"] += 1
                 else:
@@ -498,8 +504,9 @@ class TrafficMonitor(Thread):
                     self.traffic_counter["misc_up"]["c"] += 1
 
         ## classifica data & metadata per dropbox
-        '''
+
         print "{}:{}   ~>>~   {}:{}".format(src_host, src_port, dst_host, dst_port)
+        '''
         print "Meta up:   {}".format(self.traffic_counter["meta_up"]["size"])
         print "Meta down: {}".format(self.traffic_counter["meta_down"]["size"])
         print "Data up:   {}".format(self.traffic_counter["data_up"]["size"])
@@ -511,7 +518,7 @@ class TrafficMonitor(Thread):
         print "Total up:   {}".format(self.traffic_counter["total_up"]["size"])
         print "Total down: {}".format(self.traffic_counter["total_down"]["size"])
         '''
-        '''
+
         desc = "{0: >20}:{1: >6}   ~>>>{2: >10}>>>~   {3: >20}:{4: >6} {5: >5}".format(src_host, src_port, total_size,
                                                                                        dst_host, dst_port, flow)
         stat = "{0: >20}={1:>8} >> meta [{2: >10}/{3: >10}] data[{4: >10}/{5: >10}] total[{6: >10}/{7: >10}]".format(
@@ -526,7 +533,7 @@ class TrafficMonitor(Thread):
 
         # print desc
         print stat
-        '''
+
         '''
         print "{}:{}   ~>>~   {}:{}".format(src_host, src_port, dst_host, dst_port)
         print "Meta up:   {}".format(sizeof_fmt(self.traffic_counter["meta_up"]["size"]))
@@ -536,6 +543,10 @@ class TrafficMonitor(Thread):
         print "Comp up:   {}".format(sizeof_fmt(self.traffic_counter["comp_up"]["size"]))
         print "Comp down: {}".format(sizeof_fmt(self.traffic_counter["comp_down"]["size"]))
         '''
+
+        # http://www.wired.com/2016/03/epic-story-dropboxs-exodus-amazon-cloud-empire/
+        # voy a suponer que dropbox y amazon son datos
+        # y ec son metadatos...
 
         dst_key = "{}:{}".format(dst_host, dst_host)
         src_key = "{}:{}".format(src_host, src_port)
