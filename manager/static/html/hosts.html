@@ -245,12 +245,15 @@
         <input type="hidden" class="form-control" ng-model="run.testClient" placeholder="-client" value="StackSync">
         -->
 
+        <!--
+        el valor que se hace forward es lo que se muestra... :/
+        -->
         <select ng-model="run.testProfile">
             <option ng-value="default">backupsample</option>
             <option ng-value="backupsample">backupsample</option>
-            <option ng-value="cdnsample">cndsample</option>
-            <option ng-value="regularsample">samplesample</option>
-            <option ng-value="syncsample">syncsample</option>
+            <option ng-value="recipebackup">recipebackup</option>
+            <option ng-value="recipedownload">recipedownload</option>
+            <option ng-value="recipesync">recipesync</option>
         </select>
         <select ng-model="run.testClient" >
             <option ng-value="stacksync">StackSync</option>
