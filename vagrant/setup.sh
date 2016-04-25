@@ -20,6 +20,7 @@ echo "#2 AssignCredentialsToProfile"
 sudo ./scripts/config.owncloud.sh;
 sudo ./scripts/config.stacksync.sh;  # '%s' # h['stacksync-ip']
 sudo ./scripts/config.megasync.sh `hostname`;
+sudo ./scripts/config.dropbox.sh;
 
 
 echo "#3 Install RabbitMQ Pip Pika"
