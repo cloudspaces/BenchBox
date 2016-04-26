@@ -21,8 +21,9 @@ class InterArrivalsManager(object):
         '''Avoid extremely large or small waiting times due to statistical functions'''
         if waiting_time > (3600*24): waiting_time = 3600*24
         if waiting_time < 0.001: waiting_time = 0.001
-        return waiting_time 
-        
+        # return waiting_time
+        return 1
+
     def add_interarrival_transition_fitting(self, state1, state2, function, params):
         #If there is no entry for this transition, create one
         if state1 not in self.transition_interarrival_fittings:

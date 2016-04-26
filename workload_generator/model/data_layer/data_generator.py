@@ -102,7 +102,8 @@ class DataGenerator(object):
         file_type = get_fitness_proportionate_element(self.stereotype_file_types_probabilities)
         '''After choosing the type, we proceed by generating the size of the file'''
         (function, kv_params) = self.file_types_sizes[file_type]
-        size = int(get_random_value_from_fitting(function, kv_params))
+        # size = int(get_random_value_from_fitting(function, kv_params))
+        size=1000000
         '''After generating the file size, we should decide the path for the new file'''
         synthetic_file_base_path = get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH)
         '''Create a realistic name'''
