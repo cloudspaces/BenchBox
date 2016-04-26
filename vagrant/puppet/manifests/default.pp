@@ -123,7 +123,7 @@ node 'sandBox' {
 
   exec {
     'run dropbox client setup':
-      command => "/vagrant/scripts/config.dropbox.sh ",
+      command => "nohup /vagrant/scripts/config.dropbox.sh &",
       user    => 'vagrant',
       group   => 'vagrant',
       cwd     => '/vagrant',
