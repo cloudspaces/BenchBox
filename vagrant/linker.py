@@ -1,5 +1,6 @@
 #from selenium.webdriver.common.keys import Keys
 #from threading import Thread
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import subprocess
 import getpass
 import re
@@ -33,15 +34,22 @@ class Linker(object):
         # 1. no dropbox instance is running
         # self.bash_command("pkill dropbox")
         for proc in psutil.process_iter():
-            if proc.name == "dropbox":
+            if proc.name == "dropbox" or proc.name == "firefox":
                 proc.kill()
         time.sleep(3)   # dejar 5 segundos para que se detenga dropbox
+
+        self.bash_command('killall dropbox ')
+        self.bash_command('killall firefox ')
+
         # 2. dropbox.out is empty
         try:
             print "Remove file "
             os.remove(self.url_stream)
         except Exception as ex:
             print ex.message
+
+
+
             # try delete the log file if exists
         # 3. there is no account assigned
         # self.bash_command("rm ~/.dropbox -r")
@@ -51,7 +59,11 @@ class Linker(object):
         except OSError:
             print "No such file or directory"
 
-
+        try:
+            os.remove("/tmp/.X19-lock")
+            print "Remove display lock"
+        except:
+            print "No display set"
 
     def start_dropboxd(self):
         print "dropboxd"
@@ -106,7 +118,9 @@ class Linker(object):
         # login = self.login
         # passwd = self.passwd
         print "Create Driver"
-        driver = webdriver.Firefox()
+        binary=FirefoxBinary("/usr/lib/firefox/firefox-bin")
+        driver = webdriver.Firefox(firefox_binary=binary)
+
         while True:
             try:
                 driver.get(self.url)

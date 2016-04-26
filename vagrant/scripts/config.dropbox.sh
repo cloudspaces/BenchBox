@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 ## como hacer el setup de dropbox???
 
