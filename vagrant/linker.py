@@ -69,7 +69,7 @@ class Linker(object):
         print "dropboxd"
         # run dropbox
         dropboxd = ".dropbox-dist/dropboxd"
-        cmd_run = "nohup /home/{}/{} &> {}& ".format(getpass.getuser(), dropboxd, self.url_stream)
+        cmd_run = "nohup /home/{}/{} &> {}& ".format("vagrant", dropboxd, self.url_stream)
         print "run: {}".format(cmd_run)
         # 1. need to unse the display env var such the dropbox detects no display
         # self.bash_command('unset DISPLAY')
