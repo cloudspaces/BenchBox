@@ -75,7 +75,7 @@ vagrant/1.txt
 vagrant/logs
 vagrant/Vagrantfile.rb
 vagrant/Vagrantfile.txt
-
+vagrant/megasync.sh
 
 monitor/logger/test
 monitor/logger/plots/output

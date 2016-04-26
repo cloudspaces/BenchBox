@@ -55,7 +55,7 @@ node 'benchBox' {
   ->
   */
   exec {
-  'run message queue boostrap benchBox status':
+    'run message queue boostrap benchBox status':
       command => 'nohup ./startPeerConsumer.sh & ',
       user    => 'vagrant',
       group   => 'vagrant',
@@ -119,15 +119,26 @@ node 'sandBox' {
       group   => vagrant,
       mode    => '0644',
       recurse => true
-  }->
+  } ->
+
   exec {
-  'run messagequeue boostrap sandBox status':
-  command => 'nohup ./startPeerConsumer.sh & ',
-  user    => 'vagrant',
-  group   => 'vagrant',
-  cwd     => '/vagrant',
-  path    => ['/usr/bin', '/bin/']
+    'run dropbox client setup':
+      command => "./scripts/config.dropbox.sh &",
+      user    => 'vagrant',
+      group   => 'vagrant',
+      cwd     => '/vagrant',
+      path    => ['/usr/bin','/bin']
   }
+  ->
+  exec {
+    'run messagequeue boostrap sandBox status':
+      command => 'nohup ./startPeerConsumer.sh & ',
+      user    => 'vagrant',
+      group   => 'vagrant',
+      cwd     => '/vagrant',
+      path    => ['/usr/bin', '/bin']
+  }
+
 
   # dropbox
   /*

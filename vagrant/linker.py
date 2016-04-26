@@ -46,7 +46,12 @@ class Linker(object):
         # 3. there is no account assigned
         # self.bash_command("rm ~/.dropbox -r")
         print "Remove config dir"
-        shutil.rmtree("{}/.dropbox".format(os.path.expanduser("~")))
+        try:
+            shutil.rmtree("{}/.dropbox".format(os.path.expanduser("~")))
+        except OSError:
+            print "No such file or directory"
+
+
 
     def start_dropboxd(self):
         print "dropboxd"
