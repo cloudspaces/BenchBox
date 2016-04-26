@@ -174,6 +174,19 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
             };
 
+            $scope.resetStatus = function(index){
+                var host = $scope.hosts[index];
+                console.log(host);
+                console.log("Reset the host status to None at mongodb");
+
+                host.status_benchbox = undefined;
+                host.status_sandbox = undefined;
+                host.status = undefined;
+
+                Hosts.update({id: host._id}, host);
+
+            };
+
 
             $scope.rpc = function (name, cmd, ss) {
                 console.info(name, cmd, ss);
@@ -384,7 +397,6 @@ queryDownloadInfluxMeasurement = function(measurement){
     })
 };
 queryDropInfluxMeasurement = function(measurement){
-    console.log("Download measurement: ", measurement);
     $.ajax({
         url: 'http://localhost:'+location.port+"/influx/query",
         data: {query: "drop measurement "+measurement},
