@@ -4,7 +4,7 @@ var str_decoder = require('string_decoder').StringDecoder;
 var constants = require("../constants");
 var influx = require('influx');
 
-var influxClient = influx(constants.influx.server);
+var influxClient = influx(constants.influx.client_metrics);
 
 // here im creating another connection, not sharing the main...
 // produce action

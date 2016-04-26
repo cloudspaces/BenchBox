@@ -384,7 +384,7 @@ queryDownloadInfluxMeasurement = function(measurement){
             // download json as csv file
             console.log("influx response: ");
             $.notify("Success influx query",'success');
-            console.log(data);
+            // console.log(data);
             var milliseconds = (new Date).getTime();
             var withHeader = true;
             var output_name = "report_"+measurement+"_"+milliseconds;
@@ -544,6 +544,7 @@ $('#btnFixImage').click(function () {
 
 function JSONToCSVConvertor(JSONData, ReportTitle, ShowLabel) {
     //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
+    // console.log("JSONTOCSVConverter",JSONData);
     var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
 
     var CSV = '';

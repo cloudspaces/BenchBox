@@ -11,11 +11,8 @@ operation_chain,PutContentResponse,Unlink,978,genpareto,{'shape':5.5953230451229
 operation_chain,Unlink,MoveResponse,318,genpareto,{'shape':4.05974572112893,'scale':0.230971524365217,'threshold':0.0200000000185978}
 operation_chain,Unlink,PutContentResponse,1053,genpareto,{'shape':3.13573091706067,'scale':0.746839394368102,'threshold':0.00100000016390778}
 operation_chain,Unlink,Unlink,18057,genpareto,{'shape':0.949044501927819,'scale':0.0508355787457194,'threshold':0.0249999999068978}
-
 activity_distribution,genpareto,{'shape':3.02809764917398,'scale':0.0664626786932026,'threshold':0.027999999932897}
-
 file_update_location_probabilities,{'B':0.38, 'E': 0.03, 'M': 0.08, 'BE': 0.1, 'BM': 0.11, 'ME': 0.01, 'BEM': 0.29}
-
 directory_count_distribution,randint,{'low':1,'high':50}
 stereotype_file_types_probabilities,{'image' : 0.81791722,'application' : 0.236178605889,'text' : 0.145223301261,'audio' : 0.0455101376059,'chemical' : 0.000920123935777,'video' : 0.00296845326991,'message' : 0.000830569888593}
 stereotype_file_type_extensions,{'application' : ['x-httpd-php','pdf','javascript','java-vm','xml'],'audio' : ['mpeg','ogg','x-wav','basic','midi'],'chemical' : ['x-pdb','x-cache','x-cdx','x-cif','x-mdl-rdfile'],'image' : ['jpeg','png','gif','tiff','svg+xml'],'message' : ['rfc822'],'text' : ['html','plain','x-chdr','x-csrc','x-java'],'video' : ['mp4','x-msvideo','quicktime','3gpp','x-flv']}
