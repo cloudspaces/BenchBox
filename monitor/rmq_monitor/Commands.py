@@ -123,6 +123,8 @@ class Commands(object):
                             self.client_running = True
                             self.sync_proc_pid = psutil.Process(self.sync_proc.pid).children()[0].pid
                         else:
+                            # en caso de dropbox y stacksync van aqui dentro. # quizas es porque los han arrancado con interfaz visual i no xuta nada...
+
                             for proc in psutil.process_iter():
                                 if proc.name() == proc_name:
                                     self.client_running = True
