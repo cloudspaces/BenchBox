@@ -125,7 +125,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
                 reader.onload = function(e){
                     // profileList.innerHTML = reader.result;
-                    console.log(reader.result);
+                    // console.log(reader.result);
 
                     // save for each line
                     var validHosts = [];
@@ -153,6 +153,12 @@ angular.module('app', ['ngRoute', 'ngResource'])
                     if(validHosts.length == 0){
                         $.notify("No operation performed!", "info")
                     }else {
+                        validHosts.forEach(function(item, idx){
+                            var host = new Hosts(item);
+                            host.$save(function () {
+                                $scope.hosts.push(host);
+                            });
+                        });
                         $.notify("Please refresh the window!", "success")
                     }
                 };

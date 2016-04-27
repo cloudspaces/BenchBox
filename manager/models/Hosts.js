@@ -4,7 +4,7 @@ var HostSchema = new mongoose.Schema({
     hostname: {type: String, default: 'toSet'},
     ip:  {type: String, default: 'localhost'},
     logging: {type: String, default: 'milax'},
-    profile: {type: String, default:'sync', enum : ['sync', 'idle', 'cdn', 'backup', 'regular']},
+    profile: {type: String, default:'sync'},
     cred_stacksync: {type: String, default:'None'},
     cred_owncloud: {type: String, default:'[user:pass] or just user'},
     cred_dropbox:{type:String,default: 'email:pass'},
