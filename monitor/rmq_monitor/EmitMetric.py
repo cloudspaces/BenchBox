@@ -76,25 +76,24 @@ class EmitMetric(object):
                    'files': 0,
                    'time': calendar.timegm(time.gmtime()) * 1000}
 
+        ##########################################################################################################
         # psutil read metrics
         try:
             # self.proc = psutil.Process(pid)
             process_name = None
-
             if self.personal_cloud.lower() == "stacksync":
-                self.proc = psutil.Process(pid)
                 process_name = "java"
             elif self.personal_cloud.lower() == "dropbox":
-                self.proc = psutil.Process(pid)
                 process_name = "dropbox"
             elif self.personal_cloud.lower() == "owncloud":
                 process_name = "owncloudcmd"
-                self.proc = psutil.Process(pid) #.children()[0]
             elif self.personal_cloud.lower() == 'mega':
                 process_name = "megacmd"
+
+            if self.proc is None or self.proc.pid != pid:
                 self.proc = psutil.Process(pid)
 
-            if process_name == self.proc.name() or "owncloudcmd" == process_name  or "megacmd" == process_name:
+            if process_name == self.proc.name() or "owncloudcmd" == process_name or "megacmd" == process_name:
                 print "OKEY match {} == {}".format(self.proc.name(), process_name)
             else:
                 print "sync client does not match: {}".format(process_name)
@@ -105,6 +104,7 @@ class EmitMetric(object):
             print ex.message
             return False  # exit as the process is not alive.
 
+        ##########################################################################################################
         print "PID: {} [{}]".format(pid, self.personal_cloud.lower())
         try:
             if self.personal_cloud.lower() == "stacksync":
