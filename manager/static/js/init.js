@@ -85,19 +85,19 @@ angular.module('app', ['ngRoute', 'ngResource'])
                             // console.log(" [not changed]" + $scope.hosts[idx].status + " : "+ item.status )
                         } else {
                             var changeDummy = " [changed dummyhost] from:  " + $scope.hosts[idx].status + " to " + item.status;
-                            console.log(changeDummy);
+                            //console.log(changeDummy);
                             $.notify(changeDummy, 'success');
                             $scope.hosts[idx].status = item.status
                         }
                         if ($scope.hosts[idx].status_sandbox !== item.status_sandbox) {
                             var changeSandBox = " [changed sandbox] from:  " + $scope.hosts[idx].status_sandbox + " to " + item.status_sandbox;
-                            console.log(changeSandBox);
+                            //console.log(changeSandBox);
                             $.notify(changeSandBox, 'success');
                             $scope.hosts[idx].status_sandbox = item.status_sandbox
                         }
                         if ($scope.hosts[idx].status_benchbox !== item.status_benchbox) {
                             var changeBenchBox = " [changed] benchbox from:  " + $scope.hosts[idx].status_benchbox + " to " + item.status_benchbox;
-                            console.log(changeBenchBox);
+                            //console.log(changeBenchBox);
                             $.notify(changeBenchBox, 'success');
                             $scope.hosts[idx].status_benchbox = item.status_benchbox
                         }
@@ -109,10 +109,9 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 // emit keepalive requests
 
 
-
             }
 
-            $scope.saveFromFile = function(){
+            $scope.saveFromFile = function () {
                 console.log("Save from file")
                 var profileFile = document.getElementById("profileFile"); // <input> myFile
                 var profileList = document.getElementById("profileFileOutput"); // <div> output
@@ -123,25 +122,25 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 var reader = new FileReader();
                 // register listener on load file
 
-                reader.onload = function(e){
+                reader.onload = function (e) {
                     // profileList.innerHTML = reader.result;
                     // console.log(reader.result);
 
                     // save for each line
                     var validHosts = [];
                     var lines = reader.result.split("\n");
-                    lines.forEach(function(item, idx, all){
+                    lines.forEach(function (item, idx, all) {
                         // console.log(idx, item)
-                        if(item.substring(0,1) == "#"){
+                        if (item.substring(0, 1) == "#") {
                             // console.log("skipped")
-                        }else{
-                            if(item.length == 0){
+                        } else {
+                            if (item.length == 0) {
                                 // console.log("empty")
-                            }else {
+                            } else {
                                 try {
-                                    var host = eval("("+item+")");
+                                    var host = eval("(" + item + ")");
                                     validHosts.push(host)
-                                }catch (err){
+                                } catch (err) {
                                     console.error("unhandled format, it has to be a object castable into object")
                                 }
                             }
@@ -150,10 +149,10 @@ angular.module('app', ['ngRoute', 'ngResource'])
                     console.log(validHosts);
 
                     // inject valid hosts into mongodb
-                    if(validHosts.length == 0){
+                    if (validHosts.length == 0) {
                         $.notify("No operation performed!", "info")
-                    }else {
-                        validHosts.forEach(function(item, idx){
+                    } else {
+                        validHosts.forEach(function (item, idx) {
                             var host = new Hosts(item);
                             host.$save(function () {
                                 $scope.hosts.push(host);
@@ -162,9 +161,11 @@ angular.module('app', ['ngRoute', 'ngResource'])
                         $.notify("Please refresh the window!", "success")
                     }
                 };
-
-                reader.readAsText(myFile);
-
+                try {
+                    reader.readAsText(myFile);
+                } catch (err) {
+                    $.notify("No file selected!", "error")
+                }
             };
 
             $scope.saveHost = function () {
@@ -209,7 +210,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
             };
 
 
-            $scope.getMetrics = function(index){
+            $scope.getMetrics = function (index) {
                 var host = $scope.hosts[index];
                 console.log(host);
                 //
@@ -219,7 +220,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 // invoke ajax request to the node server, the server does influx query and returns the result as ajax response.
             };
 
-            $scope.resetMetrics = function(index){
+            $scope.resetMetrics = function (index) {
                 var host = $scope.hosts[index];
                 console.log(host);
                 //
@@ -228,7 +229,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
             };
 
-            $scope.resetStatus = function(index){
+            $scope.resetStatus = function (index) {
                 var host = $scope.hosts[index];
                 console.log(host);
                 console.log("Reset the host status to None at mongodb");
@@ -237,7 +238,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 host.status_sandbox = undefined;
                 host.status = undefined;
 
-                Hosts.update({id: host._id}, host);
+                // Hosts.update({id: host._id}, host); // aixo no va
 
             };
 
@@ -281,7 +282,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 //console.log($scope.run);
 
                 // setup testFolder
-                switch($scope.run.testClient){
+                switch ($scope.run.testClient) {
                     case "StackSync":
                         $scope.run.testFolder = "stacksync_folder";
                         break;
@@ -302,12 +303,12 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 console.log($scope.run.testClient);
                 console.log($scope.run.testFolder);
 
-                if(cmd == 'execute'){
+                if (cmd == 'execute') {
                     cmd = $scope.run.testOperation; // esto no existe.
                 }
 
                 // hardcoded queue multiplexing
-                switch (cmd){
+                switch (cmd) {
                     case 'executor':
                         // handle benchBox - execute
                         cmd = $scope.run.testOperation; // hello / warmup / start / stop
@@ -401,7 +402,7 @@ testConnection = function (ip, port, cb) {
     // if i dont need to use the failure  function they recommend me to use post or get
     console.log("Get list");
     $.ajax({
-        url: 'http://localhost:'+location.port+'/rpc/nmap',
+        url: 'http://localhost:' + location.port + '/rpc/nmap',
         contentType: "application/json; charset=utf-8",
         data: {data: ip + ' ' + port},
         dataType: 'json',
@@ -426,44 +427,44 @@ testConnection = function (ip, port, cb) {
     });
 };
 
-queryDownloadInfluxMeasurement = function(measurement){
+queryDownloadInfluxMeasurement = function (measurement) {
     console.log("Download measurement: ", measurement);
     $.ajax({
-        url: 'http://localhost:'+location.port+"/influx/query",
-        data: {query: "select * from "+measurement},
+        url: 'http://localhost:' + location.port + "/influx/query",
+        data: {query: "select * from " + measurement},
         timeout: 6000000,
         type: 'GET',
         dataType: 'json',
-        success: function(data){
+        success: function (data) {
             // download json as csv file
             console.log("influx response: ");
-            $.notify("Success influx query",'success');
+            $.notify("Success influx query", 'success');
             // console.log(data);
             var milliseconds = (new Date).getTime();
             var withHeader = true;
-            var output_name = "report_"+measurement+"_"+milliseconds;
+            var output_name = "report_" + measurement + "_" + milliseconds;
             JSONToCSVConvertor(data[0], output_name, withHeader);
         },
-        error: function(err){
+        error: function (err) {
             console.log(err);
             $.notify('Error! ' + err, 'error');
         }
     })
 };
-queryDropInfluxMeasurement = function(measurement){
+queryDropInfluxMeasurement = function (measurement) {
     $.ajax({
-        url: 'http://localhost:'+location.port+"/influx/query",
-        data: {query: "drop measurement "+measurement},
+        url: 'http://localhost:' + location.port + "/influx/query",
+        data: {query: "drop measurement " + measurement},
         timeout: 6000000,
         dataType: 'json',
         type: 'GET',
-        success: function(data){
+        success: function (data) {
             // download json as csv file
             console.log("influx response: ");
-            $.notify("Success DROP "+measurement+"query",'success');
+            $.notify("Success DROP " + measurement + "query", 'success');
         },
-        error: function(err){
-            $.notify('Measurement '+measurement+' is clean! ', 'info');
+        error: function (err) {
+            $.notify('Measurement ' + measurement + ' is clean! ', 'info');
         }
     })
 };
@@ -489,7 +490,7 @@ rmqHost = function (host, cmd, cb) {
     //console.log("ARGS::::::");
     //console.log(args);
     $.ajax({
-        url: 'http://localhost:'+location.port+'/rmq/emit',
+        url: 'http://localhost:' + location.port + '/rmq/emit',
         data: args,
         timeout: 6000000, // 6000s ::100min
         type: 'GET',
@@ -497,7 +498,7 @@ rmqHost = function (host, cmd, cb) {
             //console.log(args);
             console.log("Success, rmq!");
             console.log(data);
-            $.notify('Success rmq: ['+args.target_queue+"] " + host.hostname + ' ' + cmd, 'success');
+            $.notify('Success rmq: [' + args.target_queue + "] " + host.hostname + ' ' + cmd, 'success');
         },
         error: function (err) {
             console.log(err);
@@ -524,7 +525,7 @@ rpcHost = function (host, cmd, cb) {
     appendAllParams(args, 'bb-config');
     appendAllHosts(args, 'bb-hosts');
     $.ajax({
-        url: 'http://localhost:'+location.port+'/rpc/rpc',
+        url: 'http://localhost:' + location.port + '/rpc/rpc',
         data: args,
         timeout: 6000000, // 6000s ::100min
         type: 'GET',
@@ -647,7 +648,7 @@ function JSONToCSVConvertor(JSONData, ReportTitle, ShowLabel) {
     //Generate a file name
     var fileName = ""; // prefix
     //this will remove the blank-spaces from the title and replace it with an underscore
-    fileName += ReportTitle.replace(/ /g,"_");
+    fileName += ReportTitle.replace(/ /g, "_");
 
     //Initialize file format you want csv or xls
     var uri = 'data:text/csv;charset=utf-8,' + escape(CSV);
@@ -670,7 +671,6 @@ function JSONToCSVConvertor(JSONData, ReportTitle, ShowLabel) {
     link.click();
     document.body.removeChild(link);
 }
-
 
 
 console.log(GLOBAL_VAR);

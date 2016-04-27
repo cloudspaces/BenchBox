@@ -38,6 +38,10 @@ fi
 python zerorpc/startZeroRPC.py &
 echo 'Start the nodeManager server'
 
+echo "Wait the servers to start"
+sleep 10
+
+
 npm start
 
 echo 'Start/OK'
