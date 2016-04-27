@@ -89,7 +89,7 @@ class Commands(object):
             'stacksync': "/usr/bin/stacksync",
             'owncloud': "/vagrant/owncloudsync.sh",
             # 'dropbox': "/home/vagrant/.dropbox-dist/dropboxd",  # launch dropbox
-            'dropbox': "/usr/local/bin/dropbox start",  # launch dropbox
+            'dropbox': "sudo -H -u vagrant bash -c '/usr/local/bin/dropbox start'",  # launch dropbox
             'mega': "/vagrant/megasync.sh"
         }
         str_cmd = pc_cmd[self.personal_cloud.lower()]
