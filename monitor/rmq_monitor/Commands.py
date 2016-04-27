@@ -88,7 +88,8 @@ class Commands(object):
             # owncloudcmd --httpproxy http://10.30.232.183 -u demo10 -p demo10 /home/vagrant/owncloud_folder/ http://10.30.232.183
             'stacksync': "/usr/bin/stacksync",
             'owncloud': "/vagrant/owncloudsync.sh",
-            'dropbox': "/home/vagrant/.dropbox-dist/dropboxd",  # launch dropbox
+            # 'dropbox': "/home/vagrant/.dropbox-dist/dropboxd",  # launch dropbox
+            'dropbox': "/usr/local/bin/dropbox start",  # launch dropbox
             'mega': "/vagrant/megasync.sh"
         }
         str_cmd = pc_cmd[self.personal_cloud.lower()]
