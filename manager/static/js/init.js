@@ -112,6 +112,54 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
             }
 
+            $scope.saveFromFile = function(){
+                console.log("Save from file")
+                var profileFile = document.getElementById("profileFile"); // <input> myFile
+                var profileList = document.getElementById("profileFileOutput"); // <div> output
+
+
+                var myFile = profileFile.files[0];
+                //
+                var reader = new FileReader();
+                // register listener on load file
+
+                reader.onload = function(e){
+                    // profileList.innerHTML = reader.result;
+                    console.log(reader.result);
+
+                    // save for each line
+                    var validHosts = [];
+                    var lines = reader.result.split("\n");
+                    lines.forEach(function(item, idx, all){
+                        // console.log(idx, item)
+                        if(item.substring(0,1) == "#"){
+                            // console.log("skipped")
+                        }else{
+                            if(item.length == 0){
+                                // console.log("empty")
+                            }else {
+                                try {
+                                    var host = eval("("+item+")");
+                                    validHosts.push(host)
+                                }catch (err){
+                                    console.error("unhandled format, it has to be a object castable into object")
+                                }
+                            }
+                        }
+                    });
+                    console.log(validHosts);
+
+                    // inject valid hosts into mongodb
+                    if(validHosts.length == 0){
+                        $.notify("No operation performed!", "info")
+                    }else {
+                        $.notify("Please refresh the window!", "success")
+                    }
+                };
+
+                reader.readAsText(myFile);
+
+            };
 
             $scope.saveHost = function () {
                 console.log('SaveHosts');
@@ -616,6 +664,9 @@ function JSONToCSVConvertor(JSONData, ReportTitle, ShowLabel) {
     link.click();
     document.body.removeChild(link);
 }
+
+
+
 console.log(GLOBAL_VAR);
 
 
