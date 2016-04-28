@@ -77,7 +77,7 @@ class ActionHandler(object):
     ''' executed at the benchBox, nota: el script esta en el directorio root /vagrant'''
     def warmUp(self):
         # warmup the sandBox filesystem booting the executor.py
-        output =  ""
+        output = ""
         try:
             print 'warmUp'
             str_cmd = "nohup python ~/workload_generator/executor_rmq.py &> nohup_executor_rmq.out& "
@@ -87,6 +87,7 @@ class ActionHandler(object):
             print "something failed"
         finally:
             return output
+
     "este script es compartido entre sandBox y benchBox"
     def tearDown(self):
         # clear the sandBox filesystem and cached files
@@ -94,22 +95,27 @@ class ActionHandler(object):
         try:
             output = ''
             if self.hostname == 'sandBox':              # todo if sandbox
-                check_kill_process("monitor_rmq.py")
+
                 # tambien hace falta limpiar las carpetas de sincronizacion
                 '''
+                /home/vagrant/Dropbox
                 /home/vagrant/Dropbox
                 /home/vagrant/stacksync_folder
                 /home/vagrant/owncloud_folder
                 /home/vagrant/XXXX ...
                 '''
+
                 remove_inner_path('/home/vagrant/Dropbox/*')
                 remove_inner_path('/home/vagrant/stacksync_folder/*')
-                remove_inner_path('/home/vagrant/owncloud_folder/*')
+
+                check_kill_process("monitor_rmq.py")
+
             elif self.hostname == 'benchBox':           # todo if benchBox
                 check_kill_process("executor_rmq.py")
                 # aprovechar el metodo que habia en github
                 # hace falta limpiar la carpeta de ficheros sinteticos
                 # /home/vagrant/output/*
+
                 remove_inner_path('/home/vagrant/output/*')
                 '''
                 /home/vagrant/output
@@ -222,12 +228,6 @@ class ConsumeAction(object):
         self.channel = self.connection.channel()
         self.channel.basic_qos(prefetch_count=1)
         self.channel.queue_declare(queue=self.host_queue)
-
-
-
-
-
-
 
     def on_request(self, ch, method, props, data):
         body = json.loads(data)
