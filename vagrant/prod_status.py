@@ -7,7 +7,7 @@ import getopt
 import socket
 import subprocess
 import json
-
+import glob, shutil
 import os
 import signal
 
@@ -16,6 +16,21 @@ def check_kill_process(pstring):
         fields = line.split()
         pid = fields[0]
         os.kill(int(pid), signal.SIGKILL)
+
+
+def remove_inner_path(path):
+    files = glob.glob(path)
+    try:
+        for f in files:
+            if os.path.isdir(f):
+                shutil.rmtree(f)
+            elif os.path.isfile(f):
+                os.remove(f)
+    except Exception as ex:
+        print ex.message
+
+
+
 
 class ActionHandler(object):
     def __init__(self):
@@ -72,6 +87,7 @@ class ActionHandler(object):
             print "something failed"
         finally:
             return output
+    "este script es compartido entre sandBox y benchBox"
     def tearDown(self):
         # clear the sandBox filesystem and cached files
         print 'tearDown'
@@ -79,9 +95,25 @@ class ActionHandler(object):
             output = ''
             if self.hostname == 'sandBox':              # todo if sandbox
                 check_kill_process("monitor_rmq.py")
+                # tambien hace falta limpiar las carpetas de sincronizacion
+                '''
+                /home/vagrant/Dropbox
+                /home/vagrant/stacksync_folder
+                /home/vagrant/owncloud_folder
+                /home/vagrant/XXXX ...
+                '''
+                remove_inner_path('/home/vagrant/Dropbox/*')
+                remove_inner_path('/home/vagrant/stacksync_folder/*')
+                remove_inner_path('/home/vagrant/owncloud_folder/*')
             elif self.hostname == 'benchBox':           # todo if benchBox
                 check_kill_process("executor_rmq.py")
                 # aprovechar el metodo que habia en github
+                # hace falta limpiar la carpeta de ficheros sinteticos
+                # /home/vagrant/output/*
+                remove_inner_path('/home/vagrant/output/*')
+                '''
+                /home/vagrant/output
+                '''
             else:
                 return 'unhandled hostname: {}'.format(self.hostname)
         except:

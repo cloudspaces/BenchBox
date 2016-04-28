@@ -43,11 +43,14 @@ block content
                     li.active
                         a(data-toggle='pill' href='#configHosts') Hosts
                     li
-                        a(data-toggle='pill' href='#configMonitor') Monitor
-                    //
-                        li
-                            a(data-toggle='pill' href='#configRabbit') RabbitMQ
-                        li
+                        // a(data-toggle='pill' href='#configMonitor') Monitor
+                        a(data-toggle='pill' onclick="window.open('http://localhost:3000/dashboard/db/benchbox', '_blank')") Monitor
+
+                    li
+                        // a(data-toggle='pill' href='#configRabbit') RabbitMQ
+                        a(data-toggle='pill' onclick="window.open('http://localhost:15672/#/', '_blank')") Rabbit
+
+                    //    li
                             a(data-toggle='pill' href='#configInflux') InfluxDB
         hr
         .row.tab-content.frame-fixed-size
