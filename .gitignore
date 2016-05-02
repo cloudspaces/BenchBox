@@ -49,6 +49,10 @@ workload_generator/external/impressions-code/*.o
 workload_generator/workload_generator/*
 # ignore this binary as it has to be recompiled foreach machine
 workload_generator/external/impressions
+workload_generator/time
+workload_generator/user_stereotypes/deletable
+
+
 vagrant/ls
 vagrant/.*
 vagrant/db
