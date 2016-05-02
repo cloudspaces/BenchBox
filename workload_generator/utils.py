@@ -5,6 +5,7 @@ Created on 6/7/2015
 '''
 from constants import STEREOTYPE_RECIPES_PATH
 from scipy import stats
+import numpy
 import random
 from workload_generator import constants
 
@@ -43,7 +44,6 @@ def translate_matlab_fitting_to_scipy(fitting, parameters):
         parameters = parameters.replace("mu", "'loc'")   # log location
     
     if fitting == "logistic":
-        # raise NotImplementedError
         fitting = "logistic"
         parameters = parameters.replace("sigma", "'scale'")
         parameters = parameters.replace("mu", "'loc'")
@@ -114,7 +114,9 @@ def get_random_value_from_fitting(function, kv_params):
         # return fitting(kv_params['shape'], scale=kv_params['scale'], threshold=kv_params['threshold']).rvs()
         return fitting(kv_params['shape'], scale=kv_params['scale'], loc=kv_params['threshold']).rvs()
     elif function == "lognorm":
-        return fitting(kv_params['loc'], scale=kv_params['scale']).rvs()
+        # http://stackoverflow.com/questions/8747761/scipy-lognormal-distribution-parameters
+        scale=numpy.exp(kv_params['loc'])
+        return fitting(kv_params['scale'], loc=0, scale=scale).rvs()
     elif function == "randint": 
         return fitting.rvs(kv_params['low'], kv_params['high'])
     elif function == "tlocationscale":
@@ -123,6 +125,12 @@ def get_random_value_from_fitting(function, kv_params):
         return fitting.rvs(loc=kv_params['loc'])
     elif function == "norm":
         return fitting.rvs(loc=kv_params['loc'], scale=kv_params['scale'])
+    elif function == "fisk":  # logistic NO funciona
+        # c = 3.08575486223  # calculate  a few first moments???
+        scale=numpy.exp(kv_params['loc'])
+        return fitting(kv_params['scale'], loc=0, scale=scale).rvs()
+    elif function == "logistic": # no funciona
+        return fitting().rvs(kv_params['loc'], scale=kv_params['scale'])
     else: 
         return fitting(**kv_params).rvs()
 

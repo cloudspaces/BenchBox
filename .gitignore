@@ -51,8 +51,7 @@ workload_generator/workload_generator/*
 workload_generator/external/impressions
 workload_generator/time
 workload_generator/user_stereotypes/deletable
-
-
+workload_generator/user_stereotypes/fit
 vagrant/ls
 vagrant/.*
 vagrant/db
