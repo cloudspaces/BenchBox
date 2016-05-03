@@ -66,11 +66,10 @@ class CreateFile(Action):
             ftp_rel_path = os.path.relpath(os.path.dirname(self.path), self.output_root)  # / == output
             print "send: {} -> to: {}".format(self.path, ftp_rel_path)
             ftp_abs_path = sender.send(self.path, None, ftp_rel_path)
-            print ftp_abs_path
+            print "abs: {}".format(ftp_abs_path)
         except Exception as e:
             print e.message
             # TODO return self.size
-
         return ftp_abs_path
     def to_string(self):
         return "MakeResponse " + str(self.path) + "\n"

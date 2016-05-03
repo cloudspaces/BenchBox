@@ -104,11 +104,11 @@ class Commands(object):
         Aixo ha d'executarse en un thread com a bucle infinit
         :return:
         '''
+        self.stereotype_executor.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
         print '[TEST]: run'
         if self.is_warmup:
             print '[TEST]: run test'
             self.is_running = True
-            self.stereotype_executor.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
             # TODO loop
             operations = 0
             while self.is_running:
