@@ -145,6 +145,7 @@ class Commands(object):
         else:
             response_msg = '[STOP_TEST]: WARNING: no test is running'
 
+        self.is_warmup = False
         print "clear the content of the sintetic workload generator filesystem"
         remove_inner_path('/home/vagrant/output/*')  # clear the directory after stoping the workload_generator
         # time.sleep(10)
