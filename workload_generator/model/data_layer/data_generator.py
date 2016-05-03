@@ -195,7 +195,7 @@ class DataGenerator(object):
         dir_path_to_delete = get_empty_directory(self.file_system, FS_SNAPSHOT_PATH)
         print "DELETING DIRECTORY: ", dir_path_to_delete
         if dir_path_to_delete != None and (DEBUG or os.listdir(dir_path_to_delete) == []):  # do not remoe root directory
-            if dir_path_to_delete != '/home/vagrant/output':
+            if dir_path_to_delete == '/home/vagrant/output':
                 return None
             if not DEBUG:
                 os.rmdir(dir_path_to_delete)
