@@ -61,6 +61,11 @@ class DataGenerator(object):
                 else:
                     setattr(self, model_attribute, eval(l[l.index('{'):]))
 
+
+
+
+
+
     '''Initialize the file system of the user (delegated to Impressions benchmark)'''
     def create_file_system_snapshot(self):
         '''Get initial number of directories for this user'''
@@ -226,7 +231,7 @@ if __name__ == '__main__':
     test_iterations=1
     for i in range(test_iterations):
         data_generator = DataGenerator()
-        data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "receipt/receipt_sample_backup")
+        data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "recipebackup")
         # data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backupsample")
         data_generator.create_file_system_snapshot()
         data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
