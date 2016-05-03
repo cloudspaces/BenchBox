@@ -7,6 +7,8 @@ import datetime
 import psutil
 from termcolor import colored
 from rmq_monitor.EmitMetric import EmitMetric
+import glob
+import shutil
 
 
 class Commands(object):
@@ -165,6 +167,14 @@ class Commands(object):
             return '[START_TEST]: SUCCESS: run test response'
 
     def stop(self, body):
+        # clear the shared folder content and wait
+        print "clear the content of all the shared folders and wait"
+
+        remove_inner_path('/home/vagrant/Dropbox/*')
+        remove_inner_path('/home/vagrant/stacksync_folder/*')
+
+        time.sleep(10)
+
         if self.is_running:
             print '[STOP_TEST]: stop test {}'.format(body)
             self.is_running = False
@@ -180,6 +190,7 @@ class Commands(object):
             """
             self.executor_state = "monitor stop Capturing... "
             return '[STOP_TEST]: SUCCESS: stop test'
+
         else:
             pc_cmd = {
                 'stacksync': "java",
@@ -197,3 +208,16 @@ class Commands(object):
 
     def keepalive(self, body):
         return "{} -> {}".format(datetime.datetime.now().isoformat(), self.executor_state)
+
+
+def remove_inner_path(path):
+    files = glob.glob(path)
+    try:
+        for f in files:
+            if os.path.isdir(f):
+                shutil.rmtree(f)
+            elif os.path.isfile(f):
+                os.remove(f)
+    except Exception as ex:
+        print ex.message
+

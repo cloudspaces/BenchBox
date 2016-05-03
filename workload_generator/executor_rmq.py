@@ -13,6 +13,7 @@ from threading import Thread
 from constants import STEREOTYPE_RECIPES_PATH, FS_SNAPSHOT_PATH
 from executor import StereotypeExecutorU1
 from termcolor import colored
+import shutil,glob
 
 def singleton(lockfile="executor_rmq.pid"):
     if os.path.exists(lockfile):
@@ -121,6 +122,7 @@ class Commands(object):
             return '[START_TEST]: SUCCESS: run test response'
 
     def stop(self, body):
+
         if self.is_running:
             print '[STOP_TEST]: stop test {}'.format(body)
             self.is_running = False
@@ -131,7 +133,12 @@ class Commands(object):
         else:
             return '[STOP_TEST]: WARNING: no test is running'
 
-    def keepalive(self, body):
+        print "clear the content of the sintetic workload generator filesystem"
+        remove_inner_path('/home/vagrant/output/*') # clear the directory after stoping the workload_generator
+        # time.sleep(10)
+
+
+def keepalive(self, body):
         return "{} -> {}".format(datetime.datetime.now().isoformat(), self.monitor_state)
 
 
@@ -233,4 +240,15 @@ if __name__ == '__main__':
                 print "ACK: {}".format(teclat)
             time.sleep(1)
 
+
+def remove_inner_path(path):
+    files = glob.glob(path)
+    try:
+        for f in files:
+            if os.path.isdir(f):
+                shutil.rmtree(f)
+            elif os.path.isfile(f):
+                os.remove(f)
+    except Exception as ex:
+        print ex.message
 
