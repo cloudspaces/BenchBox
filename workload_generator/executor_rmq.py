@@ -34,6 +34,18 @@ def singleton(lockfile="executor_rmq.pid"):
     with open(lockfile, 'w') as f:
         f.write(str(os.getpid()))
 
+def remove_inner_path(path):
+    files = glob.glob(path)
+    try:
+        for f in files:
+            if os.path.isdir(f):
+                shutil.rmtree(f)
+            elif os.path.isfile(f):
+                os.remove(f)
+    except Exception as ex:
+        print ex.message
+
+
 
 class Commands(object):
     # singleton class
@@ -199,6 +211,9 @@ class ExecuteRMQ(object):
         print " [Consumer] Awaiting RPC requests"
         self.channel.start_consuming()
 
+
+
+
 if __name__ == '__main__':
     print "executor.py is ran when warmup and its queue remains established... WAITING RPC"
     # read the url from path: /vagrant/rmq.url.txt
@@ -241,14 +256,4 @@ if __name__ == '__main__':
             time.sleep(1)
 
 
-def remove_inner_path(path):
-    files = glob.glob(path)
-    try:
-        for f in files:
-            if os.path.isdir(f):
-                shutil.rmtree(f)
-            elif os.path.isfile(f):
-                os.remove(f)
-    except Exception as ex:
-        print ex.message
 
