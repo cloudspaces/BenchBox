@@ -134,13 +134,12 @@ class Commands(object):
             response_msg = '[STOP_TEST]: WARNING: no test is running'
 
         print "clear the content of the sintetic workload generator filesystem"
-        remove_inner_path('/home/vagrant/output/*') # clear the directory after stoping the workload_generator
+        remove_inner_path('/home/vagrant/output/*')  # clear the directory after stoping the workload_generator
         # time.sleep(10)
         return response_msg
 
-
-def keepalive(self, body):
-        return "{} -> {}".format(datetime.datetime.now().isoformat(), self.monitor_state)
+    def keepalive(self, body):
+            return "{} -> {}".format(datetime.datetime.now().isoformat(), self.monitor_state)
 
 
 class ExecuteRMQ(object):
