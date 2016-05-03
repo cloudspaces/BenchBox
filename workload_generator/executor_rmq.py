@@ -129,13 +129,14 @@ class Commands(object):
             self.is_warmup = False
             self.execute.join()
             self.monitor_state = "executor Stopped!"
-            return '[STOP_TEST]: SUCCESS: stop test'
+            response_msg = '[STOP_TEST]: SUCCESS: stop test'
         else:
-            return '[STOP_TEST]: WARNING: no test is running'
+            response_msg = '[STOP_TEST]: WARNING: no test is running'
 
         print "clear the content of the sintetic workload generator filesystem"
         remove_inner_path('/home/vagrant/output/*') # clear the directory after stoping the workload_generator
         # time.sleep(10)
+        return response_msg
 
 
 def keepalive(self, body):
