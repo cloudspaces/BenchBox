@@ -21,6 +21,7 @@ manager/misc/*
 manager/config
 manager/config/*
 manager/output
+manager/credentials.old
 manager/hosts
 # manager/*.csv
 test

@@ -31,10 +31,12 @@ class UpdateFile(Action):
             send_output_to = os.path.relpath(os.path.dirname(self.path), self.output_root)  # / == output
             print "update with binary write: {} -> to: {}".format(self.path, send_output_to) # filename, sub_folder
             ftp_abs_path = sender.send(self.path, None, send_output_to)
+            return ftp_abs_path
         except Exception as e:
             print e
+
         # TODO return self.size
-        return ftp_abs_path
+        return None
 
     def to_string(self):
         return "UpdateFile "+ str(self.path) +"\n"
@@ -71,6 +73,7 @@ class CreateFile(Action):
             print e.message
             # TODO return self.size
         return ftp_abs_path
+
     def to_string(self):
         return "MakeResponse " + str(self.path) + "\n"
 
