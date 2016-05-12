@@ -30,7 +30,8 @@ class UpdateFile(Action):
         try:
             send_output_to = os.path.relpath(os.path.dirname(self.path), self.output_root)  # / == output
             print "update with binary write: {} -> to: {}".format(self.path, send_output_to)  # filename, sub_folder
-            ftp_abs_path = sender.send(self.path, None, send_output_to)
+            sender.send(self.path, None, send_output_to)
+            # ftp_abs_path = sender.send(self.path, None, send_output_to)
             # return ftp_abs_path
             #  this stage seems async and will just crash whenever it wants,
             # due to reference before assignment of the return variable
@@ -38,7 +39,7 @@ class UpdateFile(Action):
             print e
 
         # TODO return self.size
-        return None
+        # return None
 
     def to_string(self):
         return "UpdateFile "+ str(self.path) +"\n"
@@ -56,7 +57,7 @@ class CreateFileOrDirectory(Action):
         except Exception as e:
             print e
         # TODO return self.size
-        return 0
+        # return 0
     def to_string(self):
         return "MakeResponse " + str(self.path) + "\n"
 
@@ -70,11 +71,11 @@ class CreateFile(Action):
             ftp_rel_path = os.path.relpath(os.path.dirname(self.path), self.output_root)  # / == output
             print "send: {} -> to: {}".format(self.path, ftp_rel_path)
             ftp_abs_path = sender.send(self.path, None, ftp_rel_path)
-            print "abs: {}".format(ftp_abs_path)
+            # print "abs: {}".format(ftp_abs_path)
         except Exception as e:
             print e.message
             # TODO return self.size
-        return ftp_abs_path
+        # return None
 
     def to_string(self):
         return "MakeResponse " + str(self.path) + "\n"
@@ -93,7 +94,7 @@ class CreateDirectory(Action):
         except Exception as e:
             print e
             # TODO return self.size
-        return ftp_abs_path
+        # return ftp_abs_path
     def to_string(self):
         return "MakeResponse " + str(self.path) + "\n"
 # -------------------------------------------
@@ -113,7 +114,7 @@ class DeleteFileOrDirectory(Action):
             sender.rm(delete_output_filename, delete_output_at)
         except Exception as e:
             print "removed a folder "  # e.message
-        return 0
+        # return 0
 
     def to_string(self):
         return "Unlink "+str(self.path)+"\n"
@@ -130,7 +131,7 @@ class DeleteFile(Action):
         delete_output_at = os.path.relpath(os.path.dirname(self.path), self.output_root)
         delete_output_filename = os.path.basename(self.path)
         sender.rm(delete_output_filename, delete_output_at)
-        return 0
+        # return 0
 
     def to_string(self):
         return "Unlink File"+str(self.path)+"\n"
@@ -150,7 +151,7 @@ class DeleteDirectory(Action):
             sender.rmd(delete_output_filename, delete_output_at)
         except Exception as e:
             print "removed a folder "  # e.message
-        return 0
+        # return 0
 
     def to_string(self):
         return "Unlink Dir"+str(self.path)+"\n"
@@ -209,7 +210,7 @@ class MoveFileOrDirectory(Action):
                 print "is not dir"+self.output_tgt
         except Exception as e:
             print e.message
-        return 0
+        # return 0
 
     def moveFolder(self, ftp_client, src_path, tgt_path):
         print "move folder from {} -> {}".format(src_path, tgt_path)
@@ -291,9 +292,10 @@ class MoveFile(Action):
             print colored("move a FILE", "cyan")
             ftp_rel_src_path = os.path.relpath(self.path, self.output_root)
             ftp_rel_tgt_path = os.path.relpath(self.output_tgt, self.output_root)
-            ftp_abs_path = sender.mv(ftp_rel_src_path, ftp_rel_tgt_path) # rename the file at sandBox ftp_folder from # ftp_root
-        print ftp_abs_path
-        return ftp_abs_path
+            sender.mv(ftp_rel_src_path, ftp_rel_tgt_path) # rename the file at sandBox ftp_folder from # ftp_root
+            # ftp_abs_path = sender.mv(ftp_rel_src_path, ftp_rel_tgt_path) # rename the file at sandBox ftp_folder from # ftp_root
+        # print ftp_abs_path
+        # return ftp_abs_path
 
     def to_string(self):
         return "MoveResponse File"+str(self.path)+"\n"
@@ -325,7 +327,7 @@ class MoveDirectory(Action):
             print sub_dir
             sender.rmd(self.path, sub_dir)
 
-        return 0
+        # return 0
 
     def moveFolder(self, ftp_client, src_path, tgt_path):
         print "move folder from {} -> {}".format(src_path, tgt_path)
@@ -371,7 +373,7 @@ class UploadDirectory(Action):
         print self.output_tgt
         print colored("Upload a folder",'green')
         self.uploadFolder(sender, self.path, self.output_tgt) # self.path is the source path of the folder at sandBox
-        return 0
+        # return 0
 
     # move files at the remote fs, src_path to tgt_path
     def uploadFolder(self, ftp_client, src_path, tgt_path):
