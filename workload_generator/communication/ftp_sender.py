@@ -117,11 +117,13 @@ class ftp_sender():
 
         print "rm folder >> {}".format(fname)
         try:
-            print "ftp: rmd: ", os.path.basename(fname)
-            self.ftp.delete(os.path.basename(fname))
-        except Exception as e:
-            print "Remove remote delete failed, use rmd"
+            print "Remove remote delete failed, use rmd {}".format(fname)
             self.ftp.rmd(os.path.basename(fname))
+        except Exception as e:
+            print e.message
+            # print "ftp: rmd: ", os.path.basename(fname)
+            # self.ftp.delete(os.path.basename(fname))
+
 
 
             # yes, there was an error...
