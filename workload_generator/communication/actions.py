@@ -29,9 +29,11 @@ class UpdateFile(Action):
     def perform_action(self, sender):
         try:
             send_output_to = os.path.relpath(os.path.dirname(self.path), self.output_root)  # / == output
-            print "update with binary write: {} -> to: {}".format(self.path, send_output_to) # filename, sub_folder
+            print "update with binary write: {} -> to: {}".format(self.path, send_output_to)  # filename, sub_folder
             ftp_abs_path = sender.send(self.path, None, send_output_to)
-            return ftp_abs_path
+            # return ftp_abs_path
+            #  this stage seems async and will just crash whenever it wants,
+            # due to reference before assignment of the return variable
         except Exception as e:
             print e
 
