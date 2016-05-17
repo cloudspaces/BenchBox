@@ -72,7 +72,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
             // initial load
             $scope.hosts = Hosts.query(); // llistat de tots els hosts
-
+            $scope.is_running = false;
             $scope.itv_time = 10000;
             $interval(callAtInterval, $scope.itv_time);
 
@@ -344,6 +344,26 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
                 })
 
+
+            };
+
+            $scope.startStop = function(){
+                console.log("START & STOP click")
+                var btn = document.getElementById('btn-start-stop');
+                if($scope.is_running){
+                    // have to stop it
+                    console.log("request stop");
+                    btn.style.backgroundColor = "#00ff00"
+                    btn.innerHTML = "Start"
+
+                }else{
+                    // have to start it
+                    console.log("request start");
+                    btn.style.backgroundColor = "#ff0000"
+                    btn.innerHTML = "Stop"
+                }
+
+                $scope.is_running = !$scope.is_running;
 
             };
 
@@ -674,6 +694,9 @@ function JSONToCSVConvertor(JSONData, ReportTitle, ShowLabel) {
 
 
 console.log(GLOBAL_VAR);
+
+
+
 
 
 console.log("init.js/OK");

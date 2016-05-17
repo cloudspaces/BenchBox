@@ -174,6 +174,7 @@ amqp.connect(amqp_url, function (err, conn) {
     console.log(amqp_url)
     if (err) {
         console.log('connection rabbitmq error', err);
+        process.exit()
     } else {
         console.log('connection rabbitmq successful!');
         amqp_conn = conn; // single connection for whole server.
