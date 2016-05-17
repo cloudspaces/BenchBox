@@ -545,14 +545,10 @@ class TrafficMonitor(Thread):
             # print "the flow is: {}".format(flow)
             # data goes through
             if flow == "down":
-                if "cloudfront" in src_host:
-                    # im download from server == data down
-                    self.traffic_counter["data_down"]["size"] += total_size
-                    self.traffic_counter["data_down"]["c"] += 1
-                elif "mega.nz" in src_host:
+                if "karere.mega.nz" in src_host:
                     self.traffic_counter["meta_down"]["size"] += total_size
                     self.traffic_counter["meta_down"]["c"] += 1
-                elif "amazonaws" in src_host:
+                elif "api.mega.nz" in src_host:
                     self.traffic_counter["data_down"]["size"] += total_size
                     self.traffic_counter["data_down"]["c"] += 1
                 else:
@@ -561,12 +557,7 @@ class TrafficMonitor(Thread):
                     self.traffic_counter["misc_down"]["c"] += 1
             # elif flow == "up":
             else:
-
-                if "cloudfront" in dst_host:
-                    # im download from server == data down
-                    self.traffic_counter["data_up"]["size"] += total_size
-                    self.traffic_counter["data_up"]["c"] += 1
-                elif "mega.nz" in dst_host:
+                if "mega.nz" in dst_host:
                     self.traffic_counter["meta_up"]["size"] += total_size
                     self.traffic_counter["meta_up"]["c"] += 1
                 elif "amazonaws" in dst_host:
@@ -595,7 +586,7 @@ class TrafficMonitor(Thread):
         print "Total down: {}".format(self.traffic_counter["total_down"]["size"])
         '''
 
-
+        '''
         desc = "{0: >20}:{1: >6}   ~>>>{2: >10}>>>~   {3: >20}:{4: >6} {5: >5}".format(src_host, src_port, total_size,
                                                                                        dst_host, dst_port, flow)
         stat = "{0: >20}={1:>8} >> meta [{2: >10}/{3: >10}] data[{4: >10}/{5: >10}] total[{6: >10}/{7: >10}]".format(
@@ -610,7 +601,7 @@ class TrafficMonitor(Thread):
 
         print desc
         print stat
-
+        '''
         '''
         print "{}:{}   ~>>~   {}:{}".format(src_host, src_port, dst_host, dst_port)
         print "Meta up:   {}".format(sizeof_fmt(self.traffic_counter["meta_up"]["size"]))
