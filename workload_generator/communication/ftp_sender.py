@@ -143,7 +143,13 @@ class ftp_sender():
             print "move to "+self.ftp_root
             self.ftp.cwd(self.ftp_root)
 
-        self.ftp.rename(src, tgt)
+        while True:
+            try:
+                self.ftp.rename(src, tgt)
+                break  # if not failed continue..
+            except Exception:
+                print 'Failed moving a file'
+
         return os.path.join(self.ftp.pwd(), tgt)
 
     def move_down(self):
