@@ -348,21 +348,49 @@ angular.module('app', ['ngRoute', 'ngResource'])
             };
 
             $scope.startStop = function(){
-                console.log("START & STOP click")
+                console.log("START & STOP click");
                 var btn = document.getElementById('btn-start-stop');
                 if($scope.is_running){
-                    // have to stop it
-                    console.log("request stop");
-                    btn.style.backgroundColor = "#00ff00"
-                    btn.innerHTML = "Start"
+
+
+
+
+                    // monitor start
+                    $scope.run.testMonitor = 'start';
+                    $scope.rmq('test-check','monitor','monitor');
+                    // executor warmup
+                    console.log('MonitorStart');
+                    $scope.run.testOperation = 'warmup'; // hello / warmup / start / stop
+                    $scope.rmq('test-check','executor','executor');
+                    console.log('ExecutorWarmup');
+                    // start
+                    $scope.run.testOperation = 'start'; // hello / warmup / start / stop
+                    $scope.rmq('test-check','executor','executor');
+                    console.log('ExecutorStart');
+
+                    // Now can stop
+                    console.log("request start");
+                    btn.style.backgroundColor = "#ff0000";
+                    btn.innerHTML = "Click To Stop";
 
                 }else{
-                    // have to start it
-                    console.log("request start");
-                    btn.style.backgroundColor = "#ff0000"
-                    btn.innerHTML = "Stop"
-                }
 
+                    // executor stop
+                    $scope.run.testOperation = 'stop'; // hello / warmup / start / stop
+                    $scope.rmq('test-check','executor','executor');
+                    console.log('ExecutorStop');
+                    // monitor stop
+                    $scope.run.testMonitor = 'stop';
+                    $scope.rmq('test-check','monitor','monitor');
+                    console.log('MonitorStop');
+
+
+                    // Now can start
+                    console.log("request stop");
+                    btn.style.backgroundColor = "#00ff00";
+                    btn.innerHTML = "Click To Start";
+
+                }
                 $scope.is_running = !$scope.is_running;
 
             };
