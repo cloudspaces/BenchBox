@@ -40,9 +40,10 @@ else
 fi
 
 echo 'Create the mega folder'
-megacmd mkdir mega:/$1
 
 sudo cp /home/vagrant/.megacmd.json /root/
+
+megacmd mkdir mega:/$1
 
 while true; do
         echo 'DoSync'
