@@ -701,9 +701,9 @@ if __name__ == '__main__':
     tm = TrafficMonitor(iface="eth0", client="mega")
     tm.run() # intermediari que arranca trafficMonitor i permet realitzar get stats sobre la marcha o reiniciar el monitoreig
     while True:
-        print tm.notify_stats()
+        # print tm.notify_stats()
         time.sleep(5)
-        print tm.get_time()
+        # print tm.get_time()
     print "end"
 
 
