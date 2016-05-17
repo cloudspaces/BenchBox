@@ -42,9 +42,11 @@ fi
 echo 'Create the mega folder'
 megacmd mkdir mega:/$1
 
+sudo cp /home/vagrant/.megacmd.json /root/
+
 while true; do
         echo 'DoSync'
-        megacmd sync /home/vagrant/mega_folder mega:/$1 -conf='/home/vagrant/.megacmd.json'
+        megacmd sync /home/vagrant/mega_folder mega:/$1
         echo 'SyncingComplete'
         sleep \$delay
 done
