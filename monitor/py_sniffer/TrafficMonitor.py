@@ -45,6 +45,7 @@ class TrafficMonitor(Thread):
         self.traffic_flow_dict = {}
         self.ip2hostname_cache = {}    #
         self.packet_limit = packet_limit
+        self.register = None
         try:
             self.my_ip = ni.ifaddresses(iface)[2][0]['addr']
         except KeyError:
@@ -184,7 +185,9 @@ class TrafficMonitor(Thread):
 
         filter_ips = {
             "dropbox": [self.my_ip],
-            "stacksync": [self.sync_server_ip, self.my_ip]
+            "stacksync": [self.sync_server_ip, self.my_ip],
+            "mega": [self.my_ip],
+            "owncloud": [self.my_ip, self.sync_server_ip]
         }
 
         # filter_ports = ["443", "5672", "5000", "8080"]  # stacksync ports
@@ -193,15 +196,20 @@ class TrafficMonitor(Thread):
             "dropbox": ["443"],  # ssl connection, serverside data and metadata
             "stacksync": ["5672",   # rabbit
                           "5000",   # login
-                          "8080"]   # data => swift
+                          "8080"],   # data => swift
+            "mega": ["443"],  # habria que comprobar que puertos utilizan, pero vamos a suponer que son todos 443
+            "owncloud": ["","","8080"]  # habria que averiguar manualmente que puertos usar
         }
 
         filter_opts = {
-            "dropbox": "(port " + " || port ".join(filter_ports[self.desktop_client]) + ") && "
+            "dropbox":   "(port " + " || port ".join(filter_ports[self.desktop_client]) + ") && "
                     "(host " + " && host ".join(filter_ips[self.desktop_client]) + ")",  # filter
-            "stacksync": "(port " + " || port ".join(
-                    filter_ports[self.desktop_client]) + ") && (host " + " || host ".join(
-                    filter_ips[self.desktop_client]) + ")"  # filter
+            "stacksync": "(port " + " || port ".join(filter_ports[self.desktop_client]) + ") && "
+                    "(host " + " || host ".join(filter_ips[self.desktop_client]) + ")",  # filter
+            "mega":      "(port " + " || port ".join(filter_ports[self.desktop_client]) + ") && "
+                    "(host " + " || host ".join(filter_ips[self.desktop_client]) + ")",  # filter
+            "owncloud": "(port " + " || port ".join(filter_ports[self.desktop_client]) + ") && "
+                    "(host " + " || host ".join(filter_ips[self.desktop_client]) + ")"  # filter
 
         }
         filter = filter_opts[self.desktop_client]
@@ -253,7 +261,6 @@ class TrafficMonitor(Thread):
 
     def stop_capture(self):
         self.register = False
-
         print "Wait notify_worker.join()"
         self.cancel()
 
@@ -504,6 +511,74 @@ class TrafficMonitor(Thread):
                     self.traffic_counter["misc_up"]["size"] += total_size
                     self.traffic_counter["misc_up"]["c"] += 1
 
+
+
+
+        elif self.desktop_client == "mega":
+            # print "parse the request uri ...  preparar los dominios que havia en el paper en formato regexp"
+
+            # print src_port
+            # print dst_port
+            if src_port == 443 or dst_port == 443:
+                # print "Okey"
+                pass
+            else:
+                # print "Not"
+                return None  # not data nor metadata
+
+            # print src_host
+            # print dst_host
+            flow = None
+
+            if dst_port == 443:
+                flow = "up"
+                self.traffic_counter["total_up"]["size"] += total_size
+                self.traffic_counter["total_up"]["c"] += 1
+            elif src_port == 443:
+                self.traffic_counter["total_down"]["size"] += total_size
+                self.traffic_counter["total_down"]["c"] += 1
+                flow = "down"
+
+            if flow is None:  # else: unknown flow
+                return flow
+
+            # print "the flow is: {}".format(flow)
+            # data goes through
+            if flow == "down":
+                if "cloudfront" in src_host:
+                    # im download from server == data down
+                    self.traffic_counter["data_down"]["size"] += total_size
+                    self.traffic_counter["data_down"]["c"] += 1
+                elif "mega.nz" in src_host:
+                    self.traffic_counter["meta_down"]["size"] += total_size
+                    self.traffic_counter["meta_down"]["c"] += 1
+                elif "amazonaws" in src_host:
+                    self.traffic_counter["data_down"]["size"] += total_size
+                    self.traffic_counter["data_down"]["c"] += 1
+                else:
+                    # use whois to resole this
+                    self.traffic_counter["misc_down"]["size"] += total_size
+                    self.traffic_counter["misc_down"]["c"] += 1
+            # elif flow == "up":
+            else:
+
+                if "cloudfront" in dst_host:
+                    # im download from server == data down
+                    self.traffic_counter["data_up"]["size"] += total_size
+                    self.traffic_counter["data_up"]["c"] += 1
+                elif "mega.nz" in dst_host:
+                    self.traffic_counter["meta_up"]["size"] += total_size
+                    self.traffic_counter["meta_up"]["c"] += 1
+                elif "amazonaws" in dst_host:
+                    self.traffic_counter["data_up"]["size"] += total_size
+                    self.traffic_counter["data_up"]["c"] += 1
+                else:
+                    # use whois to resolve this ip's # aqui no entrara nunca ni referenciando por ip
+                    self.traffic_counter["misc_up"]["size"] += total_size
+                    self.traffic_counter["misc_up"]["c"] += 1
+
+
+
         ## classifica data & metadata per dropbox
 
         # print "{}:{}   ~>>~   {}:{}".format(src_host, src_port, dst_host, dst_port)
@@ -520,7 +595,7 @@ class TrafficMonitor(Thread):
         print "Total down: {}".format(self.traffic_counter["total_down"]["size"])
         '''
 
-        '''
+
         desc = "{0: >20}:{1: >6}   ~>>>{2: >10}>>>~   {3: >20}:{4: >6} {5: >5}".format(src_host, src_port, total_size,
                                                                                        dst_host, dst_port, flow)
         stat = "{0: >20}={1:>8} >> meta [{2: >10}/{3: >10}] data[{4: >10}/{5: >10}] total[{6: >10}/{7: >10}]".format(
@@ -533,9 +608,9 @@ class TrafficMonitor(Thread):
                 self.traffic_counter["total_down"]["size"]
         )
 
-        # print desc
+        print desc
         print stat
-        '''
+
         '''
         print "{}:{}   ~>>~   {}:{}".format(src_host, src_port, dst_host, dst_port)
         print "Meta up:   {}".format(sizeof_fmt(self.traffic_counter["meta_up"]["size"]))
@@ -632,7 +707,7 @@ if __name__ == '__main__':
     '''
 
     # setup network setting
-    tm = TrafficMonitor(iface="eth0")
+    tm = TrafficMonitor(iface="eth0", client="mega")
     tm.run() # intermediari que arranca trafficMonitor i permet realitzar get stats sobre la marcha o reiniciar el monitoreig
     while True:
         print tm.notify_stats()
