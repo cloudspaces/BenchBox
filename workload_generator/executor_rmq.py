@@ -50,6 +50,7 @@ def remove_inner_path(path):
 class Commands(object):
     # singleton class
     _instance = None
+
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super(Commands, cls).__new__(cls, *args, **kwargs)
@@ -61,7 +62,7 @@ class Commands(object):
         self.is_running = False
         self.sync_directory = None  # stacksync_folder, Dropbox, ....
         self.stereotype = receipt  # backupsample
-        self.stereotype_executor = StereotypeExecutorU1()
+        self.stereotype_executor = None
         self.monitor_state = "Unknown"
         # update ftp_root_directory
         self.fs_abs_target_folder = None
@@ -84,6 +85,7 @@ class Commands(object):
         print '[WARMUP]: init_stereotype_from_recipe'
         if self.is_warmup is False:
             self.sync_directory = body['msg']['test']['testFolder']
+            self.stereotype_executor = StereotypeExecutorU1()  # tornar a assignar
             self.stereotype_executor.initialize_ftp_client_by_directory(root_dir=self.sync_directory)
             self.fs_abs_target_folder = '/home/vagrant/{}'.format(self.sync_directory)  # target ftp_client dir absolute path
             self.stereotype = body['msg']['test']['testProfile']  # add benchbox switch stereotype profile at warmup
@@ -92,6 +94,7 @@ class Commands(object):
             self.stereotype_executor.initialize_from_stereotype_recipe(receipt)
             print '[WARMUP]: init fs & migrate to sandbox'
             # always
+            self.stereotype_executor.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
             self.stereotype_executor.create_fs_snapshot_and_migrate_to_sandbox()
             self.is_warmup = True
             self.monitor_state = "executor Warmup Done!"
@@ -104,7 +107,6 @@ class Commands(object):
         Aixo ha d'executarse en un thread com a bucle infinit
         :return:
         '''
-        self.stereotype_executor.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
         print '[TEST]: run'
         if self.is_warmup:
             print '[TEST]: run test'
@@ -127,6 +129,7 @@ class Commands(object):
             return '[START_TEST]: INFO: already running!'
         else:
             # SELF THREAD START
+            time.sleep(10)  # para que el
             print '[START_TEST]: INFO: instance thread'
             self.execute = Thread(target=self._test)
             self.execute.start()
@@ -140,6 +143,7 @@ class Commands(object):
             self.is_running = False
             self.is_warmup = False
             self.execute.join()
+
             self.monitor_state = "executor Stopped!"
             response_msg = '[STOP_TEST]: SUCCESS: stop test'
         else:
