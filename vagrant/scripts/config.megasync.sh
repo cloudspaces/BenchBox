@@ -44,7 +44,7 @@ megacmd mkdir mega:/$1
 
 while true; do
         echo 'DoSync'
-        megacmd sync /home/vagrant/mega_folder mega:/$1
+        megacmd sync /home/vagrant/mega_folder mega:/$1 -conf='/home/vagrant/.megacmd.json'
         echo 'SyncingComplete'
         sleep \$delay
 done
