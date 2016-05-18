@@ -24,7 +24,7 @@ appendParentDir(3, os.path.dirname(os.path.realpath(__file__)))
 
 
 from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string
-from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH, \
+from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH, FILE_SIZE_STATIC, \
     DATA_CHARACTERIZATIONS_PATH, FS_SNAPSHOT_PATH, \
     DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH, DEBUG, DATA_GENERATOR_PROPERTIES_DIR
 import time
@@ -106,9 +106,15 @@ class DataGenerator(object):
         '''Prior creating a file, we first decide which type of file to create'''
         file_type = get_fitness_proportionate_element(self.stereotype_file_types_probabilities)
         '''After choosing the type, we proceed by generating the size of the file'''
-        (function, kv_params) = self.file_types_sizes[file_type]
-        size = int(get_random_value_from_fitting(function, kv_params))
+
+        if FILE_SIZE_STATIC == 0:
+            (function, kv_params) = self.file_types_sizes[file_type]
+            size = int(get_random_value_from_fitting(function, kv_params))
+        else:
+            size = FILE_SIZE_STATIC
         # size=40 000 000 # rollback to use fitting size instead of static 40MB filesize
+
+
         '''After generating the file size, we should decide the path for the new file'''
         synthetic_file_base_path = get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH)
         '''Create a realistic name'''

@@ -25,7 +25,6 @@ def appendParentDir(num, currdir):
         num -= 1
         return appendParentDir(num, dirname)
 
-
 appendParentDir(1, os.path.dirname(os.path.realpath(__file__)))
 
 from workload_generator.model.user_activity.stereotype_executor import StereotypeExecutor
@@ -126,7 +125,6 @@ class StereotypeExecutorU1(StereotypeExecutor):
         action.perform_action(self.ftp_client.keep_alive())
 
     def doSync(self):
-        # TODO: Cheng, you can make use of data_generator.update() to test updating files
         # self.doPutContentResponse()
         print colored("doSync", 'green')
         synthetic_file_name = self.data_generator.update_file()
