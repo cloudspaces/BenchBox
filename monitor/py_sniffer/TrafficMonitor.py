@@ -198,7 +198,7 @@ class TrafficMonitor(Thread):
                           "5000",   # login
                           "8080"],   # data => swift
             "mega": ["443"],  # habria que comprobar que puertos utilizan, pero vamos a suponer que son todos 443
-            "owncloud": ["","","8080"]  # habria que averiguar manualmente que puertos usar
+            "owncloud": ["8080"]  # habria que averiguar manualmente que puertos usar
         }
 
         filter_opts = {
@@ -206,10 +206,8 @@ class TrafficMonitor(Thread):
                     "(host " + " && host ".join(filter_ips[self.desktop_client]) + ")",  # filter
             "stacksync": "(port " + " || port ".join(filter_ports[self.desktop_client]) + ") && "
                     "(host " + " || host ".join(filter_ips[self.desktop_client]) + ")",  # filter
-            "mega":      "(port " + " || port ".join(filter_ports[self.desktop_client]) + ") && "
-                    "(host " + " || host ".join(filter_ips[self.desktop_client]) + ")",  # filter
-            "owncloud": "(port " + " || port ".join(filter_ports[self.desktop_client]) + ") && "
-                    "(host " + " || host ".join(filter_ips[self.desktop_client]) + ")"  # filter
+            "mega":  "(host " + " || host ".join(filter_ips[self.desktop_client]) + ")",  # filter
+            "owncloud": "(host " + " || host ".join(filter_ips[self.desktop_client]) + ")"  # filter
 
         }
         filter = filter_opts[self.desktop_client]
