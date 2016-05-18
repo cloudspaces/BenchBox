@@ -63,7 +63,6 @@ class StereotypeExecutorU1(StereotypeExecutor):
                 root_dir  # per defecte ...
         )
 
-
     def initialize_from_stereotype_recipe(self, stereotype_recipe):
         StereotypeExecutor.initialize_from_stereotype_recipe(self, stereotype_recipe)
 
@@ -120,8 +119,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
         print "{} :>>> ACTION".format(action)
         '''Get the time to wait for this transition in millis'''
-        # to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'PutContentResponse')
-        to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+        to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'PutContentResponse')
+        # to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         print "Wait: {}s".format(to_wait)
         time.sleep(to_wait)
         action.perform_action(self.ftp_client.keep_alive())
@@ -156,15 +155,14 @@ class StereotypeExecutorU1(StereotypeExecutor):
             else:
                 action = DeleteDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
             '''Get the time to wait for this transition in millis'''
-            # to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'Unlink')
-            to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'Unlink')
+            # to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
         else:
             print "No file selected!"
 
-    # TODO: Needs implementation in data generator first
     def doMoveResponse(self):
         print colored("doMoveResponse", 'magenta')
         if random.random() > 0.25:
@@ -181,8 +179,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
             else:
                 action = MoveDirectory(src_mov, FS_SNAPSHOT_PATH, tgt_mov)
             '''Get the time to wait for this transition in millis'''
-            # to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'MoveResponse')
-            to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'MoveResponse')
+            # to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
