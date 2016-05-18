@@ -178,9 +178,13 @@ class DataGenerator(object):
         to_delete = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
         print "DELETING FILE: ", to_delete
         if to_delete != None:
+            delete_fs_node(self.file_system, to_delete)  # delete logical
             if not DEBUG:
-                os.remove(to_delete)
-            delete_fs_node(self.file_system, to_delete)
+                try:
+                    os.remove(to_delete)
+                except OSError as ex:
+                    print ex.message
+                    return None
         '''Delete a random file from the '''
         return to_delete
 
