@@ -2,11 +2,12 @@ var express = require('express');
 var router = express.Router();
 
 
+var constants = require('../constants.js');
 
 var fs = require('fs');
 var path = require('path');
-var filePath = path.join(__dirname, '../static/json/config.json')
-var filePathTemplate = path.join(__dirname, '../static/json/config.template.json')
+var filePath = path.join(__dirname, '../static/json/config.json');
+var filePathTemplate = path.join(__dirname, '../static/json/config.template.json');
 var obj;
 var configReady = false;
 
@@ -51,8 +52,14 @@ router.get('/', function (req, res, next) {
     fs.readFile(filePath, 'utf8', function(err, data){
         if (err) throw err;
         obj = JSON.parse(data);
+
+
+
         console.log('configuration', obj);
         sess.config = obj[0];
+        sess.config.rabbitmq.url = constants.rmq_url;
+        sess.config.rabbitmq.host = constants.host_ip;
+
         res.render('init', {title: 'BenchBox', session: sess});
     });
 });

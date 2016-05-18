@@ -37,7 +37,7 @@ netifaces.forEach(function (ifname) {
 
 // refactoring en cargar ip por interficie y prioridad por interficie si dispone de ip
 
-
+define("host_ip", rabbitIP);
 define("PI", 3.14);
 define("rmq_url", 'amqp://benchbox:benchbox@' + rabbitIP + '/'); // amqp
 define("influx", {
