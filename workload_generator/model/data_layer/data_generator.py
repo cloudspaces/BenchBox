@@ -113,7 +113,14 @@ class DataGenerator(object):
         else:
             size = FILE_SIZE_STATIC
         # size=40 000 000 # rollback to use fitting size instead of static 40MB filesize
+        # max file size is Integer length
+        # 2147483647
+        # 26553053639
 
+
+        if size > 2147483647:
+            size = 2147483647
+        # sdgen.jar max size is 214748647 [ integer limit ]
 
         '''After generating the file size, we should decide the path for the new file'''
         synthetic_file_base_path = get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH)
