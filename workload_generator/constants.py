@@ -62,7 +62,7 @@ CPU_MONITOR_PORT = 11000
 TO_WAIT_STATIC_MAX = 6
 TO_WAIT_STATIC_MIN = 1
 
-TO_WAIT_STATIC = 0  # 0 means use fitting
+TO_WAIT_STATIC = 5  # 0 means use fitting
 FILE_SIZE_STATIC = 0  # is bytes 0 # means use fitting
 
 
