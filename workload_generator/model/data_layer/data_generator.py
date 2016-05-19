@@ -24,7 +24,7 @@ appendParentDir(3, os.path.dirname(os.path.realpath(__file__)))
 
 
 from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string
-from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH, FILE_SIZE_STATIC, \
+from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH, FILE_SIZE_STATIC, FILE_SIZE_MAX, \
     DATA_CHARACTERIZATIONS_PATH, FS_SNAPSHOT_PATH, \
     DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH, DEBUG, DATA_GENERATOR_PROPERTIES_DIR
 import time
@@ -117,9 +117,8 @@ class DataGenerator(object):
         # 2147483647
         # 26553053639
 
-
-        if size > 2147483647:
-            size = 2147483647
+        if size > FILE_SIZE_MAX:
+            size = FILE_SIZE_MAX
         # sdgen.jar max size is 214748647 [ integer limit ]
 
         '''After generating the file size, we should decide the path for the new file'''
