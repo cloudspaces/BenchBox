@@ -48,7 +48,7 @@ if [ -d "/vagrant/node_modules" ];
 then
     echo "Node_modules already exists"
     # noop
-    # npm rebuild --no-bin-links
+    npm rebuild --no-bin-links
 else
     echo "Node_modules dont exist"
     mv /home/vagrant/node_modules /vagrant
