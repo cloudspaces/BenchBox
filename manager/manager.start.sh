@@ -41,7 +41,22 @@ echo 'Start the nodeManager server'
 echo "Wait the servers to start"
 sleep 10
 
-
+if [ `whoami` = "root" ]
+then
+echo "Manager launch from vagrant"
+if [ -d "/vagrant/node_modules" ];
+then
+    echo "Node_modules already exists"
+    # noop
+    # npm rebuild --no-bin-links
+else
+    echo "Node_modules dont exist"
+    mv /home/vagrant/node_modules /vagrant
+fi
+else
+echo "Manager launch from local"
+echo `whoami`
+fi
 npm start
 
 echo 'Start/OK'
