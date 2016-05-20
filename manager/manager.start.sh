@@ -57,6 +57,7 @@ else
 echo "Manager launch from local"
 echo `whoami`
 fi
+killall node
 npm start
 
 echo 'Start/OK'
