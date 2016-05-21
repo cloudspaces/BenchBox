@@ -168,8 +168,14 @@ block content
                             } else {
                                 console.log("Skipped", ip);
 
-                                document.getElementById('grafana-link').onclick= window.open('http://"+location.hostname+":3000/dashboard/db/benchbox', '_blank');
-                                document.getElementById('monitor-link').onclick= window.open('http://"+location.hostname+":15672/#/', '_blank')
+                                document.getElementById('grafana-link').onclick =
+                                        function() {
+                                            window.open('http://"+location.hostname+":3000/dashboard/db/benchbox', '_blank');
+                                        }
+                                document.getElementById('monitor-link').onclick=
+                                        function() {
+                                            window.open('http://"+location.hostname+":15672/#/', '_blank')
+                                        }
 
                             }
                         }
