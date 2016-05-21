@@ -8,7 +8,7 @@ from manager_rpc import ManagerRpc
 
 class ZeroRpcServer():
 
-    def __init__(self, server_address="tcp://0.0.0.0:4242", pool_size = 50):
+    def __init__(self, server_address="tcp://0.0.0.0:4242", pool_size = 25):
         print 'ZeroRPC instance'
         self.s = zerorpc.Server(ManagerRpc(), pool_size=pool_size)  # numero de cpu
         print 'ZeroRPC bind'
