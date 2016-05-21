@@ -19,5 +19,5 @@
 # not valid
 {hostname: "ast1", ip:"0.0.0.0", profile: "backupsample", logging: "milax", cred_stacksync: "aaa"}
 
-{hostname: "ast03", ip:"10.30.103.95", logging: "milax", cred_stacksync: "None", "cred_dropbox": "ast.test2@hotmail.com:lab144" }
-{hostname: "ast13", ip:"10.30.103.232", logging: "milax", cred_stacksync: "None", "cred_dropbox": "ast.test1@hotmail.com:lab144" }
+{"hostname": "ast03", "ip":"10.30.103.95", "logging": "milax",  "cred_dropbox": "ast.test2@hotmail.com:lab144" }
+{"hostname": "ast13", "ip":"10.30.103.232", "logging": "milax",  "cred_dropbox": "ast.test1@hotmail.com:lab144" }
