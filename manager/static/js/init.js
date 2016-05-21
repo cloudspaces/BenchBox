@@ -469,7 +469,7 @@ testConnection = function (ip, port, cb) {
     // if i dont need to use the failure  function they recommend me to use post or get
     console.log("Get list");
     $.ajax({
-        url: 'http://localhost:' + location.port + '/rpc/nmap',
+        url: 'http://'+location.hostname+':' + location.port + '/rpc/nmap',
         contentType: "application/json; charset=utf-8",
         data: {data: ip + ' ' + port},
         dataType: 'json',
