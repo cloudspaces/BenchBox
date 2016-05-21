@@ -18,7 +18,26 @@
 {"hostname": "ast", "ip":"0.0.0.0", "profile": "backupsample", "logging": "milax", "cred_stacksync": "aaa"}
 
 
-{hostname: "ast03", ip:"10.30.103.95", logging: "milax", cred_stacksync: "None", "cred_dropbox": "ast.test2@hotmail.com:lab144" }
+{"hostname": "d101", "ip":"10.21.1.1", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d101@outlook.com:salou2010" }
+{"hostname": "d102", "ip":"10.21.1.2", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d102@outlook.com:salou2010" }
+{"hostname": "d103", "ip":"10.21.1.3", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d103@outlook.com:salou2010" }
+{"hostname": "d104", "ip":"10.21.1.4", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d104@outlook.com:salou2010" }
+{"hostname": "d105", "ip":"10.21.1.5", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d105@outlook.com:salou2010" }
+{"hostname": "d106", "ip":"10.21.1.6", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d106@outlook.com:salou2010" }
+{"hostname": "d107", "ip":"10.21.1.7", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d107@outlook.com:salou2010" }
+{"hostname": "d108", "ip":"10.21.1.8", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d108@outlook.com:salou2010" }
+{"hostname": "d109", "ip":"10.21.1.9", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d109@outlook.com:salou2010" }
+{"hostname": "d110", "ip":"10.21.1.10", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d110@outlook.com:salou2010" }
+{"hostname": "d111", "ip":"10.21.1.11", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d111@outlook.com:salou2010" }
+{"hostname": "d112", "ip":"10.21.1.12", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d112@outlook.com:salou2010" }
+{"hostname": "d113", "ip":"10.21.1.13", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d113@outlook.com:salou2010" }
+{"hostname": "d114", "ip":"10.21.1.14", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d114@outlook.com:salou2010" }
+{"hostname": "d115", "ip":"10.21.1.15", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d115@outlook.com:salou2010" }
+{"hostname": "d116", "ip":"10.21.1.16", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d116@outlook.com:salou2010" }
+{"hostname": "d117", "ip":"10.21.1.17", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d117@outlook.com:salou2010" }
+{"hostname": "d118", "ip":"10.21.1.18", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d118@outlook.com:salou2010" }
+{"hostname": "d119", "ip":"10.21.1.19", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d119@outlook.com:salou2010" }
+{"hostname": "d120", "ip":"10.21.1.20", "logging": "milax", "cred_stacksync": "None", "cred_dropbox": "benchbox.d120@outlook.com:salou2010" }
 
 
 # not valid
