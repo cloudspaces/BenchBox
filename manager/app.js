@@ -282,8 +282,11 @@ amqp.connect(amqp_url, function (err, conn) {
                 var tags = data.tags;
                 var point = metrics;
                 var hostname = msg.fields.routingKey;
+                tags['hostname'] = hostname;
+                var measurement = "benchbox";
+
                 if (influxClientMetricsReady) {
-                    influxClientMetrics.writePoint(hostname, point, tags, function () {
+                    influxClientMetrics.writePoint(measurement, point, tags, function () {
                         console.log("done writing [" + hostname+ "]: cpu["+metrics.cpu +"] ram["+metrics.ram+"], hdd["+metrics.disk+"], net[out("+metrics.bytes_sent+")/in("+metrics.bytes_recv+")]");
 
                         /*
