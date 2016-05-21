@@ -541,7 +541,7 @@ queryDownloadInfluxMeasurement = function (measurement) {
     }else{
         influx_query = "select * from benchbox where hostname = '" + measurement + "'";
     }
-
+    console.log(influx_query)
     $.ajax({
         url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
         data: {query: influx_query},
@@ -552,11 +552,13 @@ queryDownloadInfluxMeasurement = function (measurement) {
             // download json as csv file
             console.log("influx response: ");
             $.notify("Success influx query", 'success');
-            // console.log(data);
+            console.log(data);
             var milliseconds = (new Date).getTime();
             var withHeader = true;
             var output_name = "report_" + measurement + "_" + milliseconds;
             JSONToCSVConvertor(data[0], output_name, withHeader);
+            console.log("JSONToCSVConverter end")
+            // there is a limit to the size...
         },
         error: function (err) {
             console.log(err);
@@ -567,7 +569,7 @@ queryDownloadInfluxMeasurement = function (measurement) {
 queryDropInfluxMeasurement = function (measurement) {
     $.ajax({
         url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
-        data: {query: "drop measurement from benchbox where hostname = '" + measurement + "'"},
+        data: {query: "drop series from benchbox where hostname = '" + measurement + "'"},
         timeout: 6000000,
         dataType: 'json',
         type: 'GET',

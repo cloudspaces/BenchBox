@@ -113,3 +113,4 @@ workload_generator/user_stereotypes/backupsample_old.txt
 workload_generator/fitting
 .debris
 manager/Vagrantfile.old.rb
+manager/results/*
