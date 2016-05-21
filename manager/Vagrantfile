@@ -11,7 +11,8 @@ echo "I am provisioning... Manager node"
 echo `pwd`
 date > /etc/vagrant_provisioned_at
 echo "Start manager services"
-nohup /bin/bash /vagrant/manager.start.sh  &> /vagrant/nohup_manager.out&
+# nohup /bin/bash /vagrant/manager.start.sh  &> /vagrant/nohup_manager.out&
+/vagrant/manager.start.sh
 echo "[http://localhost:8888/load#/]"
 
 SCRIPT
