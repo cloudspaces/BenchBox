@@ -23,8 +23,10 @@ var influxServerMetrics = influx(constants.influx.server_metrics);
 var influxClientMetricsReady = false;
 var influxServerMetricsReady = false;
 influxClientMetrics.getDatabaseNames(function (err, arrDBS) {
-    if (err)
+    if (err) {
+        console.log("InfluxDB failed to START")
         throw err;
+    }
     if (arrDBS.indexOf(constants.influx.client_metrics.database) > -1) {
         console.log("Database [" + constants.influx.client_metrics.database + "] ready!");
         influxClientMetricsReady = true;
