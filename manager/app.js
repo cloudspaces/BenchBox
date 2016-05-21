@@ -248,11 +248,12 @@ amqp.connect(amqp_url, function (err, conn) {
                 var tags = data.tags;
                 var point = metrics;
                 var hostname = msg.fields.routingKey; // measurement goes here
-
+                tags['hostname'] = hostname;
+                var measurement = "benchbox";
                 if (influxServerMetricsReady){
                     console.log("write server metrics to influx");
                     // write server metrics
-                    influxServerMetrics.writePoint(hostname, point, tags, function () {
+                    influxServerMetrics.writePoint(measurement, point, tags, function () {
                         // succeed write back
                     });
                 }
