@@ -162,9 +162,11 @@ block content
                             if (ip.indexOf("10.") == 0) {
                                 console.log(ip);
                                 // manager-ip
+                                // rabbitmq - amqp
+
                                 $('#manager-ip')[0].value = ip
                                 $('#rabbitmq-amqp')[0].value = "amqp://benchbox:benchbox@" + ip + "/"
-                                // rabbitmq - amqp
+
                             } else {
                                 console.log("Skipped", ip);
 
@@ -172,13 +174,18 @@ block content
                         }
                 );
 
+                if (location.hostname !== 'localhost') {
+                    $('#manager-ip')[0].value = location.hostname
+                    $('#rabbitmq-amqp')[0].value = "amqp://benchbox:benchbox@" + location.hostname + "/"
+                }
+
                 $('#grafana-link').click(
                         function () {
-                            window.open('http://'+location.hostname+':3000/dashboard/db/benchbox', '_blank');
+                            window.open('http://' + location.hostname + ':3000/dashboard/db/benchbox', '_blank');
                         })
                 $('#rabbit-link').click(
                         function () {
-                            window.open('http://'+location.hostname+':15672/#/', '_blank')
+                            window.open('http://' + location.hostname + ':15672/#/', '_blank')
                         })
 
             })
