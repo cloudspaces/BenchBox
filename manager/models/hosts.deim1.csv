@@ -15,7 +15,7 @@
 
 
 # valid
-{"hostname": "ast", "ip":"0.0.0.0", "profile": "backupsample", "logging": "milax", "cred_stacksync": "aaa"}
+# {"hostname": "ast", "ip":"0.0.0.0", "profile": "backupsample", "logging": "milax", "cred_stacksync": "aaa"}
 
 
 {"hostname": "d101", "ip":"10.21.1.1", "logging": "milax", "cred_stacksync": "dd27721b-9db7-4dbe-9fca-f86e79eb6a7b,demo1,AUTH_47f13d9fe178438580ffb08ddca763a4,stacksync_230edffc_demo1,demo1@stacksync.org", "cred_dropbox": "benchbox.d101@outlook.com:salou2010" }
@@ -41,4 +41,4 @@
 
 
 # not valid
-{hostname: "ast1", ip:"0.0.0.0", profile: "backupsample", logging: "milax", cred_stacksync: "aaa"}
+# {hostname: "ast1", ip:"0.0.0.0", profile: "backupsample", logging: "milax", cred_stacksync: "aaa"}
