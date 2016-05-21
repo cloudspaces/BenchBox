@@ -164,7 +164,7 @@ block content
                                 // manager-ip
                                 // rabbitmq - amqp
 
-                                if (location.hostname == 'localhost') {
+                                if (location.hostname !== 'localhost') {
                                     $('#manager-ip')[0].value = location.hostname
                                     $('#rabbitmq-amqp')[0].value = "amqp://benchbox:benchbox@" + location.hostname + "/"
                                 }else {
