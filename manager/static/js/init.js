@@ -497,7 +497,7 @@ testConnection = function (ip, port, cb) {
 queryDownloadInfluxMeasurement = function (measurement) {
     console.log("Download measurement: ", measurement);
     $.ajax({
-        url: 'http://localhost:' + location.port + "/influx/query",
+        url: 'http://'+location.hostname+':' + location.port + "/influx/query",
         data: {query: "select * from " + measurement},
         timeout: 6000000,
         type: 'GET',
@@ -520,7 +520,7 @@ queryDownloadInfluxMeasurement = function (measurement) {
 };
 queryDropInfluxMeasurement = function (measurement) {
     $.ajax({
-        url: 'http://localhost:' + location.port + "/influx/query",
+        url: 'http://'+location.hostname+':' + location.port + "/influx/query",
         data: {query: "drop measurement " + measurement},
         timeout: 6000000,
         dataType: 'json',
@@ -557,7 +557,7 @@ rmqHost = function (host, cmd, cb) {
     //console.log("ARGS::::::");
     //console.log(args);
     $.ajax({
-        url: 'http://localhost:' + location.port + '/rmq/emit',
+        url: 'http://'+location.hostname+':' + location.port + '/rmq/emit',
         data: args,
         timeout: 6000000, // 6000s ::100min
         type: 'GET',
@@ -592,7 +592,7 @@ rpcHost = function (host, cmd, cb) {
     appendAllParams(args, 'bb-config');
     appendAllHosts(args, 'bb-hosts');
     $.ajax({
-        url: 'http://localhost:' + location.port + '/rpc/rpc',
+        url: 'http://'+location.hostname+':' + location.port + '/rpc/rpc',
         data: args,
         timeout: 6000000, // 6000s ::100min
         type: 'GET',
@@ -638,7 +638,7 @@ notifyButtonById = function (btnId) {
     // self
 };
 
-$.fn.graphite.defaults.url = "https://localhost:8443/renderer/";
+$.fn.graphite.defaults.url = "https://"+location.hostname+":8443/renderer/";
 $.fn.graphite.defaults.width = "450";
 $.fn.graphite.defaults.height = "300";
 
