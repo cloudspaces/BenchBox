@@ -235,6 +235,12 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 // invoke ajax request to the node server, the server does influx query and returns the result as ajax response.
             };
 
+
+
+            $scope.getAllMetrics = function(){
+                queryDownloadInfluxMeasurement()
+            };
+
             $scope.resetMetrics = function (index) {
 
                 if (index == 'test-check') {
@@ -528,9 +534,17 @@ testConnection = function (ip, port, cb) {
 
 queryDownloadInfluxMeasurement = function (measurement) {
     console.log("Download measurement: ", measurement);
+    var influx_query;
+    if(measurement == undefined){
+        measurement = "all";
+        influx_query = "select * from benchbox ";
+    }else{
+        influx_query = "select * from benchbox where hostname = '" + measurement + "'";
+    }
+
     $.ajax({
         url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
-        data: {query: "select * from benchbox where hostname = '" + measurement + "'"},
+        data: {query: influx_query},
         timeout: 6000000,
         type: 'GET',
         dataType: 'json',
