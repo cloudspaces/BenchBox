@@ -156,7 +156,7 @@ block content
 
         // console.log(MY IP)
         script.
-            $(document).ready(function(){
+            $(document).ready(function () {
                 getIPs(
                         function (ip) {
                             if (ip.indexOf("10.") == 0) {
@@ -168,16 +168,17 @@ block content
                             } else {
                                 console.log("Skipped", ip);
 
-                                document.getElementById('grafana-link').onclick =
-                                        function() {
-                                            window.open('http://"+location.hostname+":3000/dashboard/db/benchbox', '_blank');
-                                        }
-                                document.getElementById('monitor-link').onclick=
-                                        function() {
-                                            window.open('http://"+location.hostname+":15672/#/', '_blank')
-                                        }
-
                             }
                         }
                 );
+
+                $('#grafana-link').click(
+                        function () {
+                            window.open('http://"+location.hostname+":3000/dashboard/db/benchbox', '_blank');
+                        })
+                $('#monitor-link').click(
+                        function () {
+                            window.open('http://"+location.hostname+":15672/#/', '_blank')
+                        })
+
             })
