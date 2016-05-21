@@ -109,8 +109,13 @@ class Commands(object):
             time.sleep(5)
             if self.client_running is False:
                 # call client && update pid
+                try_start = 10
                 while self.client_running is False:
                     self.sync_proc = subprocess.Popen(str_cmd, shell=True)
+                    try_start-=1
+                    if try_start == 0:
+                        print "Unable to start {}".format(self.personal_cloud)
+                        break
                     time.sleep(3)
                     try:
                         if proc_name == "owncloudsync":
