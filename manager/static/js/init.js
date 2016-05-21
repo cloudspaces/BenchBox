@@ -221,11 +221,29 @@ angular.module('app', ['ngRoute', 'ngResource'])
             };
 
             $scope.resetMetrics = function (index) {
-                var host = $scope.hosts[index];
-                console.log(host);
-                //
-                console.log("Drop measurement: ", host.hostname);
-                queryDropInfluxMeasurement(host.hostname);
+
+                if (index == 'test-check') {
+                    // lookup in checkbox
+                    $('.' + index).each(function () {
+                        // console.log(this)
+                        if ($(this).prop('checked')) {
+                            var checkedId = this.value;
+                            /*
+                            var host = $scope.hosts.filter(function (item) {
+                                return item._id == checkedId
+                            });
+                            */
+                            queryDropInfluxMeasurement(this.name)
+                        }
+                    })
+                } else {
+                    var host = $scope.hosts[index];
+                    console.log(host);
+                    //
+                    console.log("Drop measurement: ", host.hostname);
+                    queryDropInfluxMeasurement(host.hostname);
+                }
+
 
             };
 
@@ -300,8 +318,8 @@ angular.module('app', ['ngRoute', 'ngResource'])
                         return;
                         break;
                 }
-                console.log($scope.run.testClient);
-                console.log($scope.run.testFolder);
+                // console.log($scope.run.testClient);
+                // console.log($scope.run.testFolder);
 
                 if (cmd == 'execute') {
                     cmd = $scope.run.testOperation; // esto no existe.
@@ -344,8 +362,8 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
                 })
 
-
             };
+
 
             $scope.startStop = function () {
                 console.log("START & STOP click");
@@ -469,7 +487,7 @@ testConnection = function (ip, port, cb) {
     // if i dont need to use the failure  function they recommend me to use post or get
     console.log("Get list");
     $.ajax({
-        url: 'http://'+location.hostname+':' + location.port + '/rpc/nmap',
+        url: 'http://' + location.hostname + ':' + location.port + '/rpc/nmap',
         contentType: "application/json; charset=utf-8",
         data: {data: ip + ' ' + port},
         dataType: 'json',
@@ -497,7 +515,7 @@ testConnection = function (ip, port, cb) {
 queryDownloadInfluxMeasurement = function (measurement) {
     console.log("Download measurement: ", measurement);
     $.ajax({
-        url: 'http://'+location.hostname+':' + location.port + "/influx/query",
+        url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
         data: {query: "select * from " + measurement},
         timeout: 6000000,
         type: 'GET',
@@ -520,8 +538,8 @@ queryDownloadInfluxMeasurement = function (measurement) {
 };
 queryDropInfluxMeasurement = function (measurement) {
     $.ajax({
-        url: 'http://'+location.hostname+':' + location.port + "/influx/query",
-        data: {query: "drop measurement " + measurement},
+        url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
+        data: {query: "drop measurement from benchbox where hostname = '" + measurement+ "'"},
         timeout: 6000000,
         dataType: 'json',
         type: 'GET',
@@ -557,7 +575,7 @@ rmqHost = function (host, cmd, cb) {
     //console.log("ARGS::::::");
     //console.log(args);
     $.ajax({
-        url: 'http://'+location.hostname+':' + location.port + '/rmq/emit',
+        url: 'http://' + location.hostname + ':' + location.port + '/rmq/emit',
         data: args,
         timeout: 6000000, // 6000s ::100min
         type: 'GET',
@@ -592,7 +610,7 @@ rpcHost = function (host, cmd, cb) {
     appendAllParams(args, 'bb-config');
     appendAllHosts(args, 'bb-hosts');
     $.ajax({
-        url: 'http://'+location.hostname+':' + location.port + '/rpc/rpc',
+        url: 'http://' + location.hostname + ':' + location.port + '/rpc/rpc',
         data: args,
         timeout: 6000000, // 6000s ::100min
         type: 'GET',
@@ -638,7 +656,7 @@ notifyButtonById = function (btnId) {
     // self
 };
 
-$.fn.graphite.defaults.url = "https://"+location.hostname+":8443/renderer/";
+$.fn.graphite.defaults.url = "https://" + location.hostname + ":8443/renderer/";
 $.fn.graphite.defaults.width = "450";
 $.fn.graphite.defaults.height = "300";
 
