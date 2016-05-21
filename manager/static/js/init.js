@@ -516,7 +516,7 @@ queryDownloadInfluxMeasurement = function (measurement) {
     console.log("Download measurement: ", measurement);
     $.ajax({
         url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
-        data: {query: "select * from " + measurement},
+        data: {query: "select * from benchbox where hostname = '" + measurement+"'"},
         timeout: 6000000,
         type: 'GET',
         dataType: 'json',
