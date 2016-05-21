@@ -84,6 +84,9 @@
         <button class="btn btn-default" ng-click="resetMetrics('test-check')"
                 title="Clean metrics from influxDB of the selected hosts">Reset Metrics
         </button>
+        <button class="btn btn-default" ng-click="getMetrics('test-check')"
+                title="Download metrics from influxDB of the selected hosts">Download Metrics
+        </button>
 
         <!--
         <button class="btn btn-default " ng-click="rpc('test-check','monitorUp')" title="Run Socket Listener at dummy machine, sandBox">Listen</button>
@@ -366,8 +369,8 @@
                             <button class="btn btn-xs btn-info" ng-show="!editing[host._id]">more</button>
                         </a>
                         <button class="btn btn-xs" ng-click="ping($index)">Ping</button>
-                        <button class="btn btn-xs" ng-click="getMetrics($index)">Download</button>
-                        <button class="btn btn-xs" ng-click="resetMetrics($index)">ResetMetrics</button>
+                        <button class="btn btn-xs" ng-click="getMetrics($index)">DownloadMetric</button>
+                        <button class="btn btn-xs" ng-click="resetMetrics($index)">ResetMetric</button>
                         <!--
                         <button class="btn btn-xs" ng-click="resetStatus($index)">ResetStatus</button>
                         -->

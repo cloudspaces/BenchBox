@@ -211,12 +211,27 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
 
             $scope.getMetrics = function (index) {
-                var host = $scope.hosts[index];
-                console.log(host);
-                //
-                console.log("Download the metrics of this host: ", host.hostname);
-                queryDownloadInfluxMeasurement(host.hostname);
 
+                if (index == 'test-check') {
+                    // lookup in checkbox
+                    $('.' + index).each(function () {
+                        // console.log(this)
+                        if ($(this).prop('checked')) {
+                            /*
+                             var checkedId = this.value;
+                             var host = $scope.hosts.filter(function (item) {
+                             return item._id == checkedId
+                             });
+                             */
+                            queryDownloadInfluxMeasurement(this.name)
+                        }
+                    })
+                } else {
+                    var host = $scope.hosts[index];
+                    console.log(host);
+                    console.log("Download the metrics of this host: ", host.hostname);
+                    queryDownloadInfluxMeasurement(host.hostname);
+                }
                 // invoke ajax request to the node server, the server does influx query and returns the result as ajax response.
             };
 
@@ -227,19 +242,18 @@ angular.module('app', ['ngRoute', 'ngResource'])
                     $('.' + index).each(function () {
                         // console.log(this)
                         if ($(this).prop('checked')) {
-                            var checkedId = this.value;
                             /*
-                            var host = $scope.hosts.filter(function (item) {
-                                return item._id == checkedId
-                            });
-                            */
+                             var checkedId = this.value;
+                             var host = $scope.hosts.filter(function (item) {
+                             return item._id == checkedId
+                             });
+                             */
                             queryDropInfluxMeasurement(this.name)
                         }
                     })
                 } else {
                     var host = $scope.hosts[index];
                     console.log(host);
-                    //
                     console.log("Drop measurement: ", host.hostname);
                     queryDropInfluxMeasurement(host.hostname);
                 }
@@ -516,7 +530,7 @@ queryDownloadInfluxMeasurement = function (measurement) {
     console.log("Download measurement: ", measurement);
     $.ajax({
         url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
-        data: {query: "select * from benchbox where hostname = '" + measurement+"'"},
+        data: {query: "select * from benchbox where hostname = '" + measurement + "'"},
         timeout: 6000000,
         type: 'GET',
         dataType: 'json',
@@ -539,7 +553,7 @@ queryDownloadInfluxMeasurement = function (measurement) {
 queryDropInfluxMeasurement = function (measurement) {
     $.ajax({
         url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
-        data: {query: "drop measurement from benchbox where hostname = '" + measurement+ "'"},
+        data: {query: "drop measurement from benchbox where hostname = '" + measurement + "'"},
         timeout: 6000000,
         dataType: 'json',
         type: 'GET',
