@@ -56,11 +56,11 @@ block content
                         a(data-toggle='pill' href='#configHosts') Hosts
                     li
                         // a(data-toggle='pill' href='#configMonitor') Monitor
-                        a(data-toggle='pill' id="grafana-link" onclick="window.open('http://localhost:3000/dashboard/db/benchbox', '_blank')") Monitor
+                        a(data-toggle='pill' id="grafana-link") Monitor
 
                     li
                         // a(data-toggle='pill' href='#configRabbit') RabbitMQ
-                        //a(data-toggle='pill' id="rabbit-link" onclick="window.open('http://localhost:15672/#/', '_blank')") Rabbit
+                        a(data-toggle='pill' id="rabbit-link") Rabbit
 
                     //    li
                             a(data-toggle='pill' href='#configInflux') InfluxDB
@@ -168,8 +168,8 @@ block content
                             } else {
                                 console.log("Skipped", ip);
 
-
-
+                                document.getElementById('grafana-link').onclick= window.open('http://"+location.hostname+":3000/dashboard/db/benchbox', '_blank');
+                                document.getElementById('monitor-link').onclick= window.open('http://"+location.hostname+":15672/#/', '_blank')
 
                             }
                         }
