@@ -164,9 +164,13 @@ block content
                                 // manager-ip
                                 // rabbitmq - amqp
 
-                                $('#manager-ip')[0].value = ip
-                                $('#rabbitmq-amqp')[0].value = "amqp://benchbox:benchbox@" + ip + "/"
-
+                                if (location.hostname == 'localhost') {
+                                    $('#manager-ip')[0].value = location.hostname
+                                    $('#rabbitmq-amqp')[0].value = "amqp://benchbox:benchbox@" + location.hostname + "/"
+                                }else {
+                                    $('#manager-ip')[0].value = ip
+                                    $('#rabbitmq-amqp')[0].value = "amqp://benchbox:benchbox@" + ip + "/"
+                                }
                             } else {
                                 console.log("Skipped", ip);
 
@@ -174,10 +178,7 @@ block content
                         }
                 );
 
-                if (location.hostname !== 'localhost') {
-                    $('#manager-ip')[0].value = location.hostname
-                    $('#rabbitmq-amqp')[0].value = "amqp://benchbox:benchbox@" + location.hostname + "/"
-                }
+
 
                 $('#grafana-link').click(
                         function () {
