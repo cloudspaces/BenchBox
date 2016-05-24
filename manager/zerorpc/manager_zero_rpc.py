@@ -22,6 +22,7 @@ class ManagerZeroRpc:
             'cred_dropbox': args['cred_dropbox'][0],
             'profile': args['profile'][0],
             'stacksync-ip': args['stacksync-ip'][0],
+            'stacksync-port': args['stacksync-port'][0],
             'owncloud-ip': args['owncloud-ip'][0],
             'impala-ip': args['impala-ip'][0],
             'graphite-ip': args['graphite-ip'][0],
@@ -74,6 +75,7 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
               "echo '{}' > hostname; " \
               "" \
               "echo '{}' > ss.stacksync.ip; " \
+              "echo '{}' > ss.stacksync.port; " \
               "echo '{}' > ss.owncloud.ip; " \
               "echo '{}' > log.impala.ip; " \
               "echo '{}' > log.graphite.ip; " \
@@ -86,7 +88,8 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
                         h['passwd'],
                         h['rabbit-url'], h['profile'],
                         h['cred_stacksync'], h['cred_owncloud'], h['cred_dropbox'], h['hostname'],
-                        h['stacksync-ip'], h['owncloud-ip'], h['impala-ip'], h['graphite-ip'],
+                        h['stacksync-ip'], h['stacksync-port'],
+                        h['owncloud-ip'], h['impala-ip'], h['graphite-ip'],
                         h['passwd'])
 
     print 'sendQuery...'
