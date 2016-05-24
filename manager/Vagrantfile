@@ -17,8 +17,8 @@ echo "[http://localhost:8888/load#/]"
 
 SCRIPT
 
-box_memory = "1024"
-box_cpu = "1"
+box_memory = "4096"
+box_cpu = "2"
 
 Vagrant.configure(2) do |config|
     # The most common configuration options are documented and commented below.
