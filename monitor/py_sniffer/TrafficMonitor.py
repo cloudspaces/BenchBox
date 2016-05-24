@@ -31,7 +31,8 @@ class TrafficMonitor(Thread):
         # Thread.__init__(self)
         # pcapy.findalldevs() @ displays available network interfaces
         self.is_reporter = reporter     # enable reporting thread to get values on under demand
-        self.sync_server_ip = server    # private syncronization server IP
+        # if server is hostname format cast it to ip
+        self.sync_server_ip = socket.gethostbyname(server)    # private syncronization server IP
         self.sync_server_port= port
         self.desktop_client = client    # syncronization service name
         self.decoder = EthDecoder()     # packet decoder
