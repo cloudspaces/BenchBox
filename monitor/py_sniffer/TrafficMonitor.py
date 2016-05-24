@@ -21,10 +21,10 @@ Thread que envia metainformacion de los paquetes por rabbit al manager
 
 class TrafficMonitor(Thread):
 
-    def __init__(self, iface="eth0", read_timeout=100, promiscuous=False, max_bytes=65535, packet_limit=-1, client="dropbox", server=None, reporter=False):
+    def __init__(self, iface="eth0", read_timeout=100, promiscuous=False, max_bytes=65535, packet_limit=-1, client="dropbox", server=None, port=None, reporter=False):
 
         if client.lower() == "stacksync" and server is None:
-            print "server='server_ip' is required!"
+            print "server='server_ip' & port='server_port' are required!"
             sys.exit()
         super(TrafficMonitor, self).__init__()
         # to_ms # means buffering and lowering the amount of reads until filling the buffer or the timeout occurs instead of reading inmediately
@@ -32,6 +32,7 @@ class TrafficMonitor(Thread):
         # pcapy.findalldevs() @ displays available network interfaces
         self.is_reporter = reporter     # enable reporting thread to get values on under demand
         self.sync_server_ip = server    # private syncronization server IP
+        self.sync_server_port= port
         self.desktop_client = client    # syncronization service name
         self.decoder = EthDecoder()     # packet decoder
         self.max_bytes = max_bytes      # maximum bytes ?
@@ -194,7 +195,7 @@ class TrafficMonitor(Thread):
 
         filter_ports = {
             "dropbox": ["443"],  # ssl connection, serverside data and metadata
-            "stacksync": ["5672",   # rabbit
+            "stacksync": [self.sync_server_port,   # rabbit
                           "5000",   # login
                           "8080"],   # data => swift
             "mega": ["443"],  # habria que comprobar que puertos utilizan, pero vamos a suponer que son todos 443
