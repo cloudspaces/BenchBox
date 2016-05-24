@@ -84,7 +84,7 @@ cat > $FILE <<- EOM
     <rabbitMQ>
         <host>$sync_server_ip</host>
 
-        <port>sync_server_port</port>
+        <port>$sync_server_port</port>
         <enableSSL>false</enableSSL>
 
         <username>guest</username>
