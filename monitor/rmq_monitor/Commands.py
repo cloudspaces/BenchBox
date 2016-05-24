@@ -37,6 +37,7 @@ class Commands(object):
         self.sync_proc = None
         self.personal_cloud = None  # personal cloud
         self.personal_cloud_ip = None
+        self.personal_cloud_port = None
         self.executor_state = "Unknown"  # state +  time
 
     def hello(self, body):
@@ -65,7 +66,8 @@ class Commands(object):
                 hostname=self.hostname,
                 personal_cloud={
                     "name": self.personal_cloud,
-                    "ip": self.personal_cloud_ip
+                    "ip": self.personal_cloud_ip,
+                    "port": self.personal_cloud_port
                 },
                 receipt=self.stereotype)
 
@@ -159,6 +161,7 @@ class Commands(object):
             self.personal_cloud = body['msg']['test']['testClient']
             try:
                 self.personal_cloud_ip = body['msg']['{}-ip'.format(self.personal_cloud.lower())]
+                self.personal_cloud_port = body['msg']['{}-port'.format(self.personal_cloud.lower())]
             except:
                 print "Its not private cloud"
             self.stereotype = body['msg']['test']['testProfile']  # if its defined then this will be loaded

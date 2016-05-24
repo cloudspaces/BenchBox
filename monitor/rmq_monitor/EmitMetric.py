@@ -16,6 +16,7 @@ class EmitMetric(object):
     def __init__(self, hostname="", personal_cloud="", receipt=""):
 
         self.personal_cloud_ip = personal_cloud["ip"]
+        self.personal_cloud_port = personal_cloud["port"]
         self.personal_cloud = personal_cloud["name"]
         self.receipt = receipt
         pc_folders = {
@@ -26,7 +27,7 @@ class EmitMetric(object):
         }
 
         # when capturing from private sync server's its server ip must be forwarded
-        self.traffic_monitor = TrafficMonitor(client=self.personal_cloud.lower(), server=self.personal_cloud_ip)
+        self.traffic_monitor = TrafficMonitor(client=self.personal_cloud.lower(), server=self.personal_cloud_ip, port=self.personal_cloud_port)
         self.traffic_monitor.run() # intermediari que arranca trafficMonitor i permet realitzar get stats sobre la marcha o reiniciar el monitoreig
         self.personal_folder = pc_folders[self.personal_cloud.lower()]
 
