@@ -12,4 +12,3 @@ models/Metrics.js
 static/json/influx_line.json
 static/json/data1.json
 static/json/data.json
-static/json/config.json
