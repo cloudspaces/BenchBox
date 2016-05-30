@@ -1,0 +1,26 @@
+state_chain,Online,Offline,1,lognorm,{'scale':1099.92799769,'loc':2.8638}
+state_chain,Offline,Online,1,lognorm,{'scale':7269.91588275,'loc':2.0881}
+state_chain,Offline,Active,1,lognorm,{'scale':7269.91588275,'loc':2.0881}
+state_chain,Active,Offline,1,lognorm,{'scale':1099.92799769,'loc':2.8638}
+operation_chain,MoveResponse,MoveResponse,26,genextreme,{'shape':-0.5553899355,'scale':664.6122657,'loc':790.2330496}
+operation_chain,MoveResponse,PutContentResponse,603,genextreme,{'shape':-1.143005724,'scale':3064.669465,'loc':2465.709164}
+operation_chain,MoveResponse,Unlink,75,genextreme,{'shape':-1.414773947,'scale':2037.926431,'loc':1355.180891}
+operation_chain,PutContentResponse,MoveResponse,10570,invgauss,{'shape':1207000.423,'scale':10111.54133}
+operation_chain,PutContentResponse,PutContentResponse,65,genextreme,{'shape':-1.93355691,'scale':4543.320179,'loc':2319.664339}
+operation_chain,PutContentResponse,Unlink,313,lognorm,{'loc':10.9934717,'scale':2.619831503}
+operation_chain,Unlink,MoveResponse,346,genextreme,{'shape':-1.28894022,'scale':1517.894896,'loc':1147.190787}
+operation_chain,Unlink,PutContentResponse,54,invgauss,{'shape':81487.62963,'scale':1689.025376}
+operation_chain,Unlink,Unlink,1409403,genextreme,{'shape':-0.1245146548,'scale':554.6863389,'loc':811.0954674}
+activity_distribution,genpareto,{'shape':3.02809764917398,'scale':0.0664626786932026,'threshold':0.027999999932897}
+stereotype_file_types_probabilities,{'image' : 0.178328384009,'application' : 0.415693889931,'text' : 0.135906122756,'audio' : 0.0992809537592,'chemical' : 0.00254643708147,'video' : 0.167950424822,'message' : 0.000293787640302}
+stereotype_file_types_extensions,{'application' : ['.php','.pdf','.js','.java','.xml'],'audio' : ['.mp3','.ogg','.wav'],'chemical' : ['.pdb','.cdx','.cif','.rdfile'],'image' : ['.jpeg','.png','.gif','.tiff','.svg'],'message' : ['.eml'],'text' : ['.html','.txt','.css','.java'],'video' : ['.mp4','.3gpp','.flv']}
+file_types_sizes,{'audio': ('genpareto', {'shape':3.776394061,'scale':67176.96527,'threshold':-2.220446049e-15}),'application': ('genextreme',{'shape':-2.175808047,'scale':7600.106019,'loc':3420.754429}),'chemical': ('genextreme', {'shape':-3.357263465,'scale':6444.227397,'loc':1915.617574}),'image': ('genextreme', {'shape':-2.576589721,'scale':10463.33809,'loc':4039.572743}),'message': ('genpareto',{'shape':2.194836697,'scale':4794.324632,'threshold':-2.220446049e-15}),'text': ('genpareto', {'shape':1.233440844,'scale':2869.775258,'threshold':-2.220446049e-15}),'video': ('genpareto', {'shape':2.363544621,'scale':2469412.755,'threshold':-2.220446049e-1})}
+file_update_location_probabilities,{'B':0.38, 'E': 0.03, 'M': 0.08, 'BE': 0.1, 'BM': 0.11, 'ME': 0.01, 'BEM': 0.29}
+directory_count_distribution,randint,{'low':1,'high':50}
+file_size_distribution,audio,genpareto,{'shape':3.776394061,'scale':67176.96527,'threshold':-2.220446049e-15}
+file_size_distribution,application,genextreme,{'shape':-2.175808047,'scale':7600.106019,'loc':3420.754429}
+file_size_distribution,chemical,genextreme,{'shape':-3.357263465,'scale':6444.227397,'loc':1915.617574}
+file_size_distribution,image,genextreme,{'shape':-2.576589721,'scale':10463.33809,'loc':4039.572743}
+file_size_distribution,message,genpareto,{'shape':2.194836697,'scale':4794.324632,'threshold':-2.220446049e-15}
+file_size_distribution,text,genpareto,{'shape':1.233440844,'scale':2869.775258,'threshold':-2.220446049e-15}
+file_size_distribution,video,genpareto,{'shape':2.363544621,'scale':2469412.755,'threshold':-2.220446049e-1}

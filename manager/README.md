@@ -1,6 +1,26 @@
 # managerGUI
 
 
+# prerequisite:
+
+have the following ports free:
+* config.vm.network "forwarded_port", guest: 8888, host: 8888 # manager web interface
+* config.vm.network "forwarded_port", guest: 5672, host: 5672 # rabbitmq
+* config.vm.network "forwarded_port", guest: 15672, host: 15672 # webinterface rabbitmq
+* config.vm.network "forwarded_port", guest: 3000, host: 3000 # grafana server
+* config.vm.network "forwarded_port", guest: listens in port 8083 (web) and 8086 (HTTP API).
+# depencies:
+
+* nodejs 4.3.4
+
+
+# info
+
+rabbitmq management:
+http://localhost:15672/#/
+* user: test
+* pass: test
+
 
 # issue at installing
 ## nodejs npm dependency:

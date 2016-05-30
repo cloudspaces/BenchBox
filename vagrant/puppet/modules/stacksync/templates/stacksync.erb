@@ -11,7 +11,7 @@ fi
 
 if [ $# -eq 0 ]
 then
-echo 'start stackyncClient'
+echo 'start stacksyncClient'
 cd /usr/lib/stacksync/
 java -jar Stacksync.jar -d -c <%= @confdir %> & echo $!
 lastPid=$!

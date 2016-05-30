@@ -43,14 +43,14 @@ if which vagrant; then
 		# 64-bit stuff here
 		if [ ! -f vagrant_1.7.3_x86_64.deb ]
 		then
-	    wget https://dl.bintray.com/mitchellh/vagrant/vagrant_1.7.3_x86_64.deb;
+	    wget https://releases.hashicorp.com/vagrant/1.7.3/vagrant_1.7.3_x86_64.deb;
 	    fi
 		sudo dpkg -i vagrant_1.7.3_x86_64.deb
 	else
 		# 32-bit stuff here
 		if [ ! -f vagrant_1.7.3_i686.deb ]
 		then
-	    wget https://dl.bintray.com/mitchellh/vagrant/vagrant_1.7.3_i686.deb;
+	    wget https://releases.hashicorp.com/vagrant/1.7.3/vagrant_1.7.3_i686.deb;
 	    fi
 		sudo dpkg -i vagrant_1.7.3_i686.deb;
 	fi
@@ -65,7 +65,7 @@ if which sshpass; then
     echo 'sshpass/OK';
  else
 	echo 'sshpass/no';
-	sudo apt-get install sshpass
+	sudo apt-get -y install sshpass
 fi
 
 

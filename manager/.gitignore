@@ -2,6 +2,7 @@
 *.iml
 *.ignore
 build
+.vagrant
 npm-debug.log
 node_modules/*
 graphite/.vagrant
@@ -11,4 +12,3 @@ models/Metrics.js
 static/json/influx_line.json
 static/json/data1.json
 static/json/data.json
-static/json/config.json

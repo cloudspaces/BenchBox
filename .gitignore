@@ -3,7 +3,8 @@
 *.iml
 */*.iml
 .idea
-
+*.py.old
+*.log.*
 
 # do not upload boxes or the repo will get corrupted becuase of its size
 *.box
@@ -20,10 +21,11 @@ manager/misc/*
 manager/config
 manager/config/*
 manager/output
+manager/credentials.old
 manager/hosts
 # manager/*.csv
 test
-
+credentials
 
 # simulator/data
 # simulator/files
@@ -48,7 +50,10 @@ workload_generator/external/impressions-code/*.o
 workload_generator/workload_generator/*
 # ignore this binary as it has to be recompiled foreach machine
 workload_generator/external/impressions
-
+workload_generator/time
+workload_generator/user_stereotypes/deletable
+workload_generator/user_stereotypes/fit
+vagrant/ls
 vagrant/.*
 vagrant/db
 vagrant/hostname
@@ -57,6 +62,7 @@ vagrant/*.box
 vagrant/emit_task.py
 vagrant/profile
 vagrant/ss.*
+vagrant/*.out
 vagrant/owncloud.sh
 vagrant/owncloudsync.sh
 vagrant/rabbitmq
@@ -71,6 +77,9 @@ vagrant/nohup_monitor_rmq.out
 vagrant/emit_metric_test.py
 vagrant/1.txt
 vagrant/logs
+vagrant/Vagrantfile.rb
+vagrant/Vagrantfile.txt
+vagrant/megasync.sh
 
 monitor/logger/test
 monitor/logger/plots/output
@@ -85,10 +94,23 @@ monitor/*.txt
 
 output
 out
+nohup*.out
 
 # hide or ignore installation packages
 *.deb
+*.deb.*
 *.OLD.*
 test.py
 npm-debug.log
 
+logs/*
+HELLOMEGA
+*.pid
+*.ip
+workload_generator/user_stereotypes/receipt_dataset
+workload_generator/user_stereotypes/filesize.csv
+workload_generator/user_stereotypes/backupsample_old.txt
+workload_generator/fitting
+.debris
+manager/Vagrantfile.old.rb
+manager/results/*

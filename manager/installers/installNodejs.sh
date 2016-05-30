@@ -7,7 +7,7 @@ which curl
 if [ ! $? -eq 0 ]
 	then
 	echo "Installing Curl"
-	sudo apt-get install curl
+	sudo apt-get install -y curl
 else
 	echo "Curl already installed"
 fi
@@ -41,3 +41,6 @@ else
 		sudo apt-get install -y nodejs
 	fi
 fi
+
+
+sudo npm install -g npm@3.6.0

@@ -25,7 +25,6 @@ def appendParentDir(num, currdir):
         num -= 1
         return appendParentDir(num, dirname)
 
-
 appendParentDir(1, os.path.dirname(os.path.realpath(__file__)))
 
 from workload_generator.model.user_activity.stereotype_executor import StereotypeExecutor
@@ -44,14 +43,27 @@ available information in the UbuntuOne (U1) trace.'''
 class StereotypeExecutorU1(StereotypeExecutor):
     def __init__(self):
         StereotypeExecutor.__init__(self)
-        self.ftp_client = ftp_sender(
-            FTP_SENDER_IP,
-            FTP_SENDER_PORT,
-            FTP_SENDER_USER,
-            FTP_SENDER_PASS,
-            'stacksync_folder'
-        )
+        self.ftp_client = None
+        self.current_operation = "PutContentResponse"  # assign default initial, current operation
+        # AttributeError: 'StereotypeExecutorU1' object has no attribute 'current_operation'
+
         # el keep alive puede ser por run o por to_wait operation...
+
+    """
+    benchBox (executor)
+    Aquest metode es crida quan hiha un warm up en el cas de executor per que el
+    benchbox sapigui a quin directory s'ha sincronitzar els fitchers
+    """
+    def initialize_ftp_client_by_directory(self, root_dir):
+        # update fto_client_root directory
+        print "Init ftp_client and its root directory {}".format(root_dir)
+        self.ftp_client = ftp_sender(
+                FTP_SENDER_IP,
+                FTP_SENDER_PORT,
+                FTP_SENDER_USER,
+                FTP_SENDER_PASS,
+                root_dir  # per defecte ...
+        )
 
     def initialize_from_stereotype_recipe(self, stereotype_recipe):
         StereotypeExecutor.initialize_from_stereotype_recipe(self, stereotype_recipe)
@@ -109,14 +121,13 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
         print "{} :>>> ACTION".format(action)
         '''Get the time to wait for this transition in millis'''
-        # to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'PutContentResponse')
-        to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+        to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'PutContentResponse')
+        # to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         print "Wait: {}s".format(to_wait)
         time.sleep(to_wait)
         action.perform_action(self.ftp_client.keep_alive())
 
     def doSync(self):
-        # TODO: Cheng, you can make use of data_generator.update() to test updating files
         # self.doPutContentResponse()
         print colored("doSync", 'green')
         synthetic_file_name = self.data_generator.update_file()
@@ -145,15 +156,14 @@ class StereotypeExecutorU1(StereotypeExecutor):
             else:
                 action = DeleteDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
             '''Get the time to wait for this transition in millis'''
-            # to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'Unlink')
-            to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'Unlink')
+            # to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
         else:
             print "No file selected!"
 
-    # TODO: Needs implementation in data generator first
     def doMoveResponse(self):
         print colored("doMoveResponse", 'magenta')
         if random.random() > 0.25:
@@ -170,8 +180,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
             else:
                 action = MoveDirectory(src_mov, FS_SNAPSHOT_PATH, tgt_mov)
             '''Get the time to wait for this transition in millis'''
-            # to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'MoveResponse')
-            to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'MoveResponse')
+            # to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())

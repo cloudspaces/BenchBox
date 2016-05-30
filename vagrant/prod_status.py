@@ -7,6 +7,30 @@ import getopt
 import socket
 import subprocess
 import json
+import glob, shutil
+import os
+import signal
+
+def check_kill_process(pstring):
+    for line in os.popen("ps ax | grep " + pstring + " | grep -v grep"):
+        fields = line.split()
+        pid = fields[0]
+        os.kill(int(pid), signal.SIGKILL)
+
+
+def remove_inner_path(path):
+    files = glob.glob(path)
+    try:
+        for f in files:
+            if os.path.isdir(f):
+                shutil.rmtree(f)
+            elif os.path.isfile(f):
+                os.remove(f)
+    except Exception as ex:
+        print ex.message
+
+
+
 
 class ActionHandler(object):
     def __init__(self):
@@ -23,6 +47,12 @@ class ActionHandler(object):
         print 'up'
         return subprocess.check_output(["pwd", "."])
 
+    def vagrantStart(self):
+        print 'vagrantStart'
+        self.vagrantUp()
+        self.vagrantProvision()
+        print 'vagrantStart/OK'
+
     def vagrantUp(self):
         print 'vagrantUp'
         print subprocess.check_output(["vagrant", "up"])
@@ -38,43 +68,77 @@ class ActionHandler(object):
         print subprocess.check_output(['vagrant', 'status'])
         return 'vagrantProvision/OK'
 
+    def vagrantDestroy(self):
+        print 'vagrantDestroy'
+        print subprocess.check_output(['vagrant', 'destroy', '-f']) # vagrant destroy -f # force yes
+        return 'vagrantDestroy/OK'
+
 
     ''' executed at the benchBox, nota: el script esta en el directorio root /vagrant'''
     def warmUp(self):
         # warmup the sandBox filesystem booting the executor.py
-        print 'warmUp'
-        str_cmd = "nohup python ~/workload_generator/executor_rmq.py &> nohup_executor_rmq.out& "
-        # output = subprocess.check_output(['echo', 'warmup'])
-        return bash_command(str_cmd)
+        output = ""
+        try:
+            print 'warmUp'
+            str_cmd = "nohup python ~/workload_generator/executor_rmq.py &> nohup_executor_rmq.out& "
+            # output = subprocess.check_output(['echo', 'warmup'])
+            output = bash_command(str_cmd)
+        except:
+            print "something failed"
+        finally:
+            return output
 
+    "este script es compartido entre sandBox y benchBox"
     def tearDown(self):
         # clear the sandBox filesystem and cached files
         print 'tearDown'
-        output = ''
-        if self.hostname == 'sandBox':              # todo if sandbox
-            str_cmd = "pgrep -f monitor_rmq.py | xargs kill -9 "  # kill the process
-            output += bash_command(str_cmd)
-            str_cmd = "echo $? "  # run some cleanup script todo
-            output += bash_command(str_cmd)
-        elif self.hostname == 'benchBox':           # todo if benchBox
-            str_cmd = "pgrep -f executor_rmq.py | xargs kill -9 "  # kill the process
-            output += bash_command(str_cmd)
-            str_cmd = "echo $? "  # run some cleanup script todo
-            output += bash_command(str_cmd)
-        else:
-            return 'unhandled hostname: {}'.format(self.hostname)
+        try:
+            output = ''
+            if self.hostname == 'sandBox':              # todo if sandbox
 
+                # tambien hace falta limpiar las carpetas de sincronizacion
+                '''
+                /home/vagrant/Dropbox
+                /home/vagrant/Dropbox
+                /home/vagrant/stacksync_folder
+                /home/vagrant/owncloud_folder
+                /home/vagrant/XXXX ...
+                '''
 
+                remove_inner_path('/home/vagrant/Dropbox/*')
+                remove_inner_path('/home/vagrant/stacksync_folder/*')
 
-        return output
+                check_kill_process("monitor_rmq.py")
+
+            elif self.hostname == 'benchBox':           # todo if benchBox
+                check_kill_process("executor_rmq.py")
+                # aprovechar el metodo que habia en github
+                # hace falta limpiar la carpeta de ficheros sinteticos
+                # /home/vagrant/output/*
+
+                remove_inner_path('/home/vagrant/output/*')
+                '''
+                /home/vagrant/output
+                '''
+            else:
+                return 'unhandled hostname: {}'.format(self.hostname)
+        except:
+            print "something failed"
+        finally:
+            return output
+
     ''' executed at the sandBox '''
     def monitorUp(self):
         # start the metrics listener for monitoring
-        print 'monitorUp'
-        str_cmd = "nohup python ~/monitor/monitor_rmq.py &> nohup_monitor_rmq.out& "
-
-        return bash_command(str_cmd)
-
+        output = ""
+        try:
+            print 'monitorUp'
+            str_cmd = "sudo nohup python ~/monitor/monitor_rmq.py &> nohup_monitor_rmq.out& "
+            output = bash_command(str_cmd)
+        except:
+            print "something failed"
+        finally:
+            return output
     def execute(self):
         print 'execute'
         return bash_command('whoami')
@@ -85,20 +149,25 @@ class ProduceStatus(object):
         print 'prod: {}'.format(rmq_url)
         self.rmq_url = rmq_url
         if rmq_url == 'localhost':
-            self.connection = pika.BlockingConnection(pika.ConnectionParameters(rmq_url))
+            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+                    host=rmq_url,
+                    heartbeat_interval=5
+            ))
         else:
             print 'RabbitMQ instance'
             url_str = self.rmq_url
             url = urlparse.urlparse(url_str)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=url.hostname,
+                heartbeat_interval=5,
                 virtual_host=url.path[1:],
                 credentials=pika.PlainCredentials(url.username, url.password)
             ))
 
         self.channel = self.connection.channel()
+        self.channel.basic_qos(prefetch_count=1)
+        result = self.channel.queue_declare(durable=False, auto_delete=True)
 
-        result = self.channel.queue_declare(exclusive=True)
         self.callback_queue = result.method.queue
         self.channel.basic_consume(self.on_response,
                                    no_ack=True,
@@ -136,24 +205,36 @@ class ConsumeAction(object):
         print "Dummy Peer Worker"
         self.rmq_url = rmq_url
         if rmq_url == 'localhost':
-            self.connection = pika.BlockingConnection(pika.ConnectionParameters(rmq_url))
+            """
+            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+                    host=rmq_url,
+                    heartbeat_interval=5
+            ))
+            """
+            # Async consumer
+
         else:
             print 'Worker instance'
             url_str = self.rmq_url
             url = urlparse.urlparse(url_str)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
-                host=url.hostname, virtual_host=url.path[1:], credentials=pika.PlainCredentials(url.username, url.password)
+                host=url.hostname,
+                    heartbeat_interval=5,
+                    virtual_host=url.path[1:],
+                    credentials=pika.PlainCredentials(url.username, url.password)
             ))
 
         self.host_queue = host_queue
         self.channel = self.connection.channel()
+        self.channel.basic_qos(prefetch_count=1)
         self.channel.queue_declare(queue=self.host_queue)
 
-    def on_request(self, ch, method, props, body):
-        print " [on_request] {} ".format(body)
+    def on_request(self, ch, method, props, data):
+        body = json.loads(data)
+        print " [on_request] {} => {}".format(body['cmd'], self.host_queue)
         # todo implementar els handler vagrantUp i vagrantDown
         try:
-            toExecute = getattr(self.vagrant_ops, body)
+            toExecute = getattr(self.vagrant_ops, body['cmd'])
             print toExecute
             # lo ideal es que aixo no sigui un thread per que les peticions s'atenguin fifo
             # t = threading.Thread(target=toExecute)
@@ -161,27 +242,38 @@ class ConsumeAction(object):
             # t.start()
         except AttributeError as e:
             # print e.message
-            print "ACK: {}".format(body)
+            print "ACK: {}".format(body['cmd'])
 
-        response = "{} response: {}: {}".format(self.host_queue, body, output)
+        response = "{} response: {}: {}".format(self.host_queue, body['cmd'], output)
         print props.reply_to
         print props.correlation_id
         try:
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,
+
                              properties=pika.BasicProperties(correlation_id=props.correlation_id),
                              body=response)
         except:
             print "bypass"
-        ch.basic_ack(delivery_tag=method.delivery_tag)  # comprar que l'ack coincideix, # msg index
+
+        try:
+            ch.basic_ack(delivery_tag=method.delivery_tag)  # comprar que l'ack coincideix, # msg index
+        except:
+            print "the sender has been rebooted, so the response will never reach as their id are dynamically changing every time the node server reboots"
 
     def listen(self):
-        self.channel.basic_qos(prefetch_count=1)
-        self.channel.basic_consume(self.on_request, queue=self.host_queue)
+        self.channel.basic_consume(self.on_request,
+                                   queue=self.host_queue,
+                                   no_ack=True)
         print " [Consumer] Awaiting RPC requests"
         self.channel.start_consuming()
 
 
+
+
+"""
+Run bash command and return output
+"""
 def bash_command(cmd):
     child = subprocess.Popen(['/bin/bash', '-c', cmd])
     child.communicate()[0]
@@ -252,6 +344,13 @@ if __name__ == '__main__':
 
     ''' crear una cua amb el propi host name de tipus direct '''
     print "START DummyRabbitStatus Worker"
-    consumer_rpc = ConsumeAction(rmq_url, host_queue)
-    consumer_rpc.listen()
+    while True:
+        try:
+            consumer_rpc = ConsumeAction(rmq_url, host_queue)
+            consumer_rpc.listen()
+        except Exception as ex:
+            print "{} prod_status Consumer exception".format(ex.message)
+
+
+
     ''' dummy host does all the following setup operations '''

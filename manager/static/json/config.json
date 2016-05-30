@@ -1,0 +1,60 @@
+[
+  {
+    "profile": {
+      "sync": 1,
+      "regular": 1,
+      "cdn": 1,
+      "backup": 1,
+      "idle": 1
+    },
+    "ss": {
+      "stacksync": {
+        "ip": "stacksync.urv.cat",
+        "port": 5673
+      },
+      "owncloud": {
+        "ip": "10.30.232.183",
+        "port": 80
+      }
+    },
+    "ls": {
+      "impala": {
+        "ip": "10.30.103.146",
+        "port": 21050
+      },
+      "graphite": {
+        "ip": "10.30.103.146",
+        "port": 8443
+      },
+      "grafana": {
+        "ip": "10.30.103.146",
+        "port": 3000
+      }
+    },
+    "rabbitmq":{
+      "url": "amqp://benchbox:benchbox@10.30.236.141/",
+      "virtual_host": "",
+      "host": "10.30.236.141",
+      "user": "benchbox",
+      "password": "benchbox"
+
+    },
+    "credentials": {
+      "owncloud": [
+        {
+          "user": "demo1",
+          "pass": "demo1"
+        }
+      ],
+      "stacksync": [
+        {
+          "id": "dd27721b-9db7-4dbe-9fca-f86e79eb6a7b",
+          "name": "demo1",
+          "swift_account": "AUTH_47f13d9fe178438580ffb08ddca763a4",
+          "swift_user": "stacksync_230edffc_demo1",
+          "email": "demo1@stacksync.org"
+        }
+      ]
+    }
+  }
+]

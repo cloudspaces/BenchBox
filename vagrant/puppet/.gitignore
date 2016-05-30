@@ -1,3 +1,4 @@
 .tmp/
 .librarian
 Puppetfile.lock
+*.old.*

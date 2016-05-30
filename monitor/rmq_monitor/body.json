@@ -1,0 +1,46 @@
+[
+  {
+    "ip": "10.30.103.232",
+    "hostname": "ast13",
+    "login": "milax",
+    "profile": "sync",
+    "cred_stacksync": "d1b765d0-9c02-4951-b9fc-b80100f0c5ac,demo3,AUTH_5e446d39e4294b57831da7ce3dd0d2c2,stacksync_a807fed2_demo3,demo3@stacksync.org",
+    "cred_owncloud": "demo3",
+    "cmd": "start",
+    "target_queue": "monitor",
+    "test": {
+      "testOps": "10",
+      "testItv": "1",
+      "testProfile": "backupsample",
+      "testFolder": "stacksync_folder",
+      "testClient": "StackSync",
+      "testOperation": "keepalive",
+      "testMonitor": "start"
+    },
+    "manager-ip": "localhost",
+    "manager-port": "4242",
+    "stacksync-ip": "10.30.235.91",
+    "stacksync-port": "80",
+    "owncloud-ip": "10.30.232.183",
+    "owncloud-port": "80",
+    "graphite-ip": "10.30.103.146",
+    "graphite-port": "8443",
+    "impala-ip": "10.30.103.146",
+    "impala-port": "21050",
+    "rabbitmq-amqp": "amqp://benchbox:benchbox@10.30.236.141/",
+    "hosts": {
+      "ast03": {
+        "ip": "10.30.103.95",
+        "login": "milax"
+      },
+      "ast13": {
+        "ip": "10.30.103.232",
+        "login": "milax"
+      },
+      "x": {
+        "ip": "10.30.236.141",
+        "login": "xen"
+      }
+    }
+  }
+  }

@@ -1,100 +1,4 @@
-<!-- FIND -->
-<div class="row">
-    <div class="col-md-2">
-        <h5>
-            Search:
-        </h5>
-    </div>
-    <div class="col-md-10">
-        <input class="form-control" id="inputSearch" type="text" ng-model="search.hostname"
-               placeholder="Search by hostname">
-    </div>
-</div>
 
-
-<!-- LIST -->
-<div class="row">
-    <div class="col-md-2">
-
-    </div>
-    <div class="col-md-10">
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <td class="col-md-1">
-                            <label><input type="checkbox" name="check-all" id='check-all' ng-click="checkAll('test-check')"> # </label>
-
-                        </td>
-                        <td class="col-md-1">
-                            hostname
-                        </td>
-                        <td class="col-md-2">
-                            ip
-                        </td>
-                        <td class="col-md-2">
-                            logging
-                        </td>
-                        <td class="col-md-1">
-                            user
-                        </td>
-                        <td class="col-md-3">
-                            option
-                        </td>
-                        <td class="col-md-2">
-                            curr_status
-                        </td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="host in hosts | filter: search" class="bb-hosts">
-                        <td class="col-md-1">
-                            <p class="host-id" ng-show="false" >{{host._id}}</p>
-                            <label><input type="checkbox" class="test-check" ng-model="host.test" name="{{host.hostname}}" value="{{host._id}}"> {{$index}} </label>
-                        <!--
-                            <label><input type="checkbox" class="test-check" ng-model="host.test"> {{host._id}} </label>
-                            -->
-                        </td>
-                        <td class="col-md-1">
-                            <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.hostname">
-                            <p class="host-name" ng-show="!editing[$index]">{{host.hostname}}</p>
-                        </td>
-                        <td class="col-md-2">
-                            <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.ip">
-                            <p class="host-ip" ng-show="!editing[$index]">{{host.ip}}</p>
-                        </td>
-                        <td class="col-md-2">
-                            <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.logging">
-                            <p class="host-login" ng-show="!editing[$index]">{{host.logging}}</p>
-                        </td>
-                        <td class="col-md-1">
-                            <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.cred_owncloud">
-                            <p class="host-user" ng-show="!editing[$index]">{{host.cred_owncloud}}</p>
-                        </td>
-
-                        <td class="col-md-3">
-                            <button class="btn btn-success btn-xs" ng-show="!editing[$index]" ng-click="edit($index)">edit</button>
-                            <button class="btn btn-danger btn-xs" ng-show="!editing[$index]" ng-click="remove($index)">remove</button>
-                            <button class="btn btn-warning btn-xs" ng-show="editing[$index]" ng-click="update($index)">update</button>
-                            <button class="btn btn-primary btn-xs" ng-show="editing[$index]" ng-click="cancel($index)">cancel</button>
-                            <a href="#/{{host._id}}">
-                                <button class="btn btn-xs btn-info" ng-show="!editing[host._id]">more</button>
-                            </a>
-
-                            <button class="btn btn-xs" ng-click="ping($index)">Ping</button>
-                        </td>
-                        <td class="col-md-2">
-                            <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.status">
-                            <p class="host-status" ng-show="!editing[$index]">[D]{{host.status}}</p>
-                            <p class="host-status" ng-show="!editing[$index]">[B]{{host.status_benchbox}}</p>
-                            <p class="host-status" ng-show="!editing[$index]">[S]{{host.status_sandbox}}</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 
 <div class="row">
     <div class="col-md-2">
@@ -128,31 +32,72 @@
 </div>
 -->
 <div class="row">
-    <div class="col-md-2">
+    <div class="col-md-1">
         <h5>
             RPC Command:
         </h5>
     </div>
-    <div class="col-md-10">
+    <div class="col-md-11">
 
-            <button class="btn btn-success" ng-click="rpc('test-check','setup')" title="Download BenchBox project to the dummy machine">Setup</button>
+        <button class="btn btn-success"
+                ng-click="rpc('test-check','setup')"
+                title="Download BenchBox project to the dummy machine">Setup
+        </button>
 
-            <button class="btn btn-default" ng-click="rmq('test-check','vagrantUp', '')" title="vagrantUp rpc">vagrantUp</button>
-            <button class="btn btn-default" ng-click="rmq('test-check','vagrantProvision', '')" title="vagrantProvision rpc">vagrantProvision</button>
-            <!--
-            <button class="btn btn-default" ng-click="rpc('test-check','vagrantDown')" title="pull latest repo & vagrant down">Down</button>
-            -->
+        <!--
+        <button class="btn btn-default"
+                ng-click="rmq('test-check','vagrantUp', '')"
+                title="vagrantUp rpc">vagrantUp</button>
+        -->
+        <button class="btn btn-default"
+                ng-click="rmq('test-check','vagrantStart', '')"
+                title="vagrantStart rpc[prod_status.py], boots the selected virtual machines">vagrantStart
+        </button>
 
-            <button class="btn btn-danger pull-right" ng-click="rmq('test-check', 'tearDown', 'benchBox', 'sandBox')" title="Clear the shared file system: benchBox & sandBox">TearDown</button>
-            <button class="btn btn-primary pull-right" ng-click="rmq('test-check', 'warmUp',   'benchBox')" title="Startup file system: benchBox">Executor</button>
-            <button class="btn btn-info pull-right" ng-click="rmq('test-check', 'monitorUp', 'sandBox')" title="Startup monitor real time collection: sandBox">Monitor</button>
 
-            <!--
-            <button class="btn btn-default " ng-click="rpc('test-check','monitorUp')" title="Run Socket Listener at dummy machine, sandBox">Listen</button>
+        <!--
+        move the vagrant provision inside vagrant up,
+        <button class="btn btn-default"
+                ng-click="rmq('test-check','vagrantProvision', '')"
+                title="vagrantProvision rpc">vagrantProvision</button>
+        -->
 
-            <button class="btn btn-default pull-right" ng-click="rpc('test-check','client', 'Down')" title="Run clientSSDown at dummy machine, sandBox">SSDown</button>
-            <button class="btn btn-default pull-right" ng-click="rpc('test-check','client', 'Up')" title="Run clientSSUp at dummy machine, sandBox">SSUp</button>
-            -->
+        <button class="btn btn-default"
+                ng-click="rmq('test-check', 'vagrantDestroy', '')"
+                title="vagrantDestroy rpc[prod_status.py], destroy the running virtual machines">vagrantDestroy
+        </button>
+
+
+        <!--
+        <button class="btn btn-default" ng-click="rpc('test-check','vagrantDown')" title="pull latest repo & vagrant down">Down</button>
+        -->
+
+        <button class="btn btn-danger pull-right" ng-click="rmq('test-check', 'tearDown', 'benchBox', 'sandBox')"
+                title="Clear the shared file system: benchBox & sandBox">TearDown
+        </button>
+        <button class="btn btn-primary pull-right" ng-click="rmq('test-check', 'warmUp',   'benchBox')"
+                title="Startup file system: benchBox">Executor
+        </button>
+        <button class="btn btn-info pull-right" ng-click="rmq('test-check', 'monitorUp', 'sandBox')"
+                title="Startup monitor real time collection: sandBox">Monitor
+        </button>
+        <button class="btn btn-default" ng-click="resetMetrics('test-check')"
+                title="Clean metrics from influxDB of the selected hosts">Reset Metrics
+        </button>
+        <button class="btn btn-default" ng-click="getMetrics('test-check')"
+                title="Download metrics from influxDB of the selected hosts">Download Metrics
+        </button>
+        <button class="btn btn-default" ng-click="getAllMetrics()"
+                title="Download all metrics from benchbox measurement">
+                Download All Metrics
+        </button>
+
+        <!--
+        <button class="btn btn-default " ng-click="rpc('test-check','monitorUp')" title="Run Socket Listener at dummy machine, sandBox">Listen</button>
+
+        <button class="btn btn-default pull-right" ng-click="rpc('test-check','client', 'Down')" title="Run clientSSDown at dummy machine, sandBox">SSDown</button>
+        <button class="btn btn-default pull-right" ng-click="rpc('test-check','client', 'Up')" title="Run clientSSUp at dummy machine, sandBox">SSUp</button>
+        -->
 
     </div>
 </div>
@@ -160,33 +105,41 @@
 
 <!-- CREATE -->
 <!-- refactor this into  modal view
+-->
 <div class="row">
-    <div class="col-md-2">
+    <div class="col-md-1">
         <h5>
             New Host:
         </h5>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2 col-xs-2">
         <input class="form-control" type="text" ng-model="newHostHostname" placeholder="hostname">
     </div>
-    <div class="col-md-3">
+    <div class="col-md-3 col-xs-3">
         <input class="form-control" type="text" ng-model="newHostIp" placeholder="ip">
     </div>
-    <div class="col-md-2">
+    <div class="col-md-2 col-xs-2">
         <input class="form-control" type="text" ng-model="newHostLogging" placeholder="logging">
     </div>
-    <div class="col-md-2">
+    <div class="col-md-1 col-xs-1">
         <button class="btn btn-success btn-block" ng-click="saveHost()">Add Host</button>
     </div>
+
+    <div class="col-md-2 col-xs-2">
+        <input class="btn btn-default btn-file" type="file" id="profileFile">
+    </div>
+    <div class="col-md-1 col-xs-1">
+        <span class="btn btn-primary btn-file" ng-click="saveFromFile()">Load</span>
+    </div>
+
 </div>
--->
 
 
 <hr>
 <!-- EXECUTE -->
 
 <div class="row">
-    <div class="col-md-2">
+    <div class="col-md-1">
         <h5>
             Execute Args
         </h5>
@@ -208,22 +161,53 @@
         <input type="text" class="form-control" ng-model="run.testClient" placeholder="-client" value="StackSync">
     </div>
     -->
-    <div class="col-md-5">
+    <div class="col-md-6">
         <input type="hidden" class="form-control" ng-model="run.testOps" placeholder="-ops" value="10">
         <input type="hidden" class="form-control" ng-model="run.testItv" placeholder="-itv" value="1">
         <input type="hidden" class="form-control" ng-model="run.testProfile" placeholder="-profile" value="sync">
-        <input type="hidden" class="form-control" ng-model="run.testFolder" placeholder="-folder" value="stacksync_folder">
-        <input type="hidden" class="form-control" ng-model="run.testClient" placeholder="-client" value="StackSync">
-    </div>
-    <div class="col-md-3">
         <!--
-        <input type="text" class="form-control" ng-model="run.testOperation" placeholder="-rmq_rpc" value="hello">
+        <input type="hidden" class="form-control" ng-model="run.testFolder" placeholder="-folder" value="stacksync_folder">
         -->
+
+        <!--
+        <input type="hidden" class="form-control" ng-model="run.testClient" placeholder="-client" value="StackSync">
+        -->
+
+        <!--
+        el valor que se hace forward es lo que se muestra... :/
+        -->
+        <select ng-model="run.testProfile">
+            <!--
+            <option ng-value="backup">recipebackup</option>
+            -->
+            <!--
+            <option ng-value="backupsample">backupsample</option>
+            -->
+            <option ng-value="recipebackup">recipebackup</option>
+            <option ng-value="recipedownload">recipedownload</option>
+            <option ng-value="recipesync">recipesync</option>
+        </select>
+        <select ng-model="run.testClient">
+            <option ng-value="stacksync">StackSync</option>
+            <option ng-value="dropbox">Dropbox</option>
+            <!--
+            <option ng-value="owncloud">OwnCloud</option>
+            <option ng-value="megasync">Mega</option>
+            -->
+        </select>
+
+
+    </div>
+    <!--
+    <div class="col-md-3">
+
         <select class="form-control" ng-model="run.testOperation">
-            <option value="hello">--- -rmq_executor_rpc ---</option>
+
+            <option value="keepalive">--- -rmq_executor_rpc status ---</option>
             <option value="warmup">warmup</option>
             <option value="start">start</option>
             <option value="stop">stop</option>
+
         </select>
 
     </div>
@@ -231,38 +215,56 @@
     <div class="col-md-2">
         <button class="btn btn-success btn-block"
                 ng-click="rmq('test-check', 'executor', 'executor')"
-                title="Run executor at dummy machine, benchBox">Execute</button>
+                title="Run executor at dummy machine, benchBox">Execute
+        </button>
     </div>
+    -->
 
-
+    <div class="col-md-5">
+        <button id="btn-start-stop" ng-click="startStop()">
+            Start & Stop
+        </button>
+        <!--
+        START: implica
+        * execute => warmup + start
+        * monitor => start
+        -->
+        <!--
+        STOP: implica
+        * execute => stop
+        * monitor => stop
+        -->
+        <!--
+        Añadir logica, cuando se realiza click en uno se oculta el otro
+        -->
+    </div>
 </div>
 
 
 <!-- MONITOR -->
+<!--
 <div class="row">
-    <div class="col-md-2">
+    <div class="col-md-1">
         <h5>
             Execute Monitor
         </h5>
     </div>
-    <div class="col-md-5">
+    <div class="col-md-6">
+
         <div id="ssRadio">
-            <label><input type="radio" class="radio-inline" name="ss" value="StackSync" checked><img class="radio-image" src="https://avatars2.githubusercontent.com/u/5880314?v=3&s=200"></label>
-            <label><input type="radio" class="radio-inline" name="ss" value="OwnCloud"><img class="radio-image" src="http://apps.readynas.com/files/o/owncloud/logo-6.0.0-all.png"></label>
-            <label><input type="radio" class="radio-inline" name="ss" value="SugarSync"><img class="radio-image" src="http://smallbiztechnology.com/wp-content/uploads/2011/11/SugarSync200x200.jpg"></label>
-            <label><input type="radio" class="radio-inline" name="ss" value="DropBox"><img class="radio-image" src="http://www.siliconnews.es/wp-content/uploads/2014/01/dropbox-300x250.jpg"></label>
-            <label><input type="radio" class="radio-inline" name="ss" value="Box"><img class="radio-image" src="https://lh4.googleusercontent.com/-n00xivPZeSw/UkIipJZctvI/AAAAAAAABYM/mGPA27NGGdw/s256-no/app_box_256x256.png"></label>
-            <label><input type="radio" class="radio-inline" name="ss" value="OneDrive"><img class="radio-image" src="http://a3.mzstatic.com/us/r30/Purple6/v4/f3/a9/57/f3a957ca-7530-c148-e117-a06be51fa714/icon128-2x.png"></label>
-            <label><input type="radio" class="radio-inline" name="ss" value="GoogleDrive"><img class="radio-image" src="http://tecnologia.starmedia.com/imagenes/2013/01/como-usar-google-drive-almacenar-archivos1.jpg"></label>
+            <label><input type="radio" class="radio-inline" name="ss" value="stacksync_folder" checked><img class="radio-image" src="/images/ss/stacksync.png"></label>
+            <label><input type="radio" class="radio-inline" name="ss" value="owncloud_folder"><img class="radio-image" src="/images/ss/owncloud.png"></label>
+            <label><input type="radio" class="radio-inline" name="ss" value="sugarsync_folder"><img class="radio-image" src="/images/ss/sugarsync.jpg"></label>
+            <label><input type="radio" class="radio-inline" name="ss" value="Dropbox"><img class="radio-image" src="/images/ss/dropbox.jpg"></label>
+            <label><input type="radio" class="radio-inline" name="ss" value="boxsync_folder"><img class="radio-image" src="/images/ss/boxsync.png"></label>
+            <label><input type="radio" class="radio-inline" name="ss" value="OneDrive"><img class="radio-image" src="/images/ss/onedrive.png"></label>
+            <label><input type="radio" class="radio-inline" name="ss" value="GoogleDrive"><img class="radio-image" src="/images/ss/gdrive.jpg"></label>
         </div>
+
     </div>
     <div class="col-md-3">
-        <!--
-        <input type="text" class="form-control" ng-model="run.testMonitor" placeholder="-ops" value="10">
-        -->
         <select class="form-control" ng-model="run.testMonitor">
-            <option value="hello">--- -rmq_monitor_rpc ---</option>
-            <option value="warmup">warmup</option>
+            <option value="keepalive">--- -rmq_monitor_rpc status ---</option>
             <option value="start">start</option>
             <option value="stop">stop</option>
         </select>
@@ -272,7 +274,121 @@
         <button
                 class="btn btn-success btn-block"
                 ng-click="rmq('test-check', 'monitor', 'monitor')"
-                title="Run monitor at dummy machine, sandBox">Monitor</button>
+                title="Run monitor at dummy machine, sandBox">Monitor
+        </button>
+    </div>
+</div>
+-->
+
+
+<!-- FIND -->
+<div class="row">
+    <div class="col-md-1">
+        <h5>
+            Search:
+        </h5>
+    </div>
+    <div class="col-md-11">
+        <input class="form-control" id="inputSearch" type="text" ng-model="search.hostname"
+               placeholder="Search by hostname">
     </div>
 </div>
 
+
+<!-- LIST -->
+<div class="row">
+    <div class="col-md-1">
+
+    </div>
+    <div class="col-md-11">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <td class="col-md-1">
+                        <label><input type="checkbox" name="check-all" id='check-all' ng-click="checkAll('test-check')">
+                            # </label>
+
+                    </td>
+                    <td class="col-md-1">
+                        hostname
+                    </td>
+                    <td class="col-md-1">
+                        ip
+                    </td>
+                    <td class="col-md-1">
+                        logging
+                    </td>
+                    <td class="col-md-1">
+                        dropbox user
+                    </td>
+                    <td class="col-md-2">
+                        option
+                    </td>
+                    <td class="col-md-5">
+                        curr_status
+                    </td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="host in hosts | filter: search" class="bb-hosts">
+                    <td class="col-md-1">
+                        <p class="host-id" ng-show="false">{{host._id}}</p>
+                        <label><input type="checkbox" class="test-check" ng-model="host.test" name="{{host.hostname}}"
+                                      value="{{host._id}}"> {{$index}} </label>
+                        <!--
+                            <label><input type="checkbox" class="test-check" ng-model="host.test"> {{host._id}} </label>
+                            -->
+                    </td>
+                    <td class="col-md-1">
+                        <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.hostname">
+                        <p class="host-name" ng-show="!editing[$index]">{{host.hostname}}</p>
+                    </td>
+                    <td class="col-md-1">
+                        <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.ip">
+                        <p class="host-ip" ng-show="!editing[$index]">{{host.ip}}</p>
+                    </td>
+                    <td class="col-md-1">
+                        <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.logging">
+                        <p class="host-login" ng-show="!editing[$index]">{{host.logging}}</p>
+                    </td>
+                    <td class="col-md-1">
+                        <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.cred_dropbox">
+                        <p class="host-user" ng-show="!editing[$index]">{{host.cred_dropbox}}</p>
+                    </td>
+
+                    <td class="col-md-2">
+                        <button class="btn btn-success btn-xs" ng-show="!editing[$index]" ng-click="edit($index)">edit
+                        </button>
+                        <button class="btn btn-danger btn-xs" ng-show="!editing[$index]" ng-click="remove($index)">
+                            remove
+                        </button>
+                        <button class="btn btn-warning btn-xs" ng-show="editing[$index]" ng-click="update($index)">
+                            update
+                        </button>
+                        <button class="btn btn-primary btn-xs" ng-show="editing[$index]" ng-click="cancel($index)">
+                            cancel
+                        </button>
+                        <a href="#/{{host._id}}">
+                            <button class="btn btn-xs btn-info" ng-show="!editing[host._id]">more</button>
+                        </a>
+                        <button class="btn btn-xs" ng-click="ping($index)">Ping</button>
+                        <button class="btn btn-xs" ng-click="getMetrics($index)">DownloadMetric</button>
+                        <button class="btn btn-xs" ng-click="resetMetrics($index)">ResetMetric</button>
+                        <!--
+                        <button class="btn btn-xs" ng-click="resetStatus($index)">ResetStatus</button>
+                        -->
+
+                    </td>
+                    <td class="col-md-5">
+                        <input class="form-control" ng-show="editing[$index]" type="text" ng-model="host.status">
+                        <p class="host-status" ng-show="!editing[$index]">[D]{{host.status}}</p>
+                        <p class="host-status" ng-show="!editing[$index]">[B]{{host.status_benchbox}}</p>
+                        <p class="host-status" ng-show="!editing[$index]">[S]{{host.status_sandbox}}</p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

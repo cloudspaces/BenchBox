@@ -116,7 +116,15 @@ class ftp_sender():
         print self.ftp.pwd()
 
         print "rm folder >> {}".format(fname)
-        self.ftp.rmd(os.path.basename(fname))
+        try:
+            print "Remove remote delete failed, use rmd {}".format(fname)
+            self.ftp.rmd(os.path.basename(fname))
+        except Exception as e:
+            print e.message
+            # print "ftp: rmd: ", os.path.basename(fname)
+            # self.ftp.delete(os.path.basename(fname))
+
+
 
             # yes, there was an error...
     def get(self, src, tgt):
@@ -135,7 +143,13 @@ class ftp_sender():
             print "move to "+self.ftp_root
             self.ftp.cwd(self.ftp_root)
 
-        self.ftp.rename(src, tgt)
+        while True:
+            try:
+                self.ftp.rename(src, tgt)
+                break  # if not failed continue..
+            except Exception:
+                print 'Failed moving a file'
+
         return os.path.join(self.ftp.pwd(), tgt)
 
     def move_down(self):

@@ -1,6 +1,6 @@
 console.log("init.js");
 
-bugall = null
+bugall = null;
 angular.module('app', ['ngRoute', 'ngResource'])
 
     //---------------
@@ -58,11 +58,11 @@ angular.module('app', ['ngRoute', 'ngResource'])
             $scope.run = {
                 testOps: 10,
                 testItv: 1,
-                testProfile: 'backupsample',
-                testFolder: 'stacksync_folder',
-                testClient: 'StackSync',
-                testOperation: 'hello',
-                testMonitor: 'hello'
+                testProfile: 'recipebackup', // modificar aixo mitjançant select
+                testFolder: 'stacksync_folder', // modificar aixo mitjançant detector segons testClient
+                testClient: 'StackSync', // modificar aixo en format select
+                testOperation: 'keepalive', // default monitor operation
+                testMonitor: 'keepalive' // default execute operation
             };
 
             // controller actions
@@ -72,11 +72,12 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
             // initial load
             $scope.hosts = Hosts.query(); // llistat de tots els hosts
-
+            $scope.is_running = false;
             $scope.itv_time = 10000;
             $interval(callAtInterval, $scope.itv_time);
 
             function callAtInterval() {
+
                 Hosts.query(function (items) {
                     // console.log(items)
                     angular.forEach(items, function (item, idx, all) {
@@ -84,28 +85,88 @@ angular.module('app', ['ngRoute', 'ngResource'])
                             // console.log(" [not changed]" + $scope.hosts[idx].status + " : "+ item.status )
                         } else {
                             var changeDummy = " [changed dummyhost] from:  " + $scope.hosts[idx].status + " to " + item.status;
-                            console.log(changeDummy);
-                            $.notify(changeDummy, 'info');
+                            //console.log(changeDummy);
+                            $.notify(changeDummy, 'success');
                             $scope.hosts[idx].status = item.status
                         }
                         if ($scope.hosts[idx].status_sandbox !== item.status_sandbox) {
                             var changeSandBox = " [changed sandbox] from:  " + $scope.hosts[idx].status_sandbox + " to " + item.status_sandbox;
-                            console.log(changeSandBox);
-                            $.notify(changeSandBox, 'info');
+                            //console.log(changeSandBox);
+                            $.notify(changeSandBox, 'success');
                             $scope.hosts[idx].status_sandbox = item.status_sandbox
                         }
                         if ($scope.hosts[idx].status_benchbox !== item.status_benchbox) {
                             var changeBenchBox = " [changed] benchbox from:  " + $scope.hosts[idx].status_benchbox + " to " + item.status_benchbox;
-                            console.log(changeBenchBox);
-                            $.notify(changeBenchBox, 'info');
+                            //console.log(changeBenchBox);
+                            $.notify(changeBenchBox, 'success');
                             $scope.hosts[idx].status_benchbox = item.status_benchbox
                         }
 
                     })
                 });
 
+
+                // emit keepalive requests
+
+
             }
 
+            $scope.saveFromFile = function () {
+                console.log("Save from file")
+                var profileFile = document.getElementById("profileFile"); // <input> myFile
+                var profileList = document.getElementById("profileFileOutput"); // <div> output
+
+
+                var myFile = profileFile.files[0];
+                //
+                var reader = new FileReader();
+                // register listener on load file
+
+                reader.onload = function (e) {
+                    // profileList.innerHTML = reader.result;
+                    // console.log(reader.result);
+
+                    // save for each line
+                    var validHosts = [];
+                    var lines = reader.result.split("\n");
+                    lines.forEach(function (item, idx, all) {
+                        // console.log(idx, item)
+                        if (item.substring(0, 1) == "#") {
+                            // console.log("skipped")
+                        } else {
+                            if (item.length == 0) {
+                                // console.log("empty")
+                            } else {
+                                try {
+                                    var host = eval("(" + item + ")");
+                                    validHosts.push(host)
+                                } catch (err) {
+                                    console.error("unhandled format, it has to be a object castable into object")
+                                }
+                            }
+                        }
+                    });
+                    console.log(validHosts);
+
+                    // inject valid hosts into mongodb
+                    if (validHosts.length == 0) {
+                        $.notify("No operation performed!", "info")
+                    } else {
+                        validHosts.forEach(function (item, idx) {
+                            var host = new Hosts(item);
+                            host.$save(function () {
+                                $scope.hosts.push(host);
+                            });
+                        });
+                        $.notify("Please refresh the window!", "success")
+                    }
+                };
+                try {
+                    reader.readAsText(myFile);
+                } catch (err) {
+                    $.notify("No file selected!", "error")
+                }
+            };
 
             $scope.saveHost = function () {
                 console.log('SaveHosts');
@@ -147,6 +208,79 @@ angular.module('app', ['ngRoute', 'ngResource'])
                  $scope.editing[index] = false;
                  */
             };
+
+
+            $scope.getMetrics = function (index) {
+
+                if (index == 'test-check') {
+                    // lookup in checkbox
+                    $('.' + index).each(function () {
+                        // console.log(this)
+                        if ($(this).prop('checked')) {
+                            /*
+                             var checkedId = this.value;
+                             var host = $scope.hosts.filter(function (item) {
+                             return item._id == checkedId
+                             });
+                             */
+                            queryDownloadInfluxMeasurement(this.name)
+                        }
+                    })
+                } else {
+                    var host = $scope.hosts[index];
+                    console.log(host);
+                    console.log("Download the metrics of this host: ", host.hostname);
+                    queryDownloadInfluxMeasurement(host.hostname);
+                }
+                // invoke ajax request to the node server, the server does influx query and returns the result as ajax response.
+            };
+
+
+
+            $scope.getAllMetrics = function(){
+                queryDownloadInfluxMeasurement()
+            };
+
+            $scope.resetMetrics = function (index) {
+
+                if (index == 'test-check') {
+                    // lookup in checkbox
+                    $('.' + index).each(function () {
+                        // console.log(this)
+                        if ($(this).prop('checked')) {
+                            /*
+                             var checkedId = this.value;
+                             var host = $scope.hosts.filter(function (item) {
+                             return item._id == checkedId
+                             });
+                             */
+                            queryDropInfluxMeasurement(this.name)
+                        }
+                    })
+                } else {
+                    var host = $scope.hosts[index];
+                    console.log(host);
+                    console.log("Drop measurement: ", host.hostname);
+                    queryDropInfluxMeasurement(host.hostname);
+                }
+
+
+            };
+
+            $scope.resetStatus = function (index) {
+                var host = $scope.hosts[index];
+                console.log(host);
+                console.log("Reset the host status to None at mongodb");
+
+                host.status_benchbox = undefined;
+                host.status_sandbox = undefined;
+                host.status = undefined;
+
+                // Hosts.update({id: host._id}, host); // aixo no va
+
+            };
+
+
             $scope.rpc = function (name, cmd, ss) {
                 console.info(name, cmd, ss);
                 // console.log($scope)
@@ -172,26 +306,54 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 })
             };
 
+            /**
+             * Name is the name of the DOM element where to lookup for target hosts
+             * Cmd => indica que subcola de rabbit va a ejecutar las operaciones.
+             * @param name, [test-check|]
+             * @param cmd, [setup|vagrantUp|vagrantProvision]
+             */
             $scope.rmq = function (name, cmd) {
                 console.log(arguments);
                 var hosts = Array.prototype.slice.call(arguments, 2); // 3r till n are the target hosts
-                console.log(hosts);
-                console.log($scope.run.testOperation)
+                //console.log(hosts);
+                //console.log($scope.run.testOperation);
+                //console.log($scope.run);
 
-                if(cmd == 'execute'){
-                    cmd = $scope.run.testOperation
+                // setup testFolder
+                switch ($scope.run.testClient) {
+                    case "StackSync":
+                        $scope.run.testFolder = "stacksync_folder";
+                        break;
+                    case "Dropbox":
+                        $scope.run.testFolder = "Dropbox";
+                        break;
+                    case "OwnCloud":
+                        $scope.run.testFolder = "owncloud_folder";
+                        break;
+                    case "Mega":
+                        $scope.run.testFolder = "mega_folder";
+                        break;
+                    default:
+                        console.log("UNHANDLED PERSONAL_CLOUD!!!");
+                        return;
+                        break;
+                }
+                // console.log($scope.run.testClient);
+                // console.log($scope.run.testFolder);
+
+                if (cmd == 'execute') {
+                    cmd = $scope.run.testOperation; // esto no existe.
                 }
 
                 // hardcoded queue multiplexing
-                switch (cmd){
+                switch (cmd) {
                     case 'executor':
                         // handle benchBox - execute
-                        cmd = $scope.run.testOperation;
+                        cmd = $scope.run.testOperation; // hello / warmup / start / stop
                         break;
-
                     case 'monitor':
                         // handle sandBox - monitor
-                        cmd = $scope.run.testMonitor;
+                        cmd = $scope.run.testMonitor;   // hello / warmup / start / stop
                         break;
                     default:
                         // cmd is cmd xD
@@ -210,7 +372,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                                 return item._id == checkedId
                             });
                             console.log("rmqHost: " + cmd, this.name, checkedId, host[0]);
-                            host[0].rmq_queue = targetHost.toLowerCase()
+                            host[0].rmq_queue = targetHost.toLowerCase();
                             host[0].test_setup = $scope.run;
                             // console.log(host[0])
                             rmqHost(host[0], cmd)
@@ -220,6 +382,73 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
                 })
 
+            };
+
+
+            $scope.startStop = function () {
+                console.log("START & STOP click");
+                var btn = document.getElementById('btn-start-stop');
+
+                btn.disabled = true;
+                if ($scope.is_running) {
+                    // desible the button
+                    // monitor start
+                    $scope.run.testMonitor = 'start';
+                    $scope.rmq('test-check', 'monitor', 'monitor');
+
+                    // executor warmup
+                    console.log('MonitorStart');
+                    $scope.run.testOperation = 'warmup'; // hello / warmup / start / stop
+                    $scope.rmq('test-check', 'executor', 'executor');
+                    console.log('ExecutorWarmup');
+
+
+                    // start
+                    $scope.run.testOperation = 'start'; // hello / warmup / start / stop
+                    $scope.rmq('test-check', 'executor', 'executor');
+                    console.log('ExecutorStart');
+
+                    // Now can stop
+                    // ponemos un temporizador de 5S hasta que se pueda volver a empezar lo correcto seria imponer
+                    // cuando todos los hosts que se van a aplicar coincidan de estado, o tener dos botones...
+
+                    setTimeout(function () {
+                        console.log("request start");
+                        btn.style.backgroundColor = "#ff0000";
+                        btn.innerHTML = "Click To Stop";
+
+                        btn.disabled = false;
+                        // enable the button
+                    }, 5000);
+
+
+                } else {
+
+
+                    // executor stop
+                    $scope.run.testOperation = 'stop'; // hello / warmup / start / stop
+                    $scope.rmq('test-check', 'executor', 'executor');
+                    console.log('ExecutorStop');
+                    // monitor stop
+                    $scope.run.testMonitor = 'stop';
+                    $scope.rmq('test-check', 'monitor', 'monitor');
+                    console.log('MonitorStop');
+
+
+                    setTimeout(function () {
+
+                        // Now can start
+                        console.log("request stop");
+                        btn.style.backgroundColor = "#00ff00";
+                        btn.innerHTML = "Click To Start";
+
+
+                        btn.disabled = false;
+                        // enable the button
+                    }, 5000);
+
+                }
+                $scope.is_running = !$scope.is_running;
 
             };
 
@@ -237,8 +466,8 @@ angular.module('app', ['ngRoute', 'ngResource'])
             };
 
             $scope.edit = function (index) {
-                console.log(index)
-                console.log($scope.editing)
+                console.log(index);
+                console.log($scope.editing);
                 $scope.editing[index] = angular.copy($scope.hosts[index]);
             };
             $scope.cancel = function (index) {
@@ -278,7 +507,7 @@ testConnection = function (ip, port, cb) {
     // if i dont need to use the failure  function they recommend me to use post or get
     console.log("Get list");
     $.ajax({
-        url: 'http://localhost:'+location.port+'/rpc/nmap',
+        url: 'http://' + location.hostname + ':' + location.port + '/rpc/nmap',
         contentType: "application/json; charset=utf-8",
         data: {data: ip + ' ' + port},
         dataType: 'json',
@@ -303,6 +532,58 @@ testConnection = function (ip, port, cb) {
     });
 };
 
+queryDownloadInfluxMeasurement = function (measurement) {
+    console.log("Download measurement: ", measurement);
+    var influx_query;
+    if(measurement == undefined){
+        measurement = "all";
+        influx_query = "select * from benchbox ";
+    }else{
+        influx_query = "select * from benchbox where hostname = '" + measurement + "'";
+    }
+    console.log(influx_query)
+    $.ajax({
+        url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
+        data: {query: influx_query},
+        timeout: 6000000,
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            // download json as csv file
+            console.log("influx response: ");
+            $.notify("Success influx query", 'success');
+            console.log(data);
+            var milliseconds = (new Date).getTime();
+            var withHeader = true;
+            var output_name = "report_" + measurement + "_" + milliseconds;
+            JSONToCSVConvertor(data[0], output_name, withHeader);
+            console.log("JSONToCSVConverter end")
+            // there is a limit to the size...
+        },
+        error: function (err) {
+            console.log(err);
+            $.notify('Error! ' + err, 'error');
+        }
+    })
+};
+queryDropInfluxMeasurement = function (measurement) {
+    $.ajax({
+        url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
+        data: {query: "drop series from benchbox where hostname = '" + measurement + "'"},
+        timeout: 6000000,
+        dataType: 'json',
+        type: 'GET',
+        success: function (data) {
+            // download json as csv file
+            console.log("influx response: ");
+            $.notify("Success DROP " + measurement + "query", 'success');
+        },
+        error: function (err) {
+            $.notify('Measurement ' + measurement + ' is clean! ', 'info');
+        }
+    })
+};
+
 // cmd should be an object
 rmqHost = function (host, cmd, cb) {
 
@@ -313,6 +594,7 @@ rmqHost = function (host, cmd, cb) {
         profile: host.profile,
         cred_stacksync: host.cred_stacksync,
         cred_owncloud: host.cred_owncloud,
+        cred_dropbox: host.cred_dropbox,
         cmd: cmd,
         target_queue: host.rmq_queue,
         test: host.test_setup
@@ -320,15 +602,18 @@ rmqHost = function (host, cmd, cb) {
 
     appendAllParams(args, 'bb-config');
     appendAllHosts(args, 'bb-hosts');
+    //console.log("ARGS::::::");
+    //console.log(args);
     $.ajax({
-        url: 'http://localhost:'+location.port+'/rmq/emit',
+        url: 'http://' + location.hostname + ':' + location.port + '/rmq/emit',
         data: args,
         timeout: 6000000, // 6000s ::100min
         type: 'GET',
         success: function (data) {
+            //console.log(args);
             console.log("Success, rmq!");
             console.log(data);
-            $.notify('Run rmq! ' + host.hostname + ' ' + cmd, 'info');
+            $.notify('Success rmq: [' + args.target_queue + "] " + host.hostname + ' ' + cmd, 'success');
         },
         error: function (err) {
             console.log(err);
@@ -348,13 +633,14 @@ rpcHost = function (host, cmd, cb) {
         profile: host.profile,
         cred_stacksync: host.cred_stacksync,
         cred_owncloud: host.cred_owncloud,
+        cred_dropbox: host.cred_dropbox,
         cmd: cmd
 
     };
     appendAllParams(args, 'bb-config');
     appendAllHosts(args, 'bb-hosts');
     $.ajax({
-        url: 'http://localhost:'+location.port+'/rpc/rpc',
+        url: 'http://' + location.hostname + ':' + location.port + '/rpc/rpc',
         data: args,
         timeout: 6000000, // 6000s ::100min
         type: 'GET',
@@ -400,7 +686,7 @@ notifyButtonById = function (btnId) {
     // self
 };
 
-$.fn.graphite.defaults.url = "https://localhost:8443/renderer/";
+$.fn.graphite.defaults.url = "https://" + location.hostname + ":8443/renderer/";
 $.fn.graphite.defaults.width = "450";
 $.fn.graphite.defaults.height = "300";
 
@@ -424,6 +710,83 @@ $('#btnFixImage').click(function () {
     }
 
 });
+
+
+function JSONToCSVConvertor(JSONData, ReportTitle, ShowLabel) {
+    //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
+    // console.log("JSONTOCSVConverter",JSONData);
+    var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+
+    var CSV = '';
+    //Set Report title in first row or line
+
+    // CSV += ReportTitle + '\r\n\n';
+
+    //This condition will generate the Label/Header
+    if (ShowLabel) {
+        var row = "";
+
+        //This loop will extract the label from 1st index of on array
+        for (var index in arrData[0]) {
+
+            //Now convert each value to string and comma-seprated
+            row += index + ',';
+        }
+
+        row = row.slice(0, -1);
+
+        //append Label row with line break
+        CSV += row + '\r\n';
+    }
+
+    //1st loop is to extract each row
+    for (var i = 0; i < arrData.length; i++) {
+        var row = "";
+
+        //2nd loop will extract each column and convert it in string comma-seprated
+        for (var index in arrData[i]) {
+            //row += '"' + arrData[i][index] + '",';
+            row += arrData[i][index] + ',';
+        }
+
+        row.slice(0, row.length - 1);
+
+        //add a line break after each row
+        CSV += row + '\r\n';
+    }
+
+    if (CSV == '') {
+        alert("Invalid data");
+        return;
+    }
+
+    //Generate a file name
+    var fileName = ""; // prefix
+    //this will remove the blank-spaces from the title and replace it with an underscore
+    fileName += ReportTitle.replace(/ /g, "_");
+
+    //Initialize file format you want csv or xls
+    var uri = 'data:text/csv;charset=utf-8,' + escape(CSV);
+
+    // Now the little tricky part.
+    // you can use either>> window.open(uri);
+    // but this will not work in some browsers
+    // or you will not get the correct file extension
+
+    //this trick will generate a temp <a /> tag
+    var link = document.createElement("a");
+    link.href = uri;
+
+    //set the visibility hidden so it will not effect on your web-layout
+    link.style = "visibility:hidden";
+    link.download = fileName + ".csv";
+
+    //this part will append the anchor tag and remove it after automatic click
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 
 console.log(GLOBAL_VAR);
 

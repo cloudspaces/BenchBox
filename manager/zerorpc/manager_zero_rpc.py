@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 __author__ = 'anna'
 
-import pxssh
+from pexpect import pxssh
 from termcolor import colored
 
 
@@ -11,18 +11,18 @@ class ManagerZeroRpc:
     def __init__(self):
         print 'manager_rmq instance'
 
-
     def setup(self, args):
         print 'ManagerOps {}'.format(args['cmd'][0])
-
         host_settings = {
             'ip': args['ip'][0],
             'passwd': args['login'][0],
             'user': args['login'][0],
             'cred_stacksync': args['cred_stacksync'][0],
             'cred_owncloud': args['cred_owncloud'][0],
+            'cred_dropbox': args['cred_dropbox'][0],
             'profile': args['profile'][0],
             'stacksync-ip': args['stacksync-ip'][0],
+            'stacksync-port': args['stacksync-port'][0],
             'owncloud-ip': args['owncloud-ip'][0],
             'impala-ip': args['impala-ip'][0],
             'graphite-ip': args['graphite-ip'][0],
@@ -31,7 +31,6 @@ class ManagerZeroRpc:
             'hostname': args['hostname'][0]
         }
         print "Start Initial Task"
-
         return setup_benchbox(host_settings)
 
 '''
@@ -40,23 +39,25 @@ t3downloadVagrantBoxImg(host_settings)
 t4assignStereoTypeToProfile(host_settings)
 t5assignCredentialsToProfile(host_settings)
 t6assignSyncServer(host_settings)
-
 return 0
 '''
 
 
 def setup_benchbox(h):  # tell all the hosts to download BenchBox
     print 'setupBenchBox'
-
     # todo append rabbit.mq.url link and as ip file and also vagrant.box.url
-
-    str_cmd = "" \
+    # "git clone -b development --recursive https://github.com/CloudSpaces/BenchBox.git; " \
+    # "git clone -b development --recursive https://github.com/CloudSpaces/BenchBox.git; " \
+    print "Start setup benchbox"
+    str_cmd = " " \
               "echo 'check if Git is installed...'; " \
               "echo '{}' | sudo -S apt-get install git; " \
+              "echo 'check upgrade pip'; " \
+              "echo '{}' | sudo pip install --upgrade pip; " \
               "echo 'check if BenchBox is installed...'; " \
               "" \
               "if [ -d BenchBox ]; then " \
-              "cd BenchBox;" \
+              "cd BenchBox; " \
               "git pull; " \
               "else " \
               "git clone --recursive https://github.com/CloudSpaces/BenchBox.git; " \
@@ -70,9 +71,11 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
               "" \
               "echo '{}' > ss.stacksync.key; " \
               "echo '{}' > ss.owncloud.key; " \
+              "echo '{}' > ss.dropbox.key; " \
               "echo '{}' > hostname; " \
               "" \
               "echo '{}' > ss.stacksync.ip; " \
+              "echo '{}' > ss.stacksync.port; " \
               "echo '{}' > ss.owncloud.ip; " \
               "echo '{}' > log.impala.ip; " \
               "echo '{}' > log.graphite.ip; " \
@@ -82,12 +85,15 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
               "" \
               "" \
               "".format(h['passwd'],
+                        h['passwd'],
                         h['rabbit-url'], h['profile'],
-                        h['cred_stacksync'], h['cred_owncloud'],  h['hostname'],
-                        h['stacksync-ip'], h['owncloud-ip'], h['impala-ip'], h['graphite-ip'],
-                        h['passwd']
-                        )
-    print 'sendQuery...';
+                        h['cred_stacksync'], h['cred_owncloud'], h['cred_dropbox'], h['hostname'],
+                        h['stacksync-ip'], h['stacksync-port'],
+                        h['owncloud-ip'], h['impala-ip'], h['graphite-ip'],
+                        h['passwd'])
+
+    print 'sendQuery...'
+    print str_cmd
     return rmi(h['ip'], h['user'], h['passwd'], str_cmd)  # utilitzar un worker del pool
 
 

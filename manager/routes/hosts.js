@@ -24,7 +24,7 @@ router.get('/', function(req, res, next) {
 
 /* POST /hosts */
 router.post('/', function(req, res, next) {
-    console.log("create an host")
+    console.log("create an host");
     console.log(JSON.stringify(req.body));
     Host.create(req.body, function (err, post) {
 

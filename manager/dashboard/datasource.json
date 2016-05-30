@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "BenchBox",
+    "Type": "InfluxDB 0.9.x",
+    "Http settings": {
+      "Url": "http://localhost:8086",
+      "Access": "proxy",
+      "Http Auth": {
+        "Basic Auth": false,
+        "With Credentials": false
+      }
+    },
+    "InfluxDB Details": {
+      "Database": "metrics",
+      "User": "root",
+      "Password": "root"
+    }
+  }
+]

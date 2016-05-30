@@ -82,7 +82,7 @@ fi
 
 while true; do
 	echo 'DoSync'
-    owncloudcmd --httpproxy http://$sync_server_ip -u $user -p $pass /home/vagrant/owncloud_folder/ http://$sync_server_ip
+    owncloudcmd --silent --httpproxy http://$sync_server_ip -u $user -p $pass /home/vagrant/owncloud_folder/ http://$sync_server_ip > /dev/null 2>&1
     echo 'SyncingComplete'
      sleep \$delay
     # ls -l

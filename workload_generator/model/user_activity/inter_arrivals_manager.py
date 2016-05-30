@@ -8,6 +8,7 @@ from workload_generator.utils import get_random_value_from_fitting
 from scipy.stats import stats
 from scipy.stats.distributions import lognorm, genpareto, genextreme
 import math
+from workload_generator.constants import TO_WAIT_STATIC
 
 class InterArrivalsManager(object):
     
@@ -16,13 +17,17 @@ class InterArrivalsManager(object):
             
     '''Get the waiting time between operations based on the statistical fittings'''
     def get_waiting_time(self, state1, state2):
+
+        if TO_WAIT_STATIC != 0:
+            return TO_WAIT_STATIC # use static interval if its defined
         (function, kv_params) = self.transition_interarrival_fittings[state1][state2]
         waiting_time = get_random_value_from_fitting(function, kv_params)       
         '''Avoid extremely large or small waiting times due to statistical functions'''
         if waiting_time > (3600*24): waiting_time = 3600*24
         if waiting_time < 0.001: waiting_time = 0.001
-        return waiting_time 
-        
+        return waiting_time
+        # return 1
+
     def add_interarrival_transition_fitting(self, state1, state2, function, params):
         #If there is no entry for this transition, create one
         if state1 not in self.transition_interarrival_fittings:

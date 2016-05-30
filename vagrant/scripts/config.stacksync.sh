@@ -22,6 +22,17 @@ else
 fi
 
 
+
+sync_server_port=`more "ss.stacksync.port" | awk -F ' ' '{ print $2}' | awk -F ':' '{print $1}'`
+if [ -z $sync_server_port ];
+then
+	echo 'user next path'
+	sync_server_port=($(<"ss.stacksync.port"))
+else
+	echo 'already read once'
+	echo $sync_server_port
+fi
+
 if [ ! -f "ss.stacksync.key" ];
 then
 echo "File: not found!"
@@ -73,7 +84,7 @@ cat > $FILE <<- EOM
     <rabbitMQ>
         <host>$sync_server_ip</host>
 
-        <port>5672</port>
+        <port>$sync_server_port</port>
         <enableSSL>false</enableSSL>
 
         <username>guest</username>

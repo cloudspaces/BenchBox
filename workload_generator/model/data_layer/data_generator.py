@@ -24,7 +24,7 @@ appendParentDir(3, os.path.dirname(os.path.realpath(__file__)))
 
 
 from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string
-from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH, \
+from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH, FILE_SIZE_STATIC, FILE_SIZE_MAX, \
     DATA_CHARACTERIZATIONS_PATH, FS_SNAPSHOT_PATH, \
     DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH, DEBUG, DATA_GENERATOR_PROPERTIES_DIR
 import time
@@ -61,6 +61,11 @@ class DataGenerator(object):
                 else:
                     setattr(self, model_attribute, eval(l[l.index('{'):]))
 
+
+
+
+
+
     '''Initialize the file system of the user (delegated to Impressions benchmark)'''
     def create_file_system_snapshot(self):
         '''Get initial number of directories for this user'''
@@ -96,18 +101,33 @@ class DataGenerator(object):
                 add_fs_node(self.file_system, top+file)
 
     '''Create file at random based on the file type popularity for this stereotype'''
+    # todo create files with realistic file size
     def create_file(self):
         '''Prior creating a file, we first decide which type of file to create'''
         file_type = get_fitness_proportionate_element(self.stereotype_file_types_probabilities)
         '''After choosing the type, we proceed by generating the size of the file'''
-        (function, kv_params) = self.file_types_sizes[file_type]
-        size = int(get_random_value_from_fitting(function, kv_params))
+
+        if FILE_SIZE_STATIC == 0:
+            (function, kv_params) = self.file_types_sizes[file_type]
+            size = int(get_random_value_from_fitting(function, kv_params))
+        else:
+            size = FILE_SIZE_STATIC
+        # size=40 000 000 # rollback to use fitting size instead of static 40MB filesize
+        # max file size is Integer length
+        # 2147483647
+        # 26553053639
+
+        if size > FILE_SIZE_MAX:
+            size = FILE_SIZE_MAX
+        # sdgen.jar max size is 214748647 [ integer limit ]
+
         '''After generating the file size, we should decide the path for the new file'''
         synthetic_file_base_path = get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH)
         '''Create a realistic name'''
         synthetic_file_base_path += get_random_alphanumeric_string(random.randint(1,20)) + \
                                     random.choice(self.stereotype_file_types_extensions[file_type])
         print "CREATING FILE: ", synthetic_file_base_path
+        # se tiene que realizar los cdf en un nivel mas bajo
         add_fs_node(self.file_system, synthetic_file_base_path)
         '''Invoke SDGen to generate realistic file contents'''
         characterization = DATA_CHARACTERIZATIONS_PATH + file_type
@@ -164,9 +184,13 @@ class DataGenerator(object):
         to_delete = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
         print "DELETING FILE: ", to_delete
         if to_delete != None:
+            delete_fs_node(self.file_system, to_delete)  # delete logical
             if not DEBUG:
-                os.remove(to_delete)
-            delete_fs_node(self.file_system, to_delete)
+                try:
+                    os.remove(to_delete)
+                except OSError as ex:
+                    print ex.message
+                    return None
         '''Delete a random file from the '''
         return to_delete
 
@@ -186,7 +210,9 @@ class DataGenerator(object):
     def delete_directory(self):
         dir_path_to_delete = get_empty_directory(self.file_system, FS_SNAPSHOT_PATH)
         print "DELETING DIRECTORY: ", dir_path_to_delete
-        if dir_path_to_delete != None and (DEBUG or os.listdir(dir_path_to_delete) == []):
+        if dir_path_to_delete != None and (DEBUG or os.listdir(dir_path_to_delete) == []):  # do not remoe root directory
+            if dir_path_to_delete == '/home/vagrant/output':
+                return None
             if not DEBUG:
                 os.rmdir(dir_path_to_delete)
             delete_fs_node(self.file_system, dir_path_to_delete)
@@ -219,22 +245,30 @@ class DataGenerator(object):
         return self.current_updated_file
 
 if __name__ == '__main__':
-
-    for i in range(10):
+    # import random
+    test_iterations=1
+    for i in range(test_iterations):
         data_generator = DataGenerator()
-        data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backupsample")
+        data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "recipebackup")
+        # data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backupsample")
         data_generator.create_file_system_snapshot()
         data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
-        for j in range (50):
-            data_generator.update_file()
-            data_generator.create_directory()
-            data_generator.delete_directory()
-            data_generator.create_directory()
-            data_generator.create_file()
-            data_generator.create_file()
-            data_generator.delete_file()
-            data_generator.move_file()
-            data_generator.move_directory()
+        do_list = {
+            0: data_generator.update_file,
+            1: data_generator.create_directory,
+            2: data_generator.delete_directory,
+            3: data_generator.create_directory,
+            4: data_generator.create_file,
+            5: data_generator.delete_file,
+            6: data_generator.move_file,
+            7: data_generator.move_directory,
+            8: data_generator.update_file,
+            9: data_generator.update_file,
+        }
+        number_of_ops = 50
+        for j in range(number_of_ops):
+            todo = random.randint(0, 9)
+            do_list[todo]()
 
         '''DANGER! This deletes a directory recursively!'''
         if not DEBUG:

@@ -6,13 +6,13 @@
 
 echo "Inicializar instalación de dependencias en los Hosts"
 
-if [ -f ./debian-7.0-amd64.box ]; then
-	echo 'box/OK';
-	ls *.box
-else
-	echo 'no..., check if other path';
-	wget https://www.dropbox.com/s/sdupbseays0f7ik/debian-7.0-amd64.box;
-fi
+# if [ -f ./debian-7.0-amd64.box ]; then
+#	echo 'box/OK';
+#	ls *.box
+# else
+#	echo 'no..., check if other path';
+#	wget https://www.dropbox.com/s/sdupbseays0f7ik/debian-7.0-amd64.box;
+# fi
 
 
 # check if the machine has installed python dependecy libraries

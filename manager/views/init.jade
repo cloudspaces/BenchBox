@@ -13,10 +13,22 @@ block css
 
 block js
     // ANGULAR
-    script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.js')
-    script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular-route.js')
-    script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular-resource.js')
-    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js')
+    //
+        script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.js')
+        script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular-route.js')
+        script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular-resource.js')
+        script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js')
+    script(src='js/utils.js')
+
+    script(src='js/angular.js')
+    // script(src='js/angular-route.min.js')
+    script(src='js/angular-route.js')
+    script(src='js/angular-resource.js')
+    script(src='js/jquery.min.js')
+
+
+
+
     // BOOTSTRAP
     script(src='js/bootstrap.min.js')
     script(src='js/bootstrap-table-all.js')
@@ -31,7 +43,7 @@ block js
     script(src='js/config.js')
 
 block content
-    .container.fullheight#container
+    .container-fluid.fullheight#container
         h1= title
         .row
             .col-md-2
@@ -43,7 +55,15 @@ block content
                     li.active
                         a(data-toggle='pill' href='#configHosts') Hosts
                     li
-                        a(data-toggle='pill' href='#configMonitor') Monitor
+                        // a(data-toggle='pill' href='#configMonitor') Monitor
+                        a(data-toggle='pill' id="grafana-link") Monitor
+
+                    li
+                        // a(data-toggle='pill' href='#configRabbit') RabbitMQ
+                        a(data-toggle='pill' id="rabbit-link") Rabbit
+
+                    //    li
+                            a(data-toggle='pill' href='#configInflux') InfluxDB
         hr
         .row.tab-content.frame-fixed-size
             #configManager.tab-pane.fade
@@ -100,14 +120,27 @@ block content
                         input.bb-config.form-control#rabbitmq-amqp(type='text' placeholder='rabbitmq.amqp.url' value='#{session.config.rabbitmq.url}')
                     .col-md-2
                         button.btn.btn-primary.btn-block(onclick="") Test Connect
+            //
+                #configMonitor.tab-pane.fade
+                    .col-md-12
+                        .embed-responsive.embed-responsive-16by9
+                            iframe.embed-responsive-item(src="http://localhost:3000/dashboard/db/benchbox")
+                            // http://localhost:3000/dashboard/db/benchbox?from=1461613395004&to=1461613695004
+                            //iframe(src="http://localhost:3000/dashboard-solo/db/benchbox?panelId=3&fullscreen&edit&from=1449831622982&to=1449831742982" height="200" width="300")
+            //
+                #configRabbit.tab-pane.fade
+                    .col-md-2
+                        h4 RabbitMQ Manager
+                    .col-md-10
+                        .embed-responsive.embed-responsive-16by9
+                            iframe.embed-responsive-item(src="http://localhost:15672/#/")
 
-            #configMonitor.tab-pane.fade
-                .col-md-2
-                    h4 Monitor
-                .col-md-10
-                    .embed-responsive.embed-responsive-16by9
-                        iframe.embed-responsive-item(src="http://localhost:3000/dashboard/db/benchbox")
-                    //iframe(src="http://localhost:3000/dashboard-solo/db/benchbox?panelId=3&fullscreen&edit&from=1449831622982&to=1449831742982" height="200" width="300")
+                #configInflux.tab-pane.fade
+                    .col-md-2
+                        h4 Influx Manager
+                    .col-md-10
+                        .embed-responsive.embed-responsive-16by9
+                            iframe.embed-responsive-item(src="http://localhost:8083")
 
             #configHosts.tab-pane.fade.in.active
                 .col-md-12
@@ -120,3 +153,40 @@ block content
 
         // CUSTOM
         script(src='js/init.js')
+
+        // console.log(MY IP)
+        script.
+            $(document).ready(function () {
+                getIPs(
+                        function (ip) {
+                            if (ip.indexOf("10.") == 0) {
+                                console.log(ip);
+                                // manager-ip
+                                // rabbitmq - amqp
+
+                                if (location.hostname !== 'localhost') {
+                                    $('#manager-ip')[0].value = location.hostname
+                                    $('#rabbitmq-amqp')[0].value = "amqp://benchbox:benchbox@" + location.hostname + "/"
+                                }else {
+                                    $('#manager-ip')[0].value = ip
+                                    $('#rabbitmq-amqp')[0].value = "amqp://benchbox:benchbox@" + ip + "/"
+                                }
+                            } else {
+                                console.log("Skipped", ip);
+
+                            }
+                        }
+                );
+
+
+
+                $('#grafana-link').click(
+                        function () {
+                            window.open('http://' + location.hostname + ':3000/dashboard/db/benchbox', '_blank');
+                        })
+                $('#rabbit-link').click(
+                        function () {
+                            window.open('http://' + location.hostname + ':15672/#/', '_blank')
+                        })
+
+            })

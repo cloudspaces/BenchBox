@@ -2,6 +2,7 @@
 
 echo 'Install MongoDB'
 sudo apt-get  -y install mongodb
+sudo apt-get  -y install libkrb5-dev
 
 #echo 'Start MongoDB'
 #sudo /etc/init.d/mongodb start
