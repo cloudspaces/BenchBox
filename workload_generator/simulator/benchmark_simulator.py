@@ -3,7 +3,6 @@ Created on 1/7/2015
 
 @author: Raul
 '''
-
 import simpy
 import time
 from workload_generator.constants import SIMULATION_DURATION, \
@@ -12,12 +11,6 @@ from workload_generator.constants import SIMULATION_DURATION, \
 from workload_generator.simulator.statistics import StatisticsManager
 from workload_generator import constants
 from workload_generator.model.user_activity.stereotype_executor import StereotypeExecutor
-
-#TODO: Our model does not capture the rate of activity of clients!
-#That is, both inactive and active nodes will execute a similar
-#number of operations in our markov chain. This should be controlled.
-
-#TODO: We can also model correlations using a 24h activity or session lengths.
 
 #TODO: Updates should be better modeled than they are. In fact, we need
 #the distribution of updates per file, and probably the relationship between

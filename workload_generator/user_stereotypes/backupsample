@@ -1,4 +1,4 @@
-state_chain,Online,Offline,1,lognorm,{'scale':1099.92799769,'loc':2.8638}
+state_chain,Online,Offline,1,genextreme,{'shape':-0.5471, 'scale':0.1105, 'loc':0.1189}
 state_chain,Offline,Online,1,lognorm,{'scale':7269.91588275,'loc':2.0881}
 state_chain,Offline,Active,1,lognorm,{'scale':7269.91588275,'loc':2.0881}
 state_chain,Active,Offline,1,lognorm,{'scale':1099.92799769,'loc':2.8638}

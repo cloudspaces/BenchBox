@@ -6,7 +6,7 @@ Created on 30/6/2015
 
 from workload_generator.utils import get_random_value_from_fitting
 from scipy.stats import stats
-from scipy.stats.distributions import lognorm, genpareto
+from scipy.stats.distributions import lognorm, genpareto, genextreme
 import math
 
 class InterArrivalsManager(object):
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     loglogistic/fisk NO '''
     
     #v = numpy.random.gumbel(loc=1.20212649309532, scale=0.932804666751013, size=10000)
-    #fitting = stats.genextreme(0.718044067607244, loc=1.20212649309532, scale=0.932804666751013)
+    fitting = genextreme(-0.5471, loc=0.1189, scale=0.1105)
     #fitting = stats.genextreme(-0.698811055279666, scale=942.089026948802, loc=1200.79721156363)
     #fitting = lognorm(1.38272913665692, scale=math.exp(8.222))
     #print math.exp(8.222)
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     #print math.exp(7.003)
     #fitting = lognorm(2.0881, scale=math.exp(8.8915))
     #print math.exp(8.8915)
-    fitting = genpareto(1.6837, scale=3.7520e-005, threshold=1.8190e-006)
+    #fitting = genpareto(1.6837, scale=3.7520e-005, threshold=1.8190e-006)
     #fitting = stats.genextreme(-0.4408, scale=624.2910, loc=860.450)
     #print stats.genpareto.fit(rvs)
     #fitting = genpareto(1.9149, scale=9.5497e-004, threshold=4.7847e-005)

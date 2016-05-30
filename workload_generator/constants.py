@@ -16,12 +16,12 @@ else:
 '''In debug mode the system works without doing changes in the local file system'''
 DEBUG = False
 
-SIMULATION_DURATION = 15*24*3600.
+SIMULATION_DURATION = 30*24*3600.
 SIMULATION_TIME_SLOT = 3600.
-NODES = 63492
+NODES = 6349#63492
 STEREOTYPE_RECIPES_PATH = PROJECT_PATH + 'workload_generator/user_stereotypes/'
 
-STEREOTYPE_DISTRIBUTION = {"backupsample": 1.0}
+STEREOTYPE_DISTRIBUTION = {"backup": 1.0}
                            #"xl_markov_min_regular.csv": 0.2,
                            #"xl_markov_min_cdn.csv": 0.2,
                            #"xl_markov_min_sync.csv": 0.2,

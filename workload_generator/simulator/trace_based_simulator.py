@@ -44,13 +44,11 @@ def replay_trace():
             users[user_id].last_operation = req_t
             users[user_id].last_operation_time = t0_epoch             
         else:            
-            if users[user_id].last_operation == 'Unlink' and req_t == 'Unlink':
-                print l
             '''Log operation'''
-            statistics.trace_operations_per_user('backup', user_id,
-                users[user_id].last_operation, users[user_id].last_operation_time)
+            statistics.trace_operations_per_user('backup_trace', user_id,
+                users[user_id].last_operation, t0_epoch) #users[user_id].last_operation_time)
             '''Log interarrival times'''
-            statistics.trace_operation_transitions_and_interarrivals('backup', 
+            statistics.trace_operation_transitions_and_interarrivals('backup_trace', 
                 users[user_id].last_operation, req_t, t0_epoch-users[user_id].last_operation_time)
             
             users[user_id].last_operation = req_t
