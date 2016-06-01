@@ -702,7 +702,7 @@ if __name__ == '__main__':
     '''
 
     # setup network setting
-    tm = TrafficMonitor(iface="eth0", client="mega")
+    tm = TrafficMonitor(iface="eth0", server="stacksync.urv.cat", port="5673", client="mega")
     tm.run() # intermediari que arranca trafficMonitor i permet realitzar get stats sobre la marcha o reiniciar el monitoreig
     while True:
         # print tm.notify_stats()
