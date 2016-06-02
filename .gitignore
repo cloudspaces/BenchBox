@@ -114,3 +114,10 @@ workload_generator/fitting
 .debris
 manager/Vagrantfile.old.rb
 manager/results/*
+manager/node_modules/
+manager/results/
+utils/
+windows/.vagrant/
+workload_generator/updates_content/
+workload_generator/user_stereotypes/size/
+workload_generator/user_stereotypes/type/
