@@ -1,0 +1,97 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+
+box_sand = 'chenglong/windows'
+box_bench = 'chenglong/benchbox'
+
+
+nodes = [
+    {:hostname => 'sandBox',
+     :ip => '192.168.56.101',
+     :box => box_sand,
+     :shared_folder => '../monitor',
+     :shared_folder_as => 'C:/monitor',
+     :port_fwd => 5000,
+     :vm_is_windows => true, # if box is windows add the appropriate setups
+     :vm_is_gui => true,
+     :vm_name => 'chenglong/windows',
+     :vm_cpu => "2",
+     :vm_ram => "2048",
+    }, # contains the pc-clients && log monitor
+
+    {:hostname => 'benchBox',
+     :ip => '192.168.56.2',
+     :box => box_bench,
+     :shared_folder => '../workload_generator',
+     :shared_folder_as => '/home/vagrant/workload_generator',
+     :vm_is_windows => false,
+     :vm_is_gui => false,
+     :vm_name => 'chenglong/benchbox',
+     :vm_cpu => "1",
+     :vm_ram => "512",
+    }
+]
+
+
+Vagrant.configure(2) do |config|
+  nodes.each do |node|
+    config.vm.define node[:hostname] do |nodeconfig|
+      puts "BOX/LOAD"
+
+      nodeconfig.vm.box = node[:box]
+      nodeconfig.vm.hostname = node[:hostname] # capat : hostnamectl
+      nodeconfig.vm.network :private_network, ip: node[:ip]
+      nodeconfig.vm.provider :virtualbox do |vm|
+        vm.customize [
+                         "modifyvm", :id,
+                         "--memory", node[:vm_ram].to_s,
+                         "--cpus", node[:vm_cpu].to_s,
+                     ]
+        vm.gui = node[:vm_is_gui]
+        vm.name = node[:vm_name]
+
+      end
+
+      # if node[:shared_folder]
+      #   puts "Sharing folder"
+      #   nodeconfig.vm.synced_folder node[:shared_folder], node[:shared_folder_as]
+      # else
+      #   puts "No folder to be shared"
+      # end
+      # if node[:port_fwd]
+      #   puts "FWD port"
+      #   nodeconfig.vm.network "forwarded_port", guest: node[:port_fwd], host: node[:port_fwd]
+      # end
+
+      # if node[:is_windows]
+      #   puts "Windows ssh port"
+      #   # nodeconfig.vm.network "forwarded_port", guest: node[:port_fwd], host: node[:port_fwd]
+      #   nodeconfig.vm.guest = :windows
+      #   nodeconfig.vm.communicator = "winrm"
+      #   nodeconfig.vm.network :forwarded_port, guest: 3389, host: 3389 # windows RDP
+      #   nodeconfig.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true # windows winrm default port
+      #   # setting up larger timeout and halt timeout, due to updates and upgrades
+      #   config.vm.boot_timeout = 600
+      #   config.vm.graceful_halt_timeout = 600
+      #   # timeout in seconds
+      #   config.vm.box_check_update = true
+      #   config.ssh.insert_key = false
+      # else
+      #   nodeconfig.vm.provision :shell, inline: "echo 'Sara is my Cat & Thor is my Dog!' > /etc/motd "
+      # end
+
+    end
+    puts "PUPPET/LOAD"
+  end
+
+  # config.push.define "atlas" do |push|
+  #   push.app = "chenglong/windows"
+  #   push.token = "q3SPEhYYClFi3A.atlasv1.zoHFIR4PKL1RKpbZW4vjtW6Yo2VGrmauMdp0ys6ZcG2J3u67OyE00SBWEXO646O7uSM"
+  # end
+
+end
