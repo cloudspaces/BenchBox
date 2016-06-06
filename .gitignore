@@ -121,3 +121,13 @@ windows/.vagrant/
 workload_generator/updates_content/
 workload_generator/user_stereotypes/size/
 workload_generator/user_stereotypes/type/
+workload_generator/communication/*.save
+
+
+windows/*.key
+windows/*.ip
+windows/rabbitmq
+windows/hostname
+windows/winonly/Vagrantfile
+
+

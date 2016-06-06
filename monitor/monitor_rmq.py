@@ -1,23 +1,11 @@
 #!/usr/bin/env python
-import math
 import pika
 import os
-import datetime
 import sys
 import urlparse
-import time
-import filecmp
-import shutil
-import subprocess
 import signal
-from threading import Thread
-import psutil
-from termcolor import colored
-import socket
-import random
-import calendar
 import json
-import fcntl
+import time
 from rmq_monitor.Commands import Commands
 
 
@@ -61,6 +49,7 @@ class MonitorRMQ(object):
         ))
         self.channel = self.connection.channel()
         self.channel.basic_qos(prefetch_count=1)
+        print 'Joined to queue: {}'.format(self.queue_name)
         self.channel.queue_declare(queue=self.queue_name)
 
     def on_request(self, ch, method, props, data):
@@ -105,22 +94,44 @@ class MonitorRMQ(object):
 if __name__ == '__main__':
     print "Monitor_rmq.py [START] {}".format(sys.argv)
     rmq_url = None
-    with open('/vagrant/rabbitmq', 'r') as r:
-        rmq_url = r.read().splitlines()[0]
+    try:
+        with open('/vagrant/rabbitmq', 'r') as r:
+            rmq_url = r.read().splitlines()[0]
+    except Exception as ex:
+        print ex.message
+        with open('../vagrant/rabbitmq', 'r') as r:
+            rmq_url = r.read().splitlines()[0]
+
     dummyhost = None
     stereotype_receipt = 'backupsample'
-    with open('/vagrant/hostname', 'r') as f:
-        dummyhost = f.read().splitlines()[0]
+    try:
+        with open('/vagrant/hostname', 'r') as f:
+            dummyhost = f.read().splitlines()[0]
+    except Exception as ex:
+        print ex.message
+        with open('../vagrant/hostname', 'r') as r:
+            dummyhost = r.read().splitlines()[0]
+
     queue_name = '{}.{}'.format(dummyhost, 'monitor')
     if len(sys.argv) == 1:
         singleton()  # apply singleton
+        connection_try=0
         while True:
+            connection_try+=1
+            time.sleep(2)
             try:
+                print "Try connect to monitor through RabbitMQ "
+                print rmq_url, queue_name
                 monitor = MonitorRMQ(rmq_url=rmq_url, host_queue=queue_name)
                 monitor.listen()
+                connection_try = 0
             except Exception as ex:
                 print ex.message
-                print "Some connection exception happened..."
+                print "Some connection exception happened... [{}]".format(connection_try)
+            finally:
+                if connection_try > 2:
+                    # exit the infinit loop
+                    break
     """
     else:
         profile = "StackSync"
