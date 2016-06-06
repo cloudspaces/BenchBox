@@ -40,14 +40,14 @@ nodes = [
 
 Vagrant.configure(2) do |config|
   nodes.each do |node|
-    config.vm.define node[:hostname] do |nodeconfig|
+    config.vm.define node[:hostname] do |node_config|
       puts "BOX/LOAD"
 
-      nodeconfig.vm.box = node[:box]
+      node_config.vm.box = node[:box]
       # nodeconfig.vm.hostname = node[:hostname] # capat : hostnamectl
       # volver a geberar el box de windows con el hostname adecuado
-      nodeconfig.vm.network :private_network, ip: node[:ip]
-      nodeconfig.vm.provider :virtualbox do |vm|
+      node_config.vm.network :private_network, ip: node[:ip]
+      node_config.vm.provider :virtualbox do |vm|
         vm.customize [
                          "modifyvm", :id,
                          "--memory", node[:vm_ram].to_s,
@@ -60,7 +60,7 @@ Vagrant.configure(2) do |config|
 
       if node[:shared_folder]
         puts "Sharing folder"
-        nodeconfig.vm.synced_folder node[:shared_folder], node[:shared_folder_as]
+        node_config.vm.synced_folder node[:shared_folder], node[:shared_folder_as]
       else
         puts "No folder to be shared"
       end
@@ -73,21 +73,29 @@ Vagrant.configure(2) do |config|
       if node[:vm_is_windows]
         puts "Windows ssh port"
         # nodeconfig.vm.network "forwarded_port", guest: node[:port_fwd], host: node[:port_fwd]
-        nodeconfig.vm.guest = :windows
-        nodeconfig.vm.communicator = "winrm"
-        nodeconfig.vm.network :forwarded_port, guest: 3389, host: 3389 # windows RDP
-        nodeconfig.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true # windows winrm default port
+        node_config.vm.guest = :windows
+        node_config.vm.communicator = "winrm"
+        node_config.vm.network :forwarded_port, guest: 3389, host: 3389 # windows RDP
+        node_config.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true # windows winrm default port
         # setting up larger timeout and halt timeout, due to updates and upgrades
-        config.vm.boot_timeout = 600
-        config.vm.graceful_halt_timeout = 600
+        node_config.vm.boot_timeout = 600
+        node_config.vm.graceful_halt_timeout = 600
         # timeout in seconds
-        config.vm.box_check_update = true
+        node_config.vm.box_check_update = true
         # config.ssh.insert_key = false
         # config.ssh.hostname = "192.168.56.101"
-        config.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", disabled: true
-        config.vm.network :forwarded_port, guest: 22, host: 2230, auto_correct: true
+        node_config.vm.network :forwarded_port, guest: 22, host: 12223, id: "ssh"
+
+
+        # config.vm.network :forwarded_port, guest: 22, host: 12914, id: 'ssh'
+
+        # config.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", disabled: true
+        # config.vm.network :forwarded_port, guest: 22, host: 64673, auto_correct: true
+
       else
-        nodeconfig.vm.provision :shell, inline: "echo 'Sara is my Cat & Thor is my Dog!' > /etc/motd "
+        # assign each box their own ssh port prevent ssh port colision
+        node_config.vm.network :forwarded_port, guest: 22, host: 12224, id: "ssh"
+        node_config.vm.provision :shell, inline: "echo 'Sara is my Cat & Thor is my Dog!' > /etc/motd "
       end
 
     end
