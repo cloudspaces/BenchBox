@@ -36,6 +36,8 @@ router.get('/emit', function (req, res, next) {
                 console.log(' [x] Requesting [' + cmd + '] to [' + target_queue + ']');
                 var on_message_prop = {noAck: true};
                 console.log("consume");
+                
+                // on request handler
                 ch.consume(q.queue, function (msg) {
                     // on queue_message
                     var response = msg.content.toString();
@@ -110,6 +112,7 @@ router.get('/emit', function (req, res, next) {
                         }, 500);
                     }
                 }, on_message_prop);
+                // emit current request
                 ch.sendToQueue(target_queue, // target-hostname
                     // send rpc message to queue
                     new Buffer(JSON.stringify({cmd: cmd, msg: req.query})),

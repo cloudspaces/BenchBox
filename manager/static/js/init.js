@@ -329,6 +329,8 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 })
             };
 
+
+
             /**
              * Name is the name of the DOM element where to lookup for target hosts
              * Cmd => indica que subcola de rabbit va a ejecutar las operaciones.
@@ -369,6 +371,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 }
 
                 // hardcoded queue multiplexing
+                // when its executor take executor command, montor take monitor command, otherwise misc.
                 switch (cmd) {
                     case 'executor':
                         // handle benchBox - execute
@@ -396,7 +399,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                             });
                             console.log("rmqHost: " + cmd, this.name, checkedId, host[0]);
                             host[0].rmq_queue = targetHost.toLowerCase();
-                            host[0].test_setup = $scope.run;
+                            host[0].test_setup = $scope.run; // aqui dentro esta la variable testTarget = "windows or linux"
                             // console.log(host[0])
                             rmqHost(host[0], cmd)
                         }
@@ -620,7 +623,8 @@ rmqHost = function (host, cmd, cb) {
         cred_dropbox: host.cred_dropbox,
         cmd: cmd,
         target_queue: host.rmq_queue,
-        test: host.test_setup
+        test: host.test_setup,
+        target: host.test_setup.testTarget
     };
 
     appendAllParams(args, 'bb-config');
