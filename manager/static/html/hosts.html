@@ -34,7 +34,7 @@
 
 <div class="row">
     <label>Please select: Target OS</label>
-    <select name="target" ng-model="run.testTarget">
+    <select id="rpc-target" ng-change="changeTargetRPC()" ng-model="run.testTarget">
         <option ng-value="windows">windows</option>
         <option ng-value="linux">linux</option>
         <!--
@@ -44,10 +44,10 @@
     </select>
 </div>
 
-<div class="row" id="rpc-linux">
+<div class="row" id="rpc-linux" style="display: none">
     <div class="col-md-1">
         <h5>
-            RPC Command:
+            RPC Linux Command:
         </h5>
     </div>
     <div class="col-md-11">
@@ -119,7 +119,7 @@
 <div class="row" id="rpc-windows">
     <div class="col-md-1">
         <h5>
-            RPC Command:
+            RPC Windows Command:
         </h5>
     </div>
     <div class="col-md-11">

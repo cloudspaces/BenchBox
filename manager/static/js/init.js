@@ -3,9 +3,9 @@ console.log("init.js");
 bugall = null;
 angular.module('app', ['ngRoute', 'ngResource'])
 
-    //---------------
-    // Services
-    //---------------
+//---------------
+// Services
+//---------------
     .directive('img-stream', function () {
         return {
             restrict: 'A',
@@ -237,8 +237,30 @@ angular.module('app', ['ngRoute', 'ngResource'])
             };
 
 
+            $scope.changeTargetRPC = function () {
 
-            $scope.getAllMetrics = function(){
+                var target = $('#rpc-target')[0].value;
+                console.log(target);
+
+                switch (target) {
+                    case "windows":
+                        console.log("show windows"); 
+                        $('#rpc-linux').hide();
+                        $('#rpc-windows').show();
+                        break;
+                    case "linux":
+                        console.log("show linux");
+                        $('#rpc-windows').hide();
+                        $('#rpc-linux').show();
+                        break;
+                    default:
+                        console.log("unhandled target operating system")
+                        break;
+                }
+ 
+            };
+
+            $scope.getAllMetrics = function () {
                 queryDownloadInfluxMeasurement()
             };
 
@@ -536,10 +558,10 @@ testConnection = function (ip, port, cb) {
 queryDownloadInfluxMeasurement = function (measurement) {
     console.log("Download measurement: ", measurement);
     var influx_query;
-    if(measurement == undefined){
+    if (measurement == undefined) {
         measurement = "all";
         influx_query = "select * from benchbox ";
-    }else{
+    } else {
         influx_query = "select * from benchbox where hostname = '" + measurement + "'";
     }
     console.log(influx_query)

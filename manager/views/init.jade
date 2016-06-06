@@ -175,7 +175,7 @@ block content
                                 if (location.hostname !== 'localhost') {
                                     $('#manager-ip')[0].value = location.hostname
                                     $('#rabbitmq-amqp')[0].value = "amqp://benchbox:benchbox@" + location.hostname + "/"
-                                }else {
+                                } else {
                                     $('#manager-ip')[0].value = ip
                                     $('#rabbitmq-amqp')[0].value = "amqp://benchbox:benchbox@" + ip + "/"
                                 }
@@ -187,7 +187,6 @@ block content
                 );
 
 
-
                 $('#grafana-link').click(
                         function () {
                             window.open('http://' + location.hostname + ':3000/dashboard/db/benchbox', '_blank');
@@ -196,5 +195,6 @@ block content
                         function () {
                             window.open('http://' + location.hostname + ':15672/#/', '_blank')
                         })
+
 
             })
