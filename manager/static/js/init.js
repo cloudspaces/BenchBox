@@ -62,7 +62,8 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 testFolder: 'stacksync_folder', // modificar aixo mitjançant detector segons testClient
                 testClient: 'StackSync', // modificar aixo en format select
                 testOperation: 'keepalive', // default monitor operation
-                testMonitor: 'keepalive' // default execute operation
+                testMonitor: 'keepalive', // default execute operation
+                testTarget: 'windows' // windows or linux
             };
 
             // controller actions

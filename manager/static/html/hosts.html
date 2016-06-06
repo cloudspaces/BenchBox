@@ -31,7 +31,92 @@
     </div>
 </div>
 -->
+
 <div class="row">
+    <label>Please select: Target OS</label>
+    <select name="target" ng-model="run.testTarget">
+        <option ng-value="windows">windows</option>
+        <option ng-value="linux">linux</option>
+        <!--
+        if its windows carregar la interficie actual
+        else configurar una interficie nova, al realitzar request fer forwarding d'aquesta variable.
+        -->
+    </select>
+</div>
+
+<div class="row" id="rpc-linux">
+    <div class="col-md-1">
+        <h5>
+            RPC Command:
+        </h5>
+    </div>
+    <div class="col-md-11">
+
+        <button class="btn btn-success"
+                ng-click="rpc('test-check','setup')"
+                title="Download BenchBox project to the dummy machine">Setup
+        </button>
+
+        <!--
+        <button class="btn btn-default"
+                ng-click="rmq('test-check','vagrantUp', '')"
+                title="vagrantUp rpc">vagrantUp</button>
+        -->
+        <button class="btn btn-default"
+                ng-click="rmq('test-check','vagrantStart', '')"
+                title="vagrantStart rpc[prod_status.py], boots the selected virtual machines">vagrantStart
+        </button>
+
+
+        <!--
+        move the vagrant provision inside vagrant up,
+        <button class="btn btn-default"
+                ng-click="rmq('test-check','vagrantProvision', '')"
+                title="vagrantProvision rpc">vagrantProvision</button>
+        -->
+
+        <button class="btn btn-default"
+                ng-click="rmq('test-check', 'vagrantDestroy', '')"
+                title="vagrantDestroy rpc[prod_status.py], destroy the running virtual machines">vagrantDestroy
+        </button>
+
+
+        <!--
+        <button class="btn btn-default" ng-click="rpc('test-check','vagrantDown')" title="pull latest repo & vagrant down">Down</button>
+        -->
+
+        <button class="btn btn-danger pull-right" ng-click="rmq('test-check', 'tearDown', 'benchBox', 'sandBox')"
+                title="Clear the shared file system: benchBox & sandBox">TearDown
+        </button>
+        <button class="btn btn-primary pull-right" ng-click="rmq('test-check', 'warmUp',   'benchBox')"
+                title="Startup file system: benchBox">Executor
+        </button>
+        <button class="btn btn-info pull-right" ng-click="rmq('test-check', 'monitorUp', 'sandBox')"
+                title="Startup monitor real time collection: sandBox">Monitor
+        </button>
+        <button class="btn btn-default" ng-click="resetMetrics('test-check')"
+                title="Clean metrics from influxDB of the selected hosts">Reset Metrics
+        </button>
+        <button class="btn btn-default" ng-click="getMetrics('test-check')"
+                title="Download metrics from influxDB of the selected hosts">Download Metrics
+        </button>
+        <button class="btn btn-default" ng-click="getAllMetrics()"
+                title="Download all metrics from benchbox measurement">
+            Download All Metrics
+        </button>
+
+        <!--
+        <button class="btn btn-default " ng-click="rpc('test-check','monitorUp')" title="Run Socket Listener at dummy machine, sandBox">Listen</button>
+
+        <button class="btn btn-default pull-right" ng-click="rpc('test-check','client', 'Down')" title="Run clientSSDown at dummy machine, sandBox">SSDown</button>
+        <button class="btn btn-default pull-right" ng-click="rpc('test-check','client', 'Up')" title="Run clientSSUp at dummy machine, sandBox">SSUp</button>
+        -->
+
+    </div>
+</div>
+
+
+<div class="row" id="rpc-windows">
     <div class="col-md-1">
         <h5>
             RPC Command:
