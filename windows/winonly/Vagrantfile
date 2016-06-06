@@ -5,93 +5,82 @@
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
-
-box_sand = 'chenglong/windows'
-box_bench = 'chenglong/benchbox'
-
-
-nodes = [
-    {:hostname => 'sandBox',
-     :ip => '192.168.56.101',
-     :box => box_sand,
-     :shared_folder => '../monitor',
-     :shared_folder_as => 'C:/monitor', # %USERPROFILE%
-     :port_fwd => 5000,
-     :vm_is_windows => true, # if box is windows add the appropriate setups
-     :vm_is_gui => true,
-     :vm_name => 'chenglong/windows',
-     :vm_cpu => "2",
-     :vm_ram => "2048",
-    }, # contains the pc-clients && log monitor
-
-    {:hostname => 'benchBox',
-     :ip => '192.168.56.2',
-     :box => box_bench,
-     :shared_folder => '../workload_generator',
-     :shared_folder_as => '/home/vagrant/workload_generator',
-     :vm_is_windows => false,
-     :vm_is_gui => false,
-     :vm_name => 'chenglong/benchbox',
-     :vm_cpu => "1",
-     :vm_ram => "512",
-    }
-]
-
-
 Vagrant.configure(2) do |config|
-  nodes.each do |node|
-    config.vm.define node[:hostname] do |nodeconfig|
-      puts "BOX/LOAD"
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
 
-      nodeconfig.vm.box = node[:box]
-      nodeconfig.vm.hostname = node[:hostname] # capat : hostnamectl
-      nodeconfig.vm.network :private_network, ip: node[:ip]
-      nodeconfig.vm.provider :virtualbox do |vm|
-        vm.customize [
-                         "modifyvm", :id,
-                         "--memory", node[:vm_ram].to_s,
-                         "--cpus", node[:vm_cpu].to_s,
-                     ]
-        vm.gui = node[:vm_is_gui]
-        vm.name = node[:vm_name]
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+  config.vm.box = "chenglong/windows"
 
-      end
 
-      # if node[:shared_folder]
-      #   puts "Sharing folder"
-      #   nodeconfig.vm.synced_folder node[:shared_folder], node[:shared_folder_as]
-      # else
-      #   puts "No folder to be shared"
-      # end
-      # if node[:port_fwd]
-      #   puts "FWD port"
-      #   nodeconfig.vm.network "forwarded_port", guest: node[:port_fwd], host: node[:port_fwd]
-      # end
 
-      # if node[:is_windows]
-      #   puts "Windows ssh port"
-      #   # nodeconfig.vm.network "forwarded_port", guest: node[:port_fwd], host: node[:port_fwd]
-      #   nodeconfig.vm.guest = :windows
-      #   nodeconfig.vm.communicator = "winrm"
-      #   nodeconfig.vm.network :forwarded_port, guest: 3389, host: 3389 # windows RDP
-      #   nodeconfig.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true # windows winrm default port
-      #   # setting up larger timeout and halt timeout, due to updates and upgrades
-      #   config.vm.boot_timeout = 600
-      #   config.vm.graceful_halt_timeout = 600
-      #   # timeout in seconds
-      #   config.vm.box_check_update = true
-      #   config.ssh.insert_key = false
-      # else
-      #   nodeconfig.vm.provision :shell, inline: "echo 'Sara is my Cat & Thor is my Dog!' > /etc/motd "
-      # end
+  config.vm.guest = :windows
+  config.vm.communicator = "winrm"
 
-    end
-    puts "PUPPET/LOAD"
+  config.vm.network :forwarded_port, guest: 3389, host: 3389 # windows RDP
+  config.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true # windows winrm default port
+
+
+  # setting up larger timeout and halt timeout, due to updates and upgrades
+  config.vm.boot_timeout = 600
+  config.vm.graceful_halt_timeout = 600
+  # timeout in seconds
+
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  config.vm.box_check_update = true
+  config.ssh.insert_key = false
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network "private_network", ip: "192.168.33.10"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network "public_network"
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "../data", "/vagrant_data"
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  #
+  config.vm.provider "virtualbox" do |vb|
+     # Display the VirtualBox GUI when booting the machine
+     vb.gui = true
+     vb.name = "sandBox"
+     # Customize the amount of memory on the VM:
+     # vb.memory = "1024"
+  end
+  #
+  # View the documentation for the provider you are using for more
+  # information on available options.
+
+  # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
+  # such as FTP and Heroku are also available. See the documentation at
+  # https://docs.vagrantup.com/v2/push/atlas.html for more information.
+  config.push.define "atlas" do |push|
+     push.app = "chenglong/windows"
+     push.token = "q3SPEhYYClFi3A.atlasv1.zoHFIR4PKL1RKpbZW4vjtW6Yo2VGrmauMdp0ys6ZcG2J3u67OyE00SBWEXO646O7uSM"
   end
 
-  # config.push.define "atlas" do |push|
-  #   push.app = "chenglong/windows"
-  #   push.token = "q3SPEhYYClFi3A.atlasv1.zoHFIR4PKL1RKpbZW4vjtW6Yo2VGrmauMdp0ys6ZcG2J3u67OyE00SBWEXO646O7uSM"
-  # end
-
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   sudo apt-get update
+  #   sudo apt-get install -y apache2
+  # SHELL
 end
