@@ -87,12 +87,13 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
           "" \
           "if [ -d BenchBox ]; then " \
           "cd BenchBox; " \
+          "" \
           "git pull; " \
           "else " \
           "git clone --recursive https://github.com/CloudSpaces/BenchBox.git; " \
           "cd BenchBox; " \
           "fi; " \
-          "" \
+          "echo '{}' > target; " \
           "cd vagrant; " \
           "" \
           "echo '{}' > rabbitmq; " \
@@ -115,6 +116,7 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
           "" \
           "".format(h['passwd'],
                     h['passwd'],
+                    h['target'],
                     h['rabbit-url'], h['profile'],
                     h['cred_stacksync'], h['cred_owncloud'], h['cred_dropbox'], h['hostname'],
                     h['stacksync-ip'], h['stacksync-port'],
