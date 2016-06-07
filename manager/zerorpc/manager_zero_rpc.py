@@ -95,7 +95,7 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
           "fi; " \
           "echo '{}' > target; " \
           "cd vagrant; " \
-          "" \
+          "echo '{}' > target; " \
           "echo '{}' > rabbitmq; " \
           "echo '{}' > profile; " \
           "" \
@@ -116,6 +116,7 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
           "" \
           "".format(h['passwd'],
                     h['passwd'],
+                    h['target'],
                     h['target'],
                     h['rabbit-url'], h['profile'],
                     h['cred_stacksync'], h['cred_owncloud'], h['cred_dropbox'], h['hostname'],

@@ -145,7 +145,7 @@ class ActionHandler(object):
 
 
 class ProduceStatus(object):
-    def __init__(self, rmq_url='localhost', queue_name = 'status_manager'):
+    def __init__(self, rmq_url='localhost', queue_name = 'status_manager', target_os = 'linux'):
         print 'prod: {}'.format(rmq_url)
         self.rmq_url = rmq_url
         if rmq_url == 'localhost':
@@ -309,12 +309,19 @@ if __name__ == '__main__':
     ''' dummy host says hello to the manager '''
     status_msg, topic = parse_args(sys.argv[1:])
 
+    # target
+
+    target_os = None
+    with open('target','r') as r:
+        target_os = r.read().splitlines()[0]
+
+
     rmq_url = None
     with open('rabbitmq','r') as r:
         rmq_url = r.read().splitlines()[0]
 
     status_exchanger = 'status_exchanger'
-    emit_status_rpc = ProduceStatus(rmq_url)
+    emit_status_rpc = ProduceStatus(rmq_url=rmq_url, target_os=target_os)
 
     hostname = socket.gethostname()
 
