@@ -323,7 +323,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                         });
                         console.log("rpcHost" + cmd, this.name, checkedId, host[0]);
                         if (cmd === 'setup') {
-                            rpcHost(host[0], cmd)
+                            rpcHost(host[0], cmd, $scope.run.testTarget)
                         }
                     }
                 })
@@ -651,7 +651,7 @@ rmqHost = function (host, cmd, cb) {
     if (cb !== undefined)
         cb(args);
 };
-rpcHost = function (host, cmd, cb) {
+rpcHost = function (host, cmd, target) {
 
     var args = {
         ip: host.ip,
@@ -661,7 +661,8 @@ rpcHost = function (host, cmd, cb) {
         cred_stacksync: host.cred_stacksync,
         cred_owncloud: host.cred_owncloud,
         cred_dropbox: host.cred_dropbox,
-        cmd: cmd
+        cmd: cmd,
+        target: target // windows or linux
 
     };
     appendAllParams(args, 'bb-config');
@@ -682,8 +683,7 @@ rpcHost = function (host, cmd, cb) {
             $.notify('Error! ' + err, 'error');
         }
     });
-    if (cb !== undefined)
-        cb(args);
+
 };
 
 appendAllParams = function (target, className) {

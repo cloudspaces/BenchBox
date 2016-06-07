@@ -28,10 +28,14 @@ class ManagerZeroRpc:
             'graphite-ip': args['graphite-ip'][0],
             'rabbit-url': args['rabbitmq-amqp'][0],
             'box-url': None,
-            'hostname': args['hostname'][0]
+            'hostname': args['hostname'][0],
+            'target': args['target'][0], # target operating system
         }
         print "Start Initial Task"
+
+
         return setup_benchbox(host_settings)
+
 
 '''
 t2installVagrantVBox(host_settings)
@@ -42,30 +46,17 @@ t6assignSyncServer(host_settings)
 return 0
 '''
 
-
 def setup_benchbox(h):  # tell all the hosts to download BenchBox
     print 'setupBenchBox'
     # todo append rabbit.mq.url link and as ip file and also vagrant.box.url
     # "git clone -b development --recursive https://github.com/CloudSpaces/BenchBox.git; " \
     # "git clone -b development --recursive https://github.com/CloudSpaces/BenchBox.git; " \
-    print "Start setup benchbox"
-    str_cmd = " " \
-              "echo 'check if Git is installed...'; " \
-              "echo '{}' | sudo -S apt-get install git; " \
-              "echo 'check upgrade pip'; " \
-              "echo '{}' | sudo pip install --upgrade pip; " \
-              "echo 'check if BenchBox is installed...'; " \
-              "" \
+
+
+    str_cmd_win = " " \
               "if [ -d BenchBox ]; then " \
               "cd BenchBox; " \
-              "git pull; " \
-              "else " \
-              "git clone --recursive https://github.com/CloudSpaces/BenchBox.git; " \
-              "cd BenchBox; " \
-              "fi; " \
-              "" \
-              "cd vagrant; " \
-              "" \
+              "cd windows; " \
               "echo '{}' > rabbitmq; " \
               "echo '{}' > profile; " \
               "" \
@@ -79,22 +70,64 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
               "echo '{}' > ss.owncloud.ip; " \
               "echo '{}' > log.impala.ip; " \
               "echo '{}' > log.graphite.ip; " \
-              "" \
-              "echo '{}' | sudo -S ./setup.sh; " \
-              "nohup ./startPeerConsumer.sh & " \
-              "" \
-              "" \
-              "".format(h['passwd'],
-                        h['passwd'],
-                        h['rabbit-url'], h['profile'],
-                        h['cred_stacksync'], h['cred_owncloud'], h['cred_dropbox'], h['hostname'],
+              "".format(h['rabbit-url'], h['profile'],
+                        h['cred_stacksync'],
+                        h['cred_owncloud'],
+                        h['cred_dropbox'], h['hostname'],
                         h['stacksync-ip'], h['stacksync-port'],
-                        h['owncloud-ip'], h['impala-ip'], h['graphite-ip'],
-                        h['passwd'])
+                        h['owncloud-ip'], h['impala-ip'], h['graphite-ip'])
 
+    print "Start setup benchbox"
+    str_cmd = " " \
+          "echo 'check if Git is installed...'; " \
+          "echo '{}' | sudo -S apt-get install git; " \
+          "echo 'check upgrade pip'; " \
+          "echo '{}' | sudo pip install --upgrade pip; " \
+          "echo 'check if BenchBox is installed...'; " \
+          "" \
+          "if [ -d BenchBox ]; then " \
+          "cd BenchBox; " \
+          "git pull; " \
+          "else " \
+          "git clone --recursive https://github.com/CloudSpaces/BenchBox.git; " \
+          "cd BenchBox; " \
+          "fi; " \
+          "" \
+          "cd vagrant; " \
+          "" \
+          "echo '{}' > rabbitmq; " \
+          "echo '{}' > profile; " \
+          "" \
+          "echo '{}' > ss.stacksync.key; " \
+          "echo '{}' > ss.owncloud.key; " \
+          "echo '{}' > ss.dropbox.key; " \
+          "echo '{}' > hostname; " \
+          "" \
+          "echo '{}' > ss.stacksync.ip; " \
+          "echo '{}' > ss.stacksync.port; " \
+          "echo '{}' > ss.owncloud.ip; " \
+          "echo '{}' > log.impala.ip; " \
+          "echo '{}' > log.graphite.ip; " \
+          "" \
+          "echo '{}' | sudo -S ./setup.sh; " \
+          "nohup ./startPeerConsumer.sh & " \
+          "" \
+          "" \
+          "".format(h['passwd'],
+                    h['passwd'],
+                    h['rabbit-url'], h['profile'],
+                    h['cred_stacksync'], h['cred_owncloud'], h['cred_dropbox'], h['hostname'],
+                    h['stacksync-ip'], h['stacksync-port'],
+                    h['owncloud-ip'], h['impala-ip'], h['graphite-ip'],
+                    h['passwd'])
     print 'sendQuery...'
-    print str_cmd
-    return rmi(h['ip'], h['user'], h['passwd'], str_cmd)  # utilitzar un worker del pool
+
+    if h["target"] == "windows":
+        print "Windows request no bash commands xD"
+        print rmi(h['ip'], h['user'], h['passwd'], str_cmd)
+        return rmi(h['ip'], h['user'], h['passwd'], str_cmd_win)
+    else:
+        return rmi(h['ip'], h['user'], h['passwd'], str_cmd)
 
 
 def rmi(hostname, login, passwd, cmd, callback=None):
