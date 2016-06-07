@@ -30,6 +30,9 @@ def remove_inner_path(path):
         print ex.message
 
 
+def run_command(cmd, dir):
+    output = subprocess.check_output(cmd.split(" "), cwd=dir)
+    return output
 
 
 class ActionHandler(object):
@@ -37,11 +40,19 @@ class ActionHandler(object):
         print "vagrant handler"
         self.hostname = socket.gethostname()
         self.target = target
+        self.working_dir = None
+        home = os.path.expanduser('~')
+        if target == 'windows':
+            self.working_dir = "{}/{}".format(home,'BenchBox/windows')
+        elif target == 'linux':
+            self.working_dir = "{}/{}".format(home,'BenchBox/vagrant')
+
+
 
     ''' executed at the dummyhost '''
     def up(self):
         print 'up'
-        output =  subprocess.check_output(["echo", "Hello World!"])
+        output =  subprocess.check_output(["echo", "Hello World!"], cwd=self.working_dir)
         return output
 
     def pwd(self):
@@ -50,6 +61,9 @@ class ActionHandler(object):
 
     def vagrantStart(self):
         print 'vagrantStart'
+        #
+        # change directory to the target provisioning directory
+        #
         self.vagrantUp()
         self.vagrantProvision()
         print 'vagrantStart/OK'
@@ -88,6 +102,9 @@ class ActionHandler(object):
             print "something failed"
         finally:
             return output
+
+
+
 
     "este script es compartido entre sandBox y benchBox"
     def tearDown(self):
@@ -203,7 +220,7 @@ class ProduceStatus(object):
 class ConsumeAction(object):
     def __init__(self, rmq_url, host_queue, target_os):
         print "Dummy Peer Worker"
-        self.vagrant_ops = ActionHandler(target_os)
+        self.vagrant_ops = ActionHandler(target=target_os)
         self.rmq_url = rmq_url
         if rmq_url == 'localhost':
             """
