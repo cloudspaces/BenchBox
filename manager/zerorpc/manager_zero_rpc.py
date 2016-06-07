@@ -54,12 +54,12 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
 
 
     str_cmd_win = " " \
-              "if [ -d BenchBox ]; then " \
+              "" \
               "cd BenchBox; " \
               "cd windows; " \
               "echo '{}' > rabbitmq; " \
               "echo '{}' > profile; " \
-              "" \
+              "echo 'Forward keys'; " \
               "echo '{}' > ss.stacksync.key; " \
               "echo '{}' > ss.owncloud.key; " \
               "echo '{}' > ss.dropbox.key; " \
@@ -76,7 +76,7 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
                         h['cred_dropbox'], h['hostname'],
                         h['stacksync-ip'], h['stacksync-port'],
                         h['owncloud-ip'], h['impala-ip'], h['graphite-ip'])
-
+    print str_cmd_win
     print "Start setup benchbox"
     str_cmd = " " \
           "echo 'check if Git is installed...'; " \
@@ -123,10 +123,11 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
     print 'sendQuery...'
 
     if h["target"] == "windows":
-        print "Windows request no bash commands xD"
+        print "TARGET IS WINDOWS: {}".format(h["target"])
         print rmi(h['ip'], h['user'], h['passwd'], str_cmd)
         return rmi(h['ip'], h['user'], h['passwd'], str_cmd_win)
     else:
+        print "TARGET IS LINUX: {}".format(h["target"])
         return rmi(h['ip'], h['user'], h['passwd'], str_cmd)
 
 
