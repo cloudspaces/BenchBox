@@ -64,14 +64,14 @@ node 'sandBox' {
 
 
   file {
-    ['/home/vagrant/stacksync_folder',
-      '/home/vagrant/.stacksync',
-      '/home/vagrant/.stacksync/cache',
-      '/home/vagrant/dropbox_folder',
-      '/home/vagrant/box_folder',
-      '/home/vagrant/drive_folder',
-      '/home/vagrant/one_folder',
-      '/home/vagrant/sugar_folder'
+    ['/Users/vagrant/stacksync_folder',
+      '/Users/vagrant/.stacksync',
+      '/Users/vagrant/.stacksync/cache',
+      '/Users/vagrant/dropbox_folder',
+      '/Users/vagrant/box_folder',
+      '/Users/vagrant/drive_folder',
+      '/Users/vagrant/one_folder',
+      '/Users/vagrant/sugar_folder'
     ]:
       ensure  => directory,
       owner   => vagrant,
@@ -91,7 +91,7 @@ node 'sandBox' {
   ->
   exec {
     'run messagequeue boostrap sandBox status':
-      command => 'nohup ./startPeerConsumer.sh & ',
+      command => 'nohup ./startPeerConsumer.dat & ',
       user    => 'vagrant',
       group   => 'vagrant',
       cwd     => '/vagrant',

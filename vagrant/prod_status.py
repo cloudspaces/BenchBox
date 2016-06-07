@@ -42,6 +42,9 @@ class ActionHandler(object):
         self.target = target
         self.working_dir = None
         home = os.path.expanduser('~')
+
+        # tell the dummy host which benchbox virtual machines to emit
+
         if target == 'windows':
             self.working_dir = "{}/{}".format(home,'BenchBox/windows')
         elif target == 'linux':
@@ -57,7 +60,7 @@ class ActionHandler(object):
 
     def pwd(self):
         print 'up'
-        return subprocess.check_output(["pwd", "."])
+        return subprocess.check_output(["pwd", "."], cwd=self.working_dir)
 
     def vagrantStart(self):
         print 'vagrantStart'
@@ -70,24 +73,28 @@ class ActionHandler(object):
 
     def vagrantUp(self):
         print 'vagrantUp'
-        print subprocess.check_output(["vagrant", "up"])
+        print subprocess.check_output(["vagrant", "up"], cwd=self.working_dir)
         return 'vagrantUp/OK'
 
     def vagrantProvision(self):
         print 'vagrantProvision'
-        print subprocess.check_output(['vagrant', 'provision'])
+        print subprocess.check_output(['vagrant', 'provision'], cwd=self.working_dir)
         return 'vagrantProvision/OK'
 
     def vagrantStatus(self):
         print 'vagrantProvision'
-        print subprocess.check_output(['vagrant', 'status'])
+        print subprocess.check_output(['vagrant', 'status'], cwd=self.working_dir)
         return 'vagrantProvision/OK'
 
     def vagrantDestroy(self):
         print 'vagrantDestroy'
-        print subprocess.check_output(['vagrant', 'destroy', '-f']) # vagrant destroy -f # force yes
+        print subprocess.check_output(['vagrant', 'destroy', '-f'],cwd=self.working_dir) # vagrant destroy -f # force yes
         return 'vagrantDestroy/OK'
 
+
+    # fins aqui els vagrant operations
+    # todo: caracteritzar el warmup del sandBox en el cas de windows o linux
+    # este
 
     ''' executed at the benchBox, nota: el script esta en el directorio root /vagrant'''
     def warmUp(self):
@@ -149,14 +156,34 @@ class ActionHandler(object):
     def monitorUp(self):
         # start the metrics listener for monitoring
         output = ""
-        try:
-            print 'monitorUp'
-            str_cmd = "sudo nohup python ~/monitor/monitor_rmq.py &> nohup_monitor_rmq.out& "
-            output = bash_command(str_cmd)
-        except:
-            print "something failed"
-        finally:
-            return output
+        if self.target == "linux":
+            try:
+                print 'monitorUp'
+                str_cmd = "sudo nohup python ~/monitor/monitor_rmq.py &> nohup_monitor_rmq.out& "
+                output = bash_command(str_cmd)
+            except:
+                print "something failed"
+            finally:
+                return output
+        elif self.target == "windows":
+            # when the virtual machine is windows how can my local machine tell my windows(sandBox) guest to launch executor_rmq_py???
+            print "how to warmup windows operating sandBox ??"
+            # todo lanzar el executor_rmq.py
+            try:
+                print "warmUp windows sandBox "
+                str_cmd = ""
+
+            except:
+
+                print "something failed"
+
+            finally:
+                return output
+
+        else:
+            print "unhandled operating system"
+
+
     def execute(self):
         print 'execute'
         return bash_command('whoami')
@@ -299,6 +326,10 @@ def bash_command(cmd):
     return rc
 
     # -c command starts to be read from the first non-option argument
+
+def power_command(cmd):
+    print "power shell command through winrm"
+
 
 def parse_args(argv):
 
