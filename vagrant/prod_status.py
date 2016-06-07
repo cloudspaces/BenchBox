@@ -33,9 +33,10 @@ def remove_inner_path(path):
 
 
 class ActionHandler(object):
-    def __init__(self):
+    def __init__(self, target = 'windows'):
         print "vagrant handler"
         self.hostname = socket.gethostname()
+        self.target = target
 
     ''' executed at the dummyhost '''
     def up(self):
@@ -200,9 +201,9 @@ class ProduceStatus(object):
 
 
 class ConsumeAction(object):
-    vagrant_ops = ActionHandler()
-    def __init__(self, rmq_url, host_queue):
+    def __init__(self, rmq_url, host_queue, target_os):
         print "Dummy Peer Worker"
+        self.vagrant_ops = ActionHandler(target_os)
         self.rmq_url = rmq_url
         if rmq_url == 'localhost':
             """
@@ -346,14 +347,14 @@ if __name__ == '__main__':
 
     print " [x] emit: emit_status_rpc.call({})".format(host_queue)
     response = emit_status_rpc.call(status_msg, host_queue)
-    emit_status_rpc.close()
+    emit_status_rpc.close() # emit setup done response
     print " [.] Got %r" % (response,)
 
     ''' crear una cua amb el propi host name de tipus direct '''
-    print "START DummyRabbitStatus Worker"
+    print "START DummyRabbitStatus Worker, handle | vagrant up | vagrant halt | vagrant destroy | "
     while True:
         try:
-            consumer_rpc = ConsumeAction(rmq_url, host_queue)
+            consumer_rpc = ConsumeAction(rmq_url, host_queue, target_os)
             consumer_rpc.listen()
         except Exception as ex:
             print "{} prod_status Consumer exception".format(ex.message)
