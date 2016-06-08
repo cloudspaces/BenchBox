@@ -50,6 +50,7 @@ class ActionHandler(object):
         elif target == 'linux':
             self.working_dir = "{}/{}".format(home,'BenchBox/vagrant')
 
+        print "TARGET DIRECTORY!!! [{}]".format(self.working_dir)
 
 
     ''' executed at the dummyhost '''
@@ -57,7 +58,7 @@ class ActionHandler(object):
         print 'up'
         output =  subprocess.check_output(["echo", "Hello World!"], cwd=self.working_dir)
         return output
-
+# subprocess.check_output(["vagrant", "status"], cwd="/home/milax/BenchBox/windows")
     def pwd(self):
         print 'up'
         return subprocess.check_output(["pwd", "."], cwd=self.working_dir)
