@@ -405,13 +405,12 @@ if __name__ == '__main__':
     host_queue = "{}.{}".format(dummyhost, hostname.lower())  # this is the format, that rmq.js target_queue needs!
     # status_msg
 
-    print " [x] emit: emit_status_rpc.call({})".format(host_queue)
+    print " [Out] emit: emit_status_rpc.call({})".format(host_queue)
     response = emit_status_rpc.call(status_msg, host_queue)
     emit_status_rpc.close() # emit setup done response
-    print " [.] Got %r" % (response,)
+    print " [In] recv: Got response from manager: %r" % (response,)
 
     ''' crear una cua amb el propi host name de tipus direct '''
-    print "START DummyRabbitStatus Worker, handle | vagrant up | vagrant halt | vagrant destroy | "
     while True:
         try:
             consumer_rpc = ConsumeAction(rmq_url, host_queue, target_os)
