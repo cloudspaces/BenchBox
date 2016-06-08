@@ -31,6 +31,8 @@ nodes = [
      :box => box_bench,
      :shared_folder => '../workload_generator',
      :shared_folder_as => '/home/vagrant/workload_generator',
+     :shared_vagrant_folder => '../vagrant',
+     :shared_vagrant_folder_as => '/home/vagrant/vagrant',
      :vm_is_windows => false,
      :vm_is_gui => false,
      :vm_name => 'chenglong_benchbox',
@@ -108,7 +110,7 @@ Vagrant.configure(2) do |config|
         node_config.vm.provision :shell, inline: "echo 'Sara is my Cat & Thor is my Dog!' > /etc/motd "
       end
       puts "PUPPET/LOAD"
-      if node[:vm_is_windows]
+      if node[:vm_is_windows] # [SANDBOX]
         # provisioning windows machine - how to provision windows vm with vagrant provision
         # node_config.vm.provision :puppet do |puppet|
         #   puppet.options= ['--verbose', '--debug']
@@ -131,7 +133,7 @@ Vagrant.configure(2) do |config|
         end
 
 
-      else # provisioning linux machine
+      else # provisioning linux machine [BENCHBOX]
         node_config.vm.provision :puppet do |puppet|
           # puppet.hiera_config_path = "puppet/hiera.yaml"
           puppet.options= ['--verbose', '--debug']
@@ -140,7 +142,7 @@ Vagrant.configure(2) do |config|
           }
           puppet.manifests_path = "../vagrant/puppet/manifests"
           puppet.module_path = "../vagrant/puppet/modules"
-          puppet.manifest_file = "default-windows.pp"
+          puppet.manifest_file = "default.pp"
         end
       end
 

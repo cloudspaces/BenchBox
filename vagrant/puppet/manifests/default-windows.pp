@@ -1,49 +1,6 @@
 # this puppet deploys a client with all the software dependencies - only stacksync
 
 # -------------------------------------------------------------------------------------------------------
-# benchBox
-# -------------------------------------------------------------------------------------------------------
-node 'benchBox' {
-  class { 'apt':
-    update => {
-      frequency => 'daily',
-    },
-  }->
-  class {
-    'benchbox':
-  }
-
-  exec {
-    'run message queue boostrap benchBox status':
-      command => 'nohup ./startPeerConsumer.sh & ',
-      user    => 'vagrant',
-      group   => 'vagrant',
-      cwd     => '/vagrant',
-      path    => ['/usr/bin', '/bin/']
-  }
-
-}
-
-define download_file(
-  $site="",
-  $cwd="",
-  $creates="") {
-
-  exec { $name:
-    path    => ['/bin','/usr/bin'],
-    command => "wget ${site}/${name}",
-    cwd     => $cwd,
-    creates => "${cwd}/${name}", # if this files does not exist then the it ill not execute...
-  }
-
-}
-
-
-
-
-
-
-# -------------------------------------------------------------------------------------------------------
 # sandBox
 # -------------------------------------------------------------------------------------------------------
 node 'sandBox' {
