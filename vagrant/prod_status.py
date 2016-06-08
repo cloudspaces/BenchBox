@@ -373,12 +373,12 @@ if __name__ == '__main__':
     # target
 
     target_os = None
-    with open('target','r') as r:
+    with open('/vagrant/target','r') as r:
         target_os = r.read().splitlines()[0]
 
 
     rmq_url = None
-    with open('rabbitmq','r') as r:
+    with open('/vagrant/rabbitmq','r') as r:
         rmq_url = r.read().splitlines()[0]
 
     status_exchanger = 'status_exchanger'

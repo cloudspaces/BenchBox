@@ -16,7 +16,7 @@ function fib(n) {
     return a;
 }
 
-router.get('/update')
+router.get('/update');
 //
 amqp.connect(amqp_server_url).then(function(conn) {
     process.once('SIGINT', function() { conn.close(); });
