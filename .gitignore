@@ -80,7 +80,7 @@ vagrant/logs
 vagrant/Vagrantfile.rb
 vagrant/Vagrantfile.txt
 vagrant/megasync.sh
-
+vagrant/target
 
 monitor/hello_world.py
 monitor/logger/test
