@@ -118,6 +118,8 @@ class ActionHandler(object):
     def tearDown(self): #
         # clear the sandBox filesystem and cached files
         print 'tearDown'
+        if self.target == "windows":
+            return None # noop unimplemented exception
         try:
             output = ''
             if self.hostname == 'sandBox':              # todo if sandbox
@@ -175,7 +177,6 @@ class ActionHandler(object):
                 str_cmd = "monitor_rmq.py"
                 str_cwd = "/monitor"
                 output = power_command(str_cmd, str_cwd)
-
             except:
 
                 print "something failed"
