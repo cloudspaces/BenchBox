@@ -81,6 +81,8 @@ vagrant/Vagrantfile.rb
 vagrant/Vagrantfile.txt
 vagrant/megasync.sh
 
+
+monitor/hello_world.py
 monitor/logger/test
 monitor/logger/plots/output
 monitor/logger/capture
