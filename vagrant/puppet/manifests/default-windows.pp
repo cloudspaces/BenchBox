@@ -47,22 +47,6 @@ define download_file(
 # sandBox
 # -------------------------------------------------------------------------------------------------------
 node 'sandBox' {
-  /*
-  # owncloud
-  class{
-    "owncloud":
-      rmq_host => '10.30.232.183'
-  }
-  ->
-  # stacksync
-  class {
-    "stacksync":
-      rmq_host                  => '10.30.235.91',
-      p_repo_connection_authurl => 'http://10.30.235.91:5000/v2.0/tokens'
-  }->
-  */
-
-
   file {
     ['/Users/vagrant/stacksync_folder',
       '/Users/vagrant/.stacksync',
@@ -108,7 +92,58 @@ node 'sandBox' {
 
   include dropbox
   */
-
 }
 
+
+node 'win7-vagrant' {
+
+  file {
+    [
+      '/Users/vagrant/stacksync_folder',
+      '/Users/vagrant/.stacksync',
+      '/Users/vagrant/.stacksync/cache',
+      '/Users/vagrant/dropbox_folder',
+      '/Users/vagrant/box_folder',
+      '/Users/vagrant/drive_folder',
+      '/Users/vagrant/one_folder',
+      '/Users/vagrant/sugar_folder'
+    ]:
+      ensure  => directory,
+      owner   => vagrant,
+      group   => vagrant,
+      mode    => '0644',
+      recurse => true
+  } ->
+  /*
+  exec {
+    'run dropbox client setup':
+      command => "nohup /vagrant/scripts/config.dropbox.sh &",
+      user    => 'vagrant',
+      group   => 'vagrant',
+      cwd     => '/vagrant',
+      path    => ['/usr/bin','/bin/']
+  }
+
+  ->
+  */
+  exec {
+    'run messagequeue boostrap sandBox status':
+      command => 'startPeerConsumer.dat',
+      user    => 'vagrant',
+      group   => 'vagrant',
+      cwd     => '/vagrant'
+  }
+
+
+  # dropbox
+  /*
+    class {'dropbox::config':
+    user =>  'benchbox@outlook.com',
+    password => 'salou2010'
+  }
+
+  include dropbox
+  */
+
+}
 

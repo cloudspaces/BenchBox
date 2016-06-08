@@ -46,7 +46,8 @@ Vagrant.configure(2) do |config|
       puts "BOX/LOAD"
 
       node_config.vm.box = node[:box]
-      # nodeconfig.vm.hostname = node[:hostname] # capat : hostnamectl
+      node_config.vm.hostname = node[:hostname] # capat : hostnamectl
+      # tornar a generar el node amb el hostname sandBox enlloc de win7-vagrant
       # volver a geberar el box de windows con el hostname adecuado
       node_config.vm.network :private_network, ip: node[:ip]
       node_config.vm.provider :virtualbox do |vm|
@@ -101,7 +102,7 @@ Vagrant.configure(2) do |config|
         # config.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", disabled: true
         # config.vm.network :forwarded_port, guest: 22, host: 64673, auto_correct: true
 
-      else
+      else # when its linux
         # assign each box their own ssh port prevent ssh port colision
         node_config.vm.network :forwarded_port, guest: 22, host: 12224, id: "ssh"
         node_config.vm.provision :shell, inline: "echo 'Sara is my Cat & Thor is my Dog!' > /etc/motd "
@@ -111,6 +112,18 @@ Vagrant.configure(2) do |config|
         # provisioning windows machine
         # node_config.vm.provision :
         # how to provision windows vm with vagrant provision
+        node_config.vm.provision :puppet do |puppet|
+          puppet.options= ['--verbose', '--debug']
+          puppet.facter = {
+              "is_vagrant" => true
+          }
+          puppet.manifests_path = "../vagrant/puppet/manifests"
+          puppet.module_path = "../vagrant/puppet/modules"
+          puppet.manifest_file = "default-windows.pp"
+        end
+
+        node_config.vm.provision :shell, inline: ""
+
 
       else # provisioning linux machine
         node_config.vm.provision :puppet do |puppet|
