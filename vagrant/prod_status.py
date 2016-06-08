@@ -52,13 +52,13 @@ class ActionHandler(object):
 
         print "TARGET DIRECTORY!!! [{}]".format(self.working_dir)
 
-
     ''' executed at the dummyhost '''
     def up(self):
         print 'up'
         output =  subprocess.check_output(["echo", "Hello World!"], cwd=self.working_dir)
         return output
-# subprocess.check_output(["vagrant", "status"], cwd="/home/milax/BenchBox/windows")
+        # subprocess.check_output(["vagrant", "status"], cwd="/home/milax/BenchBox/windows")
+
     def pwd(self):
         print 'up'
         return subprocess.check_output(["pwd", "."], cwd=self.working_dir)
@@ -98,7 +98,7 @@ class ActionHandler(object):
     # este
 
     ''' executed at the benchBox, nota: el script esta en el directorio root /vagrant'''
-    def warmUp(self):
+    def warmUp(self): # unchanged only windows
         # warmup the sandBox filesystem booting the executor.py
         output = ""
         try:
@@ -115,7 +115,7 @@ class ActionHandler(object):
 
 
     "este script es compartido entre sandBox y benchBox"
-    def tearDown(self):
+    def tearDown(self): #
         # clear the sandBox filesystem and cached files
         print 'tearDown'
         try:
@@ -172,7 +172,9 @@ class ActionHandler(object):
             # todo lanzar el executor_rmq.py
             try:
                 print "warmUp windows sandBox "
-                str_cmd = ""
+                str_cmd = "monitor_rmq.py"
+                str_cwd = "/monitor"
+                output = power_command(str_cmd, str_cwd)
 
             except:
 
@@ -327,9 +329,17 @@ def bash_command(cmd):
     return rc
 
     # -c command starts to be read from the first non-option argument
-
-def power_command(cmd):
-    print "power shell command through winrm"
+'''
+cmd : command
+cwd : directory
+'''
+def power_command(cmd, cwd):
+    child = subprocess.Popen(cmd, cwd=cwd)
+    child.communicate()[0]
+    rc = child.returncode
+    # print "power shell command through winrm"
+    # simple python to launch the provider
+    return rc
 
 
 def parse_args(argv):
