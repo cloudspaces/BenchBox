@@ -125,7 +125,8 @@ Vagrant.configure(2) do |config|
         # aixo s'executa en la maquina virtual del sandBox windows
         node_config.vm.provision "shell" do |shell|
           shell.path = "../vagrant/startPeerConsumer.bat"
-          # shell.privileged = false
+          shell.privileged = false
+          # this prevents error removing WRM logfile
         end
 
 
