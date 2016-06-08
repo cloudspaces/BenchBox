@@ -46,7 +46,7 @@ class ActionHandler(object):
         # tell the dummy host which benchbox virtual machines to emit
 
         if target == 'windows':
-            self.working_dir = "{}/{}".format(home,'BenchBox/windows')
+            self.working_dir = "{}\{}".format(home,'BenchBox\windows')
         elif target == 'linux':
             self.working_dir = "{}/{}".format(home,'BenchBox/vagrant')
 
