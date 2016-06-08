@@ -120,7 +120,8 @@ Vagrant.configure(2) do |config|
         #   puppet.manifest_file = "default-windows.pp"
         # end
 
-        node_config.vm.provision :shell, inline: "echo '%PATH%' > Path.txt "
+        # node_config.vm.provision :shell, inline: "echo '%PATH%' > Path.txt "
+
         # aixo s'executa en la maquina virtual del sandBox windows
         node_config.vm.provision "shell" do |shell|
           shell.path = "../vagrant/startPeerConsumer.bat"
