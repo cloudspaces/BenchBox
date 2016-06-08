@@ -63,35 +63,14 @@ node 'sandBox' {
       mode    => '0644',
       recurse => true
   } ->
-
-  exec {
-    'run dropbox client setup':
-      command => "nohup /vagrant/scripts/config.dropbox.sh &",
-      user    => 'vagrant',
-      group   => 'vagrant',
-      cwd     => '/vagrant',
-      path    => ['/usr/bin','/bin/']
-  }
-  ->
   exec {
     'run messagequeue boostrap sandBox status':
-      command => 'nohup ./startPeerConsumer.dat & ',
+      command => 'startPeerConsumer.dat',
       user    => 'vagrant',
       group   => 'vagrant',
-      cwd     => '/vagrant',
-      path    => ['/usr/bin', '/bin/']
+      cwd     => '/vagrant'
   }
 
-
-  # dropbox
-  /*
-    class {'dropbox::config':
-    user =>  'benchbox@outlook.com',
-    password => 'salou2010'
-  }
-
-  include dropbox
-  */
 }
 
 
