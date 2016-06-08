@@ -5,7 +5,7 @@ echo "Starting sandBox prod status"
 
 
 echo "Update"
-start python C:\Users\vagrant\vagrant\prod_status.py --msg provisionOK --topic %ComputerName%
+start \max python C:\Users\vagrant\vagrant\prod_status.py --msg provisionOK --topic %ComputerName%
 echo "Finish provisioning windows sandBox"
 
 
