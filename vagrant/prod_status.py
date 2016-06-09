@@ -36,7 +36,7 @@ def run_command(cmd, dir):
 
 
 class ActionHandler(object):
-    def __init__(self, target = 'windows'):
+    def __init__(self, target = 'windows', is_dummy=False):
         print "vagrant handler"
         self.hostname = socket.gethostname()
         self.target = target
@@ -44,13 +44,16 @@ class ActionHandler(object):
         home = os.path.expanduser('~')
 
         # tell the dummy host which benchbox virtual machines to emit
+        if is_dummy:
+            print "Not a dummy host"
+            self.working_dir = "{}\{}".format(home,'BenchBox/vagrant')
+        else:
+            if target == 'windows':
+                self.working_dir = "{}\{}".format(home,'BenchBox\windows')
+            elif target == 'linux':
+                self.working_dir = "{}/{}".format(home,'BenchBox/vagrant')
 
-        if target == 'windows':
-            self.working_dir = "{}\{}".format(home,'BenchBox\windows')
-        elif target == 'linux':
-            self.working_dir = "{}/{}".format(home,'BenchBox/vagrant')
-
-        print "TARGET DIRECTORY!!! [{}]".format(self.working_dir)
+            print "TARGET DIRECTORY!!! [{}]".format(self.working_dir)
 
     ''' executed at the dummyhost '''
     def up(self):
@@ -98,7 +101,7 @@ class ActionHandler(object):
     # este
 
     ''' executed at the benchBox, nota: el script esta en el directorio root /vagrant'''
-    def warmUp(self): # unchanged only windows
+    def warmUp(self):  # unchanged only windows
         # warmup the sandBox filesystem booting the executor.py
         output = ""
         try:
@@ -194,8 +197,9 @@ class ActionHandler(object):
 
 
 class ProduceStatus(object):
-    def __init__(self, rmq_url='localhost', queue_name = 'status_manager', target_os = 'linux'):
+    def __init__(self, rmq_url='localhost', queue_name = 'status_manager', target_os = 'linux', is_dummyHost=False):
         print 'prod: {}'.format(rmq_url)
+        self.is_dummyHost = is_dummyHost
         self.rmq_url = rmq_url
         if rmq_url == 'localhost':
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
@@ -249,9 +253,9 @@ class ProduceStatus(object):
 
 
 class ConsumeAction(object):
-    def __init__(self, rmq_url, host_queue, target_os):
+    def __init__(self, rmq_url, host_queue, target_os, is_dummy):
         print "Dummy Peer Worker"
-        self.vagrant_ops = ActionHandler(target=target_os)
+        self.vagrant_ops = ActionHandler(target=target_os, is_dummy=is_dummy)
         self.rmq_url = rmq_url
         if rmq_url == 'localhost':
             """
@@ -382,7 +386,7 @@ class ProdStatusService():
     def main(self, status_msg, topic):
         ''' dummy host says hello to the manager '''
         # target
-
+        is_dummyHost = False
         target_os = None
         try:
             with open('/vagrant/target','r') as r:
@@ -391,6 +395,7 @@ class ProdStatusService():
             print "This is not a BenchBox machine"
             with open('./target','r') as r:
                 target_os = r.read().splitlines()[0]
+            is_dummyHost = True
 
         rmq_url = None
 
@@ -401,8 +406,9 @@ class ProdStatusService():
             print "This is not a BenchBox machine"
             with open('./rabbitmq','r') as r:
                 rmq_url = r.read().splitlines()[0]
+            is_dummyHost = True
         status_exchanger = 'status_exchanger'
-        emit_status_rpc = ProduceStatus(rmq_url=rmq_url, target_os=target_os)
+        emit_status_rpc = ProduceStatus(rmq_url=rmq_url, target_os=target_os, is_dummyHost=is_dummyHost)
 
         hostname = socket.gethostname()
 
@@ -433,7 +439,7 @@ class ProdStatusService():
         ''' crear una cua amb el propi host name de tipus direct '''
         while True:
             try:
-                consumer_rpc = ConsumeAction(rmq_url, host_queue, target_os)
+                consumer_rpc = ConsumeAction(rmq_url, host_queue, target_os, is_dummyHost)
                 consumer_rpc.listen()
             except Exception as ex:
                 print "{} prod_status Consumer exception".format(ex.message)
