@@ -445,3 +445,5 @@ class ProdStatusService():
 
 if __name__ == '__main__':
     status_msg, topic, windows = parse_args(sys.argv[1:])
+    ps = ProdStatusService()
+    ps.main(status_msg, topic)
