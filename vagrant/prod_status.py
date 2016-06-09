@@ -49,7 +49,7 @@ class ActionHandler(object):
         #     self.working_dir = "{}\{}".format(home,'BenchBox/vagrant')
         # else:
         if target == 'windows':
-            self.working_dir = "{}\{}".format(home,'BenchBox\windows')
+            self.working_dir = "{}\{}".format(home,'BenchBox/windows')
         elif target == 'linux':
             self.working_dir = "{}/{}".format(home,'BenchBox/vagrant')
 
