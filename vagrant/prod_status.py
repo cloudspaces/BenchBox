@@ -347,13 +347,14 @@ def parse_args(argv):
 
     print "Arguments: {}".format(argv)
     try:
-        opts, args = getopt.getopt(argv, "hm:,t:", ["msg=" , "topic="])
+        opts, args = getopt.getopt(argv, "hm:,t:,w:", ["msg=" , "topic=", "windows="])
     except getopt.GetoptError:
-        print '*.py -m <msg> -t <topic>'
+        print '*.py -m <msg> -t <topic> [-windows <boolean>] '
         sys.exit(2)
 
     msg = None
     top = None
+    win = False
     for opt, arg in opts:
         if opt == '-h':
             sys.exit()
@@ -361,63 +362,86 @@ def parse_args(argv):
             msg = arg
         elif opt in ("-t", "--topic"):
             top = arg
-    print msg, top
-    return msg, top
+        elif opt in ("-w", "--windows"): # launch the current process as subprocess
+            win = arg
+    print msg, top, win
+    return msg, top, win
 
 
 
 if __name__ == '__main__':
     ''' dummy host says hello to the manager '''
-    status_msg, topic = parse_args(sys.argv[1:])
+    status_msg, topic, windows = parse_args(sys.argv[1:])
 
-    # target
+    if windows:
+        print "recall current process with same parameters creating another "
+        file =  os.path.realpath(__file__)
+        cmd = "{} --msg {} --topic {}".format(file, status_msg, topic)
+        print cmd
+        print cmd.split(" ")
+        this_proc = subprocess.Popen(cmd.split(" "))
+        # this_proc.communicate()
+        sys.exit(0)
 
-    target_os = None
-    with open('/vagrant/target','r') as r:
-        target_os = r.read().splitlines()[0]
+    else:
 
+        # target
 
-    rmq_url = None
-    with open('/vagrant/rabbitmq','r') as r:
-        rmq_url = r.read().splitlines()[0]
-
-    status_exchanger = 'status_exchanger'
-    emit_status_rpc = ProduceStatus(rmq_url=rmq_url, target_os=target_os)
-
-    hostname = socket.gethostname()
-
-    if status_msg is None:
-        status_msg = "Hello from {} ".format(hostname)
-
-    if topic is None:
-        hostname = topic
-
-    try:  # this means that its a dummyhost
-        with open('./hostname', 'r') as f:
-            dummyhost = f.read().splitlines()[0]
-
-    except: # this means that its sandBox or benchBox
-        with open('/vagrant/hostname', 'r') as f:
-            dummyhost = f.read().splitlines()[0]
-
-    # dummyhost = hostname
-
-    host_queue = "{}.{}".format(dummyhost, hostname.lower())  # this is the format, that rmq.js target_queue needs!
-    # status_msg
-
-    print " [Out] emit: emit_status_rpc.call({})".format(host_queue)
-    response = emit_status_rpc.call(status_msg, host_queue)
-    emit_status_rpc.close() # emit setup done response
-    print " [In] recv: Got response from manager: %r" % (response,)
-
-    ''' crear una cua amb el propi host name de tipus direct '''
-    while True:
+        target_os = None
         try:
-            consumer_rpc = ConsumeAction(rmq_url, host_queue, target_os)
-            consumer_rpc.listen()
-        except Exception as ex:
-            print "{} prod_status Consumer exception".format(ex.message)
+            with open('/vagrant/target','r') as r:
+                target_os = r.read().splitlines()[0]
+        except:
+            print "This is not a BenchBox machine"
+            with open('./target','r') as r:
+                target_os = r.read().splitlines()[0]
+
+        rmq_url = None
+
+        try:
+            with open('/vagrant/rabbitmq','r') as r:
+                rmq_url = r.read().splitlines()[0]
+        except:
+            print "This is not a BenchBox machine"
+            with open('./rabbitmq','r') as r:
+                rmq_url = r.read().splitlines()[0]
+        status_exchanger = 'status_exchanger'
+        emit_status_rpc = ProduceStatus(rmq_url=rmq_url, target_os=target_os)
+
+        hostname = socket.gethostname()
+
+        if status_msg is None:
+            status_msg = "Hello from {} ".format(hostname)
+
+        if topic is None:
+            hostname = topic
+
+        try:  # this means that its a dummyhost
+            with open('./hostname', 'r') as f:
+                dummyhost = f.read().splitlines()[0]
+
+        except: # this means that its sandBox or benchBox
+            with open('/vagrant/hostname', 'r') as f:
+                dummyhost = f.read().splitlines()[0]
+
+        # dummyhost = hostname
+
+        host_queue = "{}.{}".format(dummyhost, hostname.lower())  # this is the format, that rmq.js target_queue needs!
+        # status_msg
+
+        print " [Out] emit: emit_status_rpc.call({})".format(host_queue)
+        response = emit_status_rpc.call(status_msg, host_queue)
+        emit_status_rpc.close() # emit setup done response
+        print " [In] recv: Got response from manager: %r" % (response,)
+
+        ''' crear una cua amb el propi host name de tipus direct '''
+        while True:
+            try:
+                consumer_rpc = ConsumeAction(rmq_url, host_queue, target_os)
+                consumer_rpc.listen()
+            except Exception as ex:
+                print "{} prod_status Consumer exception".format(ex.message)
 
 
 
-    ''' dummy host does all the following setup operations '''
+        ''' dummy host does all the following setup operations '''
