@@ -111,6 +111,7 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
           "echo '{}' > log.graphite.ip; " \
           "" \
           "echo '{}' | sudo -S ./setup.sh; " \
+          "echo '----------------------------------'; " \
           "nohup ./startPeerConsumer.sh & " \
           "" \
           "" \

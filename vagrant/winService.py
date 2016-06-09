@@ -5,7 +5,6 @@ import win32event
 import servicemanager
 import socket
 import sys
-from test import sampleLoopForEver as loop
 from prod_status import ProdStatusService
 
 class AppServerSvc (win32serviceutil.ServiceFramework):
