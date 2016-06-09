@@ -44,16 +44,16 @@ class ActionHandler(object):
         home = os.path.expanduser('~')
 
         # tell the dummy host which benchbox virtual machines to emit
-        if is_dummy:
-            print "Not a dummy host"
-            self.working_dir = "{}\{}".format(home,'BenchBox/vagrant')
-        else:
-            if target == 'windows':
-                self.working_dir = "{}\{}".format(home,'BenchBox\windows')
-            elif target == 'linux':
-                self.working_dir = "{}/{}".format(home,'BenchBox/vagrant')
+        # if is_dummy:
+        #     print "Not a dummy host"
+        #     self.working_dir = "{}\{}".format(home,'BenchBox/vagrant')
+        # else:
+        if target == 'windows':
+            self.working_dir = "{}\{}".format(home,'BenchBox\windows')
+        elif target == 'linux':
+            self.working_dir = "{}/{}".format(home,'BenchBox/vagrant')
 
-            print "TARGET DIRECTORY!!! [{}]".format(self.working_dir)
+        print "TARGET DIRECTORY!!! [{}]".format(self.working_dir)
 
     ''' executed at the dummyhost '''
     def up(self):
