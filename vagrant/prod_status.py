@@ -347,14 +347,13 @@ def parse_args(argv):
 
     print "Arguments: {}".format(argv)
     try:
-        opts, args = getopt.getopt(argv, "hm:,t:,w:", ["msg=" , "topic=", "windows="])
+        opts, args = getopt.getopt(argv, "hm:,t:", ["msg=" , "topic="])
     except getopt.GetoptError:
-        print '*.py -m <msg> -t <topic> [-windows <boolean>] '
+        print '*.py -m <msg> -t <topic> '
         sys.exit(2)
 
     msg = None
     top = None
-    win = False
     for opt, arg in opts:
         if opt == '-h':
             sys.exit()
@@ -362,10 +361,9 @@ def parse_args(argv):
             msg = arg
         elif opt in ("-t", "--topic"):
             top = arg
-        elif opt in ("-w", "--windows"): # launch the current process as subprocess
-            win = arg
-    print msg, top, win
-    return msg, top, win
+
+    print msg, top
+    return msg, top
 
 
 class ProdStatusService():
@@ -445,6 +443,6 @@ class ProdStatusService():
         ''' dummy host does all the following setup operations '''
 
 if __name__ == '__main__':
-    status_msg, topic, windows = parse_args(sys.argv[1:])
+    status_msg, topic = parse_args(sys.argv[1:])
     ps = ProdStatusService()
     ps.main(status_msg, topic)
