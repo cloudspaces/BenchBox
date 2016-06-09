@@ -382,11 +382,13 @@ if __name__ == '__main__':
         print cmd
         print cmd.split(" ")
         this_proc = subprocess.Popen(cmd.split(" "))
+        print "AFTER CALL"
         # this_proc.communicate()
         sys.exit(0)
+        print "AFTER EXIT"
 
     else:
-
+        print "LINUX!!!"
         # target
 
         target_os = None
