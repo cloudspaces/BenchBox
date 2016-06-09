@@ -368,27 +368,20 @@ def parse_args(argv):
     return msg, top, win
 
 
+class ProdStatusService():
 
-if __name__ == '__main__':
-    ''' dummy host says hello to the manager '''
-    status_msg, topic, windows = parse_args(sys.argv[1:])
+    def __init__(self):
+        print "Noop"
 
-    if windows:
-        print "recall current process with same parameters creating another "
-        file =  os.path.realpath(__file__)
-        python_exe = os.path.join(os.path.dirname(sys.executable),'python.exe') # // 'C:\\Python27'
+    def start(self):
+        print "Start ..."
 
-        cmd = "{} {} --msg {} --topic {}".format(python_exe, file, status_msg, topic)
-        print cmd
-        print cmd.split(" ")
-        this_proc = subprocess.Popen(cmd.split(" "))
-        print "AFTER CALL"
-        # this_proc.communicate()
+    def stop(self):
+        print "Stop ..."
         sys.exit(0)
-        print "AFTER EXIT"
 
-    else:
-        print "LINUX!!!"
+    def main(self, status_msg, topic):
+        ''' dummy host says hello to the manager '''
         # target
 
         target_os = None
@@ -449,3 +442,6 @@ if __name__ == '__main__':
 
 
         ''' dummy host does all the following setup operations '''
+
+if __name__ == '__main__':
+    status_msg, topic, windows = parse_args(sys.argv[1:])

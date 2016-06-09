@@ -4,8 +4,9 @@ import win32service
 import win32event
 import servicemanager
 import socket
-from prod_status import
-
+import sys
+from test import sampleLoopForEver as loop
+from prod_status import main as prodStatus
 
 class AppServerSvc (win32serviceutil.ServiceFramework):
     _svc_name_ = "TestService"
@@ -17,8 +18,10 @@ class AppServerSvc (win32serviceutil.ServiceFramework):
         socket.setdefaulttimeout(60)
 
     def SvcStop(self):
+        sys.exit(0) # selve destruct none gracefully
         self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
         win32event.SetEvent(self.hWaitStop)
+        self.stop_requested = True
 
     def SvcDoRun(self):
         servicemanager.LogMsg(servicemanager.EVENTLOG_INFORMATION_TYPE,
@@ -29,7 +32,8 @@ class AppServerSvc (win32serviceutil.ServiceFramework):
     def main(self):
         # here goes the call to main script
         print "Running Prod_Status"
-
+        # loop().start()
+        prodStatus('provisionOK',socket.gethostname())
 
 
 if __name__ == '__main__':
