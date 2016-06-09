@@ -379,6 +379,7 @@ class ProdStatusService():
     def stop(self):
         print "Stop ..."
         sys.exit(0)
+        #raise SystemExit, "Some message here :D"
 
     def main(self, status_msg, topic):
         ''' dummy host says hello to the manager '''

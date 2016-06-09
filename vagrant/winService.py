@@ -20,9 +20,11 @@ class AppServerSvc (win32serviceutil.ServiceFramework):
         socket.setdefaulttimeout(60)
 
     def SvcStop(self):
+
+        self.ReportServiceStatus(win32service.SERVICE_STOPPED)
         self.ps.stop()
-        self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
         win32event.SetEvent(self.hWaitStop)
+
 
     def SvcDoRun(self):
         servicemanager.LogMsg(servicemanager.EVENTLOG_INFORMATION_TYPE,
