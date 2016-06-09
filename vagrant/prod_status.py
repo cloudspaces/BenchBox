@@ -48,10 +48,17 @@ class ActionHandler(object):
         #     print "Not a dummy host"
         #     self.working_dir = "{}\{}".format(home,'BenchBox/vagrant')
         # else:
-        if target == 'windows':
-            self.working_dir = "{}\{}".format(home,'BenchBox/windows')
-        elif target == 'linux':
-            self.working_dir = "{}/{}".format(home,'BenchBox/vagrant')
+
+
+
+        if is_dummy: #  llamadas tipo vagrant up
+            if target == 'windows': # para lanzar dentro de prod_status windows
+                self.working_dir = "{}/{}".format(home,'BenchBox/windows')
+                # aqui quizas haya un fork de 4 tipo
+            elif target == 'linux': # para apuntar dentro de prod_status linux
+                self.working_dir = "{}/{}".format(home,'BenchBox/vagrant')
+        else: # cuando es lanzado dentro del sandBox de windows
+            self.working_dir = os.getcwd()
 
         print "TARGET DIRECTORY!!! [{}]".format(self.working_dir)
 
