@@ -376,7 +376,9 @@ if __name__ == '__main__':
     if windows:
         print "recall current process with same parameters creating another "
         file =  os.path.realpath(__file__)
-        cmd = "{} --msg {} --topic {}".format(file, status_msg, topic)
+        python_exe = os.path.join(os.path.dirname(sys.executable),'python.exe') # // 'C:\\Python27'
+
+        cmd = "{} {} --msg {} --topic {}".format(python_exe, file, status_msg, topic)
         print cmd
         print cmd.split(" ")
         this_proc = subprocess.Popen(cmd.split(" "))
