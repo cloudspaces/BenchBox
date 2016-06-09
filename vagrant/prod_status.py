@@ -429,7 +429,7 @@ class ProdStatusService():
         # dummyhost = hostname
 
         if is_dummyHost:
-            host_queue = "{}.{}".format(dummyhost,dummyhost)
+            host_queue = "{}.{}".format(hostname.lower(), hostname.lower())
         else:
             host_queue = "{}.{}".format(dummyhost, hostname.lower())  # this is the format, that rmq.js target_queue needs!
         # status_msg
