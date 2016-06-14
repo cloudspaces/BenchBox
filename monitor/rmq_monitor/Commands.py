@@ -99,15 +99,14 @@ class Commands(object):
 
         pc_cmd_win = {
             #'dropbox': " subprocess.call(['C:\Program Files (x86)\Dropbox\Client\Dropbox.exe'])"
-            'dropbox': "C:\Program Files (x86)\Dropbox\Client\Dropbox.exe",
-            'mega': "C:\Users\vagrant\AppData\Local\MEGAsync\MEGAsync.exe",
-            'stacksync': "C:\Users\vagrant\AppData\Roaming\StackSync_client\Stacksync.jar",
-            'sugarsync': "C:\Program Files (x86)\SugarSync\SugarSync.exe",
-            'owncloud': "C:\Program Files (x86)\ownCloud\owncloud.exe",
-            'googledrive': "C:\Program Files (x86)\Google\Drive\googledrivesync.exe",
+            'dropbox': "/Program Files (x86)/Dropbox/Client/Dropbox.exe",
+            'mega': "/Users/vagrant/AppData/Local/MEGAsync/MEGAsync.exe",
+            'stacksync': "/Users/vagrant/AppData/Roaming/StackSync_client/Stacksync.jar",
+            'sugarsync': "/Program Files (x86)/SugarSync/SugarSync.exe",
+            'owncloud': "/Program Files (x86)/ownCloud/owncloud.exe",
+            'googledrive': "/Program Files (x86)/Google/Drive/googledrivesync.exe",
 
         }
-
 
         if os.name == "nt":
             str_cmd = pc_cmd_win[self.personal_cloud.lower()]
@@ -117,15 +116,13 @@ class Commands(object):
             # unimplemented operating system
             return None
 
-
-
+        print "TARGET: client == {}".format(str_cmd)
         pc_pid = {
             'stacksync': "java",
             'owncloud': "owncloudsync",
             'dropbox': "dropbox",
             'mega': "megasync"
         }
-
         pc_pid_win = {
             #'dropbox': " subprocess.call(['C:\Program Files (x86)\Dropbox\Client\Dropbox.exe'])"
             'dropbox': "Dropbox.exe",
@@ -156,14 +153,14 @@ class Commands(object):
                         print "Unable to start {}".format(self.personal_cloud)
                         break
                     time.sleep(3)
-                    try:
+                    try: # pid lookup
                         if os.name == "nt":
                             # each case handle
                             print "Monitoring windows client"
                             print self.sync_proc
                             is_running = False
                             client_pid = None
-                            for proc  in psutil.process_iter():
+                            for proc in psutil.process_iter():
                                 if proc.name() == proc_name:
                                     is_running = True
                                     client_pid = proc.pid
@@ -171,6 +168,10 @@ class Commands(object):
                             if is_running:
                                 self.client_running = True
                                 self.sync_proc_pid = client_pid
+                                print "Process running as {}".format(self.sync_proc_pid)
+                            else:
+                                print "Process idle"
+
                         elif os.name == "posix":
                             if proc_name == "owncloudsync":
                                 self.client_running = True
@@ -191,7 +192,8 @@ class Commands(object):
                                         self.client_running = True
                                         self.sync_proc_pid = proc.pid
                                         break
-                            psutil.Process(self.sync_proc_pid)
+                        ps_client = psutil.Process(self.sync_proc_pid)
+                        print "[INFO]: {} => {}".format(ps_client.pid, ps_client.name())
                     except Exception as ex:
                         print ex.message
                         print "couldn't load the pc"

@@ -66,7 +66,7 @@ class TrafficMonitor(Thread):
         self.register = None
         try:
             if os.name == "nt":
-                self.my_ip = "10.0.2.15" # static ip assignation inner image.
+                self.my_ip = "10.0.2.15"  # static ip assignation inner image.
             else:
                 self.my_ip = ni.ifaddresses(iface)[2][0]['addr']
         except KeyError:
