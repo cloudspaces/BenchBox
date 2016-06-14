@@ -53,7 +53,9 @@ block content
                     li
                         a(data-toggle='pill' href='#configManager') Configuration
                     li.active
-                        a(data-toggle='pill' href='#configHosts') Hosts
+                        a(data-toggle='pill' href='#configHosts') Manager
+                    //li
+                    //    a(data-toggle='pill' href='#configHostsWin') Hosts(Windows)
                     li
                         // a(data-toggle='pill' href='#configMonitor') Monitor
                         a(data-toggle='pill' id="grafana-link") Monitor
@@ -146,6 +148,11 @@ block content
                 .col-md-12
                     div(ng-app="app")
                         ng-view
+            //
+                #configHostsWin.tab-pane.fade.in.active
+                    .col-md-12
+                        div(ng-app="app-win")
+                            ng-view
 
         hr
         footer.footer
@@ -153,6 +160,7 @@ block content
 
         // CUSTOM
         script(src='js/init.js')
+        // script(src='js/init.win.js')
 
         // console.log(MY IP)
         script.
@@ -167,7 +175,7 @@ block content
                                 if (location.hostname !== 'localhost') {
                                     $('#manager-ip')[0].value = location.hostname
                                     $('#rabbitmq-amqp')[0].value = "amqp://benchbox:benchbox@" + location.hostname + "/"
-                                }else {
+                                } else {
                                     $('#manager-ip')[0].value = ip
                                     $('#rabbitmq-amqp')[0].value = "amqp://benchbox:benchbox@" + ip + "/"
                                 }
@@ -179,7 +187,6 @@ block content
                 );
 
 
-
                 $('#grafana-link').click(
                         function () {
                             window.open('http://' + location.hostname + ':3000/dashboard/db/benchbox', '_blank');
@@ -188,5 +195,6 @@ block content
                         function () {
                             window.open('http://' + location.hostname + ':15672/#/', '_blank')
                         })
+
 
             })

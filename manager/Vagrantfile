@@ -36,6 +36,7 @@ Vagrant.configure(2) do |config|
     config.vm.network "forwarded_port", guest: 3000, host: 3000 # grafana server
     config.vm.network "forwarded_port", guest: 18083, host: 8083 # webinterface influxdb
     config.vm.network "forwarded_port", guest: 8086, host: 8086 # listens in port 8083 (web) and 8086 (HTTP API).
+    config.vm.network :forwarded_port, guest: 22, host: 12225, id: "ssh"
 
     config.vm.provider :virtualbox do |vm|
         vm.customize [

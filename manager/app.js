@@ -173,7 +173,7 @@ var hostModel = require('./models/Hosts.js');
 
 // this chunk of code should go withing a separate file export and required...
 amqp.connect(amqp_url, function (err, conn) {
-    console.log(amqp_url)
+    console.log(amqp_url);
     if (err) {
         console.log('connection rabbitmq error', err);
         process.exit()

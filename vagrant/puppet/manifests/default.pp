@@ -12,48 +12,7 @@ node 'benchBox' {
   class {
     'benchbox':
   }
-  /*
-  class {
-    'git':
-  }->
-  class {
-    'java':
-      distribution => 'jdk',
-  }->
-  class { 'python' :
-    version    => 'system',
-    pip        => true,
-    dev        => true,
-    virtualenv => true
-  }->
-  package {
-    ['numpy']:
-      ensure   => 'installed',
-      provider => pip
-  }->
-  package {
-    ['termcolor','pika']:
-      ensure   => 'installed',
-      provider => pip
-  }->
-  package {
-    ['simpy',]:
-      ensure   => '2.3',
-      provider => pip
-  }
-  ->
-  package {
-    'python-scipy':
-      ensure   => 'installed',
-  }
 
-
-
-  class {
-    'vim':
-  }
-  ->
-  */
   exec {
     'run message queue boostrap benchBox status':
       command => 'nohup ./startPeerConsumer.sh & ',

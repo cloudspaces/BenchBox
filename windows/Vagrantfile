@@ -1,0 +1,158 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+
+box_sand = 'chenglong/windows'
+box_bench = 'chenglong/benchbox'
+
+
+nodes = [
+    {:hostname => 'sandBox',
+     :ip => '192.168.56.101',
+     :box => box_sand,
+     :shared_folder => '../monitor',
+     :shared_folder_as => '/Users/vagrant/monitor', # %USERPROFILE%
+     :shared_vagrant_folder => '../vagrant',
+     :shared_vagrant_folder_as => '/Users/vagrant/vagrant',
+     :port_fwd => 5000,
+     :vm_is_windows => true, # if box is windows add the appropriate setups
+     :vm_is_gui => true,
+     :vm_name => 'chenglong_windows',
+     :vm_cpu => "2",
+     :vm_ram => "2048",
+    }, # contains the pc-clients && log monitor
+
+    {:hostname => 'benchBox',
+     :ip => '192.168.56.2',
+     :box => box_bench,
+     :shared_folder => '../workload_generator',
+     :shared_folder_as => '/home/vagrant/workload_generator',
+     :shared_vagrant_folder => '../vagrant',
+     :shared_vagrant_folder_as => '/home/vagrant/vagrant',
+     :vm_is_windows => false,
+     :vm_is_gui => false,
+     :vm_name => 'chenglong_benchbox',
+     :vm_cpu => "1",
+     :vm_ram => "512",
+    }
+]
+
+
+Vagrant.configure(2) do |config|
+  nodes.each do |node|
+    config.vm.define node[:hostname] do |node_config|
+      puts "BOX/LOAD"
+
+      node_config.vm.box = node[:box]
+      # node_config.vm.hostname = node[:hostname] # capat : hostnamectl
+      # tornar a generar el node amb el hostname sandBox enlloc de win7-vagrant
+      # volver a geberar el box de windows con el hostname adecuado
+      node_config.vm.network :private_network, ip: node[:ip]
+      node_config.vm.provider :virtualbox do |vm|
+        vm.customize [
+                         "modifyvm", :id,
+                         "--memory", node[:vm_ram].to_s,
+                         "--cpus", node[:vm_cpu].to_s,
+                     ]
+        vm.gui = node[:vm_is_gui]
+        vm.name = node[:vm_name]
+
+      end
+
+      if node[:shared_folder]
+        puts "Sharing folder"
+        node_config.vm.synced_folder node[:shared_folder], node[:shared_folder_as]
+      else
+        puts "No folder to be shared"
+      end
+
+      if node[:shared_vagrant_folder]
+        puts "Sharing vagrant folder"
+        node_config.vm.synced_folder node[:shared_vagrant_folder], node[:shared_vagrant_folder_as]
+      else
+        puts "No folder to be shared"
+      end
+
+      # if node[:port_fwd]
+      #   puts "FWD port"
+      #   nodeconfig.vm.network "forwarded_port", guest: node[:port_fwd], host: node[:port_fwd]
+      # end
+
+      if node[:vm_is_windows]
+        puts "Windows ssh port"
+        # nodeconfig.vm.network "forwarded_port", guest: node[:port_fwd], host: node[:port_fwd]
+        node_config.vm.guest = :windows
+        node_config.vm.communicator = "winrm"
+        node_config.vm.network :forwarded_port, guest: 3389, host: 3389 # windows RDP
+        node_config.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true # windows winrm default port
+        # setting up larger timeout and halt timeout, due to updates and upgrades
+        node_config.vm.boot_timeout = 600
+        node_config.vm.graceful_halt_timeout = 600
+        # timeout in seconds
+        node_config.vm.box_check_update = true
+        # config.ssh.insert_key = false
+        # config.ssh.hostname = "192.168.56.101"
+        node_config.vm.network :forwarded_port, guest: 22, host: 12223, id: "ssh"
+
+
+        # config.vm.network :forwarded_port, guest: 22, host: 12914, id: 'ssh'
+
+        # config.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", disabled: true
+        # config.vm.network :forwarded_port, guest: 22, host: 64673, auto_correct: true
+
+      else # when its linux
+        # assign each box their own ssh port prevent ssh port colision
+        node_config.vm.network :forwarded_port, guest: 22, host: 12224, id: "ssh"
+        node_config.vm.provision :shell, inline: "echo 'Sara is my Cat & Thor is my Dog!' > /etc/motd "
+      end
+      puts "PUPPET/LOAD"
+      if node[:vm_is_windows] # [SANDBOX]
+        # provisioning windows machine - how to provision windows vm with vagrant provision
+        # node_config.vm.provision :puppet do |puppet|
+        #   puppet.options= ['--verbose', '--debug']
+        #   puppet.facter = {
+        #       "is_vagrant" => true
+        #   }
+        #   puppet.manifests_path = "../vagrant/puppet/manifests"
+        #   puppet.module_path = "../vagrant/puppet/modules"
+        #   puppet.manifest_file = "default-windows.pp"
+        # end
+
+        # node_config.vm.provision :shell, inline: "echo '%PATH%' > Path.txt "
+
+        # aixo s'executa en la maquina virtual del sandBox windows
+        node_config.vm.provision "shell" do |shell|
+          shell.path = "../vagrant/startPeerConsumer.bat"
+          shell.privileged = false
+          # this prevents error removing WRM logfile,
+          # this way the startPeerConsumer.bat blocks the provsioning
+        end
+
+
+      else # provisioning linux machine [BENCHBOX]
+        node_config.vm.provision :puppet do |puppet|
+          # puppet.hiera_config_path = "puppet/hiera.yaml"
+          puppet.options= ['--verbose', '--debug']
+          puppet.facter = {
+              "is_vagrant" => true
+          }
+          puppet.manifests_path = "../vagrant/puppet/manifests"
+          puppet.module_path = "../vagrant/puppet/modules"
+          puppet.manifest_file = "default.pp"
+        end
+      end
+
+      puts "VAGRANT/OK"
+    end
+  end
+
+  # config.push.define "atlas" do |push|
+  #   push.app = "chenglong/windows"
+  #   push.token = "q3SPEhYYClFi3A.atlasv1.zoHFIR4PKL1RKpbZW4vjtW6Yo2VGrmauMdp0ys6ZcG2J3u67OyE00SBWEXO646O7uSM"
+  # end
+
+end

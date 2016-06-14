@@ -3,9 +3,9 @@ console.log("init.js");
 bugall = null;
 angular.module('app', ['ngRoute', 'ngResource'])
 
-    //---------------
-    // Services
-    //---------------
+//---------------
+// Services
+//---------------
     .directive('img-stream', function () {
         return {
             restrict: 'A',
@@ -62,7 +62,8 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 testFolder: 'stacksync_folder', // modificar aixo mitjançant detector segons testClient
                 testClient: 'StackSync', // modificar aixo en format select
                 testOperation: 'keepalive', // default monitor operation
-                testMonitor: 'keepalive' // default execute operation
+                testMonitor: 'keepalive', // default execute operation
+                testTarget: 'windows' // windows or linux
             };
 
             // controller actions
@@ -236,8 +237,30 @@ angular.module('app', ['ngRoute', 'ngResource'])
             };
 
 
+            $scope.changeTargetRPC = function () {
 
-            $scope.getAllMetrics = function(){
+                var target = $('#rpc-target')[0].value;
+                console.log(target);
+
+                switch (target) {
+                    case "windows":
+                        console.log("show windows"); 
+                        $('#rpc-linux').hide();
+                        $('#rpc-windows').show();
+                        break;
+                    case "linux":
+                        console.log("show linux");
+                        $('#rpc-windows').hide();
+                        $('#rpc-linux').show();
+                        break;
+                    default:
+                        console.log("unhandled target operating system")
+                        break;
+                }
+ 
+            };
+
+            $scope.getAllMetrics = function () {
                 queryDownloadInfluxMeasurement()
             };
 
@@ -300,11 +323,13 @@ angular.module('app', ['ngRoute', 'ngResource'])
                         });
                         console.log("rpcHost" + cmd, this.name, checkedId, host[0]);
                         if (cmd === 'setup') {
-                            rpcHost(host[0], cmd)
+                            rpcHost(host[0], cmd, $scope.run.testTarget)
                         }
                     }
                 })
             };
+
+
 
             /**
              * Name is the name of the DOM element where to lookup for target hosts
@@ -346,6 +371,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 }
 
                 // hardcoded queue multiplexing
+                // when its executor take executor command, montor take monitor command, otherwise misc.
                 switch (cmd) {
                     case 'executor':
                         // handle benchBox - execute
@@ -373,7 +399,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                             });
                             console.log("rmqHost: " + cmd, this.name, checkedId, host[0]);
                             host[0].rmq_queue = targetHost.toLowerCase();
-                            host[0].test_setup = $scope.run;
+                            host[0].test_setup = $scope.run; // aqui dentro esta la variable testTarget = "windows or linux"
                             // console.log(host[0])
                             rmqHost(host[0], cmd)
                         }
@@ -535,10 +561,10 @@ testConnection = function (ip, port, cb) {
 queryDownloadInfluxMeasurement = function (measurement) {
     console.log("Download measurement: ", measurement);
     var influx_query;
-    if(measurement == undefined){
+    if (measurement == undefined) {
         measurement = "all";
         influx_query = "select * from benchbox ";
-    }else{
+    } else {
         influx_query = "select * from benchbox where hostname = '" + measurement + "'";
     }
     console.log(influx_query)
@@ -597,7 +623,8 @@ rmqHost = function (host, cmd, cb) {
         cred_dropbox: host.cred_dropbox,
         cmd: cmd,
         target_queue: host.rmq_queue,
-        test: host.test_setup
+        test: host.test_setup,
+        target: host.test_setup.testTarget
     };
 
     appendAllParams(args, 'bb-config');
@@ -624,7 +651,7 @@ rmqHost = function (host, cmd, cb) {
     if (cb !== undefined)
         cb(args);
 };
-rpcHost = function (host, cmd, cb) {
+rpcHost = function (host, cmd, target) {
 
     var args = {
         ip: host.ip,
@@ -634,7 +661,8 @@ rpcHost = function (host, cmd, cb) {
         cred_stacksync: host.cred_stacksync,
         cred_owncloud: host.cred_owncloud,
         cred_dropbox: host.cred_dropbox,
-        cmd: cmd
+        cmd: cmd,
+        target: target // windows or linux
 
     };
     appendAllParams(args, 'bb-config');
@@ -655,8 +683,7 @@ rpcHost = function (host, cmd, cb) {
             $.notify('Error! ' + err, 'error');
         }
     });
-    if (cb !== undefined)
-        cb(args);
+
 };
 
 appendAllParams = function (target, className) {

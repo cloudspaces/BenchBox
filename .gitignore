@@ -80,7 +80,9 @@ vagrant/logs
 vagrant/Vagrantfile.rb
 vagrant/Vagrantfile.txt
 vagrant/megasync.sh
+vagrant/target
 
+monitor/hello_world.py
 monitor/logger/test
 monitor/logger/plots/output
 monitor/logger/capture
@@ -114,3 +116,20 @@ workload_generator/fitting
 .debris
 manager/Vagrantfile.old.rb
 manager/results/*
+manager/node_modules/
+manager/results/
+utils/
+windows/.vagrant/
+workload_generator/updates_content/
+workload_generator/user_stereotypes/size/
+workload_generator/user_stereotypes/type/
+workload_generator/communication/*.save
+
+
+windows/*.key
+windows/*.ip
+windows/rabbitmq
+windows/hostname
+windows/winonly/Vagrantfile
+
+
