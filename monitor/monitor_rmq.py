@@ -119,19 +119,28 @@ if __name__ == '__main__':
         while True:
             connection_try+=1
             time.sleep(2)
-            try:
-                print "Try connect to monitor through RabbitMQ "
-                print rmq_url, queue_name
-                monitor = MonitorRMQ(rmq_url=rmq_url, host_queue=queue_name)
-                monitor.listen()
-                connection_try = 0
-            except Exception as ex:
-                print ex.message
-                print "Some connection exception happened... [{}]".format(connection_try)
-            finally:
-                if connection_try > 2:
-                    # exit the infinit loop
-                    break
+
+
+
+
+            print "Try connect to monitor through RabbitMQ "
+            print rmq_url, queue_name
+            monitor = MonitorRMQ(rmq_url=rmq_url, host_queue=queue_name)
+            monitor.listen()
+            connection_try = 0
+            # try:
+            #     print "Try connect to monitor through RabbitMQ "
+            #     print rmq_url, queue_name
+            #     monitor = MonitorRMQ(rmq_url=rmq_url, host_queue=queue_name)
+            #     monitor.listen()
+            #     connection_try = 0
+            # except Exception as ex:
+            #     print "Some connection exception happened... [{}]".format(connection_try)
+            #     print ":: {} ::".format(ex.message)
+            # finally:
+            #     if connection_try > 2:
+            #         break  # exit the infinit loop
+
     """
     else:
         profile = "StackSync"

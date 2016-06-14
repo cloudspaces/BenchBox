@@ -229,9 +229,11 @@ class Commands(object):
         # clear the shared folder content and wait
         print "clear the content of all the shared folders and wait"
         self.personal_cloud = body['msg']['test']['testClient']
-        self.personal_cloud_ip = body['msg']['{}-ip'.format(self.personal_cloud.lower())]
-        self.personal_cloud_port = body['msg']['{}-port'.format(self.personal_cloud.lower())]
-
+        try:
+            self.personal_cloud_ip = body['msg']['{}-ip'.format(self.personal_cloud.lower())]
+            self.personal_cloud_port = body['msg']['{}-port'.format(self.personal_cloud.lower())]
+        except KeyError:
+            print "[INFO] Its a public cloud, none ip:port available"
         if os.name == "nt":
             "This is windows, remove the content of windows shared folder"
             remove_inner_path('/Users/vagrant/OneDrive/*')

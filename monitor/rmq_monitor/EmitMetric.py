@@ -6,6 +6,8 @@ import math
 import psutil
 import pika
 import time
+import os
+
 
 import subprocess
 from py_sniffer.TrafficMonitor import TrafficMonitor
@@ -36,7 +38,13 @@ class EmitMetric(object):
         self.prev_metric = None  # keep track of last emited metric
         self.url_str = None
 
-        with open('rabbitmq', 'r') as r:
+        rmq_path = None
+        if os.name == "nt":
+            rmq_path = '/Users/vagrant/vagrant/rabbitmq'
+        elif os.name == "posix":
+            rmq_path = 'rabbitmq'
+
+        with open(rmq_path, 'r') as r:
             url_str = r.read().splitlines()[0]
 
         self.prev_net_counter = psutil.net_io_counters(pernic=True)['eth0']  # 10.0.2.15 static for each sandBox
