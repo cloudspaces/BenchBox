@@ -37,6 +37,10 @@ class TrafficMonitor(Thread):
             self.sync_server_ip = None
         else:
             self.sync_server_ip = socket.gethostbyname(server)    # private syncronization server IP
+        if os.name == "nt":
+            self.is_windows = True
+        else:
+            self.is_windows = False
         self.sync_server_port = port
         self.desktop_client = client    # syncronization service name
         self.decoder = EthDecoder()     # packet decoder

@@ -219,19 +219,39 @@ class Commands(object):
             return '[STOP_TEST]: SUCCESS: stop test'
 
         else:
-            pc_cmd = {
-                'stacksync': "java",
-                'owncloud': "owncloudsync.sh",
-                'dropbox': "dropbox",
-                'mega': "megasync.sh"
-            }
-            str_cmd = pc_cmd[self.personal_cloud.lower()]
-            pstring = str_cmd
-            for line in os.popen("ps ax | grep " + pstring + " | grep -v grep"):
-                fields = line.split()
-                proc_pid = fields[0]
-                os.kill(int(proc_pid), signal.SIGKILL)
-            return '[STOP_TEST]: WARNING: no test is running'
+
+
+            if os.name == "posix":
+                pc_cmd = {
+                    'stacksync': "java",
+                    'owncloud': "owncloudsync.sh",
+                    'dropbox': "dropbox",
+                    'mega': "megasync.sh"
+                }
+                str_cmd = pc_cmd[self.personal_cloud.lower()]
+                pstring = str_cmd
+                for line in os.popen("ps ax | grep " + pstring + " | grep -v grep"):
+                    fields = line.split()
+                    proc_pid = fields[0]
+                    os.kill(int(proc_pid), signal.SIGKILL)
+                return '[STOP_TEST]: WARNING: no test is running'
+            elif os.name == "nt":
+                print "check for process is running in windows..."
+                pc_cmd = {
+                    'box': "BoxSync",
+                    'stacksync': "javaw.exe",
+                    'owncloud': "owncloud.exe",
+                    'sugarsync': "SugarSync.exe",
+                    'dropbox': "Dropbox.exe",
+                    'mega': "MEGAsync.exe",
+                    'googledrive': "googledrivesync.exe",
+                    'amazondrive': "AmazonDrive.exe",
+                }
+                for proc in psutil.process_iter():
+                    if proc.name() == pc_cmd[self.personal_cloud.lower()]:
+                        # proc.terminate() # kill()
+                        proc.kill() # ProcessTerminate in windows => asinc
+
 
     def keepalive(self, body):
         return "{} -> {}".format(datetime.datetime.now().isoformat(), self.executor_state)
