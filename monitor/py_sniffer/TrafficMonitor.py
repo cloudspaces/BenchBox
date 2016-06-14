@@ -23,6 +23,14 @@ class TrafficMonitor(Thread):
 
     def __init__(self, iface="eth0", read_timeout=100, promiscuous=False, max_bytes=65535, packet_limit=-1, client="dropbox", server=None, port=None, reporter=False):
 
+        if os.name == "nt":
+            iface = "\\Device\\NPF_{EDB20D9F-1750-46D6-ADE7-76940B8DF917}"
+            if iface == pcapy.findalldevs()[0]:
+                print "OKEY"
+            else:
+                iface = pcapy.findalldevs()[0]
+                print "WARNING!"
+
         if client.lower() == "stacksync" and server is None:
             print "server='server_ip' & port='server_port' are required!"
             sys.exit()
@@ -188,7 +196,15 @@ class TrafficMonitor(Thread):
         # desktop client
         # setup capture
         self.is_root()
+
+
+        # for each network interface
+        # check regkey_value('HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\services\Tcpip\Parameters\Interfaces\{71AAC716-65BF-4942-9835-5BFECFE0CFC2}','IPAddress')
+
+        #def __init__(self, iface="eth0", read_timeout=100, promiscuous=False, max_bytes=65535, packet_limit=-1, client="dropbox", server=None, port=None, reporter=False):
         self.pc = pcapy.open_live(self.interface, self.max_bytes, self.promiscuous, self.read_timeout)
+        # '\\Device\\NPF_{EDB20D9F-1750-46D6-ADE7-76940B8DF917}',
+        # '\\Device\\NPF_{71AAC716-65BF-4942-9835-5BFECFE0CFC2}'
         # self.notify_worker = None  # tread that will submit network information to the manager through rabbitmq
         self.notify_worker = None
         # setup filter
@@ -694,6 +710,35 @@ class TrafficMonitor(Thread):
         return "%.1f%s%s" % (num, 'Yi', suffix)
 
 
+
+# only windows run this
+# regkey_value('HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\services\Tcpip\Parameters\Interfaces\{71AAC716-65BF-4942-9835-5BFECFE0CFC2}','IPAddress')
+'''
+def regkey_value(path, name="", start_key = None):
+    try:
+        import winreg
+    except:
+        print "OS exception.."
+        return
+
+    if isinstance(path, str):
+        path = path.split("\\")
+    if start_key is None:
+        start_key = getattr(winreg, path[0])
+        return regkey_value(path[1:], name, start_key)
+    else:
+        subkey = path.pop(0)
+    with winreg.OpenKey(start_key, subkey) as handle:
+        assert handle
+        if path:
+            return regkey_value(path, name, handle)
+        else:
+            desc, i = None, 0
+            while not desc or desc[0] != name:
+                desc = winreg.EnumValue(handle, i)
+                i += 1
+            return desc[1]
+'''
 # -------------------------------------------------------------------------------
 # Main
 # -------------------------------------------------------------------------------
@@ -712,7 +757,11 @@ if __name__ == '__main__':
     '''
 
     # setup network setting
-    tm = TrafficMonitor(iface="eth0", server="stacksync.urv.cat", port="5673", client="mega")
+    if os.name == "nt":
+        interface = '\\Device\\NPF_{EDB20D9F-1750-46D6-ADE7-76940B8DF917}'
+    elif os.name == "posix":
+        interface = "eth0"
+    tm = TrafficMonitor(iface=interface, server="stacksync.urv.cat", port="5673", client="mega")
     tm.run() # intermediari que arranca trafficMonitor i permet realitzar get stats sobre la marcha o reiniciar el monitoreig
     while True:
         # print tm.notify_stats()
