@@ -676,11 +676,14 @@ class TrafficMonitor(Thread):
 
     @staticmethod
     def is_root():
-        if os.getuid() == 0:
-            print("r00thless!!! ")
-        else:
-            print("Cannot run as a mortal. ")
-            sys.exit()
+        try:
+            if os.getuid() == 0:
+                print("r00thless!!! ")
+            else:
+                print("Cannot run as a mortal. ")
+                sys.exit()
+        except AttributeError:
+            print "nt is ruthless, bypass rule is_root!!!"
 
     @staticmethod
     def sizeof_fmt(num, suffix='B'):
