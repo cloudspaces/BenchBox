@@ -96,6 +96,18 @@ class Commands(object):
             'dropbox': "sudo -H -u vagrant bash -c '/usr/local/bin/dropbox start'",  # launch dropbox
             'mega': "/vagrant/megasync.sh"
         }
+
+        pc_cmd_win = {
+            #'dropbox': " subprocess.call(['C:\Program Files (x86)\Dropbox\Client\Dropbox.exe'])"
+            'dropbox': "C:\Program Files (x86)\Dropbox\Client\Dropbox.exe",
+            'megasync': "C:\Users\vagrant\AppData\Local\MEGAsync\MEGAsync.exe",
+            'stacksync': "C:\Users\vagrant\AppData\Roaming\StackSync_client\Stacksync.jar",
+            'sugarsync': "C:\Program Files (x86)\SugarSync\SugarSync.exe",
+            'owncloud': "C:\Program Files (x86)\ownCloud\owncloud.exe",
+            'googledrive': "C:\Program Files (x86)\Google\Drive\googledrivesync.exe",
+
+        }
+
         str_cmd = pc_cmd[self.personal_cloud.lower()]
 
         pc_pid = {
@@ -177,8 +189,16 @@ class Commands(object):
         # clear the shared folder content and wait
         print "clear the content of all the shared folders and wait"
 
-        remove_inner_path('/home/vagrant/Dropbox/*')
-        remove_inner_path('/home/vagrant/stacksync_folder/*')
+        if os.name == "nt":
+            "This is windows, remove the content of windows shared folder"
+            remove_inner_path('/Users/vagrant/OneDrive/*')
+            remove_inner_path('/Users/vagrant/stacksync_folder/*')
+
+            time.sleep(10)
+
+        elif os.name == "posix":
+            remove_inner_path('/home/vagrant/Dropbox/*')
+            remove_inner_path('/home/vagrant/stacksync_folder/*')
 
         time.sleep(10)
 
