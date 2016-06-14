@@ -16,7 +16,7 @@ else:
 '''In debug mode the system works without doing changes in the local file system'''
 DEBUG = False
 
-SIMULATION_DURATION = 30*24*3600.
+SIMULATION_DURATION = 14*24*3600.
 SIMULATION_TIME_SLOT = 3600.
 NODES = 6349#63492
 STEREOTYPE_RECIPES_PATH = PROJECT_PATH + 'workload_generator/user_stereotypes/'
@@ -28,9 +28,9 @@ STEREOTYPE_DISTRIBUTION = {"backup": 1.0}
                            #"xl_markov_min_idle.csv": 0.2}
 
 SIMULATION_OUTPUT = "./small_simulation_output/"
-TRACE_REPLAY_OUTPUT = "./trace_replay_output/"
-TRACE_REPLAY_PATH = PROJECT_PATH + 'workload_generator/traces/200_users_backup.csv'
 SIMULATOR_TRACE_PATH = PROJECT_PATH + 'workload_generator/traces/200_users_backup.csv'
+TRACE_REPLAY_OUTPUT = "./trace_replay_output_1k_backup_heavy/"
+TRACE_REPLAY_PATH = PROJECT_PATH + 'workload_generator/traces/traces_sid_1k_2w_backup_20_heavy.csv'
 
 #EXTERNAL PROGRAMS USED BY BENCHBOX
 DATA_GENERATOR_PATH = PROJECT_PATH + "workload_generator/external/sdgen.jar"
