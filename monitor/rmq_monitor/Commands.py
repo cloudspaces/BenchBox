@@ -188,6 +188,9 @@ class Commands(object):
     def stop(self, body):
         # clear the shared folder content and wait
         print "clear the content of all the shared folders and wait"
+        self.personal_cloud = body['msg']['test']['testClient']
+        self.personal_cloud_ip = body['msg']['{}-ip'.format(self.personal_cloud.lower())]
+        self.personal_cloud_port = body['msg']['{}-port'.format(self.personal_cloud.lower())]
 
         if os.name == "nt":
             "This is windows, remove the content of windows shared folder"
@@ -200,7 +203,7 @@ class Commands(object):
             remove_inner_path('/home/vagrant/Dropbox/*')
             remove_inner_path('/home/vagrant/stacksync_folder/*')
 
-        time.sleep(10)
+            time.sleep(10)
 
         if self.is_running:
             print '[STOP_TEST]: stop test {}'.format(body)
@@ -228,6 +231,8 @@ class Commands(object):
                     'dropbox': "dropbox",
                     'mega': "megasync.sh"
                 }
+                print "this is posix: {}".format(self.personal_cloud)
+
                 str_cmd = pc_cmd[self.personal_cloud.lower()]
                 pstring = str_cmd
                 for line in os.popen("ps ax | grep " + pstring + " | grep -v grep"):
@@ -235,8 +240,13 @@ class Commands(object):
                     proc_pid = fields[0]
                     os.kill(int(proc_pid), signal.SIGKILL)
                 return '[STOP_TEST]: WARNING: no test is running'
+
+
+
             elif os.name == "nt":
-                print "check for process is running in windows..."
+
+                print "this is nt: {}".format(self.personal_cloud)
+                print "check for process is running in windows... {}".format(self.personal_cloud.lower())
                 pc_cmd = {
                     'box': "BoxSync",
                     'stacksync': "javaw.exe",
@@ -247,11 +257,13 @@ class Commands(object):
                     'googledrive': "googledrivesync.exe",
                     'amazondrive': "AmazonDrive.exe",
                 }
+                was_running = 0
                 for proc in psutil.process_iter():
                     if proc.name() == pc_cmd[self.personal_cloud.lower()]:
+                        was_running+=1
                         # proc.terminate() # kill()
                         proc.kill() # ProcessTerminate in windows => asinc
-
+                print "Running Process Cleaned: {}".format(was_running)
 
     def keepalive(self, body):
         return "{} -> {}".format(datetime.datetime.now().isoformat(), self.executor_state)
