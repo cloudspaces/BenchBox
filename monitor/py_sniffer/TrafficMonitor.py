@@ -53,7 +53,10 @@ class TrafficMonitor(Thread):
         self.packet_limit = packet_limit
         self.register = None
         try:
-            self.my_ip = ni.ifaddresses(iface)[2][0]['addr']
+            if os.name == "nt":
+                self.my_ip = "10.0.2.15" # static ip assignation inner image.
+            else:
+                self.my_ip = ni.ifaddresses(iface)[2][0]['addr']
         except KeyError:
             print "Interface not found!"
             sys.exit()

@@ -100,7 +100,7 @@ class Commands(object):
         pc_cmd_win = {
             #'dropbox': " subprocess.call(['C:\Program Files (x86)\Dropbox\Client\Dropbox.exe'])"
             'dropbox': "C:\Program Files (x86)\Dropbox\Client\Dropbox.exe",
-            'megasync': "C:\Users\vagrant\AppData\Local\MEGAsync\MEGAsync.exe",
+            'mega': "C:\Users\vagrant\AppData\Local\MEGAsync\MEGAsync.exe",
             'stacksync': "C:\Users\vagrant\AppData\Roaming\StackSync_client\Stacksync.jar",
             'sugarsync': "C:\Program Files (x86)\SugarSync\SugarSync.exe",
             'owncloud': "C:\Program Files (x86)\ownCloud\owncloud.exe",
