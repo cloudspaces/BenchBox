@@ -185,7 +185,7 @@ class ActionHandler(object):
             try:
                 print "warmUp windows sandBox "
                 str_cmd = "monitor_rmq.py"
-                str_cwd = "/monitor"
+                str_cwd = "/Users/vagrant/monitor"
                 output = power_command(str_cmd, str_cwd)
             except:
 
