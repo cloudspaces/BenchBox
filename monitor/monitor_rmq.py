@@ -115,13 +115,10 @@ if __name__ == '__main__':
     queue_name = '{}.{}'.format(dummyhost, 'monitor')
     if len(sys.argv) == 1:
         singleton()  # apply singleton
-        connection_try=0
+        connection_try = 0
         while True:
-            connection_try+=1
+            connection_try += 1
             time.sleep(2)
-
-
-
 
             print "Try connect to monitor through RabbitMQ "
             print rmq_url, queue_name
