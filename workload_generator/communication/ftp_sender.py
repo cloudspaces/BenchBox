@@ -29,7 +29,10 @@ class ftp_sender():
     def send(self, fname, new_name=None, sub_folder=None):
         print ">> {} <<  ".format(self.ftp.pwd())
         if sub_folder:
-            self.ftp.cwd("~")  # move to home
+            if os.name == "posix":
+                self.ftp.cwd("~")  # move to home
+            elif os.name == "nt":
+                self.ftp.cwd("/Users/vagrant")
             if self.ftp_root:
                 print "move to "+self.ftp_root
                 self.ftp.cwd(self.ftp_root)
@@ -54,8 +57,11 @@ class ftp_sender():
         print ">> {} <<  ".format(self.ftp.pwd())
 
         sub_folder = os.path.dirname(ftp_rel_path)
+        if os.name == "posix":
+            self.ftp.cwd("~")  # move to home
+        elif os.name == "nt":
+            self.ftp.cwd("/Users/vagrant")
 
-        self.ftp.cwd("~")  # move to home
         if self.ftp_root:
             print "move to "+self.ftp_root
             self.ftp.cwd(self.ftp_root)
@@ -85,7 +91,11 @@ class ftp_sender():
     def rm(self, fname, sub_folder=None):
 
         if sub_folder:
-            self.ftp.cwd("~")  # move to home
+            if os.name == "posix":
+                self.ftp.cwd("~")  # move to home
+            elif os.name == "nt":
+                self.ftp.cwd("/Users/vagrant")
+
             if self.ftp_root:
                 print "move to "+self.ftp_root
                 self.ftp.cwd(self.ftp_root)
@@ -106,7 +116,11 @@ class ftp_sender():
     def rmd(self, fname, sub_folder=None):
 
         if sub_folder:
-            self.ftp.cwd("~")  # move to home
+            if os.name == "posix":
+                self.ftp.cwd("~")  # move to home
+            elif os.name == "nt":
+                self.ftp.cwd("/Users/vagrant")
+
             if self.ftp_root:
                 print "move to "+self.ftp_root
                 self.ftp.cwd(self.ftp_root)
@@ -138,7 +152,11 @@ class ftp_sender():
 
     def mv(self, src, tgt):
         #
-        self.ftp.cwd("~")  # move to home
+        if os.name == "posix":
+            self.ftp.cwd("~")  # move to home
+        elif os.name == "nt":
+            self.ftp.cwd("/Users/vagrant")
+
         if self.ftp_root:
             print "move to "+self.ftp_root
             self.ftp.cwd(self.ftp_root)
