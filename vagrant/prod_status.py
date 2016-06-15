@@ -182,13 +182,13 @@ class ActionHandler(object):
             # when the virtual machine is windows how can my local machine tell my windows(sandBox) guest to launch executor_rmq_py???
             print "how to warmup windows operating sandBox ??"
             # todo lanzar el executor_rmq.py
+            output = power_command("python", "/Users/vagrant/monitor/monitor_rmq.py")
+
             try:
                 print "warmUp windows sandBox "
-                str_cmd = "monitor_rmq.py"
-                str_cwd = "/monitor"
-                output = power_command(str_cmd, str_cwd)
-            except:
 
+            except Exception as ex:
+                print ex.message
                 print "something failed"
 
             finally:
@@ -345,10 +345,14 @@ def bash_command(cmd):
 cmd : command
 cwd : directory
 '''
-def power_command(cmd, cwd):
-    child = subprocess.Popen(cmd, cwd=cwd)
+def power_command(cmd, script):
+    print cmd
+    print script
+    request= "{} {}".format(cmd, script)
+    child = subprocess.Popen(request)
     child.communicate()[0]
     rc = child.returncode
+    print "Return code from cmd: [{}] -> {}".format(cmd, rc)
     # print "power shell command through winrm"
     # simple python to launch the provider
     return rc
@@ -448,11 +452,11 @@ class ProdStatusService():
 
         ''' crear una cua amb el propi host name de tipus direct '''
         while True:
-            try:
-                consumer_rpc = ConsumeAction(rmq_url, host_queue, target_os, is_dummyHost)
-                consumer_rpc.listen()
-            except Exception as ex:
-                print "{} prod_status Consumer exception".format(ex.message)
+            # try:
+            consumer_rpc = ConsumeAction(rmq_url, host_queue, target_os, is_dummyHost)
+            consumer_rpc.listen()
+            # except Exception as ex:
+            #    print "{} prod_status Consumer exception".format(ex.message)
 
 
 

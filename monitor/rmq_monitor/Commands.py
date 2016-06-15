@@ -96,16 +96,50 @@ class Commands(object):
             'dropbox': "sudo -H -u vagrant bash -c '/usr/local/bin/dropbox start'",  # launch dropbox
             'mega': "/vagrant/megasync.sh"
         }
-        str_cmd = pc_cmd[self.personal_cloud.lower()]
 
+        pc_cmd_win = {
+            #'dropbox': " subprocess.call(['C:\Program Files (x86)\Dropbox\Client\Dropbox.exe'])"
+            'dropbox': "/Program Files (x86)/Dropbox/Client/Dropbox.exe",
+            'mega': "/Users/vagrant/AppData/Local/MEGAsync/MEGAsync.exe",
+            'stacksync': "/Users/vagrant/AppData/Roaming/StackSync_client/Stacksync.jar",
+            'sugarsync': "/Program Files (x86)/SugarSync/SugarSync.exe",
+            'owncloud': "/Program Files (x86)/ownCloud/owncloud.exe",
+            'googledrive': "/Program Files (x86)/Google/Drive/googledrivesync.exe",
+
+        }
+
+        if os.name == "nt":
+            str_cmd = pc_cmd_win[self.personal_cloud.lower()]
+        elif os.name == "posix":
+            str_cmd = pc_cmd[self.personal_cloud.lower()]
+        else:
+            # unimplemented operating system
+            return None
+
+        print "TARGET: client == {}".format(str_cmd)
         pc_pid = {
             'stacksync': "java",
             'owncloud': "owncloudsync",
             'dropbox': "dropbox",
             'mega': "megasync"
         }
-        proc_name = pc_pid[self.personal_cloud.lower()]  # get the process name to be tracked
+        pc_pid_win = {
+            #'dropbox': " subprocess.call(['C:\Program Files (x86)\Dropbox\Client\Dropbox.exe'])"
+            'dropbox': "Dropbox.exe",
+            'mega': "MEGAsync.exe",
+            'stacksync': "javaw.exe",
+            'sugarsync': "SugarSync.exe",
+            'owncloud': "owncloud.exe",
+            'googledrive': "googledrivesync.exe",
 
+        }
+
+        if os.name == "nt":
+            proc_name = pc_pid_win[self.personal_cloud.lower()]
+        elif os.name == "posix":
+            proc_name = pc_pid[self.personal_cloud.lower()]  # get the process name to be tracked
+        else:
+            return None
         while self.is_running:
             # check if client is running
             time.sleep(5)
@@ -119,27 +153,47 @@ class Commands(object):
                         print "Unable to start {}".format(self.personal_cloud)
                         break
                     time.sleep(3)
-                    try:
-                        if proc_name == "owncloudsync":
-                            self.client_running = True
-                            self.sync_proc_pid = psutil.Process(self.sync_proc.pid).children()[0].pid
-                            # cojer el pid del script
-                            # elif proc_name == "boxsync":
-                            # psutil.Process(self.sync_proc_pid).children()[0].children()[0]
-                            # el primer children es el script
-                            # el segundo children corresponde lo que hay en el bucle infinito del script
-                            # sleep/owncloudcmd
-                        elif proc_name == "megasync":
-                            self.client_running = True
-                            self.sync_proc_pid = psutil.Process(self.sync_proc.pid).children()[0].pid
-                        else:
-                            # en caso de dropbox y stacksync van aqui dentro. # quizas es porque los han arrancado con interfaz visual i no xuta nada...
+                    try: # pid lookup
+                        if os.name == "nt":
+                            # each case handle
+                            print "Monitoring windows client"
+                            print self.sync_proc
+                            is_running = False
+                            client_pid = None
                             for proc in psutil.process_iter():
                                 if proc.name() == proc_name:
-                                    self.client_running = True
-                                    self.sync_proc_pid = proc.pid
+                                    is_running = True
+                                    client_pid = proc.pid
                                     break
-                        psutil.Process(self.sync_proc_pid)
+                            if is_running:
+                                self.client_running = True
+                                self.sync_proc_pid = client_pid
+                                print "Process running as {}".format(self.sync_proc_pid)
+                            else:
+                                print "Process idle"
+
+                        elif os.name == "posix":
+                            if proc_name == "owncloudsync":
+                                self.client_running = True
+                                self.sync_proc_pid = psutil.Process(self.sync_proc.pid).children()[0].pid
+                                # cojer el pid del script
+                                # elif proc_name == "boxsync":
+                                # psutil.Process(self.sync_proc_pid).children()[0].children()[0]
+                                # el primer children es el script
+                                # el segundo children corresponde lo que hay en el bucle infinito del script
+                                # sleep/owncloudcmd
+                            elif proc_name == "megasync":
+                                self.client_running = True
+                                self.sync_proc_pid = psutil.Process(self.sync_proc.pid).children()[0].pid
+                            else:
+                                # en caso de dropbox y stacksync van aqui dentro. # quizas es porque los han arrancado con interfaz visual i no xuta nada...
+                                for proc in psutil.process_iter():
+                                    if proc.name() == proc_name:
+                                        self.client_running = True
+                                        self.sync_proc_pid = proc.pid
+                                        break
+                        ps_client = psutil.Process(self.sync_proc_pid)
+                        print "[INFO]: {} => {}".format(ps_client.pid, ps_client.name())
                     except Exception as ex:
                         print ex.message
                         print "couldn't load the pc"
@@ -176,11 +230,24 @@ class Commands(object):
     def stop(self, body):
         # clear the shared folder content and wait
         print "clear the content of all the shared folders and wait"
+        self.personal_cloud = body['msg']['test']['testClient']
+        try:
+            self.personal_cloud_ip = body['msg']['{}-ip'.format(self.personal_cloud.lower())]
+            self.personal_cloud_port = body['msg']['{}-port'.format(self.personal_cloud.lower())]
+        except KeyError:
+            print "[INFO] Its a public cloud, none ip:port available"
+        if os.name == "nt":
+            "This is windows, remove the content of windows shared folder"
+            remove_inner_path('/Users/vagrant/OneDrive/*')
+            remove_inner_path('/Users/vagrant/stacksync_folder/*')
 
-        remove_inner_path('/home/vagrant/Dropbox/*')
-        remove_inner_path('/home/vagrant/stacksync_folder/*')
+            #time.sleep(10)
 
-        time.sleep(10)
+        elif os.name == "posix":
+            remove_inner_path('/home/vagrant/Dropbox/*')
+            remove_inner_path('/home/vagrant/stacksync_folder/*')
+
+            #time.sleep(10)
 
         if self.is_running:
             print '[STOP_TEST]: stop test {}'.format(body)
@@ -199,19 +266,48 @@ class Commands(object):
             return '[STOP_TEST]: SUCCESS: stop test'
 
         else:
-            pc_cmd = {
-                'stacksync': "java",
-                'owncloud': "owncloudsync.sh",
-                'dropbox': "dropbox",
-                'mega': "megasync.sh"
-            }
-            str_cmd = pc_cmd[self.personal_cloud.lower()]
-            pstring = str_cmd
-            for line in os.popen("ps ax | grep " + pstring + " | grep -v grep"):
-                fields = line.split()
-                proc_pid = fields[0]
-                os.kill(int(proc_pid), signal.SIGKILL)
-            return '[STOP_TEST]: WARNING: no test is running'
+
+
+            if os.name == "posix":
+                pc_cmd = {
+                    'stacksync': "java",
+                    'owncloud': "owncloudsync.sh",
+                    'dropbox': "dropbox",
+                    'mega': "megasync.sh"
+                }
+                print "this is posix: {}".format(self.personal_cloud)
+
+                str_cmd = pc_cmd[self.personal_cloud.lower()]
+                pstring = str_cmd
+                for line in os.popen("ps ax | grep " + pstring + " | grep -v grep"):
+                    fields = line.split()
+                    proc_pid = fields[0]
+                    os.kill(int(proc_pid), signal.SIGKILL)
+                return '[STOP_TEST]: WARNING: no test is running'
+
+
+
+            elif os.name == "nt":
+
+                print "this is nt: {}".format(self.personal_cloud)
+                print "check for process is running in windows... {}".format(self.personal_cloud.lower())
+                pc_cmd = {
+                    'box': "BoxSync",
+                    'stacksync': "javaw.exe",
+                    'owncloud': "owncloud.exe",
+                    'sugarsync': "SugarSync.exe",
+                    'dropbox': "Dropbox.exe",
+                    'mega': "MEGAsync.exe",
+                    'googledrive': "googledrivesync.exe",
+                    'amazondrive': "AmazonDrive.exe",
+                }
+                was_running = 0
+                for proc in psutil.process_iter():
+                    if proc.name() == pc_cmd[self.personal_cloud.lower()]:
+                        was_running+=1
+                        # proc.terminate() # kill()
+                        proc.kill() # ProcessTerminate in windows => asinc
+                print "Running Process Cleaned: {}".format(was_running)
 
     def keepalive(self, body):
         return "{} -> {}".format(datetime.datetime.now().isoformat(), self.executor_state)

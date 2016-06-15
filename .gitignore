@@ -131,5 +131,7 @@ windows/*.ip
 windows/rabbitmq
 windows/hostname
 windows/winonly/Vagrantfile
+windows/profile
+windows/ss.*.*
 
-
+target

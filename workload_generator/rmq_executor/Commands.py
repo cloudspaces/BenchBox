@@ -3,6 +3,7 @@ from constants import STEREOTYPE_RECIPES_PATH, FS_SNAPSHOT_PATH
 from executor import StereotypeExecutorU1
 import datetime
 from termcolor import colored
+import os
 import time
 
 class Commands(object):
@@ -48,7 +49,10 @@ class Commands(object):
         if self.is_warmup is False:
             self.sync_directory = body['msg']['test']['testFolder']
             self.stereotype_executor.initialize_ftp_client_by_directory(root_dir=self.sync_directory)
-            self.fs_abs_target_folder = '/home/vagrant/{}'.format(self.sync_directory)  # target ftp_client dir absolute path
+            if os.name == "nt":
+                self.fs_abs_target_folder = '/Users/vagrant/{}'.format(self.sync_directory)  # target ftp_client dir absolute path
+            elif os.name == "posix":
+                self.fs_abs_target_folder = '/home/vagrant/{}'.format(self.sync_directory)  # target ftp_client dir absolute path
             self.stereotype = body['msg']['test']['testProfile']  # add benchbox switch stereotype profile at warmup
             receipt = STEREOTYPE_RECIPES_PATH + self.stereotype
             print receipt

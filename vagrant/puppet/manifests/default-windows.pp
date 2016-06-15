@@ -70,6 +70,14 @@ node 'win7-vagrant' {
       cwd     => '/vagrant'
   }
 
+  ->
+  exec {
+    'give execution permision to impression':
+      command => 'chmod u+x ',
+      user => 'vagrant',
+      group => 'vagrant',
+      cwd => '/home/vagrant/workload_generator/external/impressions'
+  }
 
   # dropbox
   /*

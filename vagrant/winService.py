@@ -35,7 +35,7 @@ class AppServerSvc (win32serviceutil.ServiceFramework):
         # here goes the call to main script
         print "Running Prod_Status"
         # loop().start()
-        self.ps.main('provisionOK',socket.gethostname())
+        self.ps.main(status_msg='provisionOK', topic=socket.gethostname())
 
 
 if __name__ == '__main__':
