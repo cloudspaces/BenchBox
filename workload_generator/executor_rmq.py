@@ -87,7 +87,11 @@ class Commands(object):
             self.sync_directory = body['msg']['test']['testFolder']
             self.stereotype_executor = StereotypeExecutorU1()  # tornar a assignar
             self.stereotype_executor.initialize_ftp_client_by_directory(root_dir=self.sync_directory)
-            self.fs_abs_target_folder = '/home/vagrant/{}'.format(self.sync_directory)  # target ftp_client dir absolute path
+            if os.name == "nt":
+                self.fs_abs_target_folder = '/home/vagrant/{}'.format(self.sync_directory)  # target ftp_client dir absolute path
+            else:
+                self.fs_abs_target_folder = '/Users/vagrant/{}'.format(self.sync_directory)  # target ftp_client dir absolute path
+
             self.stereotype = body['msg']['test']['testProfile']  # add benchbox switch stereotype profile at warmup
             receipt = STEREOTYPE_RECIPES_PATH + self.stereotype
             print receipt
@@ -236,13 +240,13 @@ if __name__ == '__main__':
         # use file look
         singleton()
         while True:
-            try:
-                executor = ExecuteRMQ(rmq_url, queue_name, stereotype_receipt)
+            # try:
+            executor = ExecuteRMQ(rmq_url, queue_name, stereotype_receipt)
             # todo fer que stereotype_receipt y personal cloud sigui dinamic
-                executor.listen()
-            except Exception as ex:
-                print ex.message
-                print "Some connection exception happened..."
+            executor.listen()
+            # except Exception as ex:
+            #     print ex.message
+            #     print "Some connection exception happened..."
 
     else:
         profile = "StackSync"
