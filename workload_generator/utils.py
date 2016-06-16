@@ -8,6 +8,8 @@ from scipy import stats
 import numpy
 import random
 from workload_generator import constants
+import os
+import sys
 
 def translate_matlab_fitting_to_scipy(fitting, parameters):
     

@@ -9,7 +9,6 @@ the probabilities among states are set, it also provides
 random walk on that graph.
 '''
 import random
-from workload_generator.utils import get_random_value_from_fitting
 from scipy.stats.distributions import genpareto
 
 class SimpleMarkovChain(object):
