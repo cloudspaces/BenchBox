@@ -8,23 +8,11 @@ import os, sys
 import random
 import time
 from termcolor import colored
+from workload_generator.utils import appendParentDir
 
 '''
 HardCode path for each environment, should be dev, debug, production instead...
 '''
-
-
-def appendParentDir(num, currdir):
-    print currdir
-    if num is 0:
-        print 'return value'
-        sys.path.append(currdir)
-        return currdir
-    else:
-        dirname, basename = os.path.split(currdir)
-        num -= 1
-        return appendParentDir(num, dirname)
-
 appendParentDir(1, os.path.dirname(os.path.realpath(__file__)))
 
 from workload_generator.model.user_activity.stereotype_executor import StereotypeExecutor

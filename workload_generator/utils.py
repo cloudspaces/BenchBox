@@ -93,10 +93,6 @@ def translate_matlab_fitting_to_scipy(fitting, parameters):
         parameters = parameters.replace("s", "'nu'")  # none centrality ??? # Non-central moment of order n
         parameters = parameters.replace("sigma", "'scale'")
 
-
-    #TODO: fittings that sooner or later it would be good to implement
-
-
     parameters = parameters[:-1].replace("=", ":")
     parameters = "{" + parameters.replace(" ", ",") + "}"
     
@@ -181,6 +177,17 @@ def get_random_alphanumeric_string(str_length=10):
 def split_list_into_chunks(a, n):
     k, m = len(a) / n, len(a) % n
     return [a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in xrange(n)]
+
+def appendParentDir(num, currdir):
+    print currdir
+    if num is 0:
+        print 'return value'
+        sys.path.append(currdir)
+        return currdir
+    else:
+        dirname, basename = os.path.split(currdir)
+        num-=1
+        return appendParentDir(num, dirname)
         
 if __name__ == '__main__':
     build_stereotype(stereotype_name="backupsample",

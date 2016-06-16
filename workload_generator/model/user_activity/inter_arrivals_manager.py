@@ -17,7 +17,6 @@ class InterArrivalsManager(object):
             
     '''Get the waiting time between operations based on the statistical fittings'''
     def get_waiting_time(self, state1, state2):
-
         if TO_WAIT_STATIC != 0:
             return TO_WAIT_STATIC # use static interval if its defined
         (function, kv_params) = self.transition_interarrival_fittings[state1][state2]

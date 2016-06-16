@@ -3,27 +3,14 @@ Created on 30/6/2015
 
 @author: Raul
 '''
-import sys
 import shutil
-import getpass
 import subprocess
 import random
 import os
+from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string, appendParentDir
 
-def appendParentDir(num, currdir):
-    print currdir
-    if num is 0:
-        print 'return value'
-        sys.path.append(currdir)
-        return currdir
-    else:
-        dirname, basename = os.path.split(currdir)
-        num-=1
-        return appendParentDir(num, dirname)
 appendParentDir(3, os.path.dirname(os.path.realpath(__file__)))
 
-
-from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string
 from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH, FILE_SIZE_STATIC, FILE_SIZE_MAX, \
     DATA_CHARACTERIZATIONS_PATH, FS_SNAPSHOT_PATH, \
     DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH, DEBUG, DATA_GENERATOR_PROPERTIES_DIR
@@ -60,11 +47,6 @@ class DataGenerator(object):
                     setattr(self, model_attribute, (fitting, kw_params))
                 else:
                     setattr(self, model_attribute, eval(l[l.index('{'):]))
-
-
-
-
-
 
     '''Initialize the file system of the user (delegated to Impressions benchmark)'''
     def create_file_system_snapshot(self):
@@ -222,11 +204,11 @@ class DataGenerator(object):
         '''We have to respect both temporal and spatial localities, as well as to model updates themselves'''
         '''Make use of the UpdateManager for the last aspect'''
         '''1) If there is a file that has been updated, check if we should continue editing it'''
-        if self.current_updated_file != None or time.time()-self.last_update_time > 10: #TODO: This threshold should be changed by a real distribution
+        if self.current_updated_file != None or time.time()-self.last_update_time > 60: #TODO: This threshold should be changed by a real distribution
             '''2) Select a random file of the given type to update (this is a simple approach, which can be
             sophisticated, if necessary, by adding individual "edit probabilities" to files based on distributions)'''
             self.current_updated_file = get_file_based_on_type_popularity(self.file_system, \
-                                                                          self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
+                    self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
             self.last_update_time = time.time()
 
         print "FILE TO EDIT: ", self.current_updated_file
