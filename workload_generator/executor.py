@@ -124,8 +124,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
             print "no file selected!"
         else:
             action = UpdateFile(synthetic_file_name, FS_SNAPSHOT_PATH)
-            # to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'Sync')
-            to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'Sync')
+            #to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
@@ -180,7 +180,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
     def doGetContentResponse(self):
         print colored("doGetContentResponse", 'blue')
         '''Get the time to wait for this transition in millis'''
-        # to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'GetContentResponse')
-        to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+        to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'GetContentResponse')
+        #to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         print "Wait: {}s".format(to_wait)
         # action.perform_action(ftp_client)

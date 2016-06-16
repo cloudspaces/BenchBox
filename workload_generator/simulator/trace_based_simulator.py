@@ -8,6 +8,8 @@ from benchmark_simulator import StatisticsManager
 import calendar
 from workload_generator import constants
 
+STEREOTYPE_USED = 'backup_heavy'
+
 class TraceNode():
     
     def __init__(self):
@@ -57,10 +59,10 @@ def replay_trace():
             users[user_id].last_operation_time = t0_epoch             
         else:            
             '''Log operation'''
-            statistics.trace_operations_per_user('backup_heavy', user_id,
+            statistics.trace_operations_per_user(STEREOTYPE_USED, user_id,
                 users[user_id].last_operation, t0_epoch) #users[user_id].last_operation_time)
             '''Log interarrival times'''
-            statistics.trace_operation_transitions_and_interarrivals('backup_heavy', 
+            statistics.trace_operation_transitions_and_interarrivals(STEREOTYPE_USED, 
                 users[user_id].last_operation, req_t, t0_epoch-users[user_id].last_operation_time)
             
             users[user_id].last_operation = req_t

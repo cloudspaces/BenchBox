@@ -55,8 +55,6 @@ class SimpleMarkovChain(object):
         if self.current_state == None:
             self.current_state = random.choice(self.chain.keys())
             
-        if self.current_state not in self.chain:
-            print "hola"
         #Fitness proportionate selection of next state
         random_trial = random.random()
         start_range = 0.0

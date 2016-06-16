@@ -32,6 +32,7 @@ class DataGenerator(object):
         self.stereotype_file_types_extensions = dict()
         self.file_types_sizes = dict()  #Bytes
         self.directory_count_distribution = None
+        self.file_level_deduplication_ratio = 0.17 #TODO: This goes in the stereotype recipe
         '''Parameters to model files updates'''
         self.file_update_location_probabilities = dict() #Extracted from Tarasov paper, Home dataset
         self.current_updated_file = None
@@ -45,8 +46,7 @@ class DataGenerator(object):
                     fitting = l.split(',')[1]
                     kw_params = eval(l[l.index('{'):])
                     setattr(self, model_attribute, (fitting, kw_params))
-                else:
-                    setattr(self, model_attribute, eval(l[l.index('{'):]))
+                else: setattr(self, model_attribute, eval(l[l.index('{'):]))
 
     '''Initialize the file system of the user (delegated to Impressions benchmark)'''
     def create_file_system_snapshot(self):
@@ -88,19 +88,12 @@ class DataGenerator(object):
         '''Prior creating a file, we first decide which type of file to create'''
         file_type = get_fitness_proportionate_element(self.stereotype_file_types_probabilities)
         '''After choosing the type, we proceed by generating the size of the file'''
+           
+        (function, kv_params) = self.file_types_sizes[file_type]
+        size = int(get_random_value_from_fitting(function, kv_params))
 
-        if FILE_SIZE_STATIC == 0:
-            (function, kv_params) = self.file_types_sizes[file_type]
-            size = int(get_random_value_from_fitting(function, kv_params))
-        else:
-            size = FILE_SIZE_STATIC
-        # size=40 000 000 # rollback to use fitting size instead of static 40MB filesize
-        # max file size is Integer length
-        # 2147483647
-        # 26553053639
-
-        if size > FILE_SIZE_MAX:
-            size = FILE_SIZE_MAX
+        '''Ensure that files are not huge'''
+        if size > FILE_SIZE_MAX: size = FILE_SIZE_MAX
         # sdgen.jar max size is 214748647 [ integer limit ]
 
         '''After generating the file size, we should decide the path for the new file'''
@@ -111,12 +104,20 @@ class DataGenerator(object):
         print "CREATING FILE: ", synthetic_file_base_path
         # se tiene que realizar los cdf en un nivel mas bajo
         add_fs_node(self.file_system, synthetic_file_base_path)
+        
         '''Invoke SDGen to generate realistic file contents'''
         characterization = DATA_CHARACTERIZATIONS_PATH + file_type
 
         if not DEBUG:
-            os.chdir(DATA_GENERATOR_PROPERTIES_DIR)
-            subprocess.call(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path])
+            '''Decide whther we have to create a new file or to take deduplicated content'''
+            if self.file_level_deduplication_ratio > random.random():
+                os.chdir(DATA_GENERATOR_PROPERTIES_DIR)
+                subprocess.call(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path])
+            else: 
+                '''Get a random file as content and store it with a new name'''
+                src_path = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
+                shutil.copyfile(src_path, synthetic_file_base_path)
+
         return synthetic_file_base_path
 
     def move_file(self):
