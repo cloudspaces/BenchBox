@@ -27,7 +27,6 @@ operation_chain,Unlink,MakeResponse,488325,genextreme,{'shape':-1.220071096,'sca
 operation_chain,Unlink,MoveResponse,387950,genextreme,{'shape':-0.2916574561,'scale':611.1933994,'loc':867.4523622}
 operation_chain,Unlink,PutContentResponse,250419,genextreme,{'shape':-0.9957301973,'scale':1727.450805,'loc':1582.617719}
 operation_chain,Unlink,Unlink,1222645,genextreme,{'shape':-0.3059925633,'scale':581.765825,'loc':777.6437872}
-activity_distribution,genpareto,{'shape':3.02809764917398,'scale':0.0664626786932026,'threshold':0.027999999932897}
 file_update_location_probabilities,{'B':0.38, 'E': 0.03, 'M': 0.08, 'BE': 0.1, 'BM': 0.11, 'ME': 0.01, 'BEM': 0.29}
 directory_count_distribution,randint,{'low':1,'high':50}
 stereotype_file_types_probabilities,{'image' : 0.332057601135,'application' : 0.375006544061,'text' : 0.246370910249,'audio' : 0.0340549988665,'chemical' : 0.00524133725904,'video' : 0.00572055445904,'message' : 0.00154805397055}

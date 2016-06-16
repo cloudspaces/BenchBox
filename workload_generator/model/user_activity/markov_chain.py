@@ -18,7 +18,6 @@ class SimpleMarkovChain(object):
         self.result_chain = dict()
         self.previous_state = None
         self.current_state = None
-        self.activity_distribution = None
         self.activity_rate = None
         
     def add_transition(self, state1, state2, probability):

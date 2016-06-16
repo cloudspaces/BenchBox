@@ -134,7 +134,7 @@ def get_random_value_from_fitting(function, kv_params):
 
 '''Utility method to clean and provide a better format to user stereotype recipes from results
 collected in Impala queries and matlab fittings'''
-def build_stereotype(stereotype_name, markov_chain_file, interarrival_fittings_file, activity_distribution_file, size_distribution_file):
+def build_stereotype(stereotype_name, markov_chain_file, interarrival_fittings_file, size_distribution_file):
     #for markov_chain_file in sorted(glob.glob(markov_chain_directory + "*.csv")):
     #output_markov_chain = file(STEREOTYPE_RECIPES_PATH + markov_chain_file.split("_")[-1].split(".")[0] + ".txt", "w")
     output_markov_chain = file(STEREOTYPE_RECIPES_PATH + stereotype_name, "w")
@@ -157,11 +157,6 @@ def build_stereotype(stereotype_name, markov_chain_file, interarrival_fittings_f
         print 'Resulting scipy generator function: ', fitting, parameters
             
         print >> output_markov_chain, state1 + "," + state2 + "," + num_transitions + "," + fitting + "," + parameters
-    
-    for ad_line in open(activity_distribution_file, "r"):
-        fitting, parameters = ad_line.split(",")        
-        fitting, parameters = translate_matlab_fitting_to_scipy(fitting, parameters)
-        print >> output_markov_chain, "activity distribution" + "," + fitting + "," + parameters 
 
     for fs_line in open(size_distribution_file, "r"):
         mimetype, fitting, parameters = fs_line.split(",")
@@ -195,6 +190,5 @@ if __name__ == '__main__':
     build_stereotype(stereotype_name="backupsample",
                      markov_chain_file=constants.STEREOTYPE_RECIPES_PATH + "backupsample_markov.csv",
                      interarrival_fittings_file=constants.STEREOTYPE_RECIPES_PATH + "backupsample_interarrivals.csv",
-                     activity_distribution_file=constants.STEREOTYPE_RECIPES_PATH + "backupsample_activity_distribution.csv",
                      size_distribution_file=constants.STEREOTYPE_RECIPES_PATH + "filesize.csv")
     

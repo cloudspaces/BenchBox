@@ -7,7 +7,6 @@ import shutil
 import subprocess
 import random
 import os
-import sys
 from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string, appendParentDir
 
 appendParentDir(3, os.path.dirname(os.path.realpath(__file__)))
