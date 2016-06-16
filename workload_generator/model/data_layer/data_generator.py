@@ -116,7 +116,8 @@ class DataGenerator(object):
             else: 
                 '''Get a random file as content and store it with a new name'''
                 src_path = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
-                shutil.copyfile(src_path, synthetic_file_base_path)
+                if src_path!= None: 
+                    shutil.copyfile(src_path, synthetic_file_base_path)
 
         return synthetic_file_base_path
 
