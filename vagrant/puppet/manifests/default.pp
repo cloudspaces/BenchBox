@@ -99,6 +99,11 @@ node 'sandBox' {
   }
 
   ->
+
+  file { "/home/vagrant/workload_generator/external/impressions":
+    mode => 755,
+  }
+  /*
   exec {
     'give execution permision to impression':
       command => 'chmod u+x ',
@@ -106,6 +111,7 @@ node 'sandBox' {
       group => 'vagrant',
       cwd => '/home/vagrant/workload_generator/external/impressions'
   }
+  */
 
   # dropbox
   /*

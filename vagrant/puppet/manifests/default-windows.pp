@@ -71,6 +71,11 @@ node 'win7-vagrant' {
   }
 
   ->
+
+  file { "/home/vagrant/workload_generator/external/impressions":
+    mode => 755,
+  }
+  /*
   exec {
     'give execution permision to impression':
       command => 'chmod u+x ',
@@ -78,7 +83,7 @@ node 'win7-vagrant' {
       group => 'vagrant',
       cwd => '/home/vagrant/workload_generator/external/impressions'
   }
-
+  */
   # dropbox
   /*
     class {'dropbox::config':
