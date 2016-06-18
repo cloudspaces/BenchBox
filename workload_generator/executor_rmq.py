@@ -61,6 +61,7 @@ class Commands(object):
         self.is_warmup = False
         self.is_running = False
         self.sync_directory = None  # stacksync_folder, Dropbox, ....
+        self.target_ftp_target = None
         self.stereotype = receipt  # backupsample
         self.stereotype_executor = None
         self.monitor_state = "Unknown"
@@ -86,11 +87,20 @@ class Commands(object):
         if self.is_warmup is False:
             self.sync_directory = body['msg']['test']['testFolder']
             self.stereotype_executor = StereotypeExecutorU1()  # tornar a assignar
-            self.stereotype_executor.initialize_ftp_client_by_directory(root_dir=self.sync_directory)
-            if os.name == "nt":
-                self.fs_abs_target_folder = '/home/vagrant/{}'.format(self.sync_directory)  # target ftp_client dir absolute path
+
+            self.target_ftp_target = body['msg']['test']['testTarget']
+            self.target_ftp_home = None
+
+            if self.target_ftp_target == "windows":
+                self.target_ftp_home = "/Users/vagrant"
+            elif self.target_ftp_target == "linux":
+                self.target_ftp_home = "/home/vagrant"
             else:
-                self.fs_abs_target_folder = '/Users/vagrant/{}'.format(self.sync_directory)  # target ftp_client dir absolute path
+                print "Unhandled sandbox target host"
+
+            self.stereotype_executor.initialize_ftp_client_by_directory(root_dir=self.sync_directory, ftp_home=self.target_ftp_home)
+
+            self.fs_abs_target_folder = '{}/{}'.format(self.target_ftp_home, self.sync_directory)  # target ftp_client dir absolute path
 
             self.stereotype = body['msg']['test']['testProfile']  # add benchbox switch stereotype profile at warmup
             receipt = STEREOTYPE_RECIPES_PATH + self.stereotype
