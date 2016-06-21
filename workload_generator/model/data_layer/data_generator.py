@@ -46,6 +46,8 @@ class DataGenerator(object):
                     fitting = l.split(',')[1]
                     kw_params = eval(l[l.index('{'):])
                     setattr(self, model_attribute, (fitting, kw_params))
+                elif model_attribute == "file_level_deduplication_ratio":
+                    setattr(self, model_attribute, float(l.split(',')[1]))
                 else: setattr(self, model_attribute, eval(l[l.index('{'):]))
 
     '''Initialize the file system of the user (delegated to Impressions benchmark)'''
@@ -235,7 +237,7 @@ if __name__ == '__main__':
     test_iterations=1
     for i in range(test_iterations):
         data_generator = DataGenerator()
-        data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "recipebackup")
+        data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backup")
         # data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backupsample")
         data_generator.create_file_system_snapshot()
         data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
