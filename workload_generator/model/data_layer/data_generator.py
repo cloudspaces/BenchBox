@@ -114,22 +114,19 @@ class DataGenerator(object):
         if not DEBUG:
             try:
                 '''Decide whether we have to create a new file or to take deduplicated content'''
-                if self.file_level_deduplication_ratio > random.random():
-                    os.chdir(DATA_GENERATOR_PROPERTIES_DIR)
-                    p = Popen(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path], stdout=PIPE, stderr=STDOUT)
-                    print p.pid
-                    print "Happens while running"
-                    p.communicate() #now wait
-                    p.wait() #now wait
-                    print "I have to wait!!"
-                    #for line in p.stdout:
-                    #    print line
+                if True: #self.file_level_deduplication_ratio > random.random():
+                    cp = subprocess.call(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path])
+                    #p = Popen(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path], stdout=PIPE, stderr=STDOUT)
+                    print "Generating new synthetic file..."
+                    #p.wait(timeout=10) #now wait
+                    print cp
                     
                 else: 
                     '''Get a random file as content and store it with a new name'''
                     src_path = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
-                    if src_path!= None:
-                        shutil.copyfile(src_path, synthetic_file_base_path)
+                    if src_path== None: return None
+                    print "Generating deduplicated file..."
+                    shutil.copyfile(src_path, synthetic_file_base_path)
             except Exception as ex:
                 print ex
                 success = False
@@ -306,7 +303,7 @@ if __name__ == '__main__':
         for j in range(number_of_ops):
             todo = random.randint(0, 5)
             do_list[todo]()
-            time.sleep(1)
+            time.sleep(0.1)
 
         '''DANGER! This deletes a directory recursively!'''
         if not DEBUG:
