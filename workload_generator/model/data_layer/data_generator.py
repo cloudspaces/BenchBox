@@ -11,7 +11,7 @@ from workload_generator.utils import get_random_value_from_fitting, get_random_a
 
 appendParentDir(3, os.path.dirname(os.path.realpath(__file__)))
 
-from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH, FILE_SIZE_STATIC, FILE_SIZE_MAX, \
+from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH, FILE_SIZE_MAX, \
     DATA_CHARACTERIZATIONS_PATH, FS_SNAPSHOT_PATH, \
     DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH, DEBUG, DATA_GENERATOR_PROPERTIES_DIR
 import time
@@ -40,7 +40,9 @@ class DataGenerator(object):
 
     def initialize_from_recipe(self, stereotype_recipe):
         for l in open(stereotype_recipe, "r"):
+            print l
             model_attribute = l.split(',')[0]
+            print dir(self)
             if model_attribute in dir(self):
                 if model_attribute == "directory_count_distribution":
                     fitting = l.split(',')[1]
@@ -48,7 +50,10 @@ class DataGenerator(object):
                     setattr(self, model_attribute, (fitting, kw_params))
                 elif model_attribute == "file_level_deduplication_ratio":
                     setattr(self, model_attribute, float(l.split(',')[1]))
-                else: setattr(self, model_attribute, eval(l[l.index('{'):]))
+                else:
+                    print  model_attribute
+                    setattr(self, model_attribute, eval(l[l.index('{'):]))
+                    print l[l.index('{'):]
 
     '''Initialize the file system of the user (delegated to Impressions benchmark)'''
     def create_file_system_snapshot(self):
@@ -198,7 +203,7 @@ class DataGenerator(object):
     def delete_directory(self):
         dir_path_to_delete = get_empty_directory(self.file_system, FS_SNAPSHOT_PATH)
         print "DELETING DIRECTORY: ", dir_path_to_delete
-        if dir_path_to_delete != None and (DEBUG or os.listdir(dir_path_to_delete) == []):  # do not remoe root directory
+        if dir_path_to_delete != None and (DEBUG or os.listdir(dir_path_to_delete) == []):  # do not remove root directory
             if dir_path_to_delete == '/home/vagrant/output':
                 return None
             if not DEBUG:
@@ -242,11 +247,11 @@ if __name__ == '__main__':
         data_generator.create_file_system_snapshot()
         data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
         do_list = {
-            0: data_generator.update_file,
+            0: data_generator.create_file,
             1: data_generator.create_directory,
             2: data_generator.delete_directory,
             3: data_generator.create_directory,
-            4: data_generator.create_file,
+            4: data_generator.update_file,
             5: data_generator.delete_file,
             6: data_generator.move_file,
             7: data_generator.move_directory,
@@ -257,6 +262,7 @@ if __name__ == '__main__':
         for j in range(number_of_ops):
             todo = random.randint(0, 9)
             do_list[todo]()
+            time.sleep(1)
 
         '''DANGER! This deletes a directory recursively!'''
         if not DEBUG:
