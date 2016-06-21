@@ -5,6 +5,7 @@ Created on 30/6/2015
 '''
 import shutil
 import subprocess
+from subprocess import Popen, PIPE, STDOUT
 import random
 import os
 from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string, appendParentDir
@@ -39,10 +40,9 @@ class DataGenerator(object):
         self.last_update_time = -1
 
     def initialize_from_recipe(self, stereotype_recipe):
+        print "Initializing data generator from stereotype recipe..." + stereotype_recipe
         for l in open(stereotype_recipe, "r"):
-            print l
             model_attribute = l.split(',')[0]
-            print dir(self)
             if model_attribute in dir(self):
                 if model_attribute == "directory_count_distribution":
                     fitting = l.split(',')[1]
@@ -50,13 +50,11 @@ class DataGenerator(object):
                     setattr(self, model_attribute, (fitting, kw_params))
                 elif model_attribute == "file_level_deduplication_ratio":
                     setattr(self, model_attribute, float(l.split(',')[1]))
-                else:
-                    print  model_attribute
-                    setattr(self, model_attribute, eval(l[l.index('{'):]))
-                    print l[l.index('{'):]
+                else: setattr(self, model_attribute, eval(l[l.index('{'):]))
 
     '''Initialize the file system of the user (delegated to Impressions benchmark)'''
     def create_file_system_snapshot(self):
+        print "Creating initial file system snapshot..."
         '''Get initial number of directories for this user'''
         (function, kv_params) = self.directory_count_distribution
         num_dirs = get_random_value_from_fitting(function, kv_params)
@@ -75,8 +73,9 @@ class DataGenerator(object):
         fs_config_file.close()
         '''Create the file system'''
         time.sleep(1)
-        if not DEBUG:
+        if not DEBUG: 
             subprocess.call([FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH])
+        time.sleep(1)
 
     '''Generate the logical structure of the initial snapshot before migration to sandbox'''
     def initialize_file_system_tree(self, fs_snapshot_path):
@@ -90,45 +89,56 @@ class DataGenerator(object):
                 add_fs_node(self.file_system, top+file)
 
     '''Create file at random based on the file type popularity for this stereotype'''
-    # todo create files with realistic file size
     def create_file(self):
         '''Prior creating a file, we first decide which type of file to create'''
         file_type = get_fitness_proportionate_element(self.stereotype_file_types_probabilities)
-        '''After choosing the type, we proceed by generating the size of the file'''
-           
+        
+        '''After choosing the type, we proceed by generating the size of the file'''           
         (function, kv_params) = self.file_types_sizes[file_type]
         size = int(get_random_value_from_fitting(function, kv_params))
 
         '''Ensure that files are not huge'''
-        if size > FILE_SIZE_MAX: size = FILE_SIZE_MAX
-        # sdgen.jar max size is 214748647 [ integer limit ]
+        if size > FILE_SIZE_MAX: 
+            size = FILE_SIZE_MAX
 
         '''After generating the file size, we should decide the path for the new file'''
         synthetic_file_base_path = get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH)
         '''Create a realistic name'''
         synthetic_file_base_path += get_random_alphanumeric_string(random.randint(1,20)) + \
                                     random.choice(self.stereotype_file_types_extensions[file_type])
-        print "CREATING FILE: ", synthetic_file_base_path
-        # se tiene que realizar los cdf en un nivel mas bajo
-        add_fs_node(self.file_system, synthetic_file_base_path)
+        print "CREATING FILE: ", synthetic_file_base_path, str(size)        
         
         '''Invoke SDGen to generate realistic file contents'''
         characterization = DATA_CHARACTERIZATIONS_PATH + file_type
-
+        success = True
         if not DEBUG:
-            '''Decide whther we have to create a new file or to take deduplicated content'''
-            if self.file_level_deduplication_ratio > random.random():
-                os.chdir(DATA_GENERATOR_PROPERTIES_DIR)
-                subprocess.call(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path])
-            else: 
-                '''Get a random file as content and store it with a new name'''
-                src_path = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
-                if src_path!= None:
-                    try:
+            try:
+                '''Decide whether we have to create a new file or to take deduplicated content'''
+                if self.file_level_deduplication_ratio > random.random():
+                    os.chdir(DATA_GENERATOR_PROPERTIES_DIR)
+                    p = Popen(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path], stdout=PIPE, stderr=STDOUT)
+                    print p.pid
+                    print "Happens while running"
+                    p.communicate() #now wait
+                    p.wait() #now wait
+                    print "I have to wait!!"
+                    #for line in p.stdout:
+                    #    print line
+                    
+                else: 
+                    '''Get a random file as content and store it with a new name'''
+                    src_path = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
+                    if src_path!= None:
                         shutil.copyfile(src_path, synthetic_file_base_path)
-                    except Exception as ex:
-                        print ex.message
-        return synthetic_file_base_path
+            except Exception as ex:
+                print ex
+                success = False
+                                        
+        if success: 
+            add_fs_node(self.file_system, synthetic_file_base_path)
+            return synthetic_file_base_path
+        
+        return None
 
     def move_file(self):
         src_path = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
@@ -138,11 +148,19 @@ class DataGenerator(object):
             return None, None
         dest_path += src_path.split(os.sep)[-1]
         print "MOVE FILE: ", src_path, " TO: ", dest_path
-        if not DEBUG:
-            shutil.move(src_path, dest_path)
-        delete_fs_node(self.file_system, src_path)
-        add_fs_node(self.file_system, dest_path)
-        return src_path, dest_path
+        success = True
+        if not DEBUG:            
+            try:
+                shutil.move(src_path, dest_path)
+            except Exception as ex:
+                print ex
+                success = False
+        if success:
+            delete_fs_node(self.file_system, src_path)
+            add_fs_node(self.file_system, dest_path)
+            return src_path, dest_path
+        
+        return None, None
 
     def move_directory(self):
         src_path = get_empty_directory(self.file_system, FS_SNAPSHOT_PATH)
@@ -166,26 +184,40 @@ class DataGenerator(object):
 
         '''If things are ok, do the move operation'''
         print "MOVE DIRECTORY: ", src_path, " TO: ", dest_path
+        success = True
         if not DEBUG:
-            shutil.move(src_path, dest_path)
-        delete_fs_node(self.file_system, src_path)
-        add_fs_node(self.file_system, dest_path)
-        return src_path, dest_path
+            try:
+                shutil.move(src_path, dest_path)
+            except Exception as ex:
+                print ex
+                success = False
+        if success:
+            delete_fs_node(self.file_system, src_path)
+            add_fs_node(self.file_system, dest_path)
+            return src_path, dest_path
+        
+        return None, None
 
     '''Delete a file at random depending on the file type popularity for this stereotype'''
     def delete_file(self):
         to_delete = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
         print "DELETING FILE: ", to_delete
-        if to_delete != None:
-            delete_fs_node(self.file_system, to_delete)  # delete logical
-            if not DEBUG:
-                try:
-                    os.remove(to_delete)
-                except OSError as ex:
-                    print ex.message
-                    return None
-        '''Delete a random file from the '''
-        return to_delete
+        if to_delete == None: return None
+          
+        success = True         
+        if not DEBUG:
+            try:
+                os.remove(to_delete)
+            except OSError as ex:
+                print ex
+                success = False 
+                
+        if success:
+            delete_fs_node(self.file_system, to_delete)  
+            '''Delete a random file from the '''
+            return to_delete
+            
+        return None
 
     '''Create a directory in a random point of the file system'''
     def create_directory(self):
@@ -193,10 +225,19 @@ class DataGenerator(object):
         directory_path = get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH)
         to_create = directory_path + get_random_alphanumeric_string()
         print "CREATING DIRECTORY: ", to_create
+        success = True
         if not DEBUG:
-            os.makedirs(to_create)
-        add_fs_node(self.file_system, to_create)
-        return to_create
+            try:
+                os.makedirs(to_create)
+            except Exception as ex:
+                print ex
+                success = False
+                
+        if success:
+            add_fs_node(self.file_system, to_create)
+            return to_create
+        
+        return None
 
     '''Delete an empty directory from te structure, if it does exist. If not,
     we prefer to do not perform file deletes as they may yield cascade operations'''
@@ -204,12 +245,18 @@ class DataGenerator(object):
         dir_path_to_delete = get_empty_directory(self.file_system, FS_SNAPSHOT_PATH)
         print "DELETING DIRECTORY: ", dir_path_to_delete
         if dir_path_to_delete != None and (DEBUG or os.listdir(dir_path_to_delete) == []):  # do not remove root directory
-            if dir_path_to_delete == '/home/vagrant/output':
-                return None
+            success = True
             if not DEBUG:
-                os.rmdir(dir_path_to_delete)
-            delete_fs_node(self.file_system, dir_path_to_delete)
-        return dir_path_to_delete
+                try:
+                    os.rmdir(dir_path_to_delete)
+                except Exception as ex:
+                    print ex
+                    success = False            
+            if success:
+                delete_fs_node(self.file_system, dir_path_to_delete)
+                return dir_path_to_delete
+        
+        return None
 
     def update_file(self):
         '''We have to respect both temporal and spatial localities, as well as to model updates themselves'''
@@ -249,18 +296,15 @@ if __name__ == '__main__':
         do_list = {
             0: data_generator.create_file,
             1: data_generator.create_directory,
-            2: data_generator.delete_directory,
-            3: data_generator.create_directory,
-            4: data_generator.update_file,
-            5: data_generator.delete_file,
-            6: data_generator.move_file,
-            7: data_generator.move_directory,
-            8: data_generator.update_file,
-            9: data_generator.update_file,
+            2: data_generator.delete_file,
+            3: data_generator.delete_directory,
+            4: data_generator.move_file,
+            5: data_generator.move_directory,
+            6: data_generator.update_file
         }
         number_of_ops = 50
         for j in range(number_of_ops):
-            todo = random.randint(0, 9)
+            todo = random.randint(0, 5)
             do_list[todo]()
             time.sleep(1)
 
