@@ -114,7 +114,7 @@ class DataGenerator(object):
         if not DEBUG:
             try:
                 '''Decide whether we have to create a new file or to take deduplicated content'''
-                if True: #self.file_level_deduplication_ratio > random.random():
+                if self.file_level_deduplication_ratio < random.random():
                     cp = subprocess.call(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path])
                     #p = Popen(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path], stdout=PIPE, stderr=STDOUT)
                     print "Generating new synthetic file..."
@@ -138,13 +138,14 @@ class DataGenerator(object):
         return None
 
     def move_file(self):
-        src_path = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
+        src_path = get_file_based_on_type_popularity(self.file_system, 
+            self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
         dest_path = get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH)
+        print "MOVE FILE: ", src_path, " TO: ", dest_path
         if src_path == None or dest_path == None:
-            print "WARNING: No files or directories to move!"
+            print "WARNING: No files to move!", src_path, dest_path
             return None, None
         dest_path += src_path.split(os.sep)[-1]
-        print "MOVE FILE: ", src_path, " TO: ", dest_path
         success = True
         if not DEBUG:            
             try:
@@ -197,7 +198,8 @@ class DataGenerator(object):
 
     '''Delete a file at random depending on the file type popularity for this stereotype'''
     def delete_file(self):
-        to_delete = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
+        to_delete = get_file_based_on_type_popularity(self.file_system, 
+            self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)        
         print "DELETING FILE: ", to_delete
         if to_delete == None: return None
           
