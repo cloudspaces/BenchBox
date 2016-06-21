@@ -9,7 +9,7 @@ import sys, os
 # Upload a file to a remove ftp server
 #-------------------------------------------------------------------------------
 class ftp_sender():
-    def __init__(self, ftp_host, ftp_port, ftp_user, ftp_pass, ftp_root):
+    def __init__(self, ftp_host, ftp_port, ftp_user, ftp_pass, ftp_root, ftp_home=None):
 
         self.ftp = FTP()
         self.ftp.connect(ftp_host, ftp_port)  # socket set timeout 1 week timeout
@@ -19,7 +19,7 @@ class ftp_sender():
         print "current directory"
         self.ftp.cwd(ftp_root)
         print self.ftp.pwd()
-
+        self.ftp_home = ftp_home
         self.ftp_host = ftp_host
         self.ftp_port = ftp_port
         self.ftp_user = ftp_user
@@ -29,10 +29,7 @@ class ftp_sender():
     def send(self, fname, new_name=None, sub_folder=None):
         print ">> {} <<  ".format(self.ftp.pwd())
         if sub_folder:
-            if os.name == "posix":
-                self.ftp.cwd("~")  # move to home
-            elif os.name == "nt":
-                self.ftp.cwd("/Users/vagrant")
+            self.ftp.cwd(self.ftp_home)  # move to home
             if self.ftp_root:
                 print "move to "+self.ftp_root
                 self.ftp.cwd(self.ftp_root)
@@ -40,8 +37,6 @@ class ftp_sender():
             self.ftp.cwd(sub_folder)
 
 
-        # Remove any path component
-        remote_name = ""
         if new_name:
             remote_name = os.path.basename(new_name)
         else:
@@ -57,10 +52,7 @@ class ftp_sender():
         print ">> {} <<  ".format(self.ftp.pwd())
 
         sub_folder = os.path.dirname(ftp_rel_path)
-        if os.name == "posix":
-            self.ftp.cwd("~")  # move to home
-        elif os.name == "nt":
-            self.ftp.cwd("/Users/vagrant")
+        self.ftp.cwd(self.ftp_home)  # move to home
 
         if self.ftp_root:
             print "move to "+self.ftp_root
@@ -91,10 +83,7 @@ class ftp_sender():
     def rm(self, fname, sub_folder=None):
 
         if sub_folder:
-            if os.name == "posix":
-                self.ftp.cwd("~")  # move to home
-            elif os.name == "nt":
-                self.ftp.cwd("/Users/vagrant")
+            self.ftp.cwd(self.ftp_home)  # move to home
 
             if self.ftp_root:
                 print "move to "+self.ftp_root
@@ -116,10 +105,7 @@ class ftp_sender():
     def rmd(self, fname, sub_folder=None):
 
         if sub_folder:
-            if os.name == "posix":
-                self.ftp.cwd("~")  # move to home
-            elif os.name == "nt":
-                self.ftp.cwd("/Users/vagrant")
+            self.ftp.cwd(self.ftp_home)  # move to home
 
             if self.ftp_root:
                 print "move to "+self.ftp_root
@@ -151,11 +137,7 @@ class ftp_sender():
         self.ftp.close()
 
     def mv(self, src, tgt):
-        #
-        if os.name == "posix":
-            self.ftp.cwd("~")  # move to home
-        elif os.name == "nt":
-            self.ftp.cwd("/Users/vagrant")
+        self.ftp.cwd(self.ftp_home)  # move to home
 
         if self.ftp_root:
             print "move to "+self.ftp_root

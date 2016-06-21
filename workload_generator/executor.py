@@ -8,19 +8,19 @@ import os, sys
 import random
 import time
 from termcolor import colored
-from workload_generator.utils import appendParentDir
+from utils import appendParentDir
 
 '''
 HardCode path for each environment, should be dev, debug, production instead...
 '''
 appendParentDir(1, os.path.dirname(os.path.realpath(__file__)))
 
-from workload_generator.model.user_activity.stereotype_executor import StereotypeExecutor
-from workload_generator.communication.actions import UploadDirectory, \
+from model.user_activity.stereotype_executor import StereotypeExecutor
+from communication.actions import UploadDirectory, \
     CreateFile, CreateDirectory, UpdateFile, DeleteFile, DeleteDirectory, MoveFile, MoveDirectory
 
-from workload_generator.communication.ftp_sender import ftp_sender
-from workload_generator.constants import DEBUG, FS_SNAPSHOT_PATH, TO_WAIT_STATIC_MAX, TO_WAIT_STATIC_MIN, \
+from communication.ftp_sender import ftp_sender
+from constants import DEBUG, FS_SNAPSHOT_PATH, TO_WAIT_STATIC_MAX, TO_WAIT_STATIC_MIN, \
     FTP_SENDER_IP, FTP_SENDER_PORT, FTP_SENDER_USER, FTP_SENDER_PASS
 
 '''Class that executes remote operations on the Sandbox based on the
@@ -42,15 +42,16 @@ class StereotypeExecutorU1(StereotypeExecutor):
     Aquest metode es crida quan hiha un warm up en el cas de executor per que el
     benchbox sapigui a quin directory s'ha sincronitzar els fitchers
     """
-    def initialize_ftp_client_by_directory(self, root_dir):
+    def initialize_ftp_client_by_directory(self, root_dir, ftp_home):
         # update fto_client_root directory
         print "Init ftp_client and its root directory {}".format(root_dir)
         self.ftp_client = ftp_sender(
-                FTP_SENDER_IP,
-                FTP_SENDER_PORT,
-                FTP_SENDER_USER,
-                FTP_SENDER_PASS,
-                root_dir  # per defecte ...
+                ftp_host=FTP_SENDER_IP,
+                ftp_port=FTP_SENDER_PORT,
+                ftp_user=FTP_SENDER_USER,
+                ftp_pass=FTP_SENDER_PASS,
+                ftp_root=root_dir,  # per defecte ...
+                ftp_home=ftp_home  # default home directory
         )
 
     def initialize_from_stereotype_recipe(self, stereotype_recipe):

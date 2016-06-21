@@ -7,7 +7,7 @@ from constants import STEREOTYPE_RECIPES_PATH
 from scipy import stats
 import numpy
 import random
-from workload_generator import constants
+import constants
 import os
 import sys
 
