@@ -21,6 +21,8 @@ class FileUpdateManager(object):
     def modify_file(self, file_path, update_type, content_type, num_bytes):    
         #'B':0.38, 'E': 0.03, 'M': 0.08, 'BE': 0.1, 'BM': 0.11, 'ME': 0.01, 'BEM': 0.29
         new_content = None        
+        old_file_size = os.path.getsize(file_path)
+        print "File size before update of ", file_path, " -> ", old_file_size
         if not DEBUG:
             os.chdir(DATA_GENERATOR_PROPERTIES_DIR)
             generated_update_content_file = UPDATES_CONTENT_GENERATION_PATH + str(uuid.uuid4())
@@ -55,6 +57,9 @@ class FileUpdateManager(object):
             self.do_append(file_path, content_parts[2])
         else:
             raise NotImplementedError("NOT IMPLEMENTED UPDATE TYPE: " + update_type)
+        
+        print "File size after update: ", os.path.getsize(file_path) 
+        print "Expected size after update : ", old_file_size+num_bytes
     
     def do_prepend(self, file_path, content):
         with tempfile.TemporaryFile() as f:

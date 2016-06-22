@@ -156,6 +156,8 @@ class DataGenerator(object):
         if success:
             delete_fs_node(self.file_system, src_path)
             add_fs_node(self.file_system, dest_path)
+            if src_path == self.current_updated_file:
+                self.current_updated_file = dest_path
             return src_path, dest_path
         
         return None, None
@@ -214,6 +216,8 @@ class DataGenerator(object):
         if success:
             delete_fs_node(self.file_system, to_delete)  
             '''Delete a random file from the '''
+            if to_delete == self.current_updated_file:
+                self.current_updated_file = None
             return to_delete
             
         return None
@@ -261,7 +265,7 @@ class DataGenerator(object):
         '''We have to respect both temporal and spatial localities, as well as to model updates themselves'''
         '''Make use of the UpdateManager for the last aspect'''
         '''1) If there is a file that has been updated, check if we should continue editing it'''
-        if self.current_updated_file != None or time.time()-self.last_update_time > 60: #TODO: This threshold should be changed by a real distribution
+        if self.current_updated_file == None or time.time()-self.last_update_time > 60: #TODO: This threshold should be changed by a real distribution
             '''2) Select a random file of the given type to update (this is a simple approach, which can be
             sophisticated, if necessary, by adding individual "edit probabilities" to files based on distributions)'''
             self.current_updated_file = get_file_based_on_type_popularity(self.file_system, \
@@ -299,13 +303,14 @@ if __name__ == '__main__':
             3: data_generator.delete_directory,
             4: data_generator.move_file,
             5: data_generator.move_directory,
-            6: data_generator.update_file
+            6: data_generator.update_file,
+            7: data_generator.create_file,
+            8: data_generator.create_file
         }
-        number_of_ops = 50
+        number_of_ops = 500
         for j in range(number_of_ops):
-            todo = random.randint(0, 5)
+            todo = random.randint(0, 8)
             do_list[todo]()
-            time.sleep(0.1)
 
         '''DANGER! This deletes a directory recursively!'''
         if not DEBUG:
