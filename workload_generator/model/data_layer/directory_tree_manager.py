@@ -53,6 +53,8 @@ def get_fitness_proportionate_element(probabilities_dict):
             file_type = k
             break
         else: start_range += probabilities_dict[k]
+    if file_type==None: 
+        print "WARNING: Could not select a file type, probably your probabilities in the recipe do not sum 1!"
     return file_type
 
 '''Return an existing file in the directory tree based on the popularity of file types'''

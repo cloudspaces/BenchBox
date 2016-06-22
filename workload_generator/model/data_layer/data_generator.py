@@ -5,7 +5,6 @@ Created on 30/6/2015
 '''
 import shutil
 import subprocess
-from subprocess import Popen, PIPE, STDOUT
 import random
 import os
 from workload_generator.utils import get_random_value_from_fitting, get_random_alphanumeric_string, appendParentDir
@@ -14,7 +13,7 @@ appendParentDir(3, os.path.dirname(os.path.realpath(__file__)))
 
 from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH, FILE_SIZE_MAX, \
     DATA_CHARACTERIZATIONS_PATH, FS_SNAPSHOT_PATH, \
-    DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH, DEBUG, DATA_GENERATOR_PROPERTIES_DIR
+    DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH, DEBUG
 import time
 from workload_generator.model.data_layer.update_manager import FileUpdateManager
 from workload_generator.model.data_layer.directory_tree_manager import delete_fs_node, \
@@ -22,6 +21,12 @@ from workload_generator.model.data_layer.directory_tree_manager import delete_fs
     get_random_fs_directory, get_empty_directory, \
     get_fitness_proportionate_element, get_type_of_file
 
+'''
+This class is intended to produce changes in a folder, such as CRUD operations on
+files and directories. The idea is to model realistic behaviors of users on sync
+folders of Personal Clouds for their performance evaluation. The behavior of the
+execution of this class will depend on the stereotype recipes used for its initialization.
+'''
 class DataGenerator(object):
 
     def __init__(self):
@@ -33,7 +38,7 @@ class DataGenerator(object):
         self.stereotype_file_types_extensions = dict()
         self.file_types_sizes = dict()  #Bytes
         self.directory_count_distribution = None
-        self.file_level_deduplication_ratio = 0.17 #TODO: This goes in the stereotype recipe
+        self.file_level_deduplication_ratio = 0.0
         '''Parameters to model files updates'''
         self.file_update_location_probabilities = dict() #Extracted from Tarasov paper, Home dataset
         self.file_type_update_probabilities = dict()
@@ -117,11 +122,7 @@ class DataGenerator(object):
                 '''Decide whether we have to create a new file or to take deduplicated content'''
                 if self.file_level_deduplication_ratio < random.random():
                     cp = subprocess.call(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path])
-                    #p = Popen(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path], stdout=PIPE, stderr=STDOUT)
-                    print "Generating new synthetic file..."
-                    #p.wait(timeout=10) #now wait
-                    print cp
-                    
+                    print "Generating new synthetic file..."                    
                 else: 
                     '''Get a random file as content and store it with a new name'''
                     src_path = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
@@ -138,6 +139,7 @@ class DataGenerator(object):
         
         return None
 
+    '''Move a file (if there is any) to a random location within the synthetic file system'''
     def move_file(self):
         src_path = get_file_based_on_type_popularity(self.file_system, 
             self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
@@ -163,6 +165,7 @@ class DataGenerator(object):
         
         return None, None
 
+    '''Move and empty directory to a random place within the synthetic file system'''
     def move_directory(self):
         src_path = get_empty_directory(self.file_system, FS_SNAPSHOT_PATH)
         if src_path == None:
@@ -243,7 +246,7 @@ class DataGenerator(object):
         
         return None
 
-    '''Delete an empty directory from te structure, if it does exist. If not,
+    '''Delete an empty directory from the structure, if it does exist. If not,
     we prefer to do not perform file deletes as they may yield cascade operations'''
     def delete_directory(self):
         dir_path_to_delete = get_empty_directory(self.file_system, FS_SNAPSHOT_PATH)
