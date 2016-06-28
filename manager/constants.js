@@ -8,7 +8,7 @@ function define(name, value) {
 var os = require('os');
 var ifaces = os.networkInterfaces();
 var rabbitIP = undefined;
-var netifaces = ['eth0', 'wlan0'];
+var netifaces = ['enp4s0f2','eth0', 'wlan0'];
 
 // Object.keys(ifaces).forEach(function (ifname) {
 netifaces.forEach(function (ifname) {

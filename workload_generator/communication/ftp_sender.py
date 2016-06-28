@@ -5,9 +5,10 @@ from ftplib import FTP
 import traceback
 import sys, os
 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
 # Upload a file to a remove ftp server
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 class ftp_sender():
     def __init__(self, ftp_host, ftp_port, ftp_user, ftp_pass, ftp_root, ftp_home=None):
 
@@ -19,23 +20,23 @@ class ftp_sender():
         print "current directory"
         self.ftp.cwd(ftp_root)
         print self.ftp.pwd()
-        self.ftp_home = ftp_home
         self.ftp_host = ftp_host
         self.ftp_port = ftp_port
         self.ftp_user = ftp_user
         self.ftp_pass = ftp_pass
         self.ftp_root = ftp_root
 
+        self.ftp_home = "/"
+
     def send(self, fname, new_name=None, sub_folder=None):
         print ">> {} <<  ".format(self.ftp.pwd())
         if sub_folder:
             self.ftp.cwd(self.ftp_home)  # move to home
             if self.ftp_root:
-                print "move to "+self.ftp_root
+                print "move to " + self.ftp_root
                 self.ftp.cwd(self.ftp_root)
-            print "move to "+sub_folder
+            print "move to " + sub_folder
             self.ftp.cwd(sub_folder)
-
 
         if new_name:
             remote_name = os.path.basename(new_name)
@@ -44,7 +45,7 @@ class ftp_sender():
         remote_dir = self.ftp.pwd()
         remote_abs_path = os.path.join(remote_dir, remote_name)
         # fname, local file name path
-        self.ftp.storbinary('STOR ' + remote_name, open(fname,'rb'))
+        self.ftp.storbinary('STOR ' + remote_name, open(fname, 'rb'))
 
         return remote_abs_path
 
@@ -55,9 +56,9 @@ class ftp_sender():
         self.ftp.cwd(self.ftp_home)  # move to home
 
         if self.ftp_root:
-            print "move to "+self.ftp_root
+            print "move to " + self.ftp_root
             self.ftp.cwd(self.ftp_root)
-        print "move to "+sub_folder
+        print "move to " + sub_folder
         self.ftp.cwd(sub_folder)
 
         # Remove any path component
@@ -79,16 +80,15 @@ class ftp_sender():
         except Exception as e:
             print e.message
 
-
     def rm(self, fname, sub_folder=None):
 
         if sub_folder:
             self.ftp.cwd(self.ftp_home)  # move to home
 
             if self.ftp_root:
-                print "move to "+self.ftp_root
+                print "move to " + self.ftp_root
                 self.ftp.cwd(self.ftp_root)
-            print "move to "+sub_folder
+            print "move to " + sub_folder
             self.ftp.cwd(sub_folder)
             # self.ftp.delete(sub_folder + "/" + os.path.basename(fname))
         print self.ftp.pwd()
@@ -98,7 +98,7 @@ class ftp_sender():
         except Exception as e:
             print "rm folder >> {}".format(fname)
             self.ftp.rmd(os.path.basename(fname))
-            #traceback.print_exc(file=sys.stderr)
+            # traceback.print_exc(file=sys.stderr)
 
             # yes, there was an error...
 
@@ -108,9 +108,9 @@ class ftp_sender():
             self.ftp.cwd(self.ftp_home)  # move to home
 
             if self.ftp_root:
-                print "move to "+self.ftp_root
+                print "move to " + self.ftp_root
                 self.ftp.cwd(self.ftp_root)
-            print "move to "+sub_folder
+            print "move to " + sub_folder
             self.ftp.cwd(sub_folder)
             # self.ftp.delete(sub_folder + "/" + os.path.basename(fname))
         print self.ftp.pwd()
@@ -127,6 +127,7 @@ class ftp_sender():
 
 
             # yes, there was an error...
+
     def get(self, src, tgt):
         return self.ftp.retrbinary(src, tgt)
 
@@ -140,27 +141,32 @@ class ftp_sender():
         self.ftp.cwd(self.ftp_home)  # move to home
 
         if self.ftp_root:
-            print "move to "+self.ftp_root
+            print "move to " + self.ftp_root
             self.ftp.cwd(self.ftp_root)
-
+        idx_try = 0
         while True:
+            idx_try = +1
             try:
                 self.ftp.rename(src, tgt)
                 break  # if not failed continue..
             except Exception:
+                if idx_try == 3:  # 3 move attemps failed
+                    print "File impossible to move"
+                    break
+                print Exception.message
                 print 'Failed moving a file'
 
         return os.path.join(self.ftp.pwd(), tgt)
 
     def move_down(self):
         self.ftp.cwd('..')
-        
+
     def move_up(self, folder):
         self.ftp.cwd(folder)
 
     def cwd(self, folder):
         self.ftp.cwd(folder)
-    
+
     def get_ftp_host(self):
         return self.ftp_host
 
@@ -178,14 +184,13 @@ class ftp_sender():
                 self.ftp.login(self.ftp_user, self.ftp_pass)
         return self
 
+
 if __name__ == '__main__':
 
     print 'testing ftp operations'
-    ftp_client = ftp_sender('10.30.103.145', '21','milax','milax','ftpdir')
-
+    ftp_client = ftp_sender('10.30.103.145', '21', 'milax', 'milax', 'ftpdir')
 
     print 'do operations'
-
 
     '''def doMakeResponse(self): '''
 
@@ -196,8 +201,6 @@ if __name__ == '__main__':
     '''def doUnlink(self):'''
 
     '''def doMoveResponse(self):'''
-
-
 
     if ftp_client:
         print "close ftp_client"
