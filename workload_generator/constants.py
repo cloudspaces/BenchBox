@@ -6,7 +6,6 @@ Created on 6/7/2015
 import getpass
 import os
 
-
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 # hardcode due to no convention with closing slash or not for directory this may fail if the directory is root
 if os.name == 'posix':
@@ -45,8 +44,6 @@ SNAPSHOT_PATH = {
 }
 
 FS_SNAPSHOT_PATH = SNAPSHOT_PATH[username]
-
-
 
 UPDATES_CONTENT_GENERATION_PATH = PROJECT_PATH + "workload_generator/updates_content/"
 DIRECTORY_DEPTH_PROBABILITY = 0.1

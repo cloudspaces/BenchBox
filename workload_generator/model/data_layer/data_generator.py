@@ -44,6 +44,7 @@ class DataGenerator(object):
         self.file_type_update_probabilities = dict()
         self.current_updated_file = None
         self.last_update_time = -1
+        self.file_update_sizes = dict()  #Bytes
 
     def initialize_from_recipe(self, stereotype_recipe):
         print "Initializing data generator from stereotype recipe..." + stereotype_recipe
@@ -281,10 +282,12 @@ class DataGenerator(object):
         if self.current_updated_file != None:
             '''3) Select the type of update to be done (Prepend, Middle or Append)'''
             update_type = get_fitness_proportionate_element(self.file_update_location_probabilities)
-            '''4) Select the size of the update to be done (1%, 40% of the content)'''
             if not DEBUG:
-                file_size = os.path.getsize(self.current_updated_file)
-                updated_bytes = int(file_size*random.random()) #TODO: This should be changed by a real distribution            
+                '''4) Select the size of the update to be done (1%, 40% of the content)'''
+                file_size = os.path.getsize(self.current_updated_file)         
+                (function, kv_params) = self.file_update_sizes[update_type]
+                relative_size = float(get_random_value_from_fitting(function, kv_params))
+                updated_bytes = abs(int(file_size - (file_size*relative_size))) #TODO: At the moment we only consider additions of content in updates           
                 print "UPDATE TYPE: ", update_type, " UPDATE SIZE: ", updated_bytes
                 content_type = DATA_CHARACTERIZATIONS_PATH + get_type_of_file(self.current_updated_file, self.stereotype_file_types_extensions)
                 self.file_update_manager.modify_file(self.current_updated_file, update_type, content_type, updated_bytes)
