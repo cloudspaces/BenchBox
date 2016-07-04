@@ -87,6 +87,7 @@ class Commands(object):
         keep the pc client running {self.sync_proc_pid}
         :return:
         """
+
         pc_cmd = {
             #'stacksync': "/usr/bin/java -jar /usr/lib/stacksync/Stacksync.jar -d -c /vagrant",
             # owncloudcmd --httpproxy http://10.30.232.183 -u demo10 -p demo10 /home/vagrant/owncloud_folder/ http://10.30.232.183
