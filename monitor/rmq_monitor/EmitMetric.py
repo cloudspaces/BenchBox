@@ -9,8 +9,8 @@ import time
 import os
 
 import subprocess
-from py_sniffer.TrafficMonitor import TrafficMonitor
-
+# from py_sniffer.TrafficMonitor import TrafficMonitor
+from py_sniffer.sniffer import Sniffer
 
 class EmitMetric(object):
     def __init__(self, hostname="", personal_cloud="", receipt=""):
@@ -34,8 +34,21 @@ class EmitMetric(object):
             }
 
         # when capturing from private sync server's its server ip must be forwarded
-        self.traffic_monitor = TrafficMonitor(client=self.personal_cloud.lower(), server=self.personal_cloud_ip,
-                                              port=self.personal_cloud_port)
+
+        config_client = {
+            "sync_server_ip": self.personal_cloud_ip,
+            "sync_server_port": self.personal_cloud_port,
+            "packet_limit": -1,
+            "max_bytes": 65535,
+            "promiscuous": False,
+            "read_timeout": 100
+        }
+
+        # self.traffic_monitor = TrafficMonitor(client=self.personal_cloud.lower(), server=self.personal_cloud_ip,
+        #                                       port=self.personal_cloud_port)
+
+        self.traffic_monitor = Sniffer(personal_cloud=self.personal_cloud.lower(), config=config_client)
+
         self.traffic_monitor.run()  # intermediari que arranca trafficMonitor i permet realitzar get stats sobre la marcha o reiniciar el monitoreig
         self.personal_folder = pc_folders[self.personal_cloud.lower()]
 
@@ -197,6 +210,7 @@ class EmitMetric(object):
             print "invalid literal for... file counter"
 
         net_stats = self.traffic_monitor.notify_stats()
+        # net_stats = self.traffic_monitor.target.notify_stats()
         # z = dict(x.items() + y.items()) => metrics
         # envez de esto dict join
         metrics['data_rate_size_up'] = net_stats['data_rate']['size_up']

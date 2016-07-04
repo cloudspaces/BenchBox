@@ -48,7 +48,8 @@ class Sniffer(Thread):
         self.target.hello()
         return 0
 
-
+    def notify_status(self):
+        return self.target.notify_status()
 
 def parseArgs(argv):
     personal_cloud = ''
@@ -97,5 +98,5 @@ if __name__ == '__main__':
         # idx += 1
         # print "Notify status... {}".format(idx)
         time.sleep(5)
-        print tm.target.notify_stats()
+        print tm.notify_stats()
     print "end"
