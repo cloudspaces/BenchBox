@@ -48,8 +48,8 @@ class Sniffer(Thread):
         self.target.hello()
         return 0
 
-    def notify_status(self):
-        return self.target.notify_status()
+    def notify_stats(self):
+        return self.target.notify_stats()
 
 def parseArgs(argv):
     personal_cloud = ''
