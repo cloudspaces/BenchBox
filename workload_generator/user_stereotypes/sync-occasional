@@ -1,0 +1,37 @@
+state_chain,Online,Offline,1,lognorm,{'scale':1099.92799769,'loc':2.8638}
+state_chain,Offline,Online,1,lognorm,{'scale':7269.91588275,'loc':2.0881}
+state_chain,Offline,Active,1,lognorm,{'scale':7269.91588275,'loc':2.0881}
+state_chain,Active,Offline,1,lognorm,{'scale':1099.92799769,'loc':2.8638}
+operation_chain,GetContentResponse,GetContentResponse,2468450,genextreme,{'shape':-1.105477017,'scale':1952.773432,'loc':1707.588989}
+operation_chain,GetContentResponse,MakeResponse,16823,fatiguelife,{'scale':119793.6094,'shape':9.42840195}
+operation_chain,GetContentResponse,MoveResponse,1034,genextreme,{'shape':-2.699835805,'scale':36407.83712,'loc':13517.98619}
+operation_chain,GetContentResponse,PutContentResponse,36609,genextreme,{'shape':-2.398610869,'scale':14065.1986,'loc':5857.030239}
+operation_chain,GetContentResponse,Unlink,7583,genextreme,{'shape':-2.218794212,'scale':9574.975018,'loc':4319.338328}
+operation_chain,MakeResponse,GetContentResponse,9049,genpareto,{'shape':0.8178754359,'scale':2612.285405,'threshold':8}
+operation_chain,MakeResponse,MakeResponse,3581173,genextreme,{'shape':-0.3174483792,'scale':589.8248033,'loc':771.6250853}
+operation_chain,MakeResponse,MoveResponse,498620,genextreme,{'shape':-0.3935661197,'scale':641.5030213,'loc':906.2950703}
+operation_chain,MakeResponse,PutContentResponse,1058202,genextreme,{'shape':-0.6262752518,'scale':1130.626942,'loc':1288.140742}
+operation_chain,MakeResponse,Unlink,758525,genextreme,{'shape':-0.450286014,'scale':678.3174528,'loc':857.1921841}
+operation_chain,MoveResponse,GetContentResponse,1334,invgauss,{'shape':2156573.355,'scale':2687.808318}
+operation_chain,MoveResponse,MakeResponse,179471,genextreme,{'shape':-1.112899584,'scale':1232.838084,'loc':1051.099494}
+operation_chain,MoveResponse,MoveResponse,496356,genextreme,{'shape':-0.4276493143,'scale':654.8890802,'loc':834.834589}
+operation_chain,MoveResponse,PutContentResponse,781491,genextreme,{'shape':-0.509935486,'scale':945.348965,'loc':1357.201125}
+operation_chain,MoveResponse,Unlink,83290,genextreme,{'shape':-0.6435388187,'scale':726.2789374,'loc':806.5324538}
+operation_chain,PutContentResponse,GetContentResponse,41452,genpareto,{'shape':2.713231971,'scale':4668.814246,'threshold':6}
+operation_chain,PutContentResponse,MakeResponse,1544976,genextreme,{'shape':-1.900930151,'scale':6453.225724,'loc':3367.987316}
+operation_chain,PutContentResponse,MoveResponse,154208,genextreme,{'shape':-1.205385894,'scale':1476.274084,'loc':1170.988918}
+operation_chain,PutContentResponse,PutContentResponse,15907643,genextreme,{'shape':-1.275983927,'scale':1770.298147,'loc':1317.417832}
+operation_chain,PutContentResponse,Unlink,276179,genextreme,{'shape':-1.616449557,'scale':3715.106847,'loc':2277.703664}
+operation_chain,Unlink,GetContentResponse,4599,invgauss,{'shape':2392945.032,'scale':1812.849085}
+operation_chain,Unlink,MakeResponse,488325,genextreme,{'shape':-1.220071096,'scale':1338.961558,'loc':1068.113374}
+operation_chain,Unlink,MoveResponse,387950,genextreme,{'shape':-0.2916574561,'scale':611.1933994,'loc':867.4523622}
+operation_chain,Unlink,PutContentResponse,250419,genextreme,{'shape':-0.9957301973,'scale':1727.450805,'loc':1582.617719}
+operation_chain,Unlink,Unlink,1222645,genextreme,{'shape':-0.3059925633,'scale':581.765825,'loc':777.6437872}
+file_type_update_probabilities,{'Code' : 0.1727289697,'Pict' : 0.0217473456,'Compressed' : 0.0003027737,'Docs' : 0.5861243148,'AudioVideo' : 0.0025223552, 'AppBinary' : 0.216574241}
+file_update_sizes,{'AudioVideo': ('tlocationscale', {'loc':1.0023,'scale':7.7649e-004,'df':0.2737}),'AppBinary': ('tlocationscale', {'loc':1.0029,'scale':0.0085,'df':0.2593}),'Pict': ('tlocationscale', {'loc':0.9999,'scale':0.0116,'df':0.3808}),'Docs': ('tlocationscale',{'loc':1.0006,'scale':0.0011,'df':0.5574}),'Code': ('tlocationscale', {'loc':1.0007,'scale':0.0026,'df':0.4424}),'Compressed': ('tlocationscale', {'loc':1.0001,'scale':7.6166e-004,'df':0.1575})}
+file_update_location_probabilities,{'B':0.38, 'E': 0.03, 'M': 0.08, 'BE': 0.1, 'BM': 0.11, 'ME': 0.01, 'BEM': 0.29}
+directory_count_distribution,randint,{'low':1,'high':100}
+stereotype_file_types_probabilities,{'Compressed' : 0.2143,'Docs' : 0.4425,'Pict' : 0.0435,'AudioVideo' : 0.0220,'Code' : 0.1822,'AppBinary' : 0.0954}
+stereotype_file_types_extensions,{'AppBinary' : ['.o', '.msf', '.jar', '.dat', '.ini', '.dll', '.log', '.mo', '.lock', '.npy', '.exe'],'AudioVideo' : ['.mp3', '.ogg', '.wav', '.au'],'Pict' : ['.jpeg','.png','.gif', '.svg', '.tif', '.bmp'], 'Code' : ['.php', '.html', '.js', '.xml', '.h', '.c', '.java', '.py', '.css', '.htm', '.cpp', '.r', '.hpp', '.json', '.d', '.m'],'Docs' : ['.pdf', '.txt', '.tmp', '.doc', '.odt', '.docx', '.xls', '.csv', '.tex', '.po'],'Compressed' : ['.gz', '.zip']}
+file_types_sizes,{'AudioVideo': ('genpareto', {'shape':2.4727,'scale':1.7194e+004,'threshold':-2.2204e-015}),'AppBinary': ('genpareto', {'shape':2.1164,'scale':4.0991e+003,'threshold':-2.2204e-015}),'Pict': ('genpareto', {'shape':2.1686,'scale':2.6006e+003,'threshold':-2.2204e-015}),'Docs': ('genpareto',{'shape':2.0787,'scale':1.5624e+003,'threshold':-2.2204e-015}),'Code': ('genpareto', {'shape':0.8845,'scale':2.9578e+003,'threshold':-2.2204e-015}),'Compressed': ('genpareto', {'shape':1.0657,'scale':5.1760e+003,'threshold':-2.2204e-015})}
+file_level_deduplication_ratio, 0.17

@@ -7,6 +7,7 @@ Created on 30/6/2015
 from workload_generator.utils import get_random_value_from_fitting
 from scipy.stats import stats
 from scipy.stats.distributions import lognorm, genpareto, genextreme
+from scipy.stats import t
 import math
 from workload_generator.constants import TO_WAIT_STATIC
 
@@ -59,7 +60,8 @@ if __name__ == '__main__':
     loglogistic/fisk NO '''
     
     #v = numpy.random.gumbel(loc=1.20212649309532, scale=0.932804666751013, size=10000)
-    fitting = genextreme(-0.5471, loc=0.1189, scale=0.1105)
+    #fitting = genextreme(-0.5471, loc=0.1189, scale=0.1105)
+    fitting = t(0.3808, loc=0.9999, scale=0.0116)
     #fitting = stats.genextreme(-0.698811055279666, scale=942.089026948802, loc=1200.79721156363)
     #fitting = lognorm(1.38272913665692, scale=math.exp(8.222))
     #print math.exp(8.222)
