@@ -86,7 +86,7 @@ class StatisticsManager(object):
                 self.session_per_stereotype[stereotype][state].close()
         
         for stereotype in sorted(self.operations_per_timeslot.keys()):
-            stereotype_file = open(self.output_dir + stereotype + "_ops_per_timeslot.dat", "w")            
+            stereotype_file = open(self.output_dir + stereotype + "_ops_per_timeslot.csv", "w")            
             simulation_timeslot_len = int(SIMULATION_DURATION/SIMULATION_TIME_SLOT)
             for i in range(simulation_timeslot_len):  
                 to_print = dict()
@@ -104,13 +104,13 @@ class StatisticsManager(object):
             stereotype_file.close()
             
         for state in sorted(self.users_per_timeslot.keys()):
-            state_file = open(self.output_dir + state + "_users_per_timeslot.dat", "w")
+            state_file = open(self.output_dir + state + "_users_per_timeslot.csv", "w")
             for current_timeslot in sorted(self.users_per_timeslot[state].keys()):
                 print >> state_file, len(self.users_per_timeslot[state][current_timeslot])
             state_file.close()
             
         for stereotype in sorted(self.operations_per_user.keys()):
-            stereotype_file = open(self.output_dir + stereotype + "_ops_per_user.dat", "w")
+            stereotype_file = open(self.output_dir + stereotype + "_ops_per_user.csv", "w")
             for user in self.operations_per_user[stereotype].keys():
                 print >> stereotype_file, self.operations_per_user[stereotype][user]
             stereotype_file.close()

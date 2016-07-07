@@ -8,7 +8,7 @@ from benchmark_simulator import StatisticsManager
 import calendar
 from workload_generator import constants
 
-STEREOTYPE_USED = 'backup_heavy'
+STEREOTYPE_USED = 'sync_20_heavy'
 
 class TraceNode():
     
@@ -29,7 +29,13 @@ def replay_trace():
     
     for l in open(constants.TRACE_REPLAY_PATH,'r'):
         processed+=len(l)
-        sid,ext,size,tstamp,req_t,node_id, user_id = l.replace('\r','').replace('\n','').split(',')
+        stereotype, ext, node_id, req_t, sid, tstamp, node_type, user_id, size = l.replace('\r','').replace('\n','').split(',')
+        
+        if stereotype != STEREOTYPE_USED:
+            continue
+        
+        if user_id == '2334906526':
+            print l
         
         users_set.add(user_id)
         
@@ -37,10 +43,7 @@ def replay_trace():
         
         if initial_time == -1: 
             initial_time = time.strptime(tstamp[0:tstamp.rfind('.')+4], '%Y-%m-%d %H:%M:%S.%f')
-            
-        if not req_t in {'MoveResponse', 'PutContentResponse', 'GetContentResponse', 'Unlink'}: continue
         
-        #print l
         if '.' not in tstamp:
             tstamp = tstamp + '.000'
         this_time = time.strptime(tstamp[0:tstamp.rfind('.')+4], '%Y-%m-%d %H:%M:%S.%f')
@@ -69,7 +72,7 @@ def replay_trace():
             users[user_id].last_operation_time = t0_epoch 
             
         if int(processed/(1024*1024)) != mb:
-            print "Processed MBytes: ", mb
+            #print "Processed MBytes: ", mb
             mb = int(processed/(1024.*1024.))
             
     statistics.finish_statistics()

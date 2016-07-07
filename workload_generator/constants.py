@@ -28,8 +28,8 @@ STEREOTYPE_DISTRIBUTION = {"backup": 1.0}
 
 SIMULATION_OUTPUT = "./small_simulation_output/"
 SIMULATOR_TRACE_PATH = PROJECT_PATH + 'workload_generator/traces/200_users_backup.csv'
-TRACE_REPLAY_OUTPUT = "./trace_replay_output_1k_download_occasional/"
-TRACE_REPLAY_PATH = PROJECT_PATH + 'workload_generator/traces/traces_sid_1k_2w_download_80_ocasional.csv'
+TRACE_REPLAY_OUTPUT = "./trace_replay_output_1k_sync_heavy2/"
+TRACE_REPLAY_PATH = '/home/user/Desktop/traces_sintetic_profile.csv'
 
 #EXTERNAL PROGRAMS USED BY BENCHBOX
 DATA_GENERATOR_PATH = PROJECT_PATH + "workload_generator/external/sdgen.jar"
