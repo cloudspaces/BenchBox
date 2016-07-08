@@ -8,7 +8,7 @@ from benchmark_simulator import StatisticsManager
 import calendar
 from workload_generator import constants
 
-STEREOTYPE_USED = 'sync_20_heavy'
+STEREOTYPE_USED = 'SYNC_HEAVY'
 
 class TraceNode():
     
@@ -29,17 +29,12 @@ def replay_trace():
     
     for l in open(constants.TRACE_REPLAY_PATH,'r'):
         processed+=len(l)
-        stereotype, ext, node_id, req_t, sid, tstamp, node_type, user_id, size = l.replace('\r','').replace('\n','').split(',')
+        stereotype, prio, ext, node_id, req_t, sid, tstamp, node_type, user_id, size = l.replace('\r','').replace('\n','').split(',')
         
         if stereotype != STEREOTYPE_USED:
-            continue
+            continue        
         
-        if user_id == '2334906526':
-            print l
-        
-        users_set.add(user_id)
-        
-        if node_id == 'node_id' or node_id == '': continue
+        users_set.add(user_id)        
         
         if initial_time == -1: 
             initial_time = time.strptime(tstamp[0:tstamp.rfind('.')+4], '%Y-%m-%d %H:%M:%S.%f')
@@ -72,7 +67,7 @@ def replay_trace():
             users[user_id].last_operation_time = t0_epoch 
             
         if int(processed/(1024*1024)) != mb:
-            #print "Processed MBytes: ", mb
+            print "Processed MBytes: ", mb
             mb = int(processed/(1024.*1024.))
             
     statistics.finish_statistics()

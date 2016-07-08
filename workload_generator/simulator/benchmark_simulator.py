@@ -12,11 +12,8 @@ from workload_generator.simulator.statistics import StatisticsManager
 from workload_generator import constants
 from workload_generator.model.user_activity.stereotype_executor import StereotypeExecutor
 
-#TODO: Updates should be better modeled than they are. In fact, we need
-#the distribution of updates per file, and probably the relationship between
-#file updates and file size and content.
-
 index = 0
+global index
 
 '''Dummy class to emulate the calls of the real one, for simulation purposes'''
 class SimulatedStereotypeExecutorU1(StereotypeExecutor):
@@ -27,48 +24,43 @@ class SimulatedStereotypeExecutorU1(StereotypeExecutor):
     
     '''Do an execution step as a client'''
     def execute(self):    
-        to_execute = getattr(self, 'do' + self.next_action)
+        to_execute = getattr(self, 'do_' + self.next_action.lower())
         result = to_execute()
         return result
         
-    def doOnline(self):
+    def do_online(self):
         #print '''Online wait: ''', self.get_waiting_time()       
         return self.get_waiting_time()
         
-    def doOffline(self):
+    def do_offline(self):
         #print '''Offline wait. Theoretically, diconnect the client: ''', self.get_waiting_time(), "State: ", self.state_chain.previous_state        
         return self.get_waiting_time()
         
-    def doActive(self):
+    def do_start(self):
         #print '''Active state, so do not wait and start doing storage operations!'''
-        return 0.0
+        return self.get_waiting_time()
         
     '''Operations that should connect to the Cristian's Benchmarking Framework'''        
-    def doMakeResponse(self):
+    def do_upload(self):
         '''Get the time to wait for this transition in millis''' 
         #print "Make: ", self.get_waiting_time(), "State: ", self.state_chain.previous_state      
         return self.get_waiting_time()
-
-    def doPutContentResponse(self):
-        '''Get the time to wait for this transition in millis''' 
-        #print "Put: ", self.get_waiting_time(), "State: ", self.state_chain.previous_state        
-        return self.get_waiting_time()
         
-    def doSync(self):
+    def do_sync(self):
         #print "Sync: ", self.get_waiting_time(), "State: ", self.state_chain.previous_state
         return self.get_waiting_time()
         
-    def doUnlink(self):
+    def do_delete(self):
         '''Get the time to wait for this transition in millis'''  
         #print "Unlink: ", self.get_waiting_time(), "State: ", self.state_chain.previous_state    
         return self.get_waiting_time()
         
-    def doMoveResponse(self):
+    def do_move(self):
         '''Get the time to wait for this transition in millis'''        
         #print "Move: ", self.get_waiting_time(), "State: ", self.state_chain.previous_state
         return self.get_waiting_time()
         
-    def doGetContentResponse(self):
+    def do_download(self):
         '''Get the time to wait for this transition in millis'''  
         #print "Get: ", self.get_waiting_time(), "State: ", self.state_chain.previous_state    
         return self.get_waiting_time()
@@ -95,17 +87,17 @@ def do_simulation_step(env, node):
             print "Simulation time: ", env.now/SIMULATION_TIME_SLOT, "hrs"
             index+=1
         #print "Proc: ", node.process_id, " Time: ", env.now, node.stereotype
-        previous_node_state = node.stereotype_executor.state_chain.previous_state
+        #previous_node_state = node.stereotype_executor.state_chain.previous_state
         node.stereotype_executor.next_operation()
         wait_time = -1
         try:
             while wait_time < 0.0:
                 wait_time = node.stereotype_executor.execute() #* 1000
                                 
-                is_active = node.stereotype_executor.state_chain.previous_state == 'Active'
+                #is_active = node.stereotype_executor.state_chain.previous_state == 'Active'
                 has_operation_to_log = node.stereotype_executor.operation_chain.previous_state!= None
                 '''Log operation'''
-                if is_active and has_operation_to_log:
+                if has_operation_to_log:
                     node.statistics.trace_operations_per_user(node.stereotype, node.process_id,
                         node.stereotype_executor.operation_chain.previous_state, env.now)
                     '''Log interarrival times'''
@@ -113,14 +105,14 @@ def do_simulation_step(env, node):
                         node.stereotype_executor.operation_chain.previous_state, 
                             node.stereotype_executor.operation_chain.current_state, wait_time)
                     
-                '''Log session length'''  
-                if previous_node_state != node.stereotype_executor.state_chain.previous_state:
-                    previous_node_state = node.stereotype_executor.state_chain.previous_state
-                    node.statistics.trace_session_length(node.stereotype, node.process_id,
-                         node.stereotype_executor.state_chain.previous_state, node.stereotype_executor.session_duration)                    
-                    '''Nodes per timeslot and state '''           
-                    node.statistics.trace_nodes_state_per_timeslot(node.stereotype, node.process_id,
-                         node.stereotype_executor.state_chain.previous_state, env.now, node.stereotype_executor.session_duration)
+                #'''Log session length'''  
+                #if previous_node_state != node.stereotype_executor.state_chain.previous_state:
+                #    previous_node_state = node.stereotype_executor.state_chain.previous_state
+                #    node.statistics.trace_session_length(node.stereotype, node.process_id,
+                #         node.stereotype_executor.state_chain.previous_state, node.stereotype_executor.session_duration)                    
+                #    '''Nodes per timeslot and state '''           
+                #    node.statistics.trace_nodes_state_per_timeslot(node.stereotype, node.process_id,
+                #         node.stereotype_executor.state_chain.previous_state, env.now, node.stereotype_executor.session_duration)
 
             yield env.timeout(wait_time)
         except (Exception):

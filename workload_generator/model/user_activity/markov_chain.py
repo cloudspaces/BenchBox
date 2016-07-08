@@ -9,7 +9,6 @@ the probabilities among states are set, it also provides
 random walk on that graph.
 '''
 import random
-from scipy.stats.distributions import genpareto
 
 class SimpleMarkovChain(object):
     
@@ -53,7 +52,8 @@ class SimpleMarkovChain(object):
     def next_step_in_random_navigation(self):
         #Initialize the navigation cursor to a random state
         if self.current_state == None:
-            self.current_state = random.choice(self.chain.keys())
+            #TODO:Select this from an initial probability distribution
+            self.current_state = "START"
             
         #Fitness proportionate selection of next state
         random_trial = random.random()
@@ -72,16 +72,6 @@ class SimpleMarkovChain(object):
             if model_attribute == discriminator:
                 state1, state2, num_transitions  = l.split(",")[1:4]
                 self.add_transition(state1, state2, float(num_transitions))
-            elif discriminator == "state_chain" and model_attribute in dir(self):
-                fitting = l[:-1].split(',')[1]
-                kv_params = eval(l[l.index('{'):])
-                setattr(self, model_attribute, (fitting, kv_params))
-                self.activity_rate = genpareto(1.6837, scale=3.7520e-005, threshold=1.8190e-006).rvs() #get_random_value_from_fitting(fitting, kv_params)
-                self.add_transition('Offline', 'Active', float(self.activity_rate))
-                self.add_transition('Offline', 'Online', float(1.-self.activity_rate))
-                #print "Activity rate: ", self.activity_rate
-                #from pprint import pprint
-                #print "self: ", pprint (vars(self))
 
     def print_states(self):  
         self.printChain(self.chain)
@@ -93,24 +83,3 @@ class SimpleMarkovChain(object):
         for k1 in sorted(chain.keys()):
             for k2 in sorted(chain[k1].keys()):
                 print chain[k1][k2]
-
-# if __name__ == '__main__':
-#     
-#     smc = SimpleMarkovChain()
-#     
-#     
-# 
-#     
-#     smc.print_states()
-#     smc.calculate_chain_relative_probabilities()
-#     smc.print_states()
-#     
-#     for i in range(10000000):
-#         smc.next_step_in_random_navigation()
-#         
-#     smc.calculate_results_relative_probabilities()
-#     
-#     print "STATES"
-#     smc.print_states()
-#     print "RESULTS"
-#     smc.print_results()

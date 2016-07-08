@@ -15,21 +15,21 @@ else:
 '''In debug mode the system works without doing changes in the local file system'''
 DEBUG = False
 
-SIMULATION_DURATION = 14*24*3600.
+SIMULATION_DURATION = 2*24*3600.
 SIMULATION_TIME_SLOT = 3600.
-NODES = 6349#63492
+NODES = 100#63492
 STEREOTYPE_RECIPES_PATH = PROJECT_PATH + 'workload_generator/user_stereotypes/'
 
-STEREOTYPE_DISTRIBUTION = {"backup": 1.0}
+STEREOTYPE_DISTRIBUTION = {"backup-occasional": 1.0}
                            #"xl_markov_min_regular.csv": 0.2,
                            #"xl_markov_min_cdn.csv": 0.2,
                            #"xl_markov_min_sync.csv": 0.2,
                            #"xl_markov_min_idle.csv": 0.2}
 
-SIMULATION_OUTPUT = "./small_simulation_output/"
+SIMULATION_OUTPUT = "./simulation_backup_occasional/"
 SIMULATOR_TRACE_PATH = PROJECT_PATH + 'workload_generator/traces/200_users_backup.csv'
-TRACE_REPLAY_OUTPUT = "./trace_replay_output_1k_sync_heavy2/"
-TRACE_REPLAY_PATH = '/home/user/Desktop/traces_sintetic_profile.csv'
+TRACE_REPLAY_OUTPUT = "./trace_replay_output_1k_sync_heavy/"
+TRACE_REPLAY_PATH = PROJECT_PATH +  'workload_generator/traces/traces_sintetic_master.csv'
 
 #EXTERNAL PROGRAMS USED BY BENCHBOX
 DATA_GENERATOR_PATH = PROJECT_PATH + "workload_generator/external/sdgen.jar"
@@ -59,7 +59,7 @@ CPU_MONITOR_PORT = 11000
 TO_WAIT_STATIC_MAX = 6
 TO_WAIT_STATIC_MIN = 1
 
-TO_WAIT_STATIC = 5  # 0 means use fitting
+TO_WAIT_STATIC = 0  # 0 means use fitting
 FILE_SIZE_STATIC = 0  # is bytes 0 # means use fitting
 FILE_SIZE_MAX = 2000000 # max file size 2 MB
 

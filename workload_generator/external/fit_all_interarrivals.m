@@ -3,14 +3,15 @@ function fit_all_interarrivals(directory, files_extension, column)
 files = dir(strcat(directory, '*.', files_extension));
 disp(strcat(directory, '*.', files_extension));
 fileID = fopen('interarrivals_fittings.txt','w');
-working_distributions = {'generalized extreme value', 'birnbaumsaunders', 'generalized pareto', 'inversegaussian'};
+working_distributions = {'generalized extreme value', 'birnbaumsaunders', 'generalized pareto', 'inversegaussian', 'lognormal', 'loglogistic'};
 for file = files'
     disp('--- START FITTING ---');
     disp(strcat(directory, file.name));
     dataset = load(strcat(directory, file.name));
     %Load and generate the table from the file
     dataset = dataset(:,column);
-    if length(dataset) > 100000
+    num_transitions = length(dataset);
+    if num_transitions > 100000
         dataset = randsample(dataset, 100000);
     end
     %Our dataset is in milliseconds, so convert into seconds
@@ -28,7 +29,8 @@ for file = files'
     dist = 1;
     while ~finish && dist < length(D)
         if ~isempty(strmatch(D(dist).DistName, working_distributions))
-            to_print = strcat(D(dist).DistName, ',');
+            to_print = file.name;
+            to_print = strcat(to_print, ',', num2str(num_transitions), ',', D(dist).DistName, ',');
             for i = 1:length(D(dist).Params(1,:))
                 to_print = strcat(to_print, D(dist).ParamNames(i), '=', mat2str(D(dist).Params(i)), {' '});
             end
