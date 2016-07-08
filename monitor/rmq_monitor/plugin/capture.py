@@ -84,7 +84,7 @@ class Capture(object):
     '''
     Retrieve the psutil metrics
     '''
-    def notify_status(self):
+    def notify_status(self, body):
         print "curr state metrics"
         # retrieve the current state metrics from the personal client capturer
         # current metrics is a local variable

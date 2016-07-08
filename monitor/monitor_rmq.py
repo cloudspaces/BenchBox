@@ -6,8 +6,8 @@ import urlparse
 import signal
 import json
 import time
-from rmq_monitor.Commands import Commands
-
+# from rmq_monitor.Commands import Commands
+from rmq_monitor.monitor import Monitor as Commands
 
 def singleton(lockfile="monitor_rmq.pid"):
     if os.path.exists(lockfile):
