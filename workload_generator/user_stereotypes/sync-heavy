@@ -1,0 +1,56 @@
+operation_chain,DELETE,DELETE,144888,genextreme,{'shape':-0.128094764344414,'scale':1.26816506335295,'loc':1.79320021239886}
+operation_chain,DELETE,DOWNLOAD,2240,genextreme,{'shape':-0.155110589297567,'scale':0.639111761730131,'loc':0.924095541161983}
+operation_chain,DELETE,IDLE,6,genpareto,{'shape':33.9012262305225,'scale':1.56275416444005e-014,'threshold':0.915000000036998}
+operation_chain,DELETE,MOVE,703,genpareto,{'shape':3.10333044357028,'scale':0.154033965456279,'threshold':0.0290000000385978}
+operation_chain,DELETE,START,13,fatiguelife,{'scale':80.7779384501016,'shape':10.9389184755678}
+operation_chain,DELETE,SYNC,20064,genextreme,{'shape':-0.598754650752249,'scale':0.720358049142973,'loc':0.75573672103059}
+operation_chain,DELETE,UPLOAD,2239,genextreme,{'shape':-1.82508141733205,'scale':2.22948452382978,'loc':1.18917996731958}
+operation_chain,DOWNLOAD,DELETE,2408,genextreme,{'shape':-0.967111380312696,'scale':0.990613572803825,'loc':0.857690163147664}
+operation_chain,DOWNLOAD,DOWNLOAD,57678,genextreme,{'shape':-1.0268370887935,'scale':0.476546734222518,'loc':0.386633856329732}
+operation_chain,DOWNLOAD,IDLE,31,expon,{'loc':5219.11038709677}
+operation_chain,DOWNLOAD,MOVE,85,fatiguelife,{'scale':31.2475546957223,'shape':5.39752351185731}
+operation_chain,DOWNLOAD,START,39,fisk,{'loc':6.36280135864331,'scale':1.37505738875791}
+operation_chain,DOWNLOAD,SYNC,60090,genextreme,{'shape':-0.853101811973957,'scale':1.45536234551505,'loc':1.35215803533535}
+operation_chain,DOWNLOAD,UPLOAD,614,genextreme,{'shape':-2.71800014239541,'scale':1.27822527289026,'loc':0.46865555568284}
+operation_chain,IDLE,DELETE,15,lognorm,{'loc':4.72507106962746,'scale':3.63854887995697}
+operation_chain,IDLE,DOWNLOAD,7,fatiguelife,{'scale':5.90846473329948,'shape':3.28283399884694}
+operation_chain,IDLE,IDLE,271,fisk,{'loc':6.19644200977047,'scale':1.99091687532024}
+operation_chain,IDLE,START,173,fisk,{'loc':6.2767881867278,'scale':1.38056085502475}
+operation_chain,IDLE,SYNC,55,lognorm,{'loc':5.12502577904036,'scale':2.59860521847322}
+operation_chain,IDLE,UPLOAD,8,fatiguelife,{'scale':585.530350760485,'shape':6.17215543853533}
+operation_chain,MOVE,DELETE,1462,genpareto,{'shape':1.34023885349205,'scale':0.0246098301866282,'threshold':0.0260000000125978}
+operation_chain,MOVE,DOWNLOAD,27,fisk,{'loc':-0.187613751911627,'scale':0.684902536730287}
+operation_chain,MOVE,IDLE,2,expon,{'loc':4507.191}
+operation_chain,MOVE,MOVE,78660,genextreme,{'shape':-0.289170724062236,'scale':0.0117398547362091,'loc':0.0496625461258256}
+operation_chain,MOVE,START,2,fatiguelife,{'scale':817.300365285615,'shape':3.51517654106007}
+operation_chain,MOVE,SYNC,1619,genextreme,{'shape':-1.4428932812502,'scale':0.146276393270199,'loc':0.0974223391739725}
+operation_chain,MOVE,UPLOAD,807,genextreme,{'shape':-1.52324102926417,'scale':1.28303291463996,'loc':0.801101148795675}
+operation_chain,START,DELETE,555,fatiguelife,{'scale':32.0763709535339,'shape':10.3782771950222}
+operation_chain,START,DOWNLOAD,657,genextreme,{'shape':-0.847094395861302,'scale':1.05885979005715,'loc':1.2413855514302}
+operation_chain,START,IDLE,25,lognorm,{'loc':5.82122034403828,'scale':3.89535187848347}
+operation_chain,START,MOVE,120,fatiguelife,{'scale':108.159453478125,'shape':9.15370439468979}
+operation_chain,START,START,92,lognorm,{'loc':3.75892682135038,'scale':4.17867466610248}
+operation_chain,START,SYNC,2500,fatiguelife,{'scale':70.7063047138417,'shape':5.90787608056283}
+operation_chain,START,UPLOAD,716,genextreme,{'shape':-3.76094953238874,'scale':247.092023770054,'loc':65.6458418622976}
+operation_chain,SYNC,DELETE,19614,genpareto,{'shape':1.45695331047824,'scale':3.12552868174114,'threshold':-2.22044604925031e-015}
+operation_chain,SYNC,DOWNLOAD,60195,genextreme,{'shape':-0.0853709377549866,'scale':0.481304890297351,'loc':0.836089549226082}
+operation_chain,SYNC,IDLE,63,lognorm,{'loc':6.14211110184599,'scale':2.78155848603177}
+operation_chain,SYNC,MOVE,2500,genpareto,{'shape':3.69119788207769,'scale':0.137846955974637,'threshold':-2.22044604925031e-015}
+operation_chain,SYNC,START,283,fisk,{'loc':5.83081637129759,'scale':1.30881086574376}
+operation_chain,SYNC,SYNC,974783,genpareto,{'shape':1.1832899496052,'scale':2.41581772617461,'threshold':-2.22044604925031e-015}
+operation_chain,SYNC,UPLOAD,4283,genpareto,{'shape':3.42506352416557,'scale':0.434882848498768,'threshold':-2.22044604925031e-015}
+operation_chain,UPLOAD,DELETE,1397,genextreme,{'shape':-2.46693872151697,'scale':2.52699538176642,'loc':1.02105356743538}
+operation_chain,UPLOAD,DOWNLOAD,753,genpareto,{'shape':0.525091652270578,'scale':0.549621664574856,'threshold':-2.22044604925031e-015}
+operation_chain,UPLOAD,IDLE,9,fatiguelife,{'scale':1088.8369369806,'shape':4.13847522943025}
+operation_chain,UPLOAD,MOVE,545,lognorm,{'loc':2.07500667607581,'scale':3.06806898469631}
+operation_chain,UPLOAD,START,25,fisk,{'loc':6.38797294116516,'scale':1.9114697189761}
+operation_chain,UPLOAD,SYNC,5613,genextreme,{'shape':-2.39252871162348,'scale':2.14042428287877,'loc':0.880589699634966}
+operation_chain,UPLOAD,UPLOAD,7465,genpareto,{'shape':1.89289283071951,'scale':0.184059480162003,'threshold':-2.22044604925031e-015}
+file_type_update_probabilities,{'Code' : 0.1727289697,'Pict' : 0.0217473456,'Compressed' : 0.0003027737,'Docs' : 0.5861243148,'AudioVideo' : 0.0025223552, 'AppBinary' : 0.216574241}
+file_update_sizes,{'AudioVideo': ('tlocationscale', {'loc':1.0023,'scale':7.7649e-004,'df':0.2737}),'AppBinary': ('tlocationscale', {'loc':1.0029,'scale':0.0085,'df':0.2593}),'Pict': ('tlocationscale', {'loc':0.9999,'scale':0.0116,'df':0.3808}),'Docs': ('tlocationscale',{'loc':1.0006,'scale':0.0011,'df':0.5574}),'Code': ('tlocationscale', {'loc':1.0007,'scale':0.0026,'df':0.4424}),'Compressed': ('tlocationscale', {'loc':1.0001,'scale':7.6166e-004,'df':0.1575})}
+file_update_location_probabilities,{'B':0.38, 'E': 0.03, 'M': 0.08, 'BE': 0.1, 'BM': 0.11, 'ME': 0.01, 'BEM': 0.29}
+directory_count_distribution,randint,{'low':1,'high':400}
+stereotype_file_types_probabilities,{'Compressed' : 0.2604,'Docs' : 0.4033,'Pict' : 0.0256,'AudioVideo' : 0.2162,'Code' : 0.0056,'AppBinary' : 0.0889}
+stereotype_file_types_extensions,{'AppBinary' : ['.o', '.msf', '.jar', '.dat', '.ini', '.dll', '.log', '.mo', '.lock', '.npy', '.exe'],'AudioVideo' : ['.mp3', '.ogg', '.wav', '.au'],'Pict' : ['.jpeg','.png','.gif', '.svg', '.tif', '.bmp'], 'Code' : ['.php', '.html', '.js', '.xml', '.h', '.c', '.java', '.py', '.css', '.htm', '.cpp', '.r', '.hpp', '.json', '.d', '.m'],'Docs' : ['.pdf', '.txt', '.tmp', '.doc', '.odt', '.docx', '.xls', '.csv', '.tex', '.po'],'Compressed' : ['.gz', '.zip']}
+file_types_sizes,{'AudioVideo': ('genpareto', {'shape':2.4727,'scale':1.7194e+004,'threshold':-2.2204e-015}),'AppBinary': ('genpareto', {'shape':2.1164,'scale':4.0991e+003,'threshold':-2.2204e-015}),'Pict': ('genpareto', {'shape':2.1686,'scale':2.6006e+003,'threshold':-2.2204e-015}),'Docs': ('genpareto',{'shape':2.0787,'scale':1.5624e+003,'threshold':-2.2204e-015}),'Code': ('genpareto', {'shape':0.8845,'scale':2.9578e+003,'threshold':-2.2204e-015}),'Compressed': ('genpareto', {'shape':1.0657,'scale':5.1760e+003,'threshold':-2.2204e-015})}
+file_level_deduplication_ratio, 0.17

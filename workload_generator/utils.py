@@ -168,5 +168,5 @@ def appendParentDir(num, currdir):
         return appendParentDir(num, dirname)
         
 if __name__ == '__main__':
-    build_stereotype("backup-occasional", PROJECT_PATH + "workload_generator/simulator/trace_replay_output_1k_backup_occasional/interarrivals_fittings.txt", no_offline=True)
+    build_stereotype("sync-occasional", PROJECT_PATH + "workload_generator/simulator/trace_replay_output_1k_sync_occasional/interarrivals_fittings.txt", no_offline=True)
     

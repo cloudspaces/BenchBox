@@ -1,0 +1,57 @@
+operation_chain,DELETE,DELETE,310033,genextreme,{'shape':-2.02202075219176,'scale':0.126776587462869,'loc':0.0856797105524728}
+operation_chain,DELETE,DOWNLOAD,1907,genpareto,{'shape':1.09779674512402,'scale':0.295818247369569,'threshold':-2.22044604925031e-015}
+operation_chain,DELETE,IDLE,40,fisk,{'loc':6.26258611170513,'scale':1.43164483196713}
+operation_chain,DELETE,MOVE,50742,genextreme,{'shape':-0.778773699789286,'scale':0.0761126451073851,'loc':0.10151839810414}
+operation_chain,DELETE,START,120,fisk,{'loc':5.32016363738379,'scale':1.81593373304488}
+operation_chain,DELETE,SYNC,83075,genextreme,{'shape':-1.10750037847337,'scale':0.913961802711371,'loc':0.701873204628456}
+operation_chain,DELETE,UPLOAD,30793,genextreme,{'shape':-1.13460986903089,'scale':0.835714584091805,'loc':0.634611917155204}
+operation_chain,DOWNLOAD,DELETE,10021,fisk,{'loc':2.60328351900352,'scale':1.43435700562201}
+operation_chain,DOWNLOAD,DOWNLOAD,292323,genextreme,{'shape':-0.481058227378166,'scale':0.30863574902793,'loc':0.373294465786977}
+operation_chain,DOWNLOAD,IDLE,138,fisk,{'loc':7.36706145028634,'scale':1.18361248932744}
+operation_chain,DOWNLOAD,MOVE,1796,genextreme,{'shape':-3.10200897721633,'scale':4.82201776669663,'loc':1.55245581466245}
+operation_chain,DOWNLOAD,START,300,fisk,{'loc':6.4186873099767,'scale':1.45720776426584}
+operation_chain,DOWNLOAD,SYNC,69693,genextreme,{'shape':-2.43629311796499,'scale':3.3371586087433,'loc':1.35332498391003}
+operation_chain,DOWNLOAD,UPLOAD,12495,genpareto,{'shape':2.68005823363598,'scale':0.271447167019898,'threshold':-2.22044604925031e-015}
+operation_chain,IDLE,DELETE,32,fatiguelife,{'scale':74.6185503790453,'shape':17.9340419076409}
+operation_chain,IDLE,DOWNLOAD,37,fatiguelife,{'scale':67.2651189092443,'shape':6.83809448444217}
+operation_chain,IDLE,IDLE,1496,genextreme,{'shape':-3.9723439578028,'scale':107.335301520421,'loc':26.9935681090621}
+operation_chain,IDLE,MOVE,6,genpareto,{'shape':35.3856932960298,'scale':1.55149382222881e-014,'threshold':0.0160000000614978}
+operation_chain,IDLE,START,736,fisk,{'loc':6.44193404272231,'scale':1.38071701114313}
+operation_chain,IDLE,SYNC,85,fisk,{'loc':6.32388989589554,'scale':1.46410814559327}
+operation_chain,IDLE,UPLOAD,46,lognorm,{'loc':6.30015678762719,'scale':2.77965799056236}
+operation_chain,MOVE,DELETE,11089,genextreme,{'shape':-1.72165907815115,'scale':0.195407834531875,'loc':0.136886206345984}
+operation_chain,MOVE,DOWNLOAD,1257,genextreme,{'shape':-1.07481001587544,'scale':0.269020971877942,'loc':0.206705147472155}
+operation_chain,MOVE,IDLE,9,fatiguelife,{'scale':2843.68513149342,'shape':1.95671468297729}
+operation_chain,MOVE,MOVE,25710,genextreme,{'shape':-1.13802992636138,'scale':0.104824190994189,'loc':0.0935897113079202}
+operation_chain,MOVE,START,40,lognorm,{'loc':5.66494455724857,'scale':3.4868354844473}
+operation_chain,MOVE,SYNC,29330,genextreme,{'shape':-1.13286479077721,'scale':0.480789971597893,'loc':0.38069343391162}
+operation_chain,MOVE,UPLOAD,34211,genextreme,{'shape':-0.778011302536575,'scale':0.682047352025574,'loc':0.69503153626279}
+operation_chain,START,DELETE,4625,fatiguelife,{'scale':47.6791105683403,'shape':8.48077042220082}
+operation_chain,START,DOWNLOAD,3103,genextreme,{'shape':-0.902877703220722,'scale':1.43704298380339,'loc':1.52576049329592}
+operation_chain,START,IDLE,80,fatiguelife,{'scale':10.2513387975248,'shape':29.3606321579206}
+operation_chain,START,MOVE,1020,genextreme,{'shape':-3.62916205601454,'scale':36.9252193585538,'loc':10.1710171173479}
+operation_chain,START,START,441,genpareto,{'shape':7.20228422984252,'scale':0.317156144059566,'threshold':-2.22044604925031e-015}
+operation_chain,START,SYNC,5912,genpareto,{'shape':3.96045286052139,'scale':7.28829186825936,'threshold':-2.22044604925031e-015}
+operation_chain,START,UPLOAD,3434,genextreme,{'shape':-3.21219241514478,'scale':54.3367800250687,'loc':16.8631470282593}
+operation_chain,SYNC,DELETE,111401,genpareto,{'shape':2.08810591801585,'scale':5.48024531019989,'threshold':-2.22044604925031e-015}
+operation_chain,SYNC,DOWNLOAD,74481,genextreme,{'shape':-0.285470310595341,'scale':0.356349305673577,'loc':0.446090499021768}
+operation_chain,SYNC,IDLE,137,fisk,{'loc':6.75186615127672,'scale':1.01437285523228}
+operation_chain,SYNC,MOVE,14602,genpareto,{'shape':3.20566425212012,'scale':0.278660174267025,'threshold':-2.22044604925031e-015}
+operation_chain,SYNC,START,697,lognorm,{'loc':6.02604095223479,'scale':2.38540396592295}
+operation_chain,SYNC,SYNC,752707,genextreme,{'shape':-2.48469871994162,'scale':2.17372582958414,'loc':0.866322335087953}
+operation_chain,SYNC,UPLOAD,58628,genpareto,{'shape':2.6217754481386,'scale':0.400682135429293,'threshold':-2.22044604925031e-015}
+operation_chain,UPLOAD,DELETE,30887,genextreme,{'shape':-2.6988320881651,'scale':4.6195325672414,'loc':1.70663643883256}
+operation_chain,UPLOAD,DOWNLOAD,16547,genpareto,{'shape':0.525955174605364,'scale':0.47932122385598,'threshold':-2.22044604925031e-015}
+operation_chain,UPLOAD,IDLE,92,fisk,{'loc':7.18438401650616,'scale':1.17252039496047}
+operation_chain,UPLOAD,MOVE,8091,genextreme,{'shape':-2.61358325345926,'scale':2.64033949346118,'loc':1.00784156987606}
+operation_chain,UPLOAD,START,292,fisk,{'loc':6.72408323708691,'scale':1.57678623479288}
+operation_chain,UPLOAD,SYNC,80588,genextreme,{'shape':-2.21460582013811,'scale':1.23424769529459,'loc':0.547087338458011}
+operation_chain,UPLOAD,UPLOAD,111265,genextreme,{'shape':-1.44714389188688,'scale':0.198531910153616,'loc':0.126060991872382}
+file_type_update_probabilities,{'Code' : 0.1727289697,'Pict' : 0.0217473456,'Compressed' : 0.0003027737,'Docs' : 0.5861243148,'AudioVideo' : 0.0025223552, 'AppBinary' : 0.216574241}
+file_update_sizes,{'AudioVideo': ('tlocationscale', {'loc':1.0023,'scale':7.7649e-004,'df':0.2737}),'AppBinary': ('tlocationscale', {'loc':1.0029,'scale':0.0085,'df':0.2593}),'Pict': ('tlocationscale', {'loc':0.9999,'scale':0.0116,'df':0.3808}),'Docs': ('tlocationscale',{'loc':1.0006,'scale':0.0011,'df':0.5574}),'Code': ('tlocationscale', {'loc':1.0007,'scale':0.0026,'df':0.4424}),'Compressed': ('tlocationscale', {'loc':1.0001,'scale':7.6166e-004,'df':0.1575})}
+file_update_location_probabilities,{'B':0.38, 'E': 0.03, 'M': 0.08, 'BE': 0.1, 'BM': 0.11, 'ME': 0.01, 'BEM': 0.29}
+directory_count_distribution,randint,{'low':1,'high':100}
+stereotype_file_types_probabilities,{'Compressed' : 0.2143,'Docs' : 0.4425,'Pict' : 0.0435,'AudioVideo' : 0.0220,'Code' : 0.1822,'AppBinary' : 0.0954}
+stereotype_file_types_extensions,{'AppBinary' : ['.o', '.msf', '.jar', '.dat', '.ini', '.dll', '.log', '.mo', '.lock', '.npy', '.exe'],'AudioVideo' : ['.mp3', '.ogg', '.wav', '.au'],'Pict' : ['.jpeg','.png','.gif', '.svg', '.tif', '.bmp'], 'Code' : ['.php', '.html', '.js', '.xml', '.h', '.c', '.java', '.py', '.css', '.htm', '.cpp', '.r', '.hpp', '.json', '.d', '.m'],'Docs' : ['.pdf', '.txt', '.tmp', '.doc', '.odt', '.docx', '.xls', '.csv', '.tex', '.po'],'Compressed' : ['.gz', '.zip']}
+file_types_sizes,{'AudioVideo': ('genpareto', {'shape':2.4727,'scale':1.7194e+004,'threshold':-2.2204e-015}),'AppBinary': ('genpareto', {'shape':2.1164,'scale':4.0991e+003,'threshold':-2.2204e-015}),'Pict': ('genpareto', {'shape':2.1686,'scale':2.6006e+003,'threshold':-2.2204e-015}),'Docs': ('genpareto',{'shape':2.0787,'scale':1.5624e+003,'threshold':-2.2204e-015}),'Code': ('genpareto', {'shape':0.8845,'scale':2.9578e+003,'threshold':-2.2204e-015}),'Compressed': ('genpareto', {'shape':1.0657,'scale':5.1760e+003,'threshold':-2.2204e-015})}
+file_level_deduplication_ratio, 0.17

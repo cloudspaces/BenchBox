@@ -15,7 +15,7 @@ else:
 '''In debug mode the system works without doing changes in the local file system'''
 DEBUG = False
 
-SIMULATION_DURATION = 2*24*3600.
+SIMULATION_DURATION = 14*24*3600.
 SIMULATION_TIME_SLOT = 3600.
 NODES = 100#63492
 STEREOTYPE_RECIPES_PATH = PROJECT_PATH + 'workload_generator/user_stereotypes/'
