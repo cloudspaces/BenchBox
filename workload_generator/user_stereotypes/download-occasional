@@ -35,11 +35,11 @@ operation_chain,UPLOAD,IDLE,56,fisk,{'loc':7.49626363942492,'scale':1.4030008703
 operation_chain,UPLOAD,MOVE,622,lognorm,{'loc':3.02708741204299,'scale':2.94906675310658}
 operation_chain,UPLOAD,SYNC,648,lognorm,{'loc':4.22739202005626,'scale':2.95353446601579}
 operation_chain,UPLOAD,UPLOAD,5436,genpareto,{'shape':3.0893738590613,'scale':0.207892541700548,'threshold':-2.22044604925031e-015}
-file_type_update_probabilities,{'Code' : 0.1727289697,'Pict' : 0.0217473456,'Compressed' : 0.0003027737,'Docs' : 0.5861243148,'AudioVideo' : 0.0025223552, 'AppBinary' : 0.216574241}
+file_type_update_probabilities,{'Code' : 0.123241225,'Pict' : 0.017395049,'Compressed' : 0.000272825,'Docs' : 0.556837138,'AudioVideo' : 0.001097873, 'AppBinary' : 0.30115589}
 file_update_sizes,{'AudioVideo': ('tlocationscale', {'loc':1.0023,'scale':7.7649e-004,'df':0.2737}),'AppBinary': ('tlocationscale', {'loc':1.0029,'scale':0.0085,'df':0.2593}),'Pict': ('tlocationscale', {'loc':0.9999,'scale':0.0116,'df':0.3808}),'Docs': ('tlocationscale',{'loc':1.0006,'scale':0.0011,'df':0.5574}),'Code': ('tlocationscale', {'loc':1.0007,'scale':0.0026,'df':0.4424}),'Compressed': ('tlocationscale', {'loc':1.0001,'scale':7.6166e-004,'df':0.1575})}
 file_update_location_probabilities,{'B':0.38, 'E': 0.03, 'M': 0.08, 'BE': 0.1, 'BM': 0.11, 'ME': 0.01, 'BEM': 0.29}
-directory_count_distribution,randint,{'low':1,'high':100}
-stereotype_file_types_probabilities,{'Compressed' : 0.0061,'Docs' : 0.1487,'Pict' : 0.5885,'AudioVideo' : 0.0413,'Code' : 0.1817,'AppBinary' : 0.0337}
+directory_count_distribution,randint,{'low':1,'high':8}
+stereotype_file_types_probabilities,{'Compressed' : 0.008934413,'Docs' : 0.201962782,'Pict' : 0.512114549,'AudioVideo' : 0.045562289,'Code' : 0.152003003,'AppBinary' : 0.079422963}
 stereotype_file_types_extensions,{'AppBinary' : ['.o', '.msf', '.jar', '.dat', '.ini', '.dll', '.log', '.mo', '.lock', '.npy', '.exe'],'AudioVideo' : ['.mp3', '.ogg', '.wav', '.au'],'Pict' : ['.jpeg','.png','.gif', '.svg', '.tif', '.bmp'], 'Code' : ['.php', '.html', '.js', '.xml', '.h', '.c', '.java', '.py', '.css', '.htm', '.cpp', '.r', '.hpp', '.json', '.d', '.m'],'Docs' : ['.pdf', '.txt', '.tmp', '.doc', '.odt', '.docx', '.xls', '.csv', '.tex', '.po'],'Compressed' : ['.gz', '.zip']}
 file_types_sizes,{'AudioVideo': ('genpareto', {'shape':2.4727,'scale':1.7194e+004,'threshold':-2.2204e-015}),'AppBinary': ('genpareto', {'shape':2.1164,'scale':4.0991e+003,'threshold':-2.2204e-015}),'Pict': ('genpareto', {'shape':2.1686,'scale':2.6006e+003,'threshold':-2.2204e-015}),'Docs': ('genpareto',{'shape':2.0787,'scale':1.5624e+003,'threshold':-2.2204e-015}),'Code': ('genpareto', {'shape':0.8845,'scale':2.9578e+003,'threshold':-2.2204e-015}),'Compressed': ('genpareto', {'shape':1.0657,'scale':5.1760e+003,'threshold':-2.2204e-015})}
 file_level_deduplication_ratio, 0.17
