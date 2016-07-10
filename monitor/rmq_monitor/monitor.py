@@ -23,8 +23,10 @@ class Monitor(object):
         print "constructor"
         self.hostname = hostname
         self.sync_client = None
+        print personal_cloud
         if personal_cloud is None:
-            raise NotImplemented
+            # raise NotImplemented
+            pass
         else:
             self.sync_client = eval("{}".format(personal_cloud))(hostname)
 
@@ -36,6 +38,14 @@ class Monitor(object):
 
     def emit(self, body=None):
         print "[Emit]: metric emission"
+        personal_cloud = body['msg']['test']['testClient']
+        if personal_cloud is None:
+            # raise NotImplemented
+            return 0 # if no personal cloud is forwarded
+        elif self.sync_client is None:
+            self.sync_client = eval("{}".format(personal_cloud))(self.hostname)
+        else:
+            return 0
         self.sync_client.notify_status()
 
 
