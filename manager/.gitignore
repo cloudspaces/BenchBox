@@ -27,6 +27,7 @@ static/images/*
 static/images/*/*
 VagrantBoxing.sh
 
+/.vagrant/machines/default/virtualbox
 
 
 
