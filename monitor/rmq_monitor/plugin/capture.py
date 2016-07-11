@@ -32,14 +32,15 @@ class Capture(object):
         with open(self.rmq_path, 'r') as read_file:
             self.rmq_path_url = read_file.read().splitlines()[0]
 
+        self.metric_network_counter_prev = None
         self.metric_prev = None
         self.traffic_monitor = None
-        self.metric_network_counter = None
+        self.metric_network_counter_curr = None
         self.metric_network_netiface = None
         iface_candidate = ['enp4s0f2', 'eth0']
         for iface in iface_candidate:
             if iface in psutil.net_io_counters(pernic=True):
-                self.metric_network_counter = psutil.net_io_counters(pernic=True)[iface]
+                self.metric_network_counter_curr = psutil.net_io_counters(pernic=True)[iface]
                 self.metric_network_netiface = iface
                 break
             else:
@@ -120,13 +121,13 @@ class Capture(object):
         # assign the network usage
         if self.metric_prev is not None:
             last_time = self.metric_prev['metrics']['time']
-            curr_net_counter = psutil.net_io_counters(pernic=True)[self.metric_network_netiface]
+            self.metric_network_counter_curr = psutil.net_io_counters(pernic=True)[self.metric_network_netiface]
             curr_time = metrics['time']
             elapsed_time = (curr_time - last_time) / 1000  # seconds
-            for key, value in curr_net_counter.__dict__.items():
-                print self.prev_net_counter
-                metrics[key] = (value - getattr(self.prev_net_counter, key)) / elapsed_time  # unit is seconds
-            self.prev_net_counter = curr_net_counter
+            for key, value in self.metric_network_counter_curr.__dict__.items():
+                print self.metric_network_counter_prev, key
+                metrics[key] = (value - getattr(self.metric_network_counter_prev, key)) / elapsed_time  # unit is seconds
+            self.metric_network_counter_prev = self.metric_network_counter_curr
 
         # assign hard disk usage
         if self.platform_is_windows:

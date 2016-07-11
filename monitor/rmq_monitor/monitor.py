@@ -28,7 +28,7 @@ class Monitor(object):
             # raise NotImplemented
             pass
         else:
-            self.sync_client = eval("{}".format(personal_cloud.lo))(hostname)
+            self.sync_client = eval("{}".format(personal_cloud.lower()))(hostname)
 
         self.monitor_state = "Unknown"
         self.traffic_monitor = None  # variable that holds the sniffer
