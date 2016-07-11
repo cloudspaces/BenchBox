@@ -41,6 +41,7 @@ class Capture(object):
         for iface in iface_candidate:
             if iface in psutil.net_io_counters(pernic=True):
                 self.metric_network_counter_curr = psutil.net_io_counters(pernic=True)[iface]
+                self.metric_network_counter_prev = self.metric_network_counter_curr
                 self.metric_network_netiface = iface
                 break
             else:
@@ -125,7 +126,6 @@ class Capture(object):
             curr_time = metrics['time']
             elapsed_time = (curr_time - last_time) / 1000  # seconds
             for key, value in self.metric_network_counter_curr.__dict__.items():
-                print self.metric_network_counter_prev, key
                 metrics[key] = (value - getattr(self.metric_network_counter_prev, key)) / elapsed_time  # unit is seconds
             self.metric_network_counter_prev = self.metric_network_counter_curr
 
