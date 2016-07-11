@@ -24,7 +24,7 @@ class StereotypeExecutor(object):
 
     def initialize_from_stereotype_recipe(self, stereotype_recipe):
         '''Initialize the Markov Chain actions'''
-        self.operation_chain.initialize_from_recipe(stereotype_recipe, 'operation_chain')
+        self.operation_chain.initialize_from_recipe(stereotype_recipe, 'operation_chain', 'initial_state_probabilities')
         self.operation_chain.calculate_chain_relative_probabilities()
         '''Initialize the inter-arrival times'''
         self.inter_arrivals_manager.initialize_from_recipe(stereotype_recipe)
@@ -45,20 +45,7 @@ class StereotypeExecutor(object):
         self.next_action = self.operation_chain.previous_state
         '''Get the waiting time after execution to transition to the next state'''
         self.inter_operation_time = self.inter_arrivals_manager.get_waiting_time(
-            self.operation_chain.previous_state, self.operation_chain.current_state)
-        
-#         if self.state_chain.previous_state == 'Active' and (self.active_session_start + self.session_duration) > self.current_time:
-#             self.operation_chain.next_step_in_random_navigation()
-#             self.next_action = self.operation_chain.previous_state
-#             self.inter_operation_time = self.inter_arrivals_manager.get_waiting_time(
-#                 self.operation_chain.previous_state, self.operation_chain.current_state)
-#         else:
-#             self.state_chain.next_step_in_random_navigation()
-#             self.next_action = self.state_chain.previous_state
-#             self.session_duration = self.inter_arrivals_manager.get_waiting_time(
-#                 self.state_chain.previous_state, self.state_chain.current_state) 
-#             if self.next_action == 'Active':
-#                 self.active_session_start = self.current_time            
+            self.operation_chain.previous_state, self.operation_chain.current_state)       
             
     def update_current_time(self):
         raise NotImplemented

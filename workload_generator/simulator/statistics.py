@@ -76,7 +76,7 @@ class StatisticsManager(object):
             self.users_per_timeslot[current_state][start_timeslot].add(process_id)
             start_timeslot+=1
         
-    def finish_statistics(self):
+    def finish_statistics(self, the_users={}):
         for stereotype in self.inter_arrivals_per_transition.keys():
             for transition in self.inter_arrivals_per_transition[stereotype].keys():
                 self.inter_arrivals_per_transition[stereotype][transition].close()
@@ -85,8 +85,14 @@ class StatisticsManager(object):
             for state in self.session_per_stereotype[stereotype].keys():
                 self.session_per_stereotype[stereotype][state].close()
         
-        for stereotype in sorted(self.operations_per_timeslot.keys()):
-            stereotype_file = open(self.output_dir + stereotype + "_ops_per_timeslot.csv", "w")            
+        stereotype_file = open(self.output_dir + stereotype + "_ops_per_timeslot.csv", "w")  
+        log_header = ''
+        for operation in sorted(self.operation_types):
+            log_header += operation + "\t"
+        log_header += "\t" + "TOTAL"
+        print >> stereotype_file, log_header
+        
+        for stereotype in sorted(self.operations_per_timeslot.keys()):          
             simulation_timeslot_len = int(SIMULATION_DURATION/SIMULATION_TIME_SLOT)
             for i in range(simulation_timeslot_len):  
                 to_print = dict()
@@ -114,3 +120,16 @@ class StatisticsManager(object):
             for user in self.operations_per_user[stereotype].keys():
                 print >> stereotype_file, self.operations_per_user[stereotype][user]
             stereotype_file.close()
+        
+        stereotype_file = open(self.output_dir + stereotype + "_initial_state_distribution.csv", "w")
+        initial_operations_dict = dict()
+        total_operations = 0
+        for user in the_users.values():
+            if user.first_operation not in initial_operations_dict.keys():
+                initial_operations_dict[user.first_operation] = 0
+            initial_operations_dict[user.first_operation] += 1
+            total_operations+=1
+        for k in sorted(initial_operations_dict.keys()):
+            print >> stereotype_file, k + ',' +  str(initial_operations_dict[k]) + ',' +  str(total_operations) + ',' + str(float(initial_operations_dict[k])/float(total_operations))
+        stereotype_file.close()
+            

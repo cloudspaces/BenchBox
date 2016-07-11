@@ -5,10 +5,6 @@ Created on 30/6/2015
 '''
 
 from workload_generator.utils import get_random_value_from_fitting
-from scipy.stats import stats
-from scipy.stats.distributions import lognorm, genpareto, genextreme
-from scipy.stats import t
-import math
 from workload_generator.constants import TO_WAIT_STATIC
 
 class InterArrivalsManager(object):
@@ -61,7 +57,7 @@ if __name__ == '__main__':
     
     #v = numpy.random.gumbel(loc=1.20212649309532, scale=0.932804666751013, size=10000)
     #fitting = genextreme(-0.5471, loc=0.1189, scale=0.1105)
-    fitting = genpareto(2.1686, scale=2.6006e+003, loc=-2.2204e-015)
+    #fitting = genpareto(2.1686, scale=2.6006e+003, loc=-2.2204e-015)
     #fitting = stats.genextreme(-0.698811055279666, scale=942.089026948802, loc=1200.79721156363)
     #fitting = lognorm(1.38272913665692, scale=math.exp(8.222))
     #print math.exp(8.222)
@@ -82,10 +78,10 @@ if __name__ == '__main__':
     #shape=0.853515926272757 scale=1.39900305679406 threshold=-2.22044604925031e-015 
     #fitting = stats.genpareto()
     
-    test = open("test.dat", "w")
-    for i in range(1000):
-        print >> test, fitting.rvs()
+    #test = open("test.dat", "w")
+    #for i in range(1000):
+        #print >> test, fitting.rvs()
         #print stats.genpareto(2.9948, scale=2.4671, loc=0.0250).rvs()
         #c=[0.7180, 0.9328, 1.2021]
         #print stats.fisk.rvs(0.5201, 0.4190)
-    test.close()
+    #test.close()

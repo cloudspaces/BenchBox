@@ -1,3 +1,4 @@
+initial_state_probabilities, {'IDLE': 0.4575, 'START': 0.5425}
 operation_chain,DELETE,DELETE,61673,fisk,{'loc':-2.28196255696046,'scale':0.3607564895765}
 operation_chain,DELETE,DOWNLOAD,4302,genextreme,{'shape':-0.640967605096129,'scale':0.0599224167340505,'loc':0.0592403142528886}
 operation_chain,DELETE,IDLE,5,genextreme,{'shape':--1.08262563130427,'scale':2240.35154797153,'loc':5436.16034365986}

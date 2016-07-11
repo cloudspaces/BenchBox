@@ -1,3 +1,4 @@
+initial_state_probabilities, {'IDLE': 0.415, 'START': 0.585}
 operation_chain,DELETE,DELETE,144888,genextreme,{'shape':-0.128094764344414,'scale':1.26816506335295,'loc':1.79320021239886}
 operation_chain,DELETE,DOWNLOAD,2240,genextreme,{'shape':-0.155110589297567,'scale':0.639111761730131,'loc':0.924095541161983}
 operation_chain,DELETE,IDLE,6,genpareto,{'shape':33.9012262305225,'scale':1.56275416444005e-014,'threshold':0.915000000036998}

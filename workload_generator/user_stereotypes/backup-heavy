@@ -1,3 +1,4 @@
+initial_state_probabilities, {'IDLE': 0.3, 'START': 0.7}
 operation_chain,DELETE,DELETE,576317,genextreme,{'shape':-0.954000701932126,'scale':0.0455224790093405,'loc':0.0691909139925137}
 operation_chain,DELETE,DOWNLOAD,29,invgauss,{'shape':570.905827586197,'scale':0.602185016019986}
 operation_chain,DELETE,IDLE,8,fatiguelife,{'scale':49.9149213542117,'shape':12.5079368186194}

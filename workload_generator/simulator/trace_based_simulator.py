@@ -8,11 +8,12 @@ from benchmark_simulator import StatisticsManager
 import calendar
 from workload_generator import constants
 
-STEREOTYPE_USED = 'SYNC_HEAVY'
+STEREOTYPE_USED = 'DOWNLOAD_OCCASIONAL'
 
 class TraceNode():
     
     def __init__(self):
+        self.first_operation = None
         self.last_operation = ''
         self.last_operation_time = ''
         self.existing_files = set()
@@ -54,7 +55,8 @@ def replay_trace():
         if user_id not in users:
             users[user_id] = TraceNode()
             users[user_id].last_operation = req_t
-            users[user_id].last_operation_time = t0_epoch             
+            users[user_id].last_operation_time = t0_epoch 
+            users[user_id].first_operation = req_t            
         else:            
             '''Log operation'''
             statistics.trace_operations_per_user(STEREOTYPE_USED, user_id,
@@ -70,7 +72,7 @@ def replay_trace():
             print "Processed MBytes: ", mb
             mb = int(processed/(1024.*1024.))
             
-    statistics.finish_statistics()
+    statistics.finish_statistics(the_users=users)
     print len(users_set)
 
 replay_trace()
