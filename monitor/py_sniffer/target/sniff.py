@@ -17,9 +17,14 @@ class Sniff(object):
             self.platform_is_windows = True
             self.iface = "\\Device\\NPF_{EDB20D9F-1750-46D6-ADE7-76940B8DF917}"
             self.my_ip = "10.0.2.15"
-        else:
+        else: # when the operating system is linux
             self.platform_is_windows = False
-            self.iface = pcapy.findalldevs()[0]
+            try:
+                self.iface = pcapy.findalldevs()[0]  #
+            except pcapy.PcapError as ex:
+                print ex.message
+                print "Probably require root permission!"
+                exit(1)
             self.my_ip = ni.ifaddresses(self.iface)[2][0]['addr']
 
         if 'sync_server_ip' in args:

@@ -11,11 +11,14 @@ class Sniffer(Thread):
     def __init__(self, personal_cloud=None, config={}):
         super(Sniffer, self).__init__()
         print "constructor"
+        self.register = None
         self.target = None
         if personal_cloud is None:
             raise NotImplemented
         else:
             self.target = eval("{}".format(personal_cloud.lower()))(config)
+
+
 
     def run(self, interval=5):
         self.register = True
@@ -73,14 +76,12 @@ def parseArgs(argv):
     print 'Random_Variable is %s' % random_variable
     return personal_cloud
 
-
-
 if __name__ == '__main__':
 
     # todo refactoring arguments?
     config_client = {
-        "sync_server_ip": "stacksync.urv.cat",
-        "sync_server_port": 8080,
+        # "sync_server_ip": "stacksync.urv.cat",
+        # "sync_server_port": 8080,
         "packet_limit": -1,
         "max_bytes": 65535,
         "promiscuous": False,
@@ -88,9 +89,8 @@ if __name__ == '__main__':
     }
 
     personal_cloud = parseArgs(sys.argv[1:])
-    if personal_cloud is None:
+    if personal_cloud is None or personal_cloud == "":
         personal_cloud = "dropbox"
-
     tm = Sniffer(personal_cloud=personal_cloud, config=config_client)
     tm.run()
     # idx = 0
