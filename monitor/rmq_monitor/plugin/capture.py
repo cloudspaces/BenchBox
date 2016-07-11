@@ -84,7 +84,7 @@ class Capture(object):
     '''
     Retrieve the psutil metrics
     '''
-    def notify_status(self, body):
+    def notify_status(self):
         print "curr state metrics"
         # retrieve the current state metrics from the personal client capturer
         # current metrics is a local variable
@@ -119,11 +119,12 @@ class Capture(object):
 
         # assign the network usage
         if self.metric_prev is not None:
-            last_time = self.metric_prev['metric']['time']
+            last_time = self.metric_prev['metrics']['time']
             curr_net_counter = psutil.net_io_counters(pernic=True)[self.metric_network_netiface]
             curr_time = metrics['time']
             elapsed_time = (curr_time - last_time) / 1000  # seconds
             for key, value in curr_net_counter.__dict__.items():
+                print self.prev_net_counter
                 metrics[key] = (value - getattr(self.prev_net_counter, key)) / elapsed_time  # unit is seconds
             self.prev_net_counter = curr_net_counter
 
@@ -186,6 +187,7 @@ class Capture(object):
         msg = json.dumps(data)
         print msg
 
+        # this step sends the metric to the manager node
         self.rmq_channel.basic_publish(
             exchange='metrics',
             routing_key=self.hostname,
@@ -204,7 +206,7 @@ class Capture(object):
         while self.is_sync_client_running:
             # while the client is running
             operations += 1
-            self.is_sync_client_running = self.emit(self.sync_client_proc_pid)
+            self.is_sync_client_running = self.notify_status()  # at each emit report if pid still running
             # this forwards the captured metric to the rabbit server
             time.sleep(1)  # metric each second
 

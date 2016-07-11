@@ -22,24 +22,9 @@ class Dropbox(Capture):
             self.sync_folder = "Dropbox"
             self.sync_folder_cleanup = "/home/vagrant/Dropbox/*"
 
-
     def hello(self, body):
-        print "{} say hello".format(self.whoami)
+        print "{} say hello {}".format(self.whoami, body)
 
-    # def start(self, body):
-    #
-    #     self.personal_cloud = body['msg']['test']['testClient']
-    #     self.personal_cloud_ip = body['msg']['{}-ip'.format(self.personal_cloud.lower())]
-    #     self.personal_cloud_port = body['msg']['{}-port'.format(self.personal_cloud.lower())]
-    #
-    #     print "{} say start".format(self.whoami)
-    #     # self.sync_client = None
-    #     # self.monitor = None
-    #
-    # def stop(self, body):
-    #     print "{} say stop".format(self.whoami)
-    #     # self.sync_client = None
-    #     # self.monitor = None
 
 
 

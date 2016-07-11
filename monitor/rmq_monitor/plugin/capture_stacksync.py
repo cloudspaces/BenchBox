@@ -21,8 +21,8 @@ class StackSync(Capture):
             self.sync_folder_cleanup = "/home/vagrant/stacksync_folder/*"
 
 
-    def hello(self):
-        print "{} say hello".format(self.whoami)
+    def hello(self, body):
+        print "{} say hello: {}".format(self.whoami, body)
 
 
 

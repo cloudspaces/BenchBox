@@ -17,15 +17,5 @@ class OwnCloud(Capture):
             self.proc_name = "owncloudsync"
             self.sync_folder = "owncloud_folder"
 
-    def hello(self):
+    def hello(self, body):
         print "{} say hello".format(self.whoami)
-
-    # def start(self):
-    #     print "{} say start".format(self.whoami)
-    #     # self.sync_client = None
-    #     # self.monitor = None
-    #
-    # def stop(self):
-    #     print "{} say stop".format(self.whoami)
-    #     # self.sync_client = None
-    #     # self.monitor = None
