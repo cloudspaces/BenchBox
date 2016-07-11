@@ -32,7 +32,7 @@ class EmitMetric(object):
                 'net': random.randint(0, 100),
                 'time': calendar.timegm(time.gmtime()) * 1000}
         tags = {
-            'profile': 'backupsample',
+            'profile': 'backup-heavy',
             'credentials': 'pc_credentials'
             # 'client': 'stacksync'
         }

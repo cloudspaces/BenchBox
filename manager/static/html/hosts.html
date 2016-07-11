@@ -248,7 +248,7 @@
         <input type="text" class="form-control" ng-model="run.testClient" placeholder="-client" value="StackSync">
     </div>
     -->
-    <div class="col-md-6">
+    <div class="col-md-4">
         <input type="hidden" class="form-control" ng-model="run.testOps" placeholder="-ops" value="10">
         <input type="hidden" class="form-control" ng-model="run.testItv" placeholder="-itv" value="1">
         <input type="hidden" class="form-control" ng-model="run.testProfile" placeholder="-profile" value="sync">
@@ -270,9 +270,12 @@
             <!--
             <option ng-value="backupsample">backupsample</option>
             -->
-            <option ng-value="recipebackup">recipebackup</option>
-            <option ng-value="recipedownload">recipedownload</option>
-            <option ng-value="recipesync">recipesync</option>
+            <option ng-value="backup-heavy">backup-heavy</option>
+            <option ng-value="backup-occasional">backup-occasional</option>
+            <option ng-value="download-heavy">download-heavy</option>
+            <option ng-value="download-occasional">download-occasional</option>
+            <option ng-value="sync-heavy">sync-heavy</option>
+            <option ng-value="sync-occasional">sync-occasional</option>
         </select>
         <select ng-model="run.testClient">
             <option ng-value="stacksync">StackSync</option>
@@ -287,27 +290,28 @@
     </div>
 
     <div class="col-md-3">
-
         <select class="form-control" ng-model="run.testOperation">
-
             <option value="keepalive">--- -rmq_executor_rpc status ---</option>
             <option value="hello">hello</option>
             <option value="warmup">warmup</option>
             <option value="start">start</option>
             <option value="stop">stop</option>
-
         </select>
 
     </div>
-
     <div class="col-md-2">
         <button class="btn btn-success btn-block"
                 ng-click="rmq('test-check', 'executor', 'executor')"
                 title="Run executor at dummy machine, benchBox">Execute
         </button>
+
     </div>
-
-
+    <div class="col-md-2">
+        <button class="btn btn-success btn-block"
+                ng-click="rmq('test-check', 'monitor', 'monitor')"
+                title="Run monitor at dummy machine, sandBox">Monitor
+        </button>
+    </div>
     <div class="col-md-5">
         <button id="btn-start-stop" ng-click="startStop()">
             Start & Stop
@@ -332,40 +336,40 @@
 <!-- MONITOR -->
 
 <!--<div class="row">-->
-    <!--<div class="col-md-1">-->
-        <!--<h5>-->
-            <!--Execute Monitor-->
-        <!--</h5>-->
-    <!--</div>-->
-    <!--&lt;!&ndash;<div class="col-md-6">&ndash;&gt;-->
-        <!--&lt;!&ndash;&ndash;&gt;-->
-        <!--&lt;!&ndash;<div id="ssRadio">&ndash;&gt;-->
-            <!--&lt;!&ndash;<label><input type="radio" class="radio-inline" name="ss" value="stacksync_folder" checked><img class="radio-image" src="/images/ss/stacksync.png"></label>&ndash;&gt;-->
-            <!--&lt;!&ndash;<label><input type="radio" class="radio-inline" name="ss" value="owncloud_folder"><img class="radio-image" src="/images/ss/owncloud.png"></label>&ndash;&gt;-->
-            <!--&lt;!&ndash;<label><input type="radio" class="radio-inline" name="ss" value="sugarsync_folder"><img class="radio-image" src="/images/ss/sugarsync.jpg"></label>&ndash;&gt;-->
-            <!--&lt;!&ndash;<label><input type="radio" class="radio-inline" name="ss" value="Dropbox"><img class="radio-image" src="/images/ss/dropbox.jpg"></label>&ndash;&gt;-->
-            <!--&lt;!&ndash;<label><input type="radio" class="radio-inline" name="ss" value="boxsync_folder"><img class="radio-image" src="/images/ss/boxsync.png"></label>&ndash;&gt;-->
-            <!--&lt;!&ndash;<label><input type="radio" class="radio-inline" name="ss" value="OneDrive"><img class="radio-image" src="/images/ss/onedrive.png"></label>&ndash;&gt;-->
-            <!--&lt;!&ndash;<label><input type="radio" class="radio-inline" name="ss" value="GoogleDrive"><img class="radio-image" src="/images/ss/gdrive.jpg"></label>&ndash;&gt;-->
-        <!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--<div class="col-md-1">-->
+<!--<h5>-->
+<!--Execute Monitor-->
+<!--</h5>-->
+<!--</div>-->
+<!--&lt;!&ndash;<div class="col-md-6">&ndash;&gt;-->
+<!--&lt;!&ndash;&ndash;&gt;-->
+<!--&lt;!&ndash;<div id="ssRadio">&ndash;&gt;-->
+<!--&lt;!&ndash;<label><input type="radio" class="radio-inline" name="ss" value="stacksync_folder" checked><img class="radio-image" src="/images/ss/stacksync.png"></label>&ndash;&gt;-->
+<!--&lt;!&ndash;<label><input type="radio" class="radio-inline" name="ss" value="owncloud_folder"><img class="radio-image" src="/images/ss/owncloud.png"></label>&ndash;&gt;-->
+<!--&lt;!&ndash;<label><input type="radio" class="radio-inline" name="ss" value="sugarsync_folder"><img class="radio-image" src="/images/ss/sugarsync.jpg"></label>&ndash;&gt;-->
+<!--&lt;!&ndash;<label><input type="radio" class="radio-inline" name="ss" value="Dropbox"><img class="radio-image" src="/images/ss/dropbox.jpg"></label>&ndash;&gt;-->
+<!--&lt;!&ndash;<label><input type="radio" class="radio-inline" name="ss" value="boxsync_folder"><img class="radio-image" src="/images/ss/boxsync.png"></label>&ndash;&gt;-->
+<!--&lt;!&ndash;<label><input type="radio" class="radio-inline" name="ss" value="OneDrive"><img class="radio-image" src="/images/ss/onedrive.png"></label>&ndash;&gt;-->
+<!--&lt;!&ndash;<label><input type="radio" class="radio-inline" name="ss" value="GoogleDrive"><img class="radio-image" src="/images/ss/gdrive.jpg"></label>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
 
-    <!--&lt;!&ndash;</div>&ndash;&gt;-->
-    <!--<div class="col-md-3">-->
-        <!--<select class="form-control" ng-model="run.testMonitor">-->
-            <!--<option value="keepalive">-&#45;&#45; -rmq_monitor_rpc status -&#45;&#45;</option>-->
-            <!--<option value="hello">hello</option>-->
-            <!--<option value="start">start</option>-->
-            <!--<option value="stop">stop</option>-->
-        <!--</select>-->
-    <!--</div>-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--<div class="col-md-3">-->
+<!--<select class="form-control" ng-model="run.testMonitor">-->
+<!--<option value="keepalive">-&#45;&#45; -rmq_monitor_rpc status -&#45;&#45;</option>-->
+<!--<option value="hello">hello</option>-->
+<!--<option value="start">start</option>-->
+<!--<option value="stop">stop</option>-->
+<!--</select>-->
+<!--</div>-->
 
-    <!--<div class="col-md-2">-->
-        <!--<button-->
-                <!--class="btn btn-success btn-block"-->
-                <!--ng-click="rmq('test-check', 'monitor', 'monitor')"-->
-                <!--title="Run monitor at dummy machine, sandBox">Monitor-->
-        <!--</button>-->
-    <!--</div>-->
+<!--<div class="col-md-2">-->
+<!--<button-->
+<!--class="btn btn-success btn-block"-->
+<!--ng-click="rmq('test-check', 'monitor', 'monitor')"-->
+<!--title="Run monitor at dummy machine, sandBox">Monitor-->
+<!--</button>-->
+<!--</div>-->
 <!--</div>-->
 
 

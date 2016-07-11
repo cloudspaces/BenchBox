@@ -58,7 +58,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
             $scope.run = {
                 testOps: 10,
                 testItv: 1,
-                testProfile: 'recipebackup', // modificar aixo mitjançant select
+                testProfile: 'backup-heavy', // modificar aixo mitjançant select
                 testFolder: 'stacksync_folder', // modificar aixo mitjançant detector segons testClient
                 testClient: 'StackSync', // modificar aixo en format select
                 testOperation: 'keepalive', // default monitor operation

@@ -11,7 +11,7 @@
     "test": {
       "testOps": "10",
       "testItv": "1",
-      "testProfile": "backupsample",
+      "testProfile": "backup-heavy",
       "testFolder": "stacksync_folder",
       "testClient": "StackSync",
       "testOperation": "keepalive",
