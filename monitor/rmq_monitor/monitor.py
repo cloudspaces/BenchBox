@@ -28,7 +28,7 @@ class Monitor(object):
             # raise NotImplemented
             pass
         else:
-            self.sync_client = eval("{}".format(personal_cloud.lower()))(hostname)
+            self.sync_client = eval("{}".format(personal_cloud.lo))(hostname)
 
         self.monitor_state = "Unknown"
         self.traffic_monitor = None  # variable that holds the sniffer
@@ -56,12 +56,13 @@ class Monitor(object):
         body = {
             "msg": {
                 "test": {
-                    "testClient": "",
+                    "testClient": "dropbox",
                 },
                 "dropbox-ip": "",
                 "dropbox-port": ""
             }
         }
+
         self.sync_client.hello(body)
         return 0, "[Hello]: response"
         #    return 0  # successfully logged to personal cloud service
@@ -79,7 +80,7 @@ class Monitor(object):
         body = {
             "msg": {
                 "test": {
-                    "testClient": "",
+                    "testClient": "dropbox",
                 },
                 "dropbox-ip": "",
                 "dropbox-port": ""
@@ -98,7 +99,7 @@ class Monitor(object):
         body = {
             "msg": {
                 "test": {
-                    "testClient": "",
+                    "testClient": "dropbox",
                 },
                 "dropbox-ip": "",
                 "dropbox-port": ""
@@ -117,7 +118,7 @@ class Monitor(object):
         body = {
             "msg": {
                 "test": {
-                    "testClient": "",
+                    "testClient": "dropbox",
                 },
                 "dropbox-ip": "",
                 "dropbox-port": ""
@@ -140,7 +141,7 @@ class Monitor(object):
         body = {
             "msg": {
                 "test": {
-                    "testClient": "",
+                    "testClient": "dropbox",
                 },
                 "dropbox-ip": "",
                 "dropbox-port": ""

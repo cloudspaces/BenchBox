@@ -124,7 +124,6 @@ class GoogleDrive():
                 print file
             except apiclient.errors.HttpError, error:
                 print "an error occured: %s" % error
-
         else:
             print "Update file"
             for item in items:
