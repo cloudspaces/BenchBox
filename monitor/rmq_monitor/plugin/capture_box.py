@@ -19,15 +19,6 @@ class Box(Capture):
             self.sync_folder = ""
             self.sync_folder_cleanup = ""
 
-    def hello(self):
+    def hello(self, body):
         print "{} say hello".format(self.whoami)
 
-    # def start(self):
-    #     print "{} say start".format(self.whoami)
-    #     # self.sync_client = None
-    #     # self.monitor = None
-    #
-    # def stop(self):
-    #     print "{} say stop".format(self.whoami)
-    #     # self.sync_client = None
-    #     # self.monitor = None
