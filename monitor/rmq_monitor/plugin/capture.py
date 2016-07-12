@@ -160,7 +160,7 @@ class Capture(object):
             print "invalid literal for... file counter"
 
         try:
-            net_stats = self.traffic_monitor.notify_status()
+            net_stats = self.traffic_monitor.notify_stats()
 
             # py_sniffer not unlocalizable
             metrics['data_rate_size_up'] = net_stats['data_rate']['size_up']
