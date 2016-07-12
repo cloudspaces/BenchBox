@@ -94,7 +94,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         action.perform_action(ftp_client)
     """
 
-    def doPutContentResponse(self):
+    def doPutContentResponse(self, op_name="PutContentResponse"):
         print colored("doPutContentResponse", 'cyan')
 
         if random.random() > 0.25:
@@ -113,13 +113,13 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
         print "{} :>>> ACTION".format(action)
         '''Get the time to wait for this transition in millis'''
-        to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'PutContentResponse')
+        to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
         # to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         print "Wait: {}s".format(to_wait)
         time.sleep(to_wait)
         action.perform_action(self.ftp_client.keep_alive())
 
-    def doSync(self):
+    def doSync(self, op_name="Sync"):
         # self.doPutContentResponse()
         print colored("doSync", 'green')
         synthetic_file_name = self.data_generator.update_file()
@@ -128,13 +128,13 @@ class StereotypeExecutorU1(StereotypeExecutor):
             print "no file selected!"
         else:
             action = UpdateFile(synthetic_file_name, FS_SNAPSHOT_PATH)
-            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'Sync')
+            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
             #to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
 
-    def doUnlink(self):
+    def doUnlink(self, op_name = "Unlink"):
         print colored("doUnlink", 'yellow')
         if random.random() > 0.25:
             synthetic_file_name = self.data_generator.delete_file()
@@ -148,7 +148,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             else:
                 action = DeleteDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
             '''Get the time to wait for this transition in millis'''
-            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'Unlink')
+            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
             # to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
@@ -156,7 +156,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         else:
             print "No file selected!"
 
-    def doMoveResponse(self):
+    def doMoveResponse(self, op_name="MoveResponse"):
         print colored("doMoveResponse", 'magenta')
         if random.random() > 0.25:
             synthetic_file_name = self.data_generator.move_file()
@@ -172,7 +172,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             else:
                 action = MoveDirectory(src_mov, FS_SNAPSHOT_PATH, tgt_mov)
             '''Get the time to wait for this transition in millis'''
-            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'MoveResponse')
+            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
             # to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
             time.sleep(to_wait)
@@ -181,10 +181,10 @@ class StereotypeExecutorU1(StereotypeExecutor):
             print "No file selected!"
 
     # TODO: Let's see how we can solve this, the workload_generator_uploads a file to personal cloud repository
-    def doGetContentResponse(self):
+    def doGetContentResponse(self, op_name="GetContentResponse"):
         print colored("doGetContentResponse", 'blue')
         '''Get the time to wait for this transition in millis'''
-        to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'GetContentResponse')
+        to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
         #to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         print "Wait: {}s".format(to_wait)
         # action.perform_action(ftp_client)
@@ -192,19 +192,19 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
     ## Adapter
     def doMOVE(self):
-        self.doMoveResponse()
+        self.doMoveResponse(op_name="MOVE")
 
     def doDOWNLOAD(self):
-        self.doGetContentResponse()
+        self.doGetContentResponse(op_name="DOWNLOAD")
 
     def doUPLOAD(self):
-        self.doPutContentResponse()
+        self.doPutContentResponse(op_name="UPLOAD")
 
     def doDELETE(self):
-        self.doUnlink()
+        self.doUnlink(op_name="DELETE")
 
     def doSYNC(self):
-        self.doPutContentResponse()
+        self.doPutContentResponse(op_name="SYNC")
 
     def doIDLE(self):
         time.sleep(1)  # itv between last operation and idle
