@@ -188,7 +188,7 @@ class Capture(object):
         }
         self.metric_prev = data  # update the last emited metric
         msg = json.dumps(data)
-        print msg
+        # print msg
 
         # this step sends the metric to the manager node
         self.rmq_channel.basic_publish(

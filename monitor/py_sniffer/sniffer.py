@@ -9,7 +9,7 @@ import psutil, os, time, sys, getopt
 class Sniffer(Thread):
 
     def __init__(self, personal_cloud=None, config=None):
-
+        print "SNIFFER instance"
         default_config = {
             # "sync_server_ip": "stacksync.urv.cat",
             # "sync_server_port": 8080,
