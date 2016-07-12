@@ -37,14 +37,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
         self.ftp_client = None
         self.current_operation = "SYNC"  # assign default initial, current operation
         # AttributeError: 'StereotypeExecutorU1' object has no attribute 'current_operation'
-
         # el keep alive puede ser por run o por to_wait operation...
 
-    """
-    benchBox (executor)
-    Aquest metode es crida quan hiha un warm up en el cas de executor per que el
-    benchbox sapigui a quin directory s'ha sincronitzar els fitchers
-    """
     def initialize_ftp_client_by_directory(self, root_dir, ftp_home):
         # update fto_client_root directory
         print "Init ftp_client and its root directory {}".format(root_dir)
@@ -79,23 +73,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
         to_execute = getattr(self, 'do' + self.operation_chain.current_state)
         to_execute()
 
-    """
-    def doMakeResponse(self):
-        print "do create" 
-        #TODO: We have to define the operations correctly, because we cannot distinguish
-        #between creating/deleting/moving files and directories
-        synthetic_file_name = None
-        if random.random() > 0.25:        
-            synthetic_file_name = self.data_generator.create_file()
-        else: synthetic_file_name = self.data_generator.create_directory()
-        action = CreateFileOrDirectory(synthetic_file_name)
-        '''Get the time to wait for this transition in millis'''
-        to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, 'MakeResponse')
-        action.perform_action(ftp_client)
-    """
-
-    def doPutContentResponse(self, op_name="PutContentResponse"):
-        print colored("doPutContentResponse", 'cyan')
+    def doUPLOAD(self, op_name="UPLOAD"):
+        print colored(op_name, 'cyan')
 
         if random.random() > 0.25:
             synthetic_file_name = self.data_generator.create_file()
@@ -119,9 +98,9 @@ class StereotypeExecutorU1(StereotypeExecutor):
         time.sleep(to_wait)
         action.perform_action(self.ftp_client.keep_alive())
 
-    def doSync(self, op_name="Sync"):
+    def doSYNC(self, op_name="SYNC"):
         # self.doPutContentResponse()
-        print colored("doSync", 'green')
+        print colored(op_name, 'green')
         synthetic_file_name = self.data_generator.update_file()
         print synthetic_file_name
         if synthetic_file_name is None:
@@ -134,8 +113,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
 
-    def doUnlink(self, op_name = "Unlink"):
-        print colored("doUnlink", 'yellow')
+    def doDELETE(self, op_name="DELETE"):
+        print colored(op_name, 'yellow')
         if random.random() > 0.25:
             synthetic_file_name = self.data_generator.delete_file()
             isFile = True
@@ -156,8 +135,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
         else:
             print "No file selected!"
 
-    def doMoveResponse(self, op_name="MoveResponse"):
-        print colored("doMoveResponse", 'magenta')
+    def doMOVE(self, op_name="MOVE"):
+        print colored(op_name, 'magenta')
         if random.random() > 0.25:
             synthetic_file_name = self.data_generator.move_file()
             isFile = True
@@ -180,36 +159,26 @@ class StereotypeExecutorU1(StereotypeExecutor):
         else:
             print "No file selected!"
 
-    # TODO: Let's see how we can solve this, the workload_generator_uploads a file to personal cloud repository
-    def doGetContentResponse(self, op_name="GetContentResponse"):
-        print colored("doGetContentResponse", 'blue')
+    def doDOWNLOAD(self, op_name="DOWNLOAD"):
+        print colored(op_name, 'blue')
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
         #to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         print "Wait: {}s".format(to_wait)
         # action.perform_action(ftp_client)
 
-
-    ## Adapter
-    def doMOVE(self):
-        self.doMoveResponse(op_name="MOVE")
-
-    def doDOWNLOAD(self):
-        self.doGetContentResponse(op_name="DOWNLOAD")
-
-    def doUPLOAD(self):
-        self.doPutContentResponse(op_name="UPLOAD")
-
-    def doDELETE(self):
-        self.doUnlink(op_name="DELETE")
-
-    def doSYNC(self):
-        self.doPutContentResponse(op_name="SYNC")
-
-    def doIDLE(self):
+    def doIDLE(self, op_name="IDLE"):
+        print colored(op_name, 'blue')
+        '''Get the time to wait for this transition in millis'''
+        to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
+        print "Wait: {}s".format(to_wait)
         time.sleep(1)  # itv between last operation and idle
 
-    def doSTART(self):
+    def doSTART(self, op_name="START"):
+        print colored(op_name, 'blue')
+        '''Get the time to wait for this transition in millis'''
+        to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
+        print "Wait: {}s".format(to_wait)
         time.sleep(1)  # itv between start and 1st operation
 
 
