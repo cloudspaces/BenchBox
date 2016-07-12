@@ -167,7 +167,7 @@ block content
             $(document).ready(function () {
                 getIPs(
                         function (ip) {
-                            if (ip.indexOf("10.") == 0) {
+                            if (ip.indexOf("10.") == 0 || ip.indexOf("192.") == 0) {
                                 console.log(ip);
                                 // manager-ip
                                 // rabbitmq - amqp

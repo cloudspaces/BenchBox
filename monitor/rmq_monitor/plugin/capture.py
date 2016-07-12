@@ -270,13 +270,12 @@ class Capture(object):
         self.monitor.join()
         self.sync_client.join()
 
-        # how to stop process in linux
-
-        if self.platform_is_windows:
+        # how to stop process
+        if self.platform_is_windows: # stop in windows
             for proc in psutil.process_iter():
                 if proc.name() == self.proc_name:
                     proc.kill()  # force quit like a boss
-        else:
+        else:  # stop in linux
             pstring = self.proc_name
             for line in os.popen("ps ax | grep " + pstring + " | grep -v grep"):
                 fields = line.split()

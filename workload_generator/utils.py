@@ -3,13 +3,20 @@ Created on 6/7/2015
 
 @author: Raul
 '''
-from constants import STEREOTYPE_RECIPES_PATH
+try:
+    from constants import PROJECT_PATH
+    from constants import STEREOTYPE_RECIPES_PATH
+except ImportError as ex:
+    print ex.message
+    from workload_generator.constants import PROJECT_PATH
+    from workload_generator.constants import STEREOTYPE_RECIPES_PATH
 from scipy import stats
 import numpy
 import random
 import os
 import sys
-from workload_generator.constants import PROJECT_PATH
+
+
 
 def translate_matlab_fitting_to_scipy(fitting, parameters):
     

@@ -138,10 +138,22 @@ if __name__ == '__main__':
             #     if connection_try > 2:
             #         break  # exit the infinit loop
 
-    """
     else:
-        profile = "StackSync"
-        actions = Commands(hostname=dummyhost)
+
+        # print "monitor_rmq.OLD.py"
+        #
+        # dummyhost = None
+        # stereotype_receipt = 'backup-heavy'
+        # try:
+        #     with open('/vagrant/hostname', 'r') as f:
+        #         dummyhost = f.read().splitlines()[0]
+        # except Exception as ex:
+        #     print ex.message
+        #     with open('../vagrant/hostname', 'r') as r:
+        #         dummyhost = r.read().splitlines()[0]
+
+        profile = "Dropbox"
+        actions = Commands(personal_cloud=profile, hostname=dummyhost)
         while True:
             print 'write command: hello|warmup|start|stop'
             teclat = raw_input()
@@ -154,4 +166,3 @@ if __name__ == '__main__':
                 print e.message
                 print "ACK: {}".format(teclat)
             time.sleep(1)
-    """

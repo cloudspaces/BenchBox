@@ -13,7 +13,9 @@ from threading import Thread
 from constants import STEREOTYPE_RECIPES_PATH, FS_SNAPSHOT_PATH
 from executor import StereotypeExecutorU1
 from termcolor import colored
-import shutil,glob
+import shutil
+import glob
+
 
 def singleton(lockfile="executor_rmq.pid"):
     if os.path.exists(lockfile):
