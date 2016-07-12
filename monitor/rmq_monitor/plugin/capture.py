@@ -10,6 +10,7 @@ import pika
 import calendar
 import math
 import json
+from py_sniffer.sniffer import Sniffer
 from threading import Thread
 
 
@@ -35,6 +36,7 @@ class Capture(object):
         self.metric_network_counter_prev = None
         self.metric_prev = None
         self.traffic_monitor = None
+
         self.metric_network_counter_curr = None
         self.metric_network_netiface = None
         iface_candidate = ['enp4s0f2', 'eth0']
@@ -250,6 +252,11 @@ class Capture(object):
         self.monitor.start()
         self.is_monitor_capturing = True
         self.is_sync_client_running = True
+
+        self.traffic_monitor = Sniffer(personal_cloud=self.personal_cloud)
+        self.traffic_monitor.run()
+
+
         print "{} say start".format(self.whoami)
         # self.sync_client = None
         # self.monitor = None
@@ -269,6 +276,8 @@ class Capture(object):
         self.is_sync_client_running = False
         self.monitor.join()
         self.sync_client.join()
+
+        self.traffic_monitor.rage_quit()
 
         # how to stop process
         if self.platform_is_windows: # stop in windows

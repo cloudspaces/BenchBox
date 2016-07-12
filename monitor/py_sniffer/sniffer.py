@@ -8,7 +8,20 @@ import psutil, os, time, sys, getopt
 
 class Sniffer(Thread):
 
-    def __init__(self, personal_cloud=None, config={}):
+    def __init__(self, personal_cloud=None, config=None):
+
+        default_config = {
+            # "sync_server_ip": "stacksync.urv.cat",
+            # "sync_server_port": 8080,
+            "packet_limit": -1,
+            "max_bytes": 65535,
+            "promiscuous": False,
+            "read_timeout": 100
+        }
+
+        if config is None:
+            config = default_config
+
         super(Sniffer, self).__init__()
         print "constructor"
         self.register = None
@@ -17,8 +30,6 @@ class Sniffer(Thread):
             raise NotImplemented
         else:
             self.target = eval("{}".format(personal_cloud.lower()))(config)
-
-
 
     def run(self, interval=5):
         self.register = True
