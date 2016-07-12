@@ -1,5 +1,5 @@
 import boxsdk
-from publisher_credentials import CREDENTIALS_BOX
+from py_publish.publisher_credentials import CREDENTIALS_BOX
 
 class Box():
 

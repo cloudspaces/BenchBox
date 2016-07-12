@@ -35,7 +35,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
     def __init__(self):
         StereotypeExecutor.__init__(self)
         self.ftp_client = None
-        self.current_operation = "PutContentResponse"  # assign default initial, current operation
+        self.current_operation = "SYNC"  # assign default initial, current operation
         # AttributeError: 'StereotypeExecutorU1' object has no attribute 'current_operation'
 
         # el keep alive puede ser por run o por to_wait operation...

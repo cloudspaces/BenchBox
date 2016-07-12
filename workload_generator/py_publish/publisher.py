@@ -7,7 +7,7 @@ from plugin.pub_googledrive import GoogleDrive as googledrive
 from plugin.pub_mega import Mega as mega
 from plugin.pub_onedrive import OneDrive as onedrive
 from plugin.pub_owncloud import OwnCloud as ownloud
-from plugin.pub_stacksync import StackSync as stacksync
+# from plugin.pub_stacksync import StackSync as stacksync
 from plugin.pub_sugarsync import SugarSync as sugarsync
 
 

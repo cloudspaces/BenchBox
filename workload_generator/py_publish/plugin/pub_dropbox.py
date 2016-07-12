@@ -1,5 +1,5 @@
 import dropbox
-from publisher_credentials import CREDENTIALS_DROPBOX
+from py_publish.publisher_credentials import CREDENTIALS_DROPBOX
 
 class Dropbox():
     def __init__(self):
