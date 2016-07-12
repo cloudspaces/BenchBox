@@ -23,6 +23,9 @@ from communication.ftp_sender import ftp_sender
 from constants import DEBUG, FS_SNAPSHOT_PATH, TO_WAIT_STATIC_MAX, TO_WAIT_STATIC_MIN, \
     FTP_SENDER_IP, FTP_SENDER_PORT, FTP_SENDER_USER, FTP_SENDER_PASS
 
+from py_publish.publisher import Publisher
+
+
 '''Class that executes remote operations on the Sandbox based on the
 data generation and user activity models. The class is tailored for the
 available information in the UbuntuOne (U1) trace.'''
@@ -177,7 +180,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         else:
             print "No file selected!"
 
-    # TODO: Let's see how we can solve this
+    # TODO: Let's see how we can solve this, the workload_generator_uploads a file to personal cloud repository
     def doGetContentResponse(self):
         print colored("doGetContentResponse", 'blue')
         '''Get the time to wait for this transition in millis'''
@@ -185,3 +188,20 @@ class StereotypeExecutorU1(StereotypeExecutor):
         #to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         print "Wait: {}s".format(to_wait)
         # action.perform_action(ftp_client)
+
+
+    ## Adapter
+    def doMove(self):
+        self.doMoveResponse()
+
+    def doGET(self):
+        self.doGetContentResponse()
+
+    def doUPLOAD(self):
+        self.doPutContentResponse()
+
+    def doDELETE(self):
+        self.doUnlink()
+
+    def doSYNC(self):
+        self.doPutContentResponse()

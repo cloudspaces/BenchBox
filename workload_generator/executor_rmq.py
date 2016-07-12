@@ -98,7 +98,7 @@ class Commands(object):
             body = {
                 "msg": {
                     "test": {
-                        "testTarget": "dropbox",
+                        "testTarget": "linux",
                         "testFolder": "Dropbox",
                         "testProfile": "backup-heavy",
                     },
@@ -328,7 +328,7 @@ if __name__ == '__main__':
             try:
                 toExecute = getattr(actions, teclat)
                 print toExecute
-                output = toExecute({})
+                output = toExecute()
             except AttributeError as e:
                 print e.message
                 print "ACK: {}".format(teclat)
