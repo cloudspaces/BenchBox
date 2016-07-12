@@ -191,10 +191,10 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
 
     ## Adapter
-    def doMove(self):
+    def doMOVE(self):
         self.doMoveResponse()
 
-    def doGET(self):
+    def doDOWNLOAD(self):
         self.doGetContentResponse()
 
     def doUPLOAD(self):
@@ -205,3 +205,13 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
     def doSYNC(self):
         self.doPutContentResponse()
+
+    def doIDLE(self):
+        time.sleep(1)  # itv between last operation and idle
+
+    def doSTART(self):
+        time.sleep(1)  # itv between start and 1st operation
+
+
+
+
