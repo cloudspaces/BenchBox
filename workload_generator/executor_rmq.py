@@ -36,6 +36,7 @@ def singleton(lockfile="executor_rmq.pid"):
     with open(lockfile, 'w') as f:
         f.write(str(os.getpid()))
 
+
 def remove_inner_path(path):
     files = glob.glob(path)
     try:
@@ -46,7 +47,6 @@ def remove_inner_path(path):
                 os.remove(f)
     except Exception as ex:
         print ex.message
-
 
 
 class Commands(object):
@@ -76,11 +76,37 @@ class Commands(object):
         # send to impala always...!!!
         # sshpass -p vagrant rsync -rvnc --delete ../output/ vagrant@192.168.56.101:stacksync_folder/
 
-    def hello(self, body):
+    def hello(self, body=None):
+        if body is None:
+            body = {
+                "cmd": "hello",
+                "msg": {
+                    "test": {
+                        "testClient": "dropbox",
+                    },
+                    "dropbox-ip": "",
+                    "dropbox-port": ""
+                }
+            }
+
         print '[HELLO]: hello world {}'.format(body['cmd'])
         return '[HELLO]: hello world response'
 
-    def warmup(self, body):
+    def warmup(self, body=None):
+
+        if body is None:
+            body = {
+                "msg": {
+                    "test": {
+                        "testTarget": "dropbox",
+                        "testFolder": "Dropbox",
+                        "testProfile": "backup-heavy",
+                    },
+                    "dropbox-ip": "",
+                    "dropbox-port": ""
+                }
+            }
+
         print '[WARMUP]: {} '.format(body)
         print FS_SNAPSHOT_PATH
         print STEREOTYPE_RECIPES_PATH
@@ -137,7 +163,19 @@ class Commands(object):
         else:
             print '[TEST]: WARNING: need warmup 1st!'
 
-    def start(self, body):
+    def start(self, body=None):
+
+        if body is None:
+            body = {
+                "msg": {
+                    "test": {
+                        "testClient": "dropbox",
+                    },
+                    "dropbox-ip": "",
+                    "dropbox-port": ""
+                }
+            }
+
         print '[START_TEST]: {}'.format(body)
         if not self.is_warmup:
             return '[START_TEST]: WARNING: require warmup!'
@@ -152,7 +190,19 @@ class Commands(object):
             self.monitor_state = "executor Running!"
             return '[START_TEST]: SUCCESS: run test response'
 
-    def stop(self, body):
+    def stop(self, body=None):
+
+        if body is None:
+            body = {
+                "msg": {
+                    "test": {
+                        "testClient": "dropbox",
+                    },
+                    "dropbox-ip": "",
+                    "dropbox-port": ""
+                }
+            }
+
 
         if self.is_running:
             print '[STOP_TEST]: stop test {}'.format(body)
@@ -171,8 +221,18 @@ class Commands(object):
         # time.sleep(10)
         return response_msg
 
-    def keepalive(self, body):
-            return "{} -> {}".format(datetime.datetime.now().isoformat(), self.monitor_state)
+    def keepalive(self, body=None):
+        if body is None:
+            body = {
+                "msg": {
+                    "test": {
+                        "testClient": "dropbox",
+                    },
+                    "dropbox-ip": "",
+                    "dropbox-port": ""
+                }
+            }
+        return "{} -> {}".format(datetime.datetime.now().isoformat(), self.monitor_state)
 
 
 class ExecuteRMQ(object):
@@ -233,8 +293,6 @@ class ExecuteRMQ(object):
         self.channel.start_consuming()
 
 
-
-
 if __name__ == '__main__':
     print "executor.py is ran when warmup and its queue remains established... WAITING RPC"
     # read the url from path: /vagrant/rmq.url.txt
@@ -270,7 +328,7 @@ if __name__ == '__main__':
             try:
                 toExecute = getattr(actions, teclat)
                 print toExecute
-                output = toExecute()
+                output = toExecute({})
             except AttributeError as e:
                 print e.message
                 print "ACK: {}".format(teclat)

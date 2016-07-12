@@ -52,16 +52,16 @@ class Monitor(object):
     def hello(self, body=None):
         #try:
         print "[Hello]: Hello World"
-
-        body = {
-            "msg": {
-                "test": {
-                    "testClient": "dropbox",
-                },
-                "dropbox-ip": "",
-                "dropbox-port": ""
+        if body is None:
+            body = {
+                "msg": {
+                    "test": {
+                        "testClient": "dropbox",
+                    },
+                    "dropbox-ip": "",
+                    "dropbox-port": ""
+                }
             }
-        }
 
         self.sync_client.hello(body)
         return 0, "[Hello]: response"
@@ -76,16 +76,16 @@ class Monitor(object):
     """
     def start(self, body=None):
         #try:
-
-        body = {
-            "msg": {
-                "test": {
-                    "testClient": "dropbox",
-                },
-                "dropbox-ip": "",
-                "dropbox-port": ""
+        if body is None:
+            body = {
+                "msg": {
+                    "test": {
+                        "testClient": "dropbox",
+                    },
+                    "dropbox-ip": "",
+                    "dropbox-port": ""
+                }
             }
-        }
 
         self.monitor_state = "start_monitor"
         if not self.sync_client.is_monitor_capturing:  # if not capturing start otherwise noop
@@ -96,15 +96,17 @@ class Monitor(object):
     RMQ request to warmup the dummyhost=>[sandbox|benchbox]
     '''
     def warmup(self, body=None):
-        body = {
-            "msg": {
-                "test": {
-                    "testClient": "dropbox",
-                },
-                "dropbox-ip": "",
-                "dropbox-port": ""
+
+        if body is None:
+            body = {
+                "msg": {
+                    "test": {
+                        "testClient": "dropbox",
+                    },
+                    "dropbox-ip": "",
+                    "dropbox-port": ""
+                }
             }
-        }
 
         self.monitor_state = "warmup_monitor"
         self.sync_client.warmup(body)
@@ -115,15 +117,16 @@ class Monitor(object):
     '''
     def stop(self, body=None):
 
-        body = {
-            "msg": {
-                "test": {
-                    "testClient": "dropbox",
-                },
-                "dropbox-ip": "",
-                "dropbox-port": ""
+        if body is None:
+            body = {
+                "msg": {
+                    "test": {
+                        "testClient": "dropbox",
+                    },
+                    "dropbox-ip": "",
+                    "dropbox-port": ""
+                }
             }
-        }
 
         self.monitor_state = "stop_monitor"
         if self.sync_client.is_monitor_capturing:  # if its capturing, stop it to capture
@@ -137,16 +140,16 @@ class Monitor(object):
     RMQ request to display the executor status
     '''
     def keepalive(self, body=None):
-
-        body = {
-            "msg": {
-                "test": {
-                    "testClient": "dropbox",
-                },
-                "dropbox-ip": "",
-                "dropbox-port": ""
+        if body is None:
+            body = {
+                "msg": {
+                    "test": {
+                        "testClient": "dropbox",
+                    },
+                    "dropbox-ip": "",
+                    "dropbox-port": ""
+                }
             }
-        }
 
         # self.monitor_state = ""
         return "{} -> {}".format(datetime.datetime.now().isoformat(), self.executor_state)
