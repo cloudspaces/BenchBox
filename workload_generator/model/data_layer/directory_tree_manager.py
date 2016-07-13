@@ -61,6 +61,7 @@ def get_fitness_proportionate_element(probabilities_dict):
 def get_file_based_on_type_popularity(file_system, stereotype_file_types_probabilities, file_type_extensions):
     tested_file_types = set()
     selected_file = None
+    file_type = None
     while len(tested_file_types) < len(stereotype_file_types_probabilities):
         '''Prior creating a file, we first decide which type of file to create'''
         file_type = get_fitness_proportionate_element(stereotype_file_types_probabilities)
@@ -70,7 +71,7 @@ def get_file_based_on_type_popularity(file_system, stereotype_file_types_probabi
         if all_files_of_type != []:
             selected_file = random.choice(all_files_of_type)
             break
-    return selected_file
+    return selected_file, file_type
 
 '''Get a random directory from the whole tree'''
 def get_random_fs_directory(tree, base_path=''):

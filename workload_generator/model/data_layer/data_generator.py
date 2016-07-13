@@ -129,7 +129,7 @@ class DataGenerator(object):
                     print "Generating new synthetic file..."                    
                 else: 
                     '''Get a random file as content and store it with a new name'''
-                    src_path = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
+                    src_path, file_type = get_file_based_on_type_popularity(self.file_system, self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
                     if src_path== None: return None
                     print "Generating deduplicated file..."
                     shutil.copyfile(src_path, synthetic_file_base_path)
@@ -145,7 +145,7 @@ class DataGenerator(object):
 
     '''Move a file (if there is any) to a random location within the synthetic file system'''
     def move_file(self):
-        src_path = get_file_based_on_type_popularity(self.file_system, 
+        src_path, file_type = get_file_based_on_type_popularity(self.file_system, 
             self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
         dest_path = get_random_fs_directory(self.file_system, FS_SNAPSHOT_PATH)
         print "MOVE FILE: ", src_path, " TO: ", dest_path
@@ -208,7 +208,7 @@ class DataGenerator(object):
 
     '''Delete a file at random depending on the file type popularity for this stereotype'''
     def delete_file(self):
-        to_delete = get_file_based_on_type_popularity(self.file_system, 
+        to_delete, file_type = get_file_based_on_type_popularity(self.file_system, 
             self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)        
         print "DELETING FILE: ", to_delete
         if to_delete == None: return None
@@ -273,11 +273,12 @@ class DataGenerator(object):
         '''We have to respect both temporal and spatial localities, as well as to model updates themselves'''
         '''Make use of the UpdateManager for the last aspect'''
         '''1) If there is a file that has been updated, check if we should continue editing it'''
+        file_type = None
         if self.current_updated_file == None or time.time()-self.last_update_time > 1: #TODO: This threshold should be changed by a real distribution
             '''2) Select a random file of the given type to update (this is a simple approach, which can be
             sophisticated, if necessary, by adding individual "edit probabilities" to files based on distributions)'''
             print self.file_type_update_probabilities
-            self.current_updated_file = get_file_based_on_type_popularity(self.file_system, \
+            self.current_updated_file, file_type = get_file_based_on_type_popularity(self.file_system, \
                     self.file_type_update_probabilities, self.stereotype_file_types_extensions)
             self.last_update_time = time.time()
 
@@ -288,7 +289,7 @@ class DataGenerator(object):
             if not DEBUG:
                 '''4) Select the size of the update to be done (1%, 40% of the content)'''
                 file_size = os.path.getsize(self.current_updated_file)         
-                (function, kv_params) = self.file_update_sizes[update_type]
+                (function, kv_params) = self.file_update_sizes[file_type]
                 relative_size = float(get_random_value_from_fitting(function, kv_params))
                 updated_bytes = abs(int(file_size - (file_size*relative_size))) #TODO: At the moment we only consider additions of content in updates           
                 print "UPDATE TYPE: ", update_type, " UPDATE SIZE: ", updated_bytes
@@ -300,22 +301,22 @@ class DataGenerator(object):
     
     
     def delete_file_or_directory(self):
-        if random.random() > 0.05:
+        if random.random() > self.file_to_dir_operations_ratio:
             return self.delete_file(), True
         else:
             return self.delete_directory(), False
         
     def move_file_or_directory(self):
-        if random.random() > 0.05:
+        if random.random() > self.file_to_dir_operations_ratio:
             return self.move_file(), True
         else:
             return self.move_directory(), False
         
     def create_file_or_directory(self):
-        if random.random() > 0.05:
-            return self.data_generator.create_file(), True
+        if random.random() > self.file_to_dir_operations_ratio:
+            return self.create_file(), True
         else:
-            return self.data_generator.create_directory(), False
+            return self.create_directory(), False
         
         
 if __name__ == '__main__':
