@@ -76,13 +76,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
     def doUPLOAD(self, op_name="UPLOAD"):
         print colored(op_name, 'cyan')
 
-        if random.random() > 0.25:
-            synthetic_file_name = self.data_generator.create_file()
-            isFile = True
-        else:
-            synthetic_file_name = self.data_generator.create_directory()
-            isFile = False
-
+        synthetic_file_name, isFile = self.data_generator.create_file_or_directory()
+        
         print "{} :>>> NEW ".format(synthetic_file_name)
 
         if isFile:
@@ -115,12 +110,9 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
     def doDELETE(self, op_name="DELETE"):
         print colored(op_name, 'yellow')
-        if random.random() > 0.25:
-            synthetic_file_name = self.data_generator.delete_file()
-            isFile = True
-        else:
-            synthetic_file_name = self.data_generator.delete_directory()
-            isFile = False
+        
+        synthetic_file_name, isFile = self.data_generator.delete_file_or_directory()
+        
         if not synthetic_file_name == None:
             if isFile:
                 action = DeleteFile(synthetic_file_name, FS_SNAPSHOT_PATH)
@@ -137,12 +129,9 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
     def doMOVE(self, op_name="MOVE"):
         print colored(op_name, 'magenta')
-        if random.random() > 0.25:
-            synthetic_file_name = self.data_generator.move_file()
-            isFile = True
-        else:
-            synthetic_file_name = self.data_generator.move_directory()
-            isFile = False
+
+        synthetic_file_name, isFile = self.data_generator.move_file_or_directory()
+        
         print synthetic_file_name
         (src_mov, tgt_mov) = synthetic_file_name
         if src_mov:

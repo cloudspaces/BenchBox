@@ -39,6 +39,7 @@ class DataGenerator(object):
         self.file_types_sizes = dict()  #Bytes
         self.directory_count_distribution = None
         self.file_level_deduplication_ratio = 0.0
+        self.file_to_dir_operations_ratio = 0.05
         '''Parameters to model files updates'''
         self.file_update_location_probabilities = dict() #Extracted from Tarasov paper, Home dataset
         self.file_type_update_probabilities = dict()
@@ -56,6 +57,8 @@ class DataGenerator(object):
                     kw_params = eval(l[l.index('{'):])
                     setattr(self, model_attribute, (fitting, kw_params))
                 elif model_attribute == "file_level_deduplication_ratio":
+                    setattr(self, model_attribute, float(l.split(',')[1]))
+                elif model_attribute == "file_to_dir_operations_ratio":
                     setattr(self, model_attribute, float(l.split(',')[1]))
                 else: setattr(self, model_attribute, eval(l[l.index('{'):]))
 
@@ -294,7 +297,27 @@ class DataGenerator(object):
         else: print "WARNING: No files to update!"
         '''5) Return the path to the locally updated file to be transferred to the sandbox'''
         return self.current_updated_file
-
+    
+    
+    def delete_file_or_directory(self):
+        if random.random() > 0.05:
+            return self.delete_file(), True
+        else:
+            return self.delete_directory(), False
+        
+    def move_file_or_directory(self):
+        if random.random() > 0.05:
+            return self.move_file(), True
+        else:
+            return self.move_directory(), False
+        
+    def create_file_or_directory(self):
+        if random.random() > 0.05:
+            return self.data_generator.create_file(), True
+        else:
+            return self.data_generator.create_directory(), False
+        
+        
 if __name__ == '__main__':
     # import random
     test_iterations=1

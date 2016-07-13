@@ -20,15 +20,15 @@ SIMULATION_TIME_SLOT = 3600.
 NODES = 100#63492
 STEREOTYPE_RECIPES_PATH = PROJECT_PATH + 'workload_generator/user_stereotypes/'
 
-STEREOTYPE_DISTRIBUTION = {"backup-occasional": 1.0}
+STEREOTYPE_DISTRIBUTION = {"download-heavy": 1.0}
                            #"xl_markov_min_regular.csv": 0.2,
                            #"xl_markov_min_cdn.csv": 0.2,
                            #"xl_markov_min_sync.csv": 0.2,
                            #"xl_markov_min_idle.csv": 0.2}
 
-SIMULATION_OUTPUT = "./simulation_backup_occasional/"
+SIMULATION_OUTPUT = "./simulation_download_heavy/"
 SIMULATOR_TRACE_PATH = PROJECT_PATH + 'workload_generator/traces/200_users_backup.csv'
-TRACE_REPLAY_OUTPUT = "./trace_replay_output_1k_sync_heavy/"
+TRACE_REPLAY_OUTPUT = "./trace_replay_output_1k_download_occasional/"
 TRACE_REPLAY_PATH = PROJECT_PATH +  'workload_generator/traces/traces_sintetic_master.csv'
 
 #EXTERNAL PROGRAMS USED BY BENCHBOX
