@@ -3,6 +3,7 @@ Created on 6/7/2015
 
 @author: Raul
 '''
+from workload_generator.constants import RANDOM_SEED
 try:
     from constants import PROJECT_PATH
     from constants import STEREOTYPE_RECIPES_PATH
@@ -15,8 +16,6 @@ import numpy
 import random
 import os
 import sys
-
-
 
 def translate_matlab_fitting_to_scipy(fitting, parameters):
     
@@ -176,4 +175,5 @@ def appendParentDir(num, currdir):
         
 if __name__ == '__main__':
     build_stereotype("sync-occasional", PROJECT_PATH + "workload_generator/simulator/trace_replay_output_1k_sync_occasional/interarrivals_fittings.txt", no_offline=True)
+
     
