@@ -58,6 +58,10 @@ class StereotypeExecutorU1(StereotypeExecutor):
         '''Initialize the file system in addition to the models'''
         self.data_generator.create_file_system_snapshot()
         self.data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
+        '''Create a set of initial files to populate the file system'''
+        for i in range(random.randint(10,20)):
+            self.data_generator.create_file()
+            
         '''When the initial file system has been built, migrate it to the sandbox'''
         if not DEBUG:
             # self.data_generator.migrate_file_system_snapshot_to_sandbox("migrate location")
