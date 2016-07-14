@@ -20,7 +20,7 @@ SIMULATION_TIME_SLOT = 3600.
 NODES = 100#63492
 STEREOTYPE_RECIPES_PATH = PROJECT_PATH + 'workload_generator/user_stereotypes/'
 
-STEREOTYPE_DISTRIBUTION = {"backup-heavy": 1.0}
+STEREOTYPE_DISTRIBUTION = {"sync-heavy": 1.0}
                            #"xl_markov_min_regular.csv": 0.2,
                            #"xl_markov_min_cdn.csv": 0.2,
                            #"xl_markov_min_sync.csv": 0.2,
@@ -61,7 +61,7 @@ TO_WAIT_STATIC_MIN = 1
 
 TO_WAIT_STATIC = 0  # 0 means use fitting
 FILE_SIZE_STATIC = 0  # is bytes 0 # means use fitting
-FILE_SIZE_MAX = 2000000 # max file size 2 MB
+FILE_SIZE_MAX = 100000000 # max file size 100 MB
 
 # FTP SENDER CONSTANTS
 
