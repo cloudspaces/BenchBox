@@ -44,6 +44,7 @@ class DataGenerator(object):
         self.file_update_location_probabilities = dict() #Extracted from Tarasov paper, Home dataset
         self.file_type_update_probabilities = dict()
         self.current_updated_file = None
+        self.current_updated_file_type = None
         self.last_update_time = -1
         self.file_update_sizes = dict()  #Bytes
 
@@ -273,12 +274,11 @@ class DataGenerator(object):
         '''We have to respect both temporal and spatial localities, as well as to model updates themselves'''
         '''Make use of the UpdateManager for the last aspect'''
         '''1) If there is a file that has been updated, check if we should continue editing it'''
-        file_type = None
         if self.current_updated_file == None or time.time()-self.last_update_time > 1: #TODO: This threshold should be changed by a real distribution
             '''2) Select a random file of the given type to update (this is a simple approach, which can be
             sophisticated, if necessary, by adding individual "edit probabilities" to files based on distributions)'''
             print self.file_type_update_probabilities
-            self.current_updated_file, file_type = get_file_based_on_type_popularity(self.file_system, \
+            self.current_updated_file, self.current_updated_file_type = get_file_based_on_type_popularity(self.file_system, \
                     self.file_type_update_probabilities, self.stereotype_file_types_extensions)
             self.last_update_time = time.time()
 
@@ -289,9 +289,11 @@ class DataGenerator(object):
             if not DEBUG:
                 '''4) Select the size of the update to be done (1%, 40% of the content)'''
                 file_size = os.path.getsize(self.current_updated_file)         
-                (function, kv_params) = self.file_update_sizes[file_type]
+                (function, kv_params) = self.file_update_sizes[self.current_updated_file_type]
                 relative_size = float(get_random_value_from_fitting(function, kv_params))
                 updated_bytes = abs(int(file_size - (file_size*relative_size))) #TODO: At the moment we only consider additions of content in updates           
+                if updated_bytes > FILE_SIZE_MAX: 
+                    updated_bytes = FILE_SIZE_MAX
                 print "UPDATE TYPE: ", update_type, " UPDATE SIZE: ", updated_bytes
                 content_type = DATA_CHARACTERIZATIONS_PATH + get_type_of_file(self.current_updated_file, self.stereotype_file_types_extensions)
                 self.file_update_manager.modify_file(self.current_updated_file, update_type, content_type, updated_bytes)
@@ -324,24 +326,19 @@ if __name__ == '__main__':
     test_iterations=1
     for i in range(test_iterations):
         data_generator = DataGenerator()
-        data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backup")
+        data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backup-heavy")
         # data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backupsample")
         data_generator.create_file_system_snapshot()
         data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
         do_list = {
-            0: data_generator.create_file,
-            1: data_generator.create_directory,
-            2: data_generator.delete_file,
-            3: data_generator.delete_directory,
-            4: data_generator.move_file,
-            5: data_generator.move_directory,
-            6: data_generator.update_file,
-            7: data_generator.create_file,
-            8: data_generator.create_file
+            0: data_generator.create_file_or_directory,
+            1: data_generator.delete_file_or_directory,
+            2: data_generator.move_file_or_directory,
+            3: data_generator.update_file
         }
         number_of_ops = 500
         for j in range(number_of_ops):
-            todo = random.randint(0, 8)
+            todo = random.randint(0, 3)
             do_list[todo]()
 
         '''DANGER! This deletes a directory recursively!'''

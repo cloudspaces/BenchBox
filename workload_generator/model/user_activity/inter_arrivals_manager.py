@@ -6,6 +6,7 @@ Created on 30/6/2015
 
 from workload_generator.utils import get_random_value_from_fitting
 from workload_generator.constants import TO_WAIT_STATIC
+from scipy import stats
 
 class InterArrivalsManager(object):
     

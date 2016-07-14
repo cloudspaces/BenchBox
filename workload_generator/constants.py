@@ -20,7 +20,7 @@ SIMULATION_TIME_SLOT = 3600.
 NODES = 100#63492
 STEREOTYPE_RECIPES_PATH = PROJECT_PATH + 'workload_generator/user_stereotypes/'
 
-STEREOTYPE_DISTRIBUTION = {"download-heavy": 1.0}
+STEREOTYPE_DISTRIBUTION = {"backup-heavy": 1.0}
                            #"xl_markov_min_regular.csv": 0.2,
                            #"xl_markov_min_cdn.csv": 0.2,
                            #"xl_markov_min_sync.csv": 0.2,
