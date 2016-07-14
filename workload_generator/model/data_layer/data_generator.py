@@ -13,13 +13,14 @@ appendParentDir(3, os.path.dirname(os.path.realpath(__file__)))
 
 from workload_generator.constants import FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH, FILE_SIZE_MAX, \
     DATA_CHARACTERIZATIONS_PATH, FS_SNAPSHOT_PATH, \
-    DATA_GENERATOR_PATH, STEREOTYPE_RECIPES_PATH, DEBUG
+    DATA_GENERATOR_PATH, DATA_GENERATOR_PROPERTIES_DIR, STEREOTYPE_RECIPES_PATH, DEBUG
 import time
 from workload_generator.model.data_layer.update_manager import FileUpdateManager
 from workload_generator.model.data_layer.directory_tree_manager import delete_fs_node, \
     add_fs_node, FileSystem, get_file_based_on_type_popularity, \
     get_random_fs_directory, get_empty_directory, \
     get_fitness_proportionate_element, get_type_of_file
+
 
 '''
 This class is intended to produce changes in a folder, such as CRUD operations on
@@ -125,7 +126,7 @@ class DataGenerator(object):
             try:
                 '''Decide whether we have to create a new file or to take deduplicated content'''
                 if self.file_level_deduplication_ratio < random.random():
-                    cp = subprocess.call(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path])
+                    cp = subprocess.call(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path], cwd=DATA_GENERATOR_PROPERTIES_DIR)
                     print "Generating new synthetic file..."                    
                 else: 
                     '''Get a random file as content and store it with a new name'''
