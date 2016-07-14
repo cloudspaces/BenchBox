@@ -16,7 +16,7 @@ else:
 DEBUG = False
 
 '''This seed will dictate the behavior of benchbox workload generators to reproduce experiments'''
-RANDOM_SEED = 123456789
+RANDOM_SEED = 12345678
 
 SIMULATION_DURATION = 14*24*3600.
 SIMULATION_TIME_SLOT = 3600.
