@@ -86,7 +86,7 @@ class DataGenerator(object):
         '''Create the file system'''
         time.sleep(1)
         if not DEBUG: 
-            subprocess.call([FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH])
+            subprocess.call([FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH])        
         time.sleep(1)
 
     '''Generate the logical structure of the initial snapshot before migration to sandbox'''
@@ -327,7 +327,7 @@ if __name__ == '__main__':
     test_iterations=1
     for i in range(test_iterations):
         data_generator = DataGenerator()
-        data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backup-heavy")
+        data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "download-occasional")
         # data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backupsample")
         data_generator.create_file_system_snapshot()
         data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
