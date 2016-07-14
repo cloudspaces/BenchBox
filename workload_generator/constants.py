@@ -15,6 +15,9 @@ else:
 '''In debug mode the system works without doing changes in the local file system'''
 DEBUG = False
 
+'''This seed will dictate the behavior of benchbox workload generators to reproduce experiments'''
+RANDOM_SEED = 123456789
+
 SIMULATION_DURATION = 14*24*3600.
 SIMULATION_TIME_SLOT = 3600.
 NODES = 100#63492
