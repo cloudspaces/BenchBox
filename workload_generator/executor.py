@@ -75,21 +75,17 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
     def doUPLOAD(self, op_name="UPLOAD"):
         print colored(op_name, 'cyan')
-
         synthetic_file_name, isFile = self.data_generator.create_file_or_directory()
-        
         print "{} :>>> NEW ".format(synthetic_file_name)
-
         if isFile:
             action = CreateFile(synthetic_file_name, FS_SNAPSHOT_PATH)
         else:
             action = CreateDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
-
-        print "{} :>>> ACTION".format(action)
+        # print "{} :>>> ACTION".format(action)
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
-        # to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         print "Wait: {}s".format(to_wait)
+        to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         time.sleep(to_wait)
         action.perform_action(self.ftp_client.keep_alive())
 
@@ -103,16 +99,14 @@ class StereotypeExecutorU1(StereotypeExecutor):
         else:
             action = UpdateFile(synthetic_file_name, FS_SNAPSHOT_PATH)
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
-            #to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
+            to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
 
     def doDELETE(self, op_name="DELETE"):
         print colored(op_name, 'yellow')
-        
         synthetic_file_name, isFile = self.data_generator.delete_file_or_directory()
-        
         if not synthetic_file_name == None:
             if isFile:
                 action = DeleteFile(synthetic_file_name, FS_SNAPSHOT_PATH)
@@ -120,8 +114,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
                 action = DeleteDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
             '''Get the time to wait for this transition in millis'''
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
-            # to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
+            to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
         else:
@@ -129,9 +123,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
     def doMOVE(self, op_name="MOVE"):
         print colored(op_name, 'magenta')
-
         synthetic_file_name, isFile = self.data_generator.move_file_or_directory()
-        
         print synthetic_file_name
         (src_mov, tgt_mov) = synthetic_file_name
         if src_mov:
@@ -141,8 +133,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
                 action = MoveDirectory(src_mov, FS_SNAPSHOT_PATH, tgt_mov)
             '''Get the time to wait for this transition in millis'''
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
-            # to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             print "Wait: {}s".format(to_wait)
+            to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
         else:
@@ -152,23 +144,30 @@ class StereotypeExecutorU1(StereotypeExecutor):
         print colored(op_name, 'blue')
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
-        #to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         print "Wait: {}s".format(to_wait)
+        to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         # action.perform_action(ftp_client)
 
     def doIDLE(self, op_name="IDLE"):
         print colored(op_name, 'blue')
-        '''Get the time to wait for this transition in millis'''
-        to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
-        print "Wait: {}s".format(to_wait)
+        try:
+            '''Get the time to wait for this transition in millis'''
+            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
+            print "Wait: {}s".format(to_wait)
+        except Exception as ex:
+            print ex.message
         time.sleep(1)  # itv between last operation and idle
 
     def doSTART(self, op_name="START"):
         print colored(op_name, 'blue')
-        '''Get the time to wait for this transition in millis'''
-        to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
-        print "Wait: {}s".format(to_wait)
+        try:
+            '''Get the time to wait for this transition in millis'''
+            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
+            print "Wait: {}s".format(to_wait)
+        except Exception as ex:
+            print ex.message
         time.sleep(1)  # itv between start and 1st operation
+
 
 
 

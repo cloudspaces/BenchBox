@@ -26,15 +26,19 @@ class ftp_sender():
         self.ftp_pass = ftp_pass
         self.ftp_root = ftp_root
 
-        self.ftp_home = "/"
+        self.ftp_home = "/home/vagrant"
 
     def send(self, fname, new_name=None, sub_folder=None):
         print ">> {} <<  ".format(self.ftp.pwd())
         if sub_folder:
+
             self.ftp.cwd(self.ftp_home)  # move to home
+            print self.ftp.pwd()
             if self.ftp_root:
+                print "from " + self.ftp.pwd()
                 print "move to " + self.ftp_root
                 self.ftp.cwd(self.ftp_root)
+
             print "move to " + sub_folder
             self.ftp.cwd(sub_folder)
 

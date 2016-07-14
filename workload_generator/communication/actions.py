@@ -61,24 +61,26 @@ class CreateFileOrDirectory(Action):
     def to_string(self):
         return "MakeResponse " + str(self.path) + "\n"
 
+
 class CreateFile(Action):
     def __init__(self, output_src_abs_path, output_root_dir):
         self.output_root = output_root_dir
         Action.__init__(self, output_src_abs_path)
     '''Create file locally and in the remote host'''
     def perform_action(self, sender):
-        try:
-            ftp_rel_path = os.path.relpath(os.path.dirname(self.path), self.output_root)  # / == output
-            print "send: {} -> to: {}".format(self.path, ftp_rel_path)
-            ftp_abs_path = sender.send(self.path, None, ftp_rel_path)
-            # print "abs: {}".format(ftp_abs_path)
-        except Exception as e:
-            print e.message
+        #try:
+        ftp_rel_path = os.path.relpath(os.path.dirname(self.path), self.output_root)  # / == output
+        print "send: {} -> to: {}".format(self.path, ftp_rel_path)
+        ftp_abs_path = sender.send(self.path, None, ftp_rel_path)
+        print "abs: {}".format(ftp_abs_path)
+        # except Exception as e:
+        #    print e.message
             # TODO return self.size
         # return None
 
     def to_string(self):
         return "MakeResponse " + str(self.path) + "\n"
+
 
 class CreateDirectory(Action):
     def __init__(self, output_abs_src, output_root):
@@ -394,11 +396,8 @@ class UploadDirectory(Action):
         ftp_client.cwd('..')
         os.chdir('..')
 
-
     def to_string(self):
         return "Upload Dir"
-
-
 
 
 class GetContentResponse(Action):
