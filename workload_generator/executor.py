@@ -197,7 +197,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             print ex.message
             return 0
 
-    def notify_operation(self, profile="sync-heavy", personal_cloud="dropbox", hostname=None,operation_name=None):
+    def notify_operation(self, profile="sync-heavy", personal_cloud="dropbox", hostname=None, operation_name=None):
         tags = ''
 
         if tags == '':
