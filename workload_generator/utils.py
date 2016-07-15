@@ -3,14 +3,16 @@ Created on 6/7/2015
 
 @author: Raul
 '''
-from workload_generator.constants import RANDOM_SEED
+
 try:
     from constants import PROJECT_PATH
     from constants import STEREOTYPE_RECIPES_PATH
+    from constants import RANDOM_SEED
 except ImportError as ex:
     print ex.message
     from workload_generator.constants import PROJECT_PATH
     from workload_generator.constants import STEREOTYPE_RECIPES_PATH
+    from workload_generator.constants import RANDOM_SEED
 from scipy import stats
 import numpy
 import random

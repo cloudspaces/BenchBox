@@ -73,11 +73,11 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
     '''Do an execution step as a client'''
 
-    def execute(self, peronal_cloud=None):
+    def execute(self, personal_cloud=None):
         '''Get the next operation to be done'''
         self.operation_chain.next_step_in_random_navigation()
         to_execute = getattr(self, 'do' + self.operation_chain.current_state)
-        to_execute(personal_cloud=peronal_cloud)
+        to_execute(personal_cloud=personal_cloud)
         return self.operation_chain.current_state
 
 
