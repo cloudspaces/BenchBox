@@ -249,7 +249,7 @@ amqp.connect(amqp_url, function (err, conn) {
                 var point = metrics;
                 var hostname = msg.fields.routingKey; // measurement goes here
                 tags['hostname'] = hostname;
-                var measurement = "benchbox";
+                var measurement = "benchbox_server";
                 if (influxServerMetricsReady) {
                     console.log("write server metrics to influx");
                     // write server metrics
@@ -283,7 +283,7 @@ amqp.connect(amqp_url, function (err, conn) {
                 var point = metrics;
                 var hostname = msg.fields.routingKey;
                 tags['hostname'] = hostname;
-                var measurement = "benchbox";
+                var measurement = "benchbox"; 
 
                 if (influxClientMetricsReady) {
                     influxClientMetrics.writePoint(measurement, point, tags, function () {
@@ -332,7 +332,7 @@ amqp.connect(amqp_url, function (err, conn) {
                 var point = metrics;
                 var hostname = msg.fields.routingKey;
                 tags['hostname'] = hostname;  // which dummyHost it belongs
-                var measurement = "benchbox"; // the database 
+                var measurement = "benchbox_workload"; // the database 
 
                 if (influxClientMetricsReady) {
                     influxClientMetrics.writePoint(measurement, point, tags, function () {
