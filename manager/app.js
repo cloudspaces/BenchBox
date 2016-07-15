@@ -232,14 +232,14 @@ amqp.connect(amqp_url, function (err, conn) {
     // ------------------------------------------------------------------------
 
 
-    conn.createChannel(function(err, ch){
+    conn.createChannel(function (err, ch) {
         // sparated channel for network and other metrics... will duplicate the server channel usage
         var ex = 'sync_server';
         ch.assertExchange(ex, 'fanout', {durable: false});
-        ch.assertQueue('', {exclusive:true}, function(err, q){
-            console.log(" ["+ex+"] waiting for server metric connection")
+        ch.assertQueue('', {exclusive: true}, function (err, q) {
+            console.log(" [" + ex + "] waiting for server metric connection")
             ch.bindQueue(q.queue, ex, '');
-            ch.consume(q.queue, function(msg){
+            ch.consume(q.queue, function (msg) {
                 ch.ack(msg);
                 var data = JSON.parse(msg.content);
                 console.log(data);
@@ -250,7 +250,7 @@ amqp.connect(amqp_url, function (err, conn) {
                 var hostname = msg.fields.routingKey; // measurement goes here
                 tags['hostname'] = hostname;
                 var measurement = "benchbox";
-                if (influxServerMetricsReady){
+                if (influxServerMetricsReady) {
                     console.log("write server metrics to influx");
                     // write server metrics
                     influxServerMetrics.writePoint(measurement, point, tags, function () {
@@ -261,7 +261,6 @@ amqp.connect(amqp_url, function (err, conn) {
         })
 
     });
-
 
 
     // ------------------------------------------------------------------------
@@ -279,6 +278,7 @@ amqp.connect(amqp_url, function (err, conn) {
                 ch.ack(msg);
                 var data = JSON.parse(msg.content);
                 var metrics = data.metrics;
+                var op_time = data.metrics.time;
                 var tags = data.tags;
                 var point = metrics;
                 var hostname = msg.fields.routingKey;
@@ -287,29 +287,28 @@ amqp.connect(amqp_url, function (err, conn) {
 
                 if (influxClientMetricsReady) {
                     influxClientMetrics.writePoint(measurement, point, tags, function () {
-                        console.log("done writing [" + hostname+ "]["+ex+"]: cpu["+metrics.cpu +"] ram["+metrics.ram+"], hdd["+metrics.disk+"], net[out("+metrics.bytes_sent+")/in("+metrics.bytes_recv+")]");
+                        console.log("done writing [" + hostname + "][" + op_time + "]: " + ex + " -> cpu[" + metrics.cpu + "] ram[" + metrics.ram + "], hdd[" + metrics.disk + "], net[out(" + metrics.bytes_sent + ")/in(" + metrics.bytes_recv + ")]");
 
                         /*
-                        { files: 1,
-                            dropin: 0,
-                            dropout: 0,
-                            ram: 171581440,
-                            disk: 336,
-                            packets_sent: 2,
-                            bytes_recv: 152,
-                            packets_recv: 2,
-                            bytes_sent: 324,
-                            errout: 0,
-                            errin: 0,
-                            net: 2,
-                            cpu: 0 }
-                        */
+                         { files: 1,
+                         dropin: 0,
+                         dropout: 0,
+                         ram: 171581440,
+                         disk: 336,
+                         packets_sent: 2,
+                         bytes_recv: 152,
+                         packets_recv: 2,
+                         bytes_sent: 324,
+                         errout: 0,
+                         errin: 0,
+                         net: 2,
+                         cpu: 0 }
+                         */
                     });
                 }
             }, {noAck: false}); // ignore if none reached, none blocking queue
         })
     })
-
 
 
     // ------------------------------------------------------------------------
@@ -327,6 +326,8 @@ amqp.connect(amqp_url, function (err, conn) {
                 ch.ack(msg);
                 var data = JSON.parse(msg.content);
                 var metrics = data.metrics;
+                var op_time = data.metrics.time;
+                // console.log(JSON.stringify(data.metrics));
                 var tags = data.tags;
                 var point = metrics;
                 var hostname = msg.fields.routingKey;
@@ -335,7 +336,7 @@ amqp.connect(amqp_url, function (err, conn) {
 
                 if (influxClientMetricsReady) {
                     influxClientMetrics.writePoint(measurement, point, tags, function () {
-                        console.log("done writting [" + hostname+ "]["+ex+"]: " + metrics );
+                        console.log("done writing [" + hostname + "][" + op_time  + "]: " + ex + " -> " + metrics.operation + "");
                         // console.log("done writing [" + hostname+ "]: cpu["+metrics.cpu +"] ram["+metrics.ram+"], hdd["+metrics.disk+"], net[out("+metrics.bytes_sent+")/in("+metrics.bytes_recv+")]");
 
                         /*

@@ -208,7 +208,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             }
 
         metrics = {
-            "operation": operation_name,
+            'operation': operation_name,
             'time': calendar.timegm(time.gmtime()) * 1000,
         }
         data = {
