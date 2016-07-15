@@ -5,13 +5,16 @@ Created on 30/6/2015
 '''
 
 from workload_generator.utils import get_random_value_from_fitting
-from workload_generator.constants import TO_WAIT_STATIC
-from scipy import stats
+from workload_generator.constants import TO_WAIT_STATIC, RANDOM_SEED,\
+    MAX_WAITING_TIME, MIN_WAITING_TIME
+import numpy
 
 class InterArrivalsManager(object):
     
     def __init__(self):
         self.transition_interarrival_fittings = dict()
+        '''Initialize random seed from constants for reproducibility'''
+        numpy.random.seed(RANDOM_SEED)
             
     '''Get the waiting time between operations based on the statistical fittings'''
     def get_waiting_time(self, state1, state2):
@@ -20,8 +23,8 @@ class InterArrivalsManager(object):
         (function, kv_params) = self.transition_interarrival_fittings[state1][state2]
         waiting_time = get_random_value_from_fitting(function, kv_params)       
         '''Avoid extremely large or small waiting times due to statistical functions'''
-        if waiting_time > (3600*24): waiting_time = 3600*24
-        if waiting_time < 0.001: waiting_time = 0.001
+        if waiting_time > MAX_WAITING_TIME: waiting_time = MAX_WAITING_TIME
+        if waiting_time < MIN_WAITING_TIME: waiting_time = MIN_WAITING_TIME
         return waiting_time
         # return 1
 
@@ -56,6 +59,13 @@ if __name__ == '__main__':
     logistic NO
     loglogistic/fisk NO '''
     
+    numpy.random.seed(RANDOM_SEED)
+    function = "genextreme"
+    kv_params = {'shape':-0.954000701932126,'scale':0.0455224790093405,'loc':0.0691909139925137}
+    
+    for i in range(10):
+        print get_random_value_from_fitting(function, kv_params)
+        
     #v = numpy.random.gumbel(loc=1.20212649309532, scale=0.932804666751013, size=10000)
     #fitting = genextreme(-0.5471, loc=0.1189, scale=0.1105)
     #fitting = genpareto(2.1686, scale=2.6006e+003, loc=-2.2204e-015)

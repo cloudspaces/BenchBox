@@ -9,6 +9,7 @@ the probabilities among states are set, it also provides
 random walk on that graph.
 '''
 import random
+from workload_generator.constants import RANDOM_SEED
 
 class SimpleMarkovChain(object):
     
@@ -19,6 +20,9 @@ class SimpleMarkovChain(object):
         self.current_state = None
         self.activity_rate = None
         self.initial_state_probabilities = None
+        '''Initialize random seed from constants for reproducibility'''
+        self.r = random.Random()
+        self.r.seed(RANDOM_SEED)
         
     def add_transition(self, state1, state2, probability):
         #If there is no entry for this transition, create one
@@ -52,7 +56,7 @@ class SimpleMarkovChain(object):
     def next_step_in_random_navigation(self):
         #Initialize the navigation cursor to a random state
         if self.current_state == None:
-            random_trial = random.random()
+            random_trial = self.r.random()
             start_range = 0.0
             for k in sorted(self.initial_state_probabilities.keys()):
                 if start_range <= random_trial and random_trial <= start_range+self.initial_state_probabilities[k]:
@@ -61,7 +65,7 @@ class SimpleMarkovChain(object):
                 else: start_range += self.initial_state_probabilities[k]      
             
         #Fitness proportionate selection of next state
-        random_trial = random.random()
+        random_trial = self.r.random()
         start_range = 0.0
         self.previous_state = self.current_state
         for k in sorted(self.chain[self.current_state].keys()):
@@ -91,3 +95,18 @@ class SimpleMarkovChain(object):
         for k1 in sorted(chain.keys()):
             for k2 in sorted(chain[k1].keys()):
                 print chain[k1][k2]
+                
+if __name__ == '__main__':
+    m1 = SimpleMarkovChain()
+    m1.initialize_from_recipe("D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\workload_generator\\user_stereotypes\\backup-heavy", "operation_chain", "initial_state_probabilities")
+    m1.calculate_chain_relative_probabilities()
+    m2 = SimpleMarkovChain()
+    m2.initialize_from_recipe("D:\\Documentos\\Recerca\\Proyectos\\IOStack\\Code\\BenchBox\\workload_generator\\user_stereotypes\\backup-heavy", "operation_chain", "initial_state_probabilities")
+    m2.calculate_chain_relative_probabilities()
+    
+    for i in range(500):
+        print m1.current_state, m2.current_state
+        m1.next_step_in_random_navigation()
+        m2.next_step_in_random_navigation()
+    
+    
