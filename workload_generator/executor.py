@@ -36,17 +36,13 @@ class StereotypeExecutorU1(StereotypeExecutor):
         StereotypeExecutor.__init__(self)
         self.rmq_channel = None
         self.ftp_client = None
-        self.dummyhostname = None
         self.current_operation = "SYNC"  # assign default initial, current operation
         # AttributeError: 'StereotypeExecutorU1' object has no attribute 'current_operation'
         # el keep alive puede ser por run o por to_wait operation...
 
     def initialize_rmq_channel(self):
         self.rmq_path = "rabbitmq"
-        self.dummyhostname_path = "hostname"
         self.rmq_path_url = None
-        with open(self.dummyhostname_path, 'r') as f:
-            self.dummyhostname = f.read().splitlines()[0]
 
         with open(self.rmq_path, 'r') as read_file:
             self.rmq_path_url = read_file.read().splitlines()[0]
@@ -120,33 +116,6 @@ class StereotypeExecutorU1(StereotypeExecutor):
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
         action.perform_action(self.ftp_client.keep_alive())
-
-        tags = ''
-
-        if tags == '':
-            tags = {
-                'profile': "sync-heavy",
-                'credentials': 'pc_credentials',
-                'client': "dropbox",
-            }
-
-        metrics = {
-            "operation": op_name,
-            'time': calendar.timegm(time.gmtime()) * 1000,
-        }
-        data = {
-            'metrics': metrics,
-            'tags': tags
-        }
-
-        msg = json.dumps(data)
-
-        ## setup pika sender settings
-        self.rmq_channel.basic_publish(
-            exchange='metrics_ops',
-            routing_key=self.hostname,
-            body=msg)
-
         return to_wait
 
 
@@ -228,8 +197,29 @@ class StereotypeExecutorU1(StereotypeExecutor):
             print ex.message
             return 0
 
+    def notify_operation(self, profile="sync-heavy", personal_cloud="dropbox", hostname=None,operation_name=None):
+        tags = ''
 
+        if tags == '':
+            tags = {
+                'profile': profile,
+                'hostname': hostname,
+                'client': personal_cloud,
+            }
 
-
+        metrics = {
+            "operation": operation_name,
+            'time': calendar.timegm(time.gmtime()) * 1000,
+        }
+        data = {
+            'metrics': metrics,
+            'tags': tags
+        }
+        msg = json.dumps(data)
+        ## setup pika sender settings
+        self.rmq_channel.basic_publish(
+            exchange='metrics_ops',
+            routing_key=hostname,
+            body=msg)
 
 
