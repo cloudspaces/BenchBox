@@ -119,7 +119,7 @@ class Commands(object):
             self.sync_directory = body['msg']['test']['testFolder']
             self.stereotype_executor = StereotypeExecutorU1()  # tornar a assignar
 
-            self.target_personal_cloud = body['msg']['testClient']
+            self.target_personal_cloud = body['msg']['test']['testClient']
             self.target_ftp_target = body['msg']['test']['testTarget']
             self.target_ftp_home = None
 
@@ -236,6 +236,7 @@ class Commands(object):
         print "clear the content of the sintetic workload generator filesystem"
         remove_inner_path('/home/vagrant/output/*')  # clear the directory after stoping the workload_generator
         # time.sleep(10)
+        exit(0)
         return response_msg
 
     def keepalive(self, body=None):
