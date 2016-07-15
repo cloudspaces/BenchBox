@@ -5,8 +5,8 @@ Created on 30/6/2015
 @author: Raul
 '''
 import os, sys
-import random
-import time
+import random,json,calendar
+import time, urlparse, os, pika
 from termcolor import colored
 from utils import appendParentDir
 
@@ -34,10 +34,39 @@ available information in the UbuntuOne (U1) trace.'''
 class StereotypeExecutorU1(StereotypeExecutor):
     def __init__(self):
         StereotypeExecutor.__init__(self)
+        self.rmq_channel = None
         self.ftp_client = None
+        self.dummyhostname = None
         self.current_operation = "SYNC"  # assign default initial, current operation
         # AttributeError: 'StereotypeExecutorU1' object has no attribute 'current_operation'
         # el keep alive puede ser por run o por to_wait operation...
+
+    def initialize_rmq_channel(self):
+        self.rmq_path = "rabbitmq"
+        self.dummyhostname_path = "hostname"
+        self.rmq_path_url = None
+        with open(self.hostname_path, 'r') as f:
+            self.dummyhostname = f.read().splitlines()[0]
+
+        with open(self.rmq_path, 'r') as read_file:
+            self.rmq_path_url = read_file.read().splitlines()[0]
+        self.rmq_url = urlparse.urlparse(self.rmq_path_url)
+        self.rmq_connection = None
+        try:
+            self.rmq_connection = pika.BlockingConnection(
+                pika.ConnectionParameters(
+                    host=self.rmq_url.hostname,
+                    heartbeat_interval=5,
+                    virtual_host=self.rmq_url.path[1:],
+                    credentials=pika.PlainCredentials(self.rmq_url.username, self.rmq_url.password)
+                )
+            )
+        except Exception as ex:
+            print ex.message
+            exit(0)
+            # failed to create rabbit connection
+        self.rmq_channel = self.rmq_connection.channel()
+
 
     def initialize_ftp_client_by_directory(self, root_dir, ftp_home):
         # update fto_client_root directory
@@ -91,7 +120,35 @@ class StereotypeExecutorU1(StereotypeExecutor):
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
         action.perform_action(self.ftp_client.keep_alive())
+
+        tags = ''
+
+        if tags == '':
+            tags = {
+                'profile': "sync-heavy",
+                'credentials': 'pc_credentials',
+                'client': "dropbox",
+            }
+
+        metrics = {
+            "operation": op_name,
+            'time': calendar.timegm(time.gmtime()) * 1000,
+        }
+        data = {
+            'metrics': metrics,
+            'tags': tags
+        }
+
+        msg = json.dumps(data)
+
+        ## setup pika sender settings
+        self.rmq_channel.basic_publish(
+            exchange='metrics_ops',
+            routing_key=self.hostname,
+            body=msg)
+
         return to_wait
+
 
     def doSYNC(self, op_name="SYNC", personal_cloud=None):
         print colored(op_name, 'green')

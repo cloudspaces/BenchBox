@@ -74,34 +74,6 @@ class Commands(object):
         self.execute = None
         # self.data_generator = DataGenerator()
 
-        if os.name == "nt":
-            self.platform_is_windows = True
-            self.rmq_path = '/Users/vagrant/vagrant/rabbitmq'
-        else:
-            self.platform_is_windows = False
-            self.rmq_path = "rabbitmq"
-
-        self.rmq_path_url = None
-
-        with open(self.rmq_path, 'r') as read_file:
-            self.rmq_path_url = read_file.read().splitlines()[0]
-        self.rmq_url = urlparse.urlparse(self.rmq_path_url)
-        self.rmq_connection = None
-        try:
-            self.rmq_connection = pika.BlockingConnection(
-                pika.ConnectionParameters(
-                    host=self.rmq_url.hostname,
-                    heartbeat_interval=5,
-                    virtual_host=self.rmq_url.path[1:],
-                    credentials=pika.PlainCredentials(self.rmq_url.username, self.rmq_url.password)
-                )
-            )
-        except Exception as ex:
-            print ex.message
-            exit(0)
-            # failed to create rabbit connection
-        self.rmq_channel = self.rmq_connection.channel()
-
         # start the monitoring stuff. # todo
         # send to impala always...!!!
         # sshpass -p vagrant rsync -rvnc --delete ../output/ vagrant@192.168.56.101:stacksync_folder/
@@ -158,6 +130,7 @@ class Commands(object):
             else:
                 print "Unhandled sandbox target host"
 
+            self.stereotype_executor.initialize_rmq_channel()
             self.stereotype_executor.initialize_ftp_client_by_directory(root_dir=self.sync_directory, ftp_home=self.target_ftp_home)
 
             self.fs_abs_target_folder = '{}/{}'.format(self.target_ftp_home, self.sync_directory)  # target ftp_client dir absolute path
@@ -188,22 +161,11 @@ class Commands(object):
             # TODO loop
             operations = 0
 
-            data = {
-                'metrics': {},
-                'tags': {}
-            }
-            msg = json.dumps(data)
-
-            ## setup pika sender settings
-            self.rmq_channel.basic_publish(
-                exchange='metrics_ops',
-                routing_key=self.hostname,
-                body=msg)
-
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
-                to_wait, operation_executed = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
-                time.sleep(5+to_wait)
+                operation_executed, to_wait = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
+                print to_wait, operation_executed
+                time.sleep(5)
                 print colored("[TEST]: INFO {} --> {} // {} // {} // {}".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory, operation_executed), 'red')
         else:
             print '[TEST]: WARNING: need warmup 1st!'
