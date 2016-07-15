@@ -202,8 +202,8 @@ class Commands(object):
 
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
-                operation_executed = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
-                # time.sleep(3)
+                to_wait, operation_executed = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
+                time.sleep(5+to_wait)
                 print colored("[TEST]: INFO {} --> {} // {} // {} // {}".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory, operation_executed), 'red')
         else:
             print '[TEST]: WARNING: need warmup 1st!'
@@ -228,7 +228,7 @@ class Commands(object):
             return '[START_TEST]: INFO: already running!'
         else:
             # SELF THREAD START
-            time.sleep(10)  # para que el
+            time.sleep(2)  # para que el
             print '[START_TEST]: INFO: instance thread'
             self.execute = Thread(target=self._test)
             self.execute.start()
