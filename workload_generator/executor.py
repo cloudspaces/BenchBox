@@ -51,6 +51,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
                 ftp_home=ftp_home  # default home directory
         )
 
+
+
     def initialize_from_stereotype_recipe(self, stereotype_recipe):
         StereotypeExecutor.initialize_from_stereotype_recipe(self, stereotype_recipe)
 
@@ -71,15 +73,15 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
     '''Do an execution step as a client'''
 
-    def execute(self):
+    def execute(self, peronal_cloud=None):
         '''Get the next operation to be done'''
         self.operation_chain.next_step_in_random_navigation()
         to_execute = getattr(self, 'do' + self.operation_chain.current_state)
-        to_execute()
+        to_execute(personal_cloud=peronal_cloud)
         return self.operation_chain.current_state
 
 
-    def doUPLOAD(self, op_name="UPLOAD"):
+    def doUPLOAD(self, op_name="UPLOAD", personal_cloud=None):
         print colored(op_name, 'cyan')
         synthetic_file_name, isFile = self.data_generator.create_file_or_directory()
         print "{} :>>> NEW ".format(synthetic_file_name)
@@ -95,7 +97,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         time.sleep(to_wait)
         action.perform_action(self.ftp_client.keep_alive())
 
-    def doSYNC(self, op_name="SYNC"):
+    def doSYNC(self, op_name="SYNC", personal_cloud=None):
         # self.doPutContentResponse()
         print colored(op_name, 'green')
         synthetic_file_name = self.data_generator.update_file()
@@ -110,7 +112,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
 
-    def doDELETE(self, op_name="DELETE"):
+    def doDELETE(self, op_name="DELETE", personal_cloud=None):
         print colored(op_name, 'yellow')
         synthetic_file_name, isFile = self.data_generator.delete_file_or_directory()
         if not synthetic_file_name == None:
@@ -127,7 +129,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         else:
             print "No file selected!"
 
-    def doMOVE(self, op_name="MOVE"):
+    def doMOVE(self, op_name="MOVE", personal_cloud=None):
         print colored(op_name, 'magenta')
         synthetic_file_name, isFile = self.data_generator.move_file_or_directory()
         print synthetic_file_name
@@ -146,16 +148,22 @@ class StereotypeExecutorU1(StereotypeExecutor):
         else:
             print "No file selected!"
 
-    def doDOWNLOAD(self, op_name="DOWNLOAD"):
+    def doDOWNLOAD(self, op_name="DOWNLOAD", personal_cloud=None):
         print colored(op_name, 'blue')
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
+        # aqui deberia ir el publisher
+        synthetic_file_name = self.data_generator.create_file()
+        print synthetic_file_name
+        print "{} :>>> PUBLISH ".format(synthetic_file_name)
+        publisher = Publisher(personal_cloud=personal_cloud)
+        publisher.publish(synthetic_file_name, FS_SNAPSHOT_PATH)  #
         print "Wait: {}s".format(to_wait)
         to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         time.sleep(to_wait)
         # action.perform_action(ftp_client)
 
-    def doIDLE(self, op_name="IDLE"):
+    def doIDLE(self, op_name="IDLE", personal_cloud=None):
         print colored(op_name, 'blue')
         try:
             '''Get the time to wait for this transition in millis'''
@@ -166,7 +174,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
         time.sleep(to_wait)  # itv between last operation and idle
 
-    def doSTART(self, op_name="START"):
+    def doSTART(self, op_name="START", personal_cloud=None):
         print colored(op_name, 'blue')
         try:
             '''Get the time to wait for this transition in millis'''
