@@ -157,6 +157,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         print synthetic_file_name
         print "{} :>>> PUBLISH ".format(synthetic_file_name)
         publisher = Publisher(personal_cloud=personal_cloud)
+        # b.publish('sample/sample.txt', '/aaaa/sample.txt')
         publisher.publish(synthetic_file_name, FS_SNAPSHOT_PATH)  #
         print "Wait: {}s".format(to_wait)
         to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
