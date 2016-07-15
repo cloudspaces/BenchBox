@@ -8,6 +8,7 @@ from workload_generator.constants import FS_SNAPSHOT_PATH,\
     STEREOTYPE_RECIPES_PATH
 
 import time
+import shutil
 
 '''Dummy class to emulate the calls of the real one, for simulation purposes'''
 class TestExecutor(StereotypeExecutor):
@@ -78,15 +79,13 @@ class TestExecutor(StereotypeExecutor):
 if __name__ == '__main__':
     
     executor = TestExecutor()
-    executor.initialize_from_stereotype_recipe(STEREOTYPE_RECIPES_PATH + "backup-heavy")
+    executor.initialize_from_stereotype_recipe(STEREOTYPE_RECIPES_PATH + "backup-occasional")
     executor.create_fs_snapshot()
     
-    for i in range(10):
+    for i in range(500):
         to_sleep = executor.execute()
         print "Sleep for: ", to_sleep
         time.sleep(to_sleep)
     
-    
-    
-    
+    shutil.rmtree(FS_SNAPSHOT_PATH)    
     

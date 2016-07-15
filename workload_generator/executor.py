@@ -20,7 +20,7 @@ from communication.actions import UploadDirectory, \
     CreateFile, CreateDirectory, UpdateFile, DeleteFile, DeleteDirectory, MoveFile, MoveDirectory
 
 from communication.ftp_sender import ftp_sender
-from constants import DEBUG, FS_SNAPSHOT_PATH, TO_WAIT_STATIC_MAX, TO_WAIT_STATIC_MIN, \
+from constants import DEBUG, FS_SNAPSHOT_PATH, MAX_WAITING_TIME, MIN_WAITING_TIME, \
     FTP_SENDER_IP, FTP_SENDER_PORT, FTP_SENDER_USER, FTP_SENDER_PASS
 
 from py_publish.publisher import Publisher
@@ -89,7 +89,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
         print "Wait: {}s".format(to_wait)
-        to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+        to_wait = random.randint(MIN_WAITING_TIME, MAX_WAITING_TIME)
         time.sleep(to_wait)
         action.perform_action(self.ftp_client.keep_alive())
 
@@ -104,7 +104,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             action = UpdateFile(synthetic_file_name, FS_SNAPSHOT_PATH)
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
             print "Wait: {}s".format(to_wait)
-            to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+            to_wait = random.randint(MIN_WAITING_TIME, MAX_WAITING_TIME)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
 
@@ -119,7 +119,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             '''Get the time to wait for this transition in millis'''
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
             print "Wait: {}s".format(to_wait)
-            to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+            to_wait = random.randint(MIN_WAITING_TIME, MAX_WAITING_TIME)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
         else:
@@ -138,7 +138,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             '''Get the time to wait for this transition in millis'''
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
             print "Wait: {}s".format(to_wait)
-            to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+            to_wait = random.randint(MIN_WAITING_TIME, MAX_WAITING_TIME)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
         else:
@@ -149,7 +149,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
         print "Wait: {}s".format(to_wait)
-        to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+        to_wait = random.randint(MIN_WAITING_TIME, MAX_WAITING_TIME)
         # action.perform_action(ftp_client)
 
     def doIDLE(self, op_name="IDLE"):

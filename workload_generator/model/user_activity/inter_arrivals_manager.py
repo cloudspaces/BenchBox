@@ -4,9 +4,9 @@ Created on 30/6/2015
 @author: Raul
 '''
 
-from workload_generator.utils import get_random_value_from_fitting,\
-    get_random_alphanumeric_string
-from workload_generator.constants import TO_WAIT_STATIC, RANDOM_SEED
+from workload_generator.utils import get_random_value_from_fitting
+from workload_generator.constants import TO_WAIT_STATIC, RANDOM_SEED,\
+    MAX_WAITING_TIME, MIN_WAITING_TIME
 import numpy
 
 class InterArrivalsManager(object):
@@ -23,8 +23,8 @@ class InterArrivalsManager(object):
         (function, kv_params) = self.transition_interarrival_fittings[state1][state2]
         waiting_time = get_random_value_from_fitting(function, kv_params)       
         '''Avoid extremely large or small waiting times due to statistical functions'''
-        if waiting_time > (3600*24): waiting_time = 3600*24
-        if waiting_time < 0.001: waiting_time = 0.001
+        if waiting_time > MAX_WAITING_TIME: waiting_time = MAX_WAITING_TIME
+        if waiting_time < MIN_WAITING_TIME: waiting_time = MIN_WAITING_TIME
         return waiting_time
         # return 1
 
