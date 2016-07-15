@@ -76,6 +76,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
         self.operation_chain.next_step_in_random_navigation()
         to_execute = getattr(self, 'do' + self.operation_chain.current_state)
         to_execute()
+        return self.operation_chain.current_state
+
 
     def doUPLOAD(self, op_name="UPLOAD"):
         print colored(op_name, 'cyan')
@@ -150,6 +152,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
         print "Wait: {}s".format(to_wait)
         to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+        time.sleep(to_wait)
         # action.perform_action(ftp_client)
 
     def doIDLE(self, op_name="IDLE"):
@@ -160,7 +163,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
             print "Wait: {}s".format(to_wait)
         except Exception as ex:
             print ex.message
-        time.sleep(1)  # itv between last operation and idle
+        to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+        time.sleep(to_wait)  # itv between last operation and idle
 
     def doSTART(self, op_name="START"):
         print colored(op_name, 'blue')
@@ -170,7 +174,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
             print "Wait: {}s".format(to_wait)
         except Exception as ex:
             print ex.message
-        time.sleep(1)  # itv between start and 1st operation
+        to_wait = random.randint(TO_WAIT_STATIC_MIN, TO_WAIT_STATIC_MAX)
+        time.sleep(to_wait)  # itv between start and 1st operation
 
 
 

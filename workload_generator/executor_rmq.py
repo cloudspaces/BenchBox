@@ -58,8 +58,9 @@ class Commands(object):
             cls._instance = super(Commands, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
-    def __init__(self, receipt):
+    def __init__(self, receipt, hostname):
         print '[INIT_EXECUTOR_RMQ]: rpc commands'
+        self.hostname = hostname # the name of the dummyHost
         self.is_warmup = False
         self.is_running = False
         self.sync_directory = None  # stacksync_folder, Dropbox, ....
@@ -100,7 +101,7 @@ class Commands(object):
                     "test": {
                         "testTarget": "linux",
                         "testFolder": "Dropbox",
-                        "testProfile": "backup-heavy",
+                        "testProfile": "sync-heavy",
                     },
                     "dropbox-ip": "",
                     "dropbox-port": ""
@@ -155,11 +156,24 @@ class Commands(object):
             self.is_running = True
             # TODO loop
             operations = 0
+
+            data = {
+                'metrics': metrics,
+                'tags': tags
+            }
+            msg = json.dumps(data)
+
+            ## setup pika sender settings
+            self.rmq_channel.basic_publish(
+                exchange='metrics_ops',
+                routing_key=self.hostname,
+                body=msg)
+
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
-                self.stereotype_executor.execute()
+                operation_executed = self.stereotype_executor.execute()
                 # time.sleep(3)
-                print colored("[TEST]: INFO {} --> {} // {} // {} ".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory), 'red')
+                print colored("[TEST]: INFO {} --> {} // {} // {} // {}".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory, operation_executed), 'red')
         else:
             print '[TEST]: WARNING: need warmup 1st!'
 
@@ -236,7 +250,7 @@ class Commands(object):
 
 
 class ExecuteRMQ(object):
-    def __init__(self, rmq_url='', host_queue='', profile=''):
+    def __init__(self, rmq_url='', host_queue='', profile='', hostname="TEST"):
         """
         This class contains the rabbitmq request handlers, that will call Commands contained in Commands class
         :param rmq_url: url where the rabbitmq server is hosted
@@ -247,7 +261,7 @@ class ExecuteRMQ(object):
         print "Executor operation consumer: "
         url = urlparse.urlparse(rmq_url)
         self.profile = profile
-        self.actions = Commands(profile)
+        self.actions = Commands(receipt=profile, hostname=hostname)
         self.queue_name = host_queue
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=url.hostname,
@@ -301,7 +315,7 @@ if __name__ == '__main__':
         rmq_url = r.read().splitlines()[0]
     dummyhost = None
     # start the ftp sender
-    stereotype_receipt = 'backup-heavy'
+    stereotype_receipt = 'sync-heavy'
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
     queue_name = '{}.{}'.format(dummyhost, 'executor')
@@ -311,7 +325,7 @@ if __name__ == '__main__':
         singleton()
         while True:
             # try:
-            executor = ExecuteRMQ(rmq_url, queue_name, stereotype_receipt)
+            executor = ExecuteRMQ(rmq_url=rmq_url, host_queue=queue_name, profile=stereotype_receipt, hostname=dummyhost)
             # todo fer que stereotype_receipt y personal cloud sigui dinamic
             executor.listen()
             # except Exception as ex:
@@ -320,7 +334,7 @@ if __name__ == '__main__':
 
     else:
         profile = "StackSync"
-        actions = Commands(receipt=stereotype_receipt)
+        actions = Commands(receipt=stereotype_receipt, hostname=dummyhost)
         while True:
             print 'write command: hello|warmup|start|stop'
             teclat = raw_input()
