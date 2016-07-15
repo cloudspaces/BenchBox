@@ -1,5 +1,5 @@
 import publisher_credentials
-import traceback
+import traceback, os
 from plugin.pub_box import Box as box
 from plugin.pub_clouddrive import CloudDrive as clouddrive
 from plugin.pub_dropbox import Dropbox as dropbox
@@ -32,8 +32,12 @@ class Publisher(object):
         :param remote_path:
         :return:
         """
+        send_output_to = os.path.relpath(os.path.dirname(local_file_path), dst_remote_path)  # / == output
+
+        print local_file_path, "Send to remote: ", send_output_to
+
         # try:
-        self.action.publish(local_file_path, dst_remote_path)
+        # self.action.publish(local_file_path, send_output_to)
         return 0
         # except Exception as ex:
         #     print ex.message
