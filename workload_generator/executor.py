@@ -93,7 +93,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         '''Get the time to wait for this transition in millis'''
         to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
         print "Wait: {}s".format(to_wait)
-        to_wait = random.randint(MIN_WAITING_TIME, MAX_WAITING_TIME)
+        to_wait = random.uniform(MIN_WAITING_TIME, MAX_WAITING_TIME)
         time.sleep(to_wait)
         action.perform_action(self.ftp_client.keep_alive())
 
@@ -108,7 +108,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             action = UpdateFile(synthetic_file_name, FS_SNAPSHOT_PATH)
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
             print "Wait: {}s".format(to_wait)
-            to_wait = random.randint(MIN_WAITING_TIME, MAX_WAITING_TIME)
+            to_wait = random.uniform(MIN_WAITING_TIME, MAX_WAITING_TIME)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
 
@@ -123,7 +123,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             '''Get the time to wait for this transition in millis'''
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
             print "Wait: {}s".format(to_wait)
-            to_wait = random.randint(MIN_WAITING_TIME, MAX_WAITING_TIME)
+            to_wait = random.uniform(MIN_WAITING_TIME, MAX_WAITING_TIME)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
         else:
@@ -142,7 +142,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             '''Get the time to wait for this transition in millis'''
             to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
             print "Wait: {}s".format(to_wait)
-            to_wait = random.randint(MIN_WAITING_TIME, MAX_WAITING_TIME)
+            to_wait = random.uniform(MIN_WAITING_TIME, MAX_WAITING_TIME)
             time.sleep(to_wait)
             action.perform_action(self.ftp_client.keep_alive())
         else:
@@ -160,7 +160,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         # b.publish('sample/sample.txt', '/aaaa/sample.txt')
         publisher.publish(synthetic_file_name, FS_SNAPSHOT_PATH)  #
         print "Wait: {}s".format(to_wait)
-        to_wait = random.randint(MIN_WAITING_TIME, MIN_WAITING_TIME)
+        to_wait = random.uniform(MIN_WAITING_TIME, MIN_WAITING_TIME)
         time.sleep(to_wait)
 
         # action.perform_action(ftp_client)
@@ -173,7 +173,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             print "Wait: {}s".format(to_wait)
         except Exception as ex:
             print ex.message
-        to_wait = random.randint(MAX_WAITING_TIME, MIN_WAITING_TIME)
+        to_wait = random.uniform(MAX_WAITING_TIME, MIN_WAITING_TIME)
         time.sleep(to_wait)  # itv between last operation and idle
 
     def doSTART(self, op_name="START", personal_cloud=None):
@@ -184,7 +184,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             print "Wait: {}s".format(to_wait)
         except Exception as ex:
             print ex.message
-        to_wait = random.randint(MAX_WAITING_TIME, MIN_WAITING_TIME)
+        to_wait = random.uniform(MAX_WAITING_TIME, MIN_WAITING_TIME)
         time.sleep(to_wait)  # itv between start and 1st operation
 
 

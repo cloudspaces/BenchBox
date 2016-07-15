@@ -60,9 +60,9 @@ SANDBOX_IP = '192.168.56.101'
 BENCHBOX_IP = '192.168.56.2'
 CPU_MONITOR_PORT = 11000
 
-MAX_WAITING_TIME = 60*30 #For our experiments, the max waiting time is set to 30 mins
-MIN_WAITING_TIME = 0.1 #For our experiments, the min waiting time is set to 0.1 secs
-FILE_SIZE_MAX = 100000000 # max file size 100 MB
+MAX_WAITING_TIME = 60*30  #For our experiments, the max waiting time is set to 30 mins
+MIN_WAITING_TIME = 0.1   #For our experiments, the min waiting time is set to 0.1 secs
+FILE_SIZE_MAX = 100000000  # max file size 100 MB
 
 TO_WAIT_STATIC = 0  # 0 means use fitting
 
