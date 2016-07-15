@@ -74,6 +74,34 @@ class Commands(object):
         self.execute = None
         # self.data_generator = DataGenerator()
 
+        if os.name == "nt":
+            self.platform_is_windows = True
+            self.rmq_path = '/Users/vagrant/vagrant/rabbitmq'
+        else:
+            self.platform_is_windows = False
+            self.rmq_path = "rabbitmq"
+
+        self.rmq_path_url = None
+
+        with open(self.rmq_path, 'r') as read_file:
+            self.rmq_path_url = read_file.read().splitlines()[0]
+        self.rmq_url = urlparse.urlparse(self.rmq_path_url)
+        self.rmq_connection = None
+        try:
+            self.rmq_connection = pika.BlockingConnection(
+                pika.ConnectionParameters(
+                    host=self.rmq_url.hostname,
+                    heartbeat_interval=5,
+                    virtual_host=self.rmq_url.path[1:],
+                    credentials=pika.PlainCredentials(self.rmq_url.username, self.rmq_url.password)
+                )
+            )
+        except Exception as ex:
+            print ex.message
+            exit(0)
+            # failed to create rabbit connection
+        self.rmq_channel = self.rmq_connection.channel()
+
         # start the monitoring stuff. # todo
         # send to impala always...!!!
         # sshpass -p vagrant rsync -rvnc --delete ../output/ vagrant@192.168.56.101:stacksync_folder/
