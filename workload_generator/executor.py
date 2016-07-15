@@ -45,7 +45,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         self.rmq_path = "rabbitmq"
         self.dummyhostname_path = "hostname"
         self.rmq_path_url = None
-        with open(self.hostname_path, 'r') as f:
+        with open(self.dummyhostname_path, 'r') as f:
             self.dummyhostname = f.read().splitlines()[0]
 
         with open(self.rmq_path, 'r') as read_file:
