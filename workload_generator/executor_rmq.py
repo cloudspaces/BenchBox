@@ -60,11 +60,12 @@ class Commands(object):
 
     def __init__(self, receipt, hostname):
         print '[INIT_EXECUTOR_RMQ]: rpc commands'
-        self.hostname = hostname # the name of the dummyHost
+        self.hostname = hostname  # the name of the dummyHost
         self.is_warmup = False
         self.is_running = False
         self.sync_directory = None  # stacksync_folder, Dropbox, ....
         self.target_ftp_target = None
+        self.target_personal_cloud = None # Dropbox, Box, GoogleDrive
         self.stereotype = receipt  # backupsample
         self.stereotype_executor = None
         self.monitor_state = "Unknown"
@@ -102,6 +103,7 @@ class Commands(object):
                         "testTarget": "linux",
                         "testFolder": "Dropbox",
                         "testProfile": "sync-heavy",
+                        "testClient": "dropbox"
                     },
                     "dropbox-ip": "",
                     "dropbox-port": ""
@@ -117,6 +119,7 @@ class Commands(object):
             self.sync_directory = body['msg']['test']['testFolder']
             self.stereotype_executor = StereotypeExecutorU1()  # tornar a assignar
 
+            self.target_personal_cloud = body['msg']['testClient']
             self.target_ftp_target = body['msg']['test']['testTarget']
             self.target_ftp_home = None
 
@@ -158,8 +161,8 @@ class Commands(object):
             operations = 0
 
             data = {
-                'metrics': metrics,
-                'tags': tags
+                'metrics': {},
+                'tags': {}
             }
             msg = json.dumps(data)
 
@@ -171,7 +174,7 @@ class Commands(object):
 
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
-                operation_executed = self.stereotype_executor.execute()
+                operation_executed = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
                 # time.sleep(3)
                 print colored("[TEST]: INFO {} --> {} // {} // {} // {}".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory, operation_executed), 'red')
         else:
