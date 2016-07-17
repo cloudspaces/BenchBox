@@ -38,6 +38,10 @@ class Publisher(object):
 
         # try:
         self.action.publish(local_file_path, send_to_remote)
+        # while True:
+        #     # try download the uploaded file
+        #     # not try download check if exists.
+        #     pass
         return 0
         # except Exception as ex:
         #     print ex.message
