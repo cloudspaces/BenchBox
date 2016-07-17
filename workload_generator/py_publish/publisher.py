@@ -32,12 +32,12 @@ class Publisher(object):
         :param remote_path:
         :return:
         """
-        send_output_to = os.path.relpath(os.path.dirname(local_file_path), dst_remote_path)  # / == output
-
-        print local_file_path, "Send to remote: ", send_output_to
+        send_output_to = os.path.relpath(local_file_path, dst_remote_path)  # / == output
+        send_to_remote = "/{}".format(send_output_to)
+        print local_file_path, "Send to remote: ", send_to_remote
 
         # try:
-        # self.action.publish(local_file_path, send_output_to)
+        self.action.publish(local_file_path, send_to_remote)
         return 0
         # except Exception as ex:
         #     print ex.message
