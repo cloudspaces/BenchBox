@@ -100,12 +100,15 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
     def execute(self, personal_cloud=None):
         '''Get the next operation to be done'''
-        self.operation_chain.next_step_in_random_navigation()
-        to_execute = getattr(self, 'do' + self.operation_chain.current_state)
+        self.next_operation()
+        to_execute = getattr(self, 'do_' + self.next_action.lower())
         return self.operation_chain.current_state,  to_execute(personal_cloud=personal_cloud)
 
+    def update_current_time(self):
+        self.current_time = time.time()
 
-    def doUPLOAD(self, op_name="UPLOAD", personal_cloud=None):
+
+    def do_upload(self, op_name="UPLOAD", personal_cloud=None):
         print colored(op_name, 'cyan')
         synthetic_file_name, isFile = self.data_generator.create_file_or_directory()
         print "{} :>>> NEW ".format(synthetic_file_name)
@@ -114,12 +117,12 @@ class StereotypeExecutorU1(StereotypeExecutor):
         else:
             action = CreateDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
         '''Get the time to wait for this transition in millis'''
-        to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
+        to_wait = self.get_waiting_time()
         action.perform_action(self.ftp_client.keep_alive())
         return to_wait
 
 
-    def doSYNC(self, op_name="SYNC", personal_cloud=None):
+    def do_sync(self, op_name="SYNC", personal_cloud=None):
         print colored(op_name, 'green')
         synthetic_file_name = self.data_generator.update_file()
         print synthetic_file_name
@@ -128,11 +131,11 @@ class StereotypeExecutorU1(StereotypeExecutor):
             return 0
         else:
             action = UpdateFile(synthetic_file_name, FS_SNAPSHOT_PATH)
-            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
+            to_wait = self.get_waiting_time()
             action.perform_action(self.ftp_client.keep_alive())
             return to_wait
 
-    def doDELETE(self, op_name="DELETE", personal_cloud=None):
+    def do_delete(self, op_name="DELETE", personal_cloud=None):
         print colored(op_name, 'yellow')
         synthetic_file_name, isFile = self.data_generator.delete_file_or_directory()
         if not synthetic_file_name is None:
@@ -141,14 +144,14 @@ class StereotypeExecutorU1(StereotypeExecutor):
             else:
                 action = DeleteDirectory(synthetic_file_name, FS_SNAPSHOT_PATH)
             '''Get the time to wait for this transition in millis'''
-            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
+            to_wait = self.get_waiting_time()
             action.perform_action(self.ftp_client.keep_alive())
             return to_wait
         else:
             print "No file selected!"
             return 0
 
-    def doMOVE(self, op_name="MOVE", personal_cloud=None):
+    def do_move(self, op_name="MOVE", personal_cloud=None):
         print colored(op_name, 'magenta')
         synthetic_file_name, isFile = self.data_generator.move_file_or_directory()
         print synthetic_file_name
@@ -159,17 +162,17 @@ class StereotypeExecutorU1(StereotypeExecutor):
             else:
                 action = MoveDirectory(src_mov, FS_SNAPSHOT_PATH, tgt_mov)
             '''Get the time to wait for this transition in millis'''
-            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
+            to_wait = self.get_waiting_time()
             action.perform_action(self.ftp_client.keep_alive())
             return to_wait
         else:
             print "No file selected!"
             return 0
 
-    def doDOWNLOAD(self, op_name="DOWNLOAD", personal_cloud=None):
+    def do_download(self, op_name="DOWNLOAD", personal_cloud=None):
         print colored(op_name, 'blue')
         '''Get the time to wait for this transition in millis'''
-        to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
+        to_wait = self.get_waiting_time()
         synthetic_file_name = self.data_generator.create_file()
         print "{} :>>> PUBLISH: ".format(synthetic_file_name)
         publisher = Publisher(personal_cloud=personal_cloud)
@@ -177,21 +180,21 @@ class StereotypeExecutorU1(StereotypeExecutor):
         publisher.publish(synthetic_file_name, FS_SNAPSHOT_PATH)  #
         return to_wait
 
-    def doIDLE(self, op_name="IDLE", personal_cloud=None):
+    def od_idle(self, op_name="IDLE", personal_cloud=None):
         print colored(op_name, 'blue')
         try:
             '''Get the time to wait for this transition in millis'''
-            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
+            to_wait = self.get_waiting_time()
             return to_wait
         except Exception as ex:
             print ex.message
             return 0
 
-    def doSTART(self, op_name="START", personal_cloud=None):
+    def do_start(self, op_name="START", personal_cloud=None):
         print colored(op_name, 'blue')
         try:
             '''Get the time to wait for this transition in millis'''
-            to_wait = self.inter_arrivals_manager.get_waiting_time(self.current_operation, op_name)
+            to_wait = self.get_waiting_time()
             return to_wait
         except Exception as ex:
             print ex.message
@@ -215,10 +218,9 @@ class StereotypeExecutorU1(StereotypeExecutor):
             'metrics': metrics,
             'tags': tags
         }
-        msg = json.dumps(data)
-        ## setup pika sender settings
+        msg = json.dumps(data)  # setup pika sender settings
         self.rmq_channel.basic_publish(
-            exchange='metrics_ops',
+            exchange='metrics_ops',  # rabbit queue that receive these messages
             routing_key=hostname,
             body=msg)
 

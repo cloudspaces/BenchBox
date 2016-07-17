@@ -102,7 +102,7 @@ class Commands(object):
                     "test": {
                         "testTarget": "linux",
                         "testFolder": "Dropbox",
-                        "testProfile": "sync-heavy",
+                        "testProfile": "download-heavy",
                         "testClient": "dropbox"
                     },
                     "dropbox-ip": "",
@@ -170,7 +170,7 @@ class Commands(object):
                     personal_cloud=self.target_personal_cloud,
                     hostname=self.hostname)
                 print to_wait, operation_executed
-                time.sleep(5)
+                time.sleep(10)
                 print colored("[TEST]: INFO {} --> {} // {} // {} // {}".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory, operation_executed), 'red')
         else:
             print '[TEST]: WARNING: need warmup 1st!'
@@ -314,7 +314,7 @@ if __name__ == '__main__':
         rmq_url = r.read().splitlines()[0]
     dummyhost = None
     # start the ftp sender
-    stereotype_receipt = 'sync-heavy'
+    stereotype_receipt = 'download-heavy'
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
     queue_name = '{}.{}'.format(dummyhost, 'executor')
@@ -345,7 +345,7 @@ if __name__ == '__main__':
             except AttributeError as e:
                 print e.message
                 print "ACK: {}".format(teclat)
-            time.sleep(1)
+            time.sleep(5)
 
 
 
