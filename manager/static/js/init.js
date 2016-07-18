@@ -421,19 +421,20 @@ angular.module('app', ['ngRoute', 'ngResource'])
                     // monitor start
                     $scope.run.testMonitor = 'start';
                     $scope.rmq('test-check', 'monitor', 'monitor');
-
+                    
                     // executor warmup
                     console.log('MonitorStart');
                     $scope.run.testOperation = 'warmup'; // hello / warmup / start / stop
                     $scope.rmq('test-check', 'executor', 'executor');
                     console.log('ExecutorWarmup');
-
-
+         
                     // start
-                    $scope.run.testOperation = 'start'; // hello / warmup / start / stop
-                    $scope.rmq('test-check', 'executor', 'executor');
-                    console.log('ExecutorStart');
-
+                    setTimeout(function(){
+                        $scope.run.testOperation = 'start'; // hello / warmup / start / stop
+                        $scope.rmq('test-check', 'executor', 'executor');
+                        console.log('ExecutorStart');
+                    }, 3000);
+                    
                     // Now can stop
                     // ponemos un temporizador de 5S hasta que se pueda volver a empezar lo correcto seria imponer
                     // cuando todos los hosts que se van a aplicar coincidan de estado, o tener dos botones...
