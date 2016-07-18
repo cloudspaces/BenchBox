@@ -186,7 +186,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         publisher.publish(synthetic_file_name, FS_SNAPSHOT_PATH)  #
         return to_wait
 
-    def od_idle(self, op_name="IDLE", personal_cloud=None):
+    def do_idle(self, op_name="IDLE", personal_cloud=None):
         print colored(op_name, 'blue')
         try:
             '''Get the time to wait for this transition in millis'''

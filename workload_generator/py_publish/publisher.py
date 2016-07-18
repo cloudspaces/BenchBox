@@ -23,7 +23,7 @@ class Publisher(object):
         if personal_cloud is None:
             raise NotImplemented
         else:
-            self.action = eval("{}".format(personal_cloud))()
+            self.action = eval("{}".format(personal_cloud.lower()))()
 
     def publish(self, local_file_path, dst_remote_path = "/"):
         """
