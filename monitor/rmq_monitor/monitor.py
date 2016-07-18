@@ -62,7 +62,7 @@ class Monitor(object):
                     "dropbox-port": ""
                 }
             }
-
+        self._sync_client_selector(request=body)
         self.sync_client.hello(body)
         return 0, "[Hello]: response"
         #    return 0  # successfully logged to personal cloud service
@@ -86,9 +86,9 @@ class Monitor(object):
                     "dropbox-port": ""
                 }
             }
-
+        self._sync_client_selector(request=body)
         self.monitor_state = "start_monitor"
-        if not self.is_monitor_capturing:  # if not capturing start otherwise noop
+        if not self.sync_client.is_monitor_capturing:  # if not capturing start otherwise noop
             self.sync_client.start(body)
         return 0, "[Start]: response"
 
@@ -107,7 +107,7 @@ class Monitor(object):
                     "dropbox-port": ""
                 }
             }
-
+        self._sync_client_selector(request=body)
         self.monitor_state = "warmup_monitor"
         self.sync_client.warmup(body)
         return 0, "[Warmup]: response"
@@ -129,9 +129,9 @@ class Monitor(object):
             }
 
         print body
-
+        self._sync_client_selector(request=body)
         self.monitor_state = "stop_monitor"
-        if self.is_monitor_capturing:  # if its capturing, stop it to capture
+        if self.sync_client.is_monitor_capturing:  # if its capturing, stop it to capture
             self.sync_client.stop(body)
         # else:
         #     self.client.stop(body)  # remove this
@@ -155,3 +155,16 @@ class Monitor(object):
 
         # self.monitor_state = ""
         return "{} -> {}".format(datetime.datetime.now().isoformat(), self.executor_state)
+
+
+    """
+    Personal Cloud
+    """
+    def _sync_client_selector(self, request=None):
+        personal_cloud = request['msg']['test']['testClient']
+        if self.sync_client is None:
+            if personal_cloud is None:
+                self.sync_client = eval("{}".format(personal_cloud))(self.hostname)
+        #     # raise NotImplemented
+        #     return 0  # if no personal cloud is forwarded
+        #
