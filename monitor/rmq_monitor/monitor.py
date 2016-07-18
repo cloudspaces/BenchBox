@@ -88,7 +88,7 @@ class Monitor(object):
             }
 
         self.monitor_state = "start_monitor"
-        if not self.sync_client.is_monitor_capturing:  # if not capturing start otherwise noop
+        if not self.is_monitor_capturing:  # if not capturing start otherwise noop
             self.sync_client.start(body)
         return 0, "[Start]: response"
 
@@ -129,7 +129,7 @@ class Monitor(object):
             }
 
         self.monitor_state = "stop_monitor"
-        if self.sync_client.is_monitor_capturing:  # if its capturing, stop it to capture
+        if self.is_monitor_capturing:  # if its capturing, stop it to capture
             self.sync_client.stop(body)
         # else:
         #     self.client.stop(body)  # remove this
