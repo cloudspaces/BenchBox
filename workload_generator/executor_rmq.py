@@ -230,8 +230,8 @@ class Commands(object):
         self.is_warmup = False
         print "clear the content of the sintetic workload generator filesystem"
         remove_inner_path('/home/vagrant/output/*')  # clear the directory after stoping the workload_generator
-        # time.sleep(10)
-        # exit(0), prevents the monitor being killed
+        time.sleep(3)
+        # exit(0) # , prevents the monitor being killed
         return response_msg
 
     def keepalive(self, body=None):

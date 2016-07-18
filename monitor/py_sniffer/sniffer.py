@@ -46,8 +46,6 @@ class Sniffer(Thread):
         # time.sleep(5)
         print "Quit parent.kill()"
         parent_process.kill()
-
-
         # print "Quited"
 
     def cancel(self):

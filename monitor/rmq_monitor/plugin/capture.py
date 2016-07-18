@@ -21,6 +21,10 @@ class Capture(object):
         print "Constructor: "
         self.hostname = hostname
 
+        self.personal_cloud = None
+        self.personal_cloud_ip = None
+        self.personal_cloud_port = None
+
         if os.name == "nt":
             self.platform_is_windows = True
             self.rmq_path = '/Users/vagrant/vagrant/rabbitmq'
@@ -244,8 +248,12 @@ class Capture(object):
 
     def start(self, body):
         self.personal_cloud = body['msg']['test']['testClient']
-        self.personal_cloud_ip = body['msg']['{}-ip'.format(self.personal_cloud.lower())]
-        self.personal_cloud_port = body['msg']['{}-port'.format(self.personal_cloud.lower())]
+        try:
+            self.personal_cloud_ip = body['msg']['{}-ip'.format(self.personal_cloud.lower())]
+            self.personal_cloud_port = body['msg']['{}-port'.format(self.personal_cloud.lower())]
+        except KeyError:
+            pass  # public cloud has none this args
+
         self.sync_client = Thread(target=self._pc_client)
         self.sync_client.start()
         self.monitor = Thread(target=self._test)
