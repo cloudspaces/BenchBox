@@ -128,6 +128,8 @@ class Monitor(object):
                 }
             }
 
+        print body
+
         self.monitor_state = "stop_monitor"
         if self.is_monitor_capturing:  # if its capturing, stop it to capture
             self.sync_client.stop(body)
