@@ -4,7 +4,7 @@ from plugin.capture_dropbox import Dropbox as dropbox
 from plugin.capture_googledrive import GoogleDrive as googledrive
 from plugin.capture_owncloud import OwnCloud as ownloud
 from plugin.capture_stacksync import StackSync as stacksync
-
+import psutil
 
 # this class will be invoked by monitor_rmq
 # this class has an instance monitor_py and sniffer_py
@@ -135,6 +135,7 @@ class Monitor(object):
             self.sync_client.stop(body)
         # else:
         #     self.client.stop(body)  # remove this
+
 
         return 0, "[Stop]: response"
 

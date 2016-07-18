@@ -210,7 +210,7 @@ class Capture(object):
         # metric values generator
 
         operations = 0
-        while self.is_sync_client_running:
+        while self.is_sync_client_running and self.is_monitor_capturing:
             # while the client is running
             operations += 1
             self.is_sync_client_running = self.notify_status()  # at each emit report if pid still running
@@ -218,7 +218,7 @@ class Capture(object):
             time.sleep(1)  # metric each second
 
         print "QUIT emit metrics"
-        exit(0)
+
     def _pc_client(self):
 
         print "start running [{}] {}".format(self.proc_name, self.pc_cmd)
@@ -242,9 +242,11 @@ class Capture(object):
                 if is_running:
                     self.is_sync_client_running = True
                     self.sync_client_proc_pid = client_pid
+                    print "SYNC client running with pid[{}]".format(client_pid)
             except Exception as ex:
                 print ex.message
                 print "Couldn't load sync client"
+
 
     def start(self, body):
         self.personal_cloud = body['msg']['test']['testClient']
@@ -280,13 +282,13 @@ class Capture(object):
         # how to stop the process in windows ... todo lookup by psutil and clean up
         self.is_monitor_capturing = False
         self.is_sync_client_running = False
-        self.monitor.join()
-        self.sync_client.join()
+        # self.monitor.join()
+        # self.sync_client.join()
 
         self.traffic_monitor.rage_quit()
-        exit(0)
+        # self.sync_client_proc_pid
         # how to stop process
-        if self.platform_is_windows: # stop in windows
+        if self.platform_is_windows:  # stop in windows
             for proc in psutil.process_iter():
                 if proc.name() == self.proc_name:
                     proc.kill()  # force quit like a boss

@@ -223,15 +223,14 @@ class Commands(object):
             print '[STOP_TEST]: stop test {}'.format(body)
             self.is_running = False
             self.is_warmup = False
-            self.execute.join()
-            exit(0) # , prevents the monitor being killed
+            # self.execute.join() => es para sol amb el is_running
             self.monitor_state = "executor Stopped!"
             response_msg = '[STOP_TEST]: SUCCESS: stop test'
         else:
             response_msg = '[STOP_TEST]: WARNING: no test is running'
+            self.is_warmup = False
 
         self.is_warmup = False
-
         return response_msg
 
     def keepalive(self, body=None):
