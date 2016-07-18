@@ -214,7 +214,7 @@ class Commands(object):
                     "dropbox-port": ""
                 }
             }
-
+        print body
 
         if self.is_running:
             print '[STOP_TEST]: stop test {}'.format(body)
@@ -231,7 +231,7 @@ class Commands(object):
         print "clear the content of the sintetic workload generator filesystem"
         remove_inner_path('/home/vagrant/output/*')  # clear the directory after stoping the workload_generator
         # time.sleep(10)
-        exit(0)
+        # exit(0), prevents the monitor being killed
         return response_msg
 
     def keepalive(self, body=None):
