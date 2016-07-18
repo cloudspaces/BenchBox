@@ -3,6 +3,7 @@
 # CHENGLONG ZOU
 # 2015/16
 #
+VAGRANT_API_VERSION="2"
 box = 'debian-7.0-amd64.box'
 box_sand = 'chenglong/sandbox'
 box_bench = 'chenglong/benchbox'
@@ -17,11 +18,14 @@ nodes = [
     {:hostname => 'benchBox', :ip => '192.168.56.2', :box => box_bench, :shared_folder=>'../workload_generator',
      :shared_folder_as=> '/home/vagrant/workload_generator'}
 ]
-Vagrant.configure("2") do |config|
+Vagrant.configure(VAGRANT_API_VERSION) do |config|
   nodes.each do |node|
     config.vm.define node[:hostname] do |nodeconfig|
-      puts "BOX/LOAD"
+      puts "BOX/LOAD #{node[:hostname]}"
+      
       # nodeconfig.vm.box_url = box_url
+      nodeconfig.ssh.username = "vagrant"
+      nodeconfig.ssh.password = "vagrant"
       nodeconfig.vm.box = node[:box]
       nodeconfig.vm.hostname = node[:hostname] # capat: hostnamectl
       nodeconfig.vm.network :private_network, ip: node[:ip]

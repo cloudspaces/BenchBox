@@ -22,11 +22,11 @@ node 'benchBox' {
       path    => ['/usr/bin', '/bin/']
   }
 
-  file{
-     '/home/vagrant/application.properties'
-     ensure => file,
-     source => 'puppet:///files/application.properties'
-  }
+  # file{
+  #    '/home/vagrant/application.properties':
+  #    ensure => file,
+  #    source => 'puppet:///files/application.properties'
+  # }
 
 
 }
