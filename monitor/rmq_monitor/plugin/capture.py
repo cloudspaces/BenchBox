@@ -218,7 +218,7 @@ class Capture(object):
             time.sleep(1)  # metric each second
 
         print "QUIT emit metrics"
-
+        exit(0)
     def _pc_client(self):
 
         print "start running [{}] {}".format(self.proc_name, self.pc_cmd)
@@ -284,7 +284,7 @@ class Capture(object):
         self.sync_client.join()
 
         self.traffic_monitor.rage_quit()
-
+        exit(0)
         # how to stop process
         if self.platform_is_windows: # stop in windows
             for proc in psutil.process_iter():

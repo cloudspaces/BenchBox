@@ -45,8 +45,10 @@ class Sniffer(Thread):
         self.target.capture_quit()
         # time.sleep(5)
         print "Quit parent.kill()"
-        # parent_process.kill()
+        parent_process.kill()
+        print "Do exit"
         # print "Quited"
+
 
     def cancel(self):
         '''

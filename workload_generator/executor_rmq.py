@@ -171,7 +171,7 @@ class Commands(object):
                     hostname=self.hostname)
                 print to_wait, operation_executed
                 time.sleep(10)
-                print colored("[TEST]: INFO {} --> {} // {} // {} // {}".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory, operation_executed), 'red')
+                print colored("[TEST]: INFO {} --> {} // {} // {} // {}({})s".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory, operation_executed, to_wait), 'red')
         else:
             print '[TEST]: WARNING: need warmup 1st!'
 
@@ -216,22 +216,22 @@ class Commands(object):
             }
         print body
 
+        print "clear the content of the sintetic workload generator filesystem"
+        remove_inner_path('/home/vagrant/output/*')  # clear the directory after stoping the workload_generator
+
         if self.is_running:
             print '[STOP_TEST]: stop test {}'.format(body)
             self.is_running = False
             self.is_warmup = False
             self.execute.join()
-
+            exit(0) # , prevents the monitor being killed
             self.monitor_state = "executor Stopped!"
             response_msg = '[STOP_TEST]: SUCCESS: stop test'
         else:
             response_msg = '[STOP_TEST]: WARNING: no test is running'
 
         self.is_warmup = False
-        print "clear the content of the sintetic workload generator filesystem"
-        remove_inner_path('/home/vagrant/output/*')  # clear the directory after stoping the workload_generator
-        time.sleep(3)
-        # exit(0) # , prevents the monitor being killed
+
         return response_msg
 
     def keepalive(self, body=None):
@@ -318,10 +318,10 @@ if __name__ == '__main__':
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
     queue_name = '{}.{}'.format(dummyhost, 'executor')
+    singleton()
     if len(sys.argv) == 1:  # means no parameters
         # DEFAULT: dummy
         # use file look
-        singleton()
         while True:
             # try:
             executor = ExecuteRMQ(rmq_url=rmq_url, host_queue=queue_name, profile=stereotype_receipt, hostname=dummyhost)

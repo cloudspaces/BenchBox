@@ -20,7 +20,8 @@ class Dropbox(Sniff):
         return self.capture_thread
 
     def capture_quit(self):
-        Thread.join(self.capture_thread, timeout=1)
+        # Thread.join(self.capture_thread, timeout=1) this never happens
+        pass
 
     def hello(self):
         print "{} say hello".format(self.whoami)
