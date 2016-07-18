@@ -272,8 +272,6 @@ class Capture(object):
     def stop(self, body):
         print "try stop..."
         self.personal_cloud = body['msg']['test']['testClient']
-        self.personal_cloud_ip = body['msg']['{}-ip'.format(self.personal_cloud.lower())]
-        self.personal_cloud_port = body['msg']['{}-port'.format(self.personal_cloud.lower())]
 
         self.remove_inner_path(self.sync_folder_cleanup)
         print "{} say stop".format(self.whoami)
