@@ -88,9 +88,10 @@ class Monitor(object):
             }
         self._sync_client_selector(request=body)
         self.monitor_state = "start_monitor"
+        result = None
         if not self.sync_client.is_monitor_capturing:  # if not capturing start otherwise noop
-            self.sync_client.start(body)
-        return 0, "[Start]: response"
+            result = self.sync_client.start(body)
+        return 0, "[Start]: response {}".format(result)
 
     '''
     RMQ request to warmup the dummyhost=>[sandbox|benchbox]
@@ -131,13 +132,13 @@ class Monitor(object):
         print body
         self._sync_client_selector(request=body)
         self.monitor_state = "stop_monitor"
+        result = None
         if self.sync_client.is_monitor_capturing:  # if its capturing, stop it to capture
-            self.sync_client.stop(body)
+            result = self.sync_client.stop(body)
         # else:
         #     self.client.stop(body)  # remove this
 
-
-        return 0, "[Stop]: response"
+        return 0, "[Stop]: response {}".format(result)
 
     '''
     RMQ request to display the executor status

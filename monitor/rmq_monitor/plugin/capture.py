@@ -267,7 +267,7 @@ class Capture(object):
         self.traffic_monitor.run()
 
 
-        print "{} say start".format(self.whoami)
+        return "{} say start".format(self.whoami)
         # self.sync_client = None
         # self.monitor = None
 
@@ -276,7 +276,7 @@ class Capture(object):
         self.personal_cloud = body['msg']['test']['testClient']
 
         self.remove_inner_path(self.sync_folder_cleanup)
-        print "{} say stop".format(self.whoami)
+
         # self.sync_client = None
         # self.monitor = None
         # how to stop the process in windows ... todo lookup by psutil and clean up
@@ -285,7 +285,8 @@ class Capture(object):
         # self.monitor.join()
         # self.sync_client.join()
 
-        self.traffic_monitor.rage_quit()
+        # self.traffic_monitor.rage_quit()
+
         # self.sync_client_proc_pid
         # how to stop process
         if self.platform_is_windows:  # stop in windows
@@ -298,6 +299,8 @@ class Capture(object):
                 fields = line.split()
                 proc_pid = fields[0]
                 os.kill(int(proc_pid), signal.SIGKILL)
+
+        return "{} say stop".format(self.whoami)
 
     @staticmethod
     def remove_inner_path(path):
