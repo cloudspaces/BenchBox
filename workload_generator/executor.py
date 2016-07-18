@@ -41,11 +41,17 @@ class StereotypeExecutorU1(StereotypeExecutor):
         # el keep alive puede ser por run o por to_wait operation...
 
     def initialize_rmq_channel(self):
-        self.rmq_path = "rabbitmq"
         self.rmq_path_url = None
 
-        with open(self.rmq_path, 'r') as read_file:
-            self.rmq_path_url = read_file.read().splitlines()[0]
+        try:
+            self.rmq_path = "rabbitmq"
+            with open(self.rmq_path, 'r') as read_file:
+                self.rmq_path_url = read_file.read().splitlines()[0]
+        except IOError:
+            self.rmq_path = "/vagrant/rabbitmq"
+            with open(self.rmq_path, 'r') as read_file:
+                self.rmq_path_url = read_file.read().splitlines()[0]
+
         self.rmq_url = urlparse.urlparse(self.rmq_path_url)
         self.rmq_connection = None
         try:
