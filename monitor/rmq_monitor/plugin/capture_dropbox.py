@@ -1,5 +1,5 @@
 from capture import Capture
-
+import pwd
 
 class Dropbox(Capture):
 
@@ -16,7 +16,13 @@ class Dropbox(Capture):
 
         else:
             # self.pc_cmd = "sudo -H -u {} bash -c '/usr/bin/dropbox start'".format('vagrant')
-            self.pc_cmd = "sudo -H -u {} bash -c '/usr/bin/dropbox start'".format('milax')
+            session_user = "vagrant"
+            try:
+                if pwd.getpwnam("milax").pw_uid == 1000:
+                    session_user = "milax"
+            except KeyError:
+                pass
+            self.pc_cmd = "sudo -H -u {} bash -c '/usr/bin/dropbox start'".format(session_user)
             # self.pc_cmd = "sudo -H -u vagrant bash -c '/usr/local/bin/dropbox start'"
             self.proc_name = "dropbox"
             self.sync_folder = "Dropbox"
