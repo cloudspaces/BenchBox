@@ -69,7 +69,7 @@ class Capture(object):
             )
         except Exception as ex:
             print ex.message
-            exit(0)
+            # exit(0)
             # failed to create rabbit connection
         self.rmq_channel = self.rmq_connection.channel()
         self.rmq_channel.exchange_declare(exchange='metrics', type='fanout')
