@@ -42,7 +42,7 @@ class MonitorRMQ(object):
         self.actions = Commands(hostname=self.hostname)
         self.queue_name = host_queue
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
-            heartbeat_interval=5,
+            heartbeat_interval=0,
             host=url.hostname,
             virtual_host=url.path[1:],
             credentials=pika.PlainCredentials(url.username, url.password)

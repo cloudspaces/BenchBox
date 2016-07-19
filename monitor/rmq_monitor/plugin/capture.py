@@ -62,7 +62,7 @@ class Capture(object):
             self.rmq_connection = pika.BlockingConnection(
                 pika.ConnectionParameters(
                     host=self.rmq_url.hostname,
-                    heartbeat_interval=5,
+                    heartbeat_interval=0,  # heartbeat forever
                     virtual_host=self.rmq_url.path[1:],
                     credentials=pika.PlainCredentials(self.rmq_url.username, self.rmq_url.password)
                 )

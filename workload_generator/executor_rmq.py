@@ -263,7 +263,7 @@ class ExecuteRMQ(object):
         self.queue_name = host_queue
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=url.hostname,
-            heartbeat_interval=5,
+            heartbeat_interval=0,  # unset heartbeat hope it running forever but none stable
             virtual_host=url.path[1:],
             credentials=pika.PlainCredentials(url.username, url.password)
         ))
