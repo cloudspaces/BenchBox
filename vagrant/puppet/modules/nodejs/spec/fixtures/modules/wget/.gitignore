@@ -1,7 +1,0 @@
-/.project
-/pkg
-/.rvmrc
-/spec/fixtures/manifests/
-/spec/fixtures/modules/
-/.rspec_system/
-/.vagrant

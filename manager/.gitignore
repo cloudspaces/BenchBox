@@ -29,6 +29,29 @@ VagrantBoxing.sh
 
 /.vagrant/machines/default/virtualbox
 
+routes/users.js
+routes/todos.js
+routes/servers.js
+routes/credentials.js
+
+static/js/backbone.js
+static/js/d3.js
+static/js/graphene.min.js
+static/js/jquery.graphite.js
+static/js/underscore.js
+static/js/webrtc-ips.js
+
+static/vendor/js
+
+
+
+
+static/html/todos.html
+static/html/template.html
+static/html/hostDummyTest.html
+static/html/todoDetails.html
+
+
 
 
 

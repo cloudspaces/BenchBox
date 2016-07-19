@@ -216,11 +216,11 @@ class StereotypeExecutorU1(StereotypeExecutor):
                 'hostname': hostname,
                 'client': personal_cloud,
                 'test_id': test_id,
-                'file_type': file_type
             }
 
         metrics = {
-            "file_size": "",
+            "file_size": file_size,
+            "file_type": file_type,
             'operation': operation_name,
             'file_size': file_size,
             'time': calendar.timegm(time.gmtime()) * 1000,
