@@ -283,7 +283,7 @@ class ConsumeAction(object):
             url = urlparse.urlparse(url_str)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=url.hostname,
-                    heartbeat_interval=5,
+                    heartbeat_interval=0,
                     virtual_host=url.path[1:],
                     credentials=pika.PlainCredentials(url.username, url.password)
             ))
