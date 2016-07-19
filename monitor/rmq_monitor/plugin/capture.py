@@ -22,6 +22,7 @@ class Capture(object):
         print "Constructor: "
         self.hostname = hostname
         self.sync_folder = None
+        self.sync_folder_cleanup = None
         self.personal_cloud = None
         self.personal_cloud_ip = None
         self.personal_cloud_port = None
@@ -316,7 +317,7 @@ class Capture(object):
         print "try stop..."
         self.personal_cloud = body['msg']['test']['testClient']
 
-        self.remove_inner_path(path="{}/*".format(self.sync_folder))
+        self.remove_inner_path(path=self.sync_folder_cleanup)
 
         # self.sync_client = None
         # self.monitor = None
