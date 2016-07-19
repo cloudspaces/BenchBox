@@ -270,9 +270,10 @@ amqp.connect(amqp_url, function (err, conn) {
             console.log(' [' + ex + '] waiting for client metric connection');
             ch.bindQueue(q.queue, ex, '');
             ch.consume(q.queue, function (msg) {
-                // console.log(" [" + ex + "] " + msg.content.toString());
+                console.log(" [" + ex + "] " + msg.content.toString());
                 ch.ack(msg);
                 var data = JSON.parse(msg.content);
+                // console.log(data)
                 var metrics = data.metrics;
                 var op_time = data.metrics.time;
                 var tags = data.tags;
