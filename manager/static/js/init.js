@@ -735,10 +735,7 @@ appendAllHosts = function (target, className) {
 notifyButtonById = function (btnId) {
     // self
 };
-
-$.fn.graphite.defaults.url = "https://" + location.hostname + ":8443/renderer/";
-$.fn.graphite.defaults.width = "450";
-$.fn.graphite.defaults.height = "300";
+ 
 
 
 $('#btnFixImage').click(function () {
