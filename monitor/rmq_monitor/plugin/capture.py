@@ -240,29 +240,31 @@ class Capture(object):
 
         print "start running [{}] {}".format(self.proc_name, self.pc_cmd)
         try_start = 10
-        while self.is_sync_client_running is False:
-            self.sync_proc = subprocess.Popen(self.pc_cmd, shell=True)
-            try_start -= 1
-            if try_start == 0:
-                print "Unable to start {}".format(self.personal_cloud)
-                break
-            time.sleep(3)
-            try:
-                #  pid lookup
-                is_running = False
-                client_pid = None
-                for proc in psutil.process_iter():
-                    if proc.name() == self.proc_name:
-                        is_running = True
-                        client_pid = proc.pid
-                        break
-                if is_running:
-                    self.is_sync_client_running = True
-                    self.sync_client_proc_pid = client_pid
-                    print "SYNC client running with pid[{}]".format(client_pid)
-            except Exception as ex:
-                print ex.message
-                print "Couldn't load sync client"
+        while self.is_monitor_capturing:  # keep resume personal cloud even if the personal cloud stops
+            time.sleep(5)
+            while self.is_sync_client_running is False:
+                self.sync_proc = subprocess.Popen(self.pc_cmd, shell=True)
+                try_start -= 1
+                if try_start == 0:
+                    print "Unable to start {}".format(self.personal_cloud)
+                    break
+                time.sleep(3)
+                try:
+                    #  pid lookup
+                    is_running = False
+                    client_pid = None
+                    for proc in psutil.process_iter():
+                        if proc.name() == self.proc_name:
+                            is_running = True
+                            client_pid = proc.pid
+                            break
+                    if is_running:
+                        self.is_sync_client_running = True
+                        self.sync_client_proc_pid = client_pid
+                        print "SYNC client running with pid[{}]".format(client_pid)
+                except Exception as ex:
+                    print ex.message
+                    print "Couldn't load sync client"
 
     @staticmethod
     def count_sync_folder_files(start_path = '.'):
@@ -288,6 +290,7 @@ class Capture(object):
         # set the capture flags
         # run the capture threads
 
+        self.is_monitor_capturing = True
 
         # start personal cloud client
         self.sync_client = Thread(target=self._pc_client)
@@ -300,7 +303,6 @@ class Capture(object):
         # start capturer loop
         self.traffic_monitor = Sniffer(personal_cloud=self.personal_cloud)
         self.traffic_monitor.run()
-        self.is_monitor_capturing = True
 
         # start emit metric to rabbit
         self.monitor = Thread(target=self._test)
