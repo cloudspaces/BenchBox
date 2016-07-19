@@ -151,7 +151,7 @@ class Capture(object):
             curr_time = metrics['time']
             elapsed_time = (curr_time - last_time) / 1000  # seconds
             if elapsed_time == 0:
-                return False
+                return True
             for key, value in self.metric_network_counter_curr.__dict__.items():
                     metrics[key] = (value - getattr(self.metric_network_counter_prev, key)) / elapsed_time  # unit is seconds
 
@@ -234,12 +234,14 @@ class Capture(object):
         # metric values generator
         self.is_monitor_capturing = True
         operations = 0
-        while self.is_sync_client_running and self.is_monitor_capturing:
+        while self.is_monitor_capturing:
             # while the client is running
             operations += 1
-            self.is_sync_client_running = self.notify_status()  # at each emit report if pid still running
-            # this forwards the captured metric to the rabbit server
-            time.sleep(1)  # metric each second
+            if self.is_sync_client_running:
+               self.is_sync_client_running = self.notify_status()  # at each emit report if pid still running
+            else:
+                # this forwards the captured metric to the rabbit server
+                time.sleep(1)  # metric each second
 
         print "QUIT emit metrics"
 
@@ -337,7 +339,7 @@ class Capture(object):
         # self.monitor = None
         # how to stop the process in windows ... todo lookup by psutil and clean up
         self.is_monitor_capturing = False
-        self.is_sync_client_running = False
+        # self.is_sync_client_running = False
         # self.monitor.join()
         # self.sync_client.join()
 
