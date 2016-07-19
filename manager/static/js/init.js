@@ -282,16 +282,16 @@ angular.module('app', ['ngRoute', 'ngResource'])
                              return item._id == checkedId
                              });
                              */
-                            queryDropInfluxMeasurement(this.name, "metrics");
-                            queryDropInfluxMeasurement(this.name, "metrics_workload")
+                            queryDropInfluxMeasurement(this.name, "benchbox");
+                            queryDropInfluxMeasurement(this.name, "benchbox_workload")
                         }
                     })
                 } else {
                     var host = $scope.hosts[index];
                     console.log(host);
                     console.log("Drop measurement: ", host.hostname);
-                    queryDropInfluxMeasurement(host.hostname, "metrics_workload");
-                    queryDropInfluxMeasurement(host.hostname, "metrics");
+                    queryDropInfluxMeasurement(host.hostname, "benchbox_workload");
+                    queryDropInfluxMeasurement(host.hostname, "benchbox");
                 }
 
 
