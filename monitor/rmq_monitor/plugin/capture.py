@@ -246,7 +246,7 @@ class Capture(object):
         try_start = 10
         while self.is_monitor_capturing:  # keep resume personal cloud even if the personal cloud stops
             time.sleep(5)
-            while self.is_sync_client_running is False:
+            while self.is_sync_client_running is False and self.is_monitor_capturing:
                 self.sync_proc = subprocess.Popen(self.pc_cmd, shell=True)
                 try_start -= 1
                 if try_start == 0:
