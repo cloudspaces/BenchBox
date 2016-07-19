@@ -127,7 +127,13 @@ class ActionHandler(object):
         # clear the sandBox filesystem and cached files
         print 'tearDown'
         if self.target == "windows":
-            return None # noop unimplemented exception
+            if self.hostname == "sandBox":
+                remove_inner_path('/Users/vagrant/Dropbox/*')
+                remove_inner_path('/Users/vagrant/stacksync_folder/*')
+            elif self.hostname == "benchBox":
+                remove_inner_path('/home/vagrant/output/*')
+
+            return None  # noop unimplemented exception
         try:
             output = ''
             if self.hostname == 'sandBox':              # todo if sandbox
