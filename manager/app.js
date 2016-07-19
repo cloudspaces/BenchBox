@@ -270,7 +270,7 @@ amqp.connect(amqp_url, function (err, conn) {
             console.log(' [' + ex + '] waiting for client metric connection');
             ch.bindQueue(q.queue, ex, '');
             ch.consume(q.queue, function (msg) {
-                console.log(" [" + ex + "] " + msg.content.toString());
+                // console.log(" [" + ex + "] " + msg.content.toString());
                 ch.ack(msg);
                 var data = JSON.parse(msg.content);
                 // console.log(data)
@@ -284,7 +284,7 @@ amqp.connect(amqp_url, function (err, conn) {
 
                 if (influxClientMetricsReady) {
                     influxClientMetrics.writePoint(measurement, point, tags, function () {
-                        console.log(metrics.time+"["+tags.test_id+"][" + hostname + "][" + op_time + "]: " + ex + " -> cpu[" + metrics.cpu + "] ram[" + metrics.ram + "], hdd[" + metrics.disk + "], net[out(" + metrics.bytes_sent + ")/in(" + metrics.bytes_recv + "), file("+metrics.disk+","+metrics.files+")]");
+                        console.log(metrics['time']+"["+tags['test_id']+"][" + hostname + "][" + op_time + "]: " + ex + " -> cpu[" + metrics.cpu + "] ram[" + metrics.ram + "], hdd[" + metrics.disk + "], net[out(" + metrics.bytes_sent + ")/in(" + metrics.bytes_recv + "), file("+metrics.disk+","+metrics.files+")]");
                         
                         /*
                          { files: 1,
@@ -333,7 +333,7 @@ amqp.connect(amqp_url, function (err, conn) {
 
                 if (influxClientMetricsReady) {
                     influxClientMetrics.writePoint(measurement, point, tags, function () {
-                        console.log(metrics.time+"["+tags.id_test+"][" + hostname + "][" + op_time  + "]: " + ex + " -> " + metrics.operation + ", "+ metrics.file_size + ", "+metrics.file_type);
+                        console.log(metrics['time']+"["+tags['id_test']+"][" + hostname + "][" + op_time  + "]: " + ex + " -> " + metrics.operation + ", "+ metrics.file_size + ", "+metrics.file_type);
                         // console.log("done writing [" + hostname+ "]: cpu["+metrics.cpu +"] ram["+metrics.ram+"], hdd["+metrics.disk+"], net[out("+metrics.bytes_sent+")/in("+metrics.bytes_recv+")]");
 
                         /*
