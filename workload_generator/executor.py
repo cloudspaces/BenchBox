@@ -106,7 +106,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
         '''Get the next operation to be done'''
         self.next_operation()
         to_execute = getattr(self, 'do_' + self.next_action.lower())
-        return self.operation_chain.current_state,  to_execute(personal_cloud=personal_cloud)
+        to_wait, file_path = to_execute(personal_cloud=personal_cloud)
+        return self.operation_chain.current_state,  to_wait, file_path
 
     def update_current_time(self):
         self.current_time = time.time()
@@ -190,7 +191,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         try:
             '''Get the time to wait for this transition in millis'''
             to_wait = self.get_waiting_time()
-            return to_wait
+            return to_wait, None
         except Exception as ex:
             print ex.message
             return 0, None
@@ -200,7 +201,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         try:
             '''Get the time to wait for this transition in millis'''
             to_wait = self.get_waiting_time()
-            return to_wait
+            return to_wait, None
         except Exception as ex:
             print ex.message
             return 0, None

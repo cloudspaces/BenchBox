@@ -164,7 +164,7 @@ class Commands(object):
 
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
-                operation_executed, (to_wait, file_path) = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
+                operation_executed, to_wait, file_path = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
                 file_type, file_size = self._file_type_size_by_path(file_path)
                 time.sleep(5)  # preventConnection close use with the next one or both
                 # self.rmq_connection.sleep(5)
@@ -187,7 +187,10 @@ class Commands(object):
         if file_path is None:
             return "None", 0
         file_name = os.path.basename(file_path)
-        file_name_part = file_name.split('')
+        try:
+            file_name_part = file_name.split('')
+        except:
+            return "None", 0
         if len(file_name_part) == 1:
             return "Folder", 0
         else:

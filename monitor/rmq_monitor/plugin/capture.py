@@ -272,7 +272,9 @@ class Capture(object):
 
     @staticmethod
     def count_sync_folder_files(start_path = '.'):
-        return len([f for f in os.listdir(start_path)if os.path.isfile(os.path.join(start_path, f))])
+        return sum([len(files) for r, d, files in os.walk(start_path)])
+        # count number of files in a dir
+        # http://stackoverflow.com/questions/16910330/python-return-files-in-directory-and-subdirectory
 
     @staticmethod
     def get_sync_folder_size(start_path = '.'):
