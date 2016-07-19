@@ -282,14 +282,16 @@ angular.module('app', ['ngRoute', 'ngResource'])
                              return item._id == checkedId
                              });
                              */
-                            queryDropInfluxMeasurement(this.name)
+                            queryDropInfluxMeasurement(this.name, "metrics");
+                            queryDropInfluxMeasurement(this.name, "metrics_workload")
                         }
                     })
                 } else {
                     var host = $scope.hosts[index];
                     console.log(host);
                     console.log("Drop measurement: ", host.hostname);
-                    queryDropInfluxMeasurement(host.hostname);
+                    queryDropInfluxMeasurement(host.hostname, "metrics_workload");
+                    queryDropInfluxMeasurement(host.hostname, "metrics");
                 }
 
 
@@ -574,7 +576,6 @@ queryDownloadInfluxMeasurement = function (measurement, table, testID) {
     }
     var influx_query;
     if (measurement == undefined) {
-        measurement = "all";
         influx_query = "select * from " + table + " ";
     } else {
         influx_query = "select * from " + table + " where hostname = '" + measurement + "'";
@@ -601,7 +602,7 @@ queryDownloadInfluxMeasurement = function (measurement, table, testID) {
             console.log(data);
             var milliseconds = (new Date).getTime();
             var withHeader = true;
-            var output_name = "report_" + measurement + "_" + milliseconds;
+            var output_name = "report_" + measurement + "_" + table + "_" + testID + "" + milliseconds;
             JSONToCSVConvertor(data[0], output_name, withHeader);
             console.log("JSONToCSVConverter end")
             // there is a limit to the size...
@@ -614,20 +615,31 @@ queryDownloadInfluxMeasurement = function (measurement, table, testID) {
 
 };
 
-queryDropInfluxMeasurement = function (measurement) {
+queryDropInfluxMeasurement = function (measurement, table) {
+
+
+    // target hostname
+    console.log("Drop measurement: ", measurement);
+    if (table == undefined) {
+        table = "benchbox"
+    }
+    var influx_query;
+    influx_query = "drop series from "+table+" where hostname = '" + measurement + "'";
+
+
     $.ajax({
         url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
-        data: {query: "drop series from benchbox where hostname = '" + measurement + "'"},
+        data: {query: influx_query},
         timeout: 6000000,
         dataType: 'json',
         type: 'GET',
         success: function (data) {
             // download json as csv file
             console.log("influx response: ");
-            $.notify("Success DROP " + measurement + "query", 'success');
+            $.notify("Success DROP " + influx_query + "query", 'success');
         },
         error: function (err) {
-            $.notify('Measurement ' + measurement + ' is clean! ', 'info');
+            $.notify('Measurement ' + influx_query + ' is clean! ', 'info');
         }
     })
 };
@@ -735,7 +747,6 @@ appendAllHosts = function (target, className) {
 notifyButtonById = function (btnId) {
     // self
 };
- 
 
 
 $('#btnFixImage').click(function () {
