@@ -21,7 +21,7 @@ class Capture(object):
 
         print "Constructor: "
         self.hostname = hostname
-
+        self.sync_folder = None
         self.personal_cloud = None
         self.personal_cloud_ip = None
         self.personal_cloud_port = None
@@ -153,35 +153,36 @@ class Capture(object):
 
         # assign hard disk usage
         if self.platform_is_windows:
-            drive_usage = "1234"
+            drive_usage = self.get_sync_folder_size(start_path=self.sync_folder)
+            metrics['disk'] = drive_usage
         else:
             drive_usage_cmd = ['/usr/bin/du', '-ks', '/home/vagrant/{}'.format(self.sync_folder)]
             drive_usage_output = subprocess.Popen(drive_usage_cmd, stdout=subprocess.PIPE)
             drive_usage = drive_usage_output.stdout.read()
-        try:
-            metrics['disk'] = int(drive_usage.split('\t')[0])  # kilo bytes cast string to int
-        except Exception as ex:
-            print "invalid literal for... memory unit"
-            metrics['disk'] = 1
+            try:
+                metrics['disk'] = int(drive_usage.split('\t')[0])  # kilo bytes cast string to int
+            except Exception as ex:
+                print "invalid literal for... memory unit"
+                metrics['disk'] = 1
 
         # assign file counter
         if self.platform_is_windows:
-            num_files = "123"
+            num_files = self.count_sync_folder_files(start_path=self.sync_folder)
+            metrics['files'] = num_files
         else:
             find_cmd = '/usr/bin/find /home/vagrant/{} -type f'.format(self.sync_folder).split()
             proc_find = subprocess.Popen(find_cmd, stdout=subprocess.PIPE)
             wc_cmd = '/usr/bin/wc -l'.split()
             proc_wc = subprocess.Popen(wc_cmd, stdin=proc_find.stdout, stdout=subprocess.PIPE)
             num_files = proc_wc.communicate()[0]
-        try:
-            metrics['files'] = int(num_files.split('\t')[0])
-        except Exception as ex:
-            print ex.message
-            print "invalid literal for... file counter"
+            try:
+                metrics['files'] = int(num_files.split('\t')[0])
+            except Exception as ex:
+                print ex.message
+                print "invalid literal for... file counter"
 
         try:
             net_stats = self.traffic_monitor.notify_stats()
-
             # py_sniffer not unlocalizable
             metrics['data_rate_size_up'] = net_stats['data_rate']['size_up']
             metrics['data_rate_size_down'] = net_stats['data_rate']['size_down']
@@ -263,6 +264,18 @@ class Capture(object):
                 print ex.message
                 print "Couldn't load sync client"
 
+    @staticmethod
+    def count_sync_folder_files(start_path = '.'):
+        return len([f for f in os.listdir(start_path)if os.path.isfile(os.path.join(start_path, f))])
+
+    @staticmethod
+    def get_sync_folder_size(start_path = '.'):
+        total_size = 0
+        for dirpath, dirnames, filenames in os.walk(start_path):
+            for f in filenames:
+                fp = os.path.join(dirpath, f)
+                total_size += os.path.getsize(fp)
+        return total_size
 
     def start(self, body):
         self.personal_cloud = body['msg']['test']['testClient']
@@ -339,4 +352,6 @@ class Capture(object):
                     os.remove(f)
         except Exception as ex:
             print ex.message
+
+
 
