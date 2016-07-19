@@ -32,7 +32,7 @@ class ftp_sender():
         print ">> {} <<  ".format(self.ftp.pwd())
         if sub_folder:
 
-            self.ftp.cwd(self.ftp_home)  # move to home
+            self._cwd_home()  # move to home
             print self.ftp.pwd()
             if self.ftp_root:
                 print "from " + self.ftp.pwd()
@@ -57,7 +57,7 @@ class ftp_sender():
         print ">> {} <<  ".format(self.ftp.pwd())
 
         sub_folder = os.path.dirname(ftp_rel_path)
-        self.ftp.cwd(self.ftp_home)  # move to home
+        self._cwd_home()  # move to home
 
         if self.ftp_root:
             print "move to " + self.ftp_root
@@ -87,7 +87,7 @@ class ftp_sender():
     def rm(self, fname, sub_folder=None):
 
         if sub_folder:
-            self.ftp.cwd(self.ftp_home)  # move to home
+            self._cwd_home()  # move to home
 
             if self.ftp_root:
                 print "move to " + self.ftp_root
@@ -109,7 +109,7 @@ class ftp_sender():
     def rmd(self, fname, sub_folder=None):
 
         if sub_folder:
-            self.ftp.cwd(self.ftp_home)  # move to home
+            self._cwd_home() # move to home
 
             if self.ftp_root:
                 print "move to " + self.ftp_root
@@ -142,7 +142,7 @@ class ftp_sender():
         self.ftp.close()
 
     def mv(self, src, tgt):
-        self.ftp.cwd(self.ftp_home)  # move to home
+        self._cwd_home()  # move to home
 
         if self.ftp_root:
             print "move to " + self.ftp_root
@@ -187,6 +187,13 @@ class ftp_sender():
                 self.ftp.connect(self.ftp_host, self.ftp_port)  # NEEDED # socket set timeout 1 week timeout
                 self.ftp.login(self.ftp_user, self.ftp_pass)
         return self
+
+    def _cwd_home(self):
+        try:
+            self.ftp.cwd(self.ftp_home)  # move to home
+        except:
+            self.ftp_home = "/"
+            self.ftp.cwd(self.ftp_home)
 
 
 if __name__ == '__main__':
