@@ -82,7 +82,13 @@ class ActionHandler(object):
 
     def vagrantUp(self):
         print 'vagrantUp'
-        print subprocess.check_output(["vagrant", "up"], cwd=self.working_dir)
+        while True:
+            try:
+                print subprocess.check_output(["vagrant", "up"], cwd=self.working_dir)
+                break
+            except:
+                print "try again vagrant up"
+                pass
         return 'vagrantUp/OK'
 
     def vagrantProvision(self):
