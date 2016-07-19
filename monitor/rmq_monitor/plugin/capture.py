@@ -238,10 +238,11 @@ class Capture(object):
             # while the client is running
             operations += 1
             if self.is_sync_client_running:
-               self.is_sync_client_running = self.notify_status()  # at each emit report if pid still running
+                self.is_sync_client_running = self.notify_status()  # at each emit report if pid still running
+                time.sleep(1)  # get metrics each second
             else:
                 # this forwards the captured metric to the rabbit server
-                time.sleep(1)  # metric each second
+                time.sleep(5)  # if client is not running wait 5
 
         print "QUIT emit metrics"
 
