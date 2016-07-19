@@ -314,7 +314,7 @@ class Capture(object):
         print "try stop..."
         self.personal_cloud = body['msg']['test']['testClient']
 
-        self.remove_inner_path(self.sync_folder_cleanup)
+        self.remove_inner_path(path="{}/*".format(self.sync_folder))
 
         # self.sync_client = None
         # self.monitor = None
