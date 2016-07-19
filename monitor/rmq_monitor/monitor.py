@@ -160,6 +160,8 @@ class Monitor(object):
         # self.monitor_state = ""
         return "{} -> {}".format(datetime.datetime.now().isoformat(), self.executor_state)
 
+    def exit(self):
+        exit(0)
 
     """
     Personal Cloud

@@ -257,6 +257,9 @@ class Commands(object):
         self.is_warmup = False
         return response_msg
 
+    def exit(self):
+        exit(0)
+
     def keepalive(self, body=None):
         if body is None:
             body = {
