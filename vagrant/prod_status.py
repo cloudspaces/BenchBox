@@ -209,7 +209,7 @@ class ProduceStatus(object):
         if rmq_url == 'localhost':
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
                     host=rmq_url,
-                    heartbeat_interval=5
+                    heartbeat_interval=0
             ))
         else:
             print 'RabbitMQ instance'
@@ -217,7 +217,7 @@ class ProduceStatus(object):
             url = urlparse.urlparse(url_str)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=url.hostname,
-                heartbeat_interval=5,
+                heartbeat_interval=0,
                 virtual_host=url.path[1:],
                 credentials=pika.PlainCredentials(url.username, url.password)
             ))
