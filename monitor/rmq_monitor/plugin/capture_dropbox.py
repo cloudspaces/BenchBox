@@ -1,5 +1,8 @@
 from capture import Capture
-import pwd
+try:
+    import pwd
+except ImportError:
+    pass # this is windows
 
 class Dropbox(Capture):
 
@@ -13,16 +16,16 @@ class Dropbox(Capture):
             self.proc_name = "Dropbox.exe"
             self.sync_folder = "/Users/vagrant/Dropbox"
             self.sync_folder_cleanup = "/Users/vagrant/Dropbox/*"
-
         else:
             # self.pc_cmd = "sudo -H -u {} bash -c '/usr/bin/dropbox start'".format('vagrant')
             session_user = "vagrant"
             self.pc_cmd = "sudo -H -u {} bash -c '/usr/local/bin/dropbox start'".format(session_user)
             try:
+                # windows will crash here
                 if pwd.getpwnam("milax").pw_uid == 1000:
                     session_user = "milax"
                     self.pc_cmd = "sudo -H -u {} bash -c '/usr/bin/dropbox start'".format(session_user)
-            except KeyError:
+            except Exception:
                 pass
             # self.pc_cmd = "sudo -H -u vagrant bash -c '/usr/local/bin/dropbox start'"
             self.proc_name = "dropbox"
