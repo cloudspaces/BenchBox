@@ -397,10 +397,7 @@ class ProdStatusService():
         # target
         is_dummyHost = False
         target_os = None
-
         rmq_url = None
-
-
 
         try:
             with open('/vagrant/rabbitmq','r') as r:

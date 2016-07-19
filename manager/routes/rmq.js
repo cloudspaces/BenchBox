@@ -35,8 +35,6 @@ router.get('/emit', function (req, res, next) {
                 }
                 console.log(' [x] Requesting [' + cmd + '] to [' + target_queue + ']');
                 var on_message_prop = {noAck: true};
-                console.log("consume");
-                
                 // on request handler
                 ch.consume(q.queue, function (msg) {
                     // on queue_message
