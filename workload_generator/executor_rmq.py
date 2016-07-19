@@ -72,6 +72,7 @@ class Commands(object):
         # update ftp_root_directory
         self.fs_abs_target_folder = None
         self.execute = None
+        self.test_id = None
         # self.data_generator = DataGenerator()
 
         # start the monitoring stuff. # todo
@@ -164,13 +165,14 @@ class Commands(object):
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
                 operation_executed, to_wait = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
-                time.sleep(5) # preventConnection close use with the next one or both
+                time.sleep(5)  # preventConnection close use with the next one or both
                 # self.rmq_connection.sleep(5)
                 self.stereotype_executor.notify_operation(
                     operation_name=operation_executed,
                     profile=self.stereotype,
                     personal_cloud=self.target_personal_cloud,
-                    hostname=self.hostname)
+                    hostname=self.hostname,
+                    test_id=self.test_id)
 
                 print to_wait, operation_executed
                 print colored("[TEST]: INFO {} --> {} // {} // {} // {}({})s".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory, operation_executed, to_wait), 'red')
@@ -189,7 +191,7 @@ class Commands(object):
                     "dropbox-port": ""
                 }
             }
-
+        self.test_id = body['test_id']
         print '[START_TEST]: {}'.format(body)
         if not self.is_warmup:
             return '[START_TEST]: WARNING: require warmup!'

@@ -26,6 +26,7 @@ class Capture(object):
         self.personal_cloud = None
         self.personal_cloud_ip = None
         self.personal_cloud_port = None
+        self.test_id = None
 
         if os.name == "nt":
             self.platform_is_windows = True
@@ -126,7 +127,8 @@ class Capture(object):
                    'dropout': 0,
                    'disk': 0,
                    'files': 0,
-                   'time': calendar.timegm(time.gmtime()) * 1000}
+                   'time': calendar.timegm(time.gmtime()) * 1000
+                   }
 
         try:
             if self.is_sync_client_running:  # the sync client is running
@@ -200,8 +202,9 @@ class Capture(object):
         if tags == '':
             tags = {
                 'profile': self.stereotype_recipe,
-                'credentials': 'pc_credentials',
+                'credentials': 'NotUsed',
                 'client': self.whoami,
+                'test_id': self.test_id
             }
 
         data = {
@@ -281,6 +284,8 @@ class Capture(object):
         return total_size
 
     def start(self, body):
+
+        self.test_id = body['test_id']
         self.personal_cloud = body['msg']['test']['testClient']
         try:
             self.personal_cloud_ip = body['msg']['{}-ip'.format(self.personal_cloud.lower())]

@@ -82,8 +82,6 @@ class StereotypeExecutorU1(StereotypeExecutor):
                 ftp_home=ftp_home  # default home directory
         )
 
-
-
     def initialize_from_stereotype_recipe(self, stereotype_recipe):
         StereotypeExecutor.initialize_from_stereotype_recipe(self, stereotype_recipe)
 
@@ -206,7 +204,10 @@ class StereotypeExecutorU1(StereotypeExecutor):
             print ex.message
             return 0
 
-    def notify_operation(self, profile="sync-heavy", personal_cloud="dropbox", hostname=None, operation_name=None):
+    def notify_operation(self,
+                         profile="sync-heavy", personal_cloud="dropbox",
+                         hostname=None, operation_name=None,
+                         file_size="", test_id=None):
         tags = ''
 
         if tags == '':
@@ -214,10 +215,12 @@ class StereotypeExecutorU1(StereotypeExecutor):
                 'profile': profile,
                 'hostname': hostname,
                 'client': personal_cloud,
+                'test_id': test_id
             }
 
         metrics = {
             'operation': operation_name,
+            # 'file_size': "",
             'time': calendar.timegm(time.gmtime()) * 1000,
         }
         data = {

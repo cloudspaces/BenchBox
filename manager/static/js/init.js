@@ -329,6 +329,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 })
             };
 
+            $scope.testID = 0;
 
 
             /**
@@ -400,6 +401,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                             console.log("rmqHost: " + cmd, this.name, checkedId, host[0]);
                             host[0].rmq_queue = targetHost.toLowerCase();
                             host[0].test_setup = $scope.run; // aqui dentro esta la variable testTarget = "windows or linux"
+                            host[0].testID = $scope.testID;
                             // console.log(host[0])
                             rmqHost(host[0], cmd)
                         }
@@ -414,7 +416,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
             $scope.startStop = function () {
                 console.log("START & STOP click");
                 var btn = document.getElementById('btn-start-stop');
-
+                $scope.testID = (new Date).getTime(); // update testID
                 btn.disabled = true;
                 if ($scope.is_running) {
                     // desible the button
@@ -625,7 +627,8 @@ rmqHost = function (host, cmd, cb) {
         cmd: cmd,
         target_queue: host.rmq_queue,
         test: host.test_setup,
-        target: host.test_setup.testTarget
+        target: host.test_setup,
+        test_id: host.testID,
     };
 
     appendAllParams(args, 'bb-config');

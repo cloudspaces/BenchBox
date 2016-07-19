@@ -21,6 +21,7 @@ class Monitor(object):
     # name of the current dummyhost => the physical machine => ast10,ast12,ast13
     def __init__(self, personal_cloud=None, hostname=None):
         print "constructor: {}[{}]".format(hostname, personal_cloud)
+        self.test_id = None
         self.hostname = hostname
         self.sync_client = None
         print personal_cloud
@@ -86,6 +87,7 @@ class Monitor(object):
                     "dropbox-port": ""
                 }
             }
+
         self._sync_client_selector(request=body)
         self.monitor_state = "start_monitor"
         result = None
