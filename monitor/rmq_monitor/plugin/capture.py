@@ -278,14 +278,16 @@ class Capture(object):
 
         # start personal cloud client
         self.sync_client = Thread(target=self._pc_client)
-        self.is_sync_client_running = True
         self.sync_client.start()
-        self.is_sync_client_running = True
+
+        while self.is_sync_client_running is False:
+            print "Launch wait ...  {} ".format(self.personal_cloud)
+            time.sleep(2)
 
         # start capturer loop
         self.traffic_monitor = Sniffer(personal_cloud=self.personal_cloud)
-        self.is_monitor_capturing = True
         self.traffic_monitor.run()
+        self.is_monitor_capturing = True
 
         # start emit metric to rabbit
         self.monitor = Thread(target=self._test)
