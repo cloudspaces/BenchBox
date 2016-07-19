@@ -196,7 +196,12 @@ class Commands(object):
         if len(file_name_part) == 1:
             return "Folder", 0
         else:
-            return file_name_part[1], os.path.getsize(file_path)
+            try:
+                fsize = os.path.getsize(file_path)
+                return file_name_part[1], fsize
+            except:
+                fsize = 0
+                return "None", fsize
 
     def start(self, body=None):
         if body is None:
