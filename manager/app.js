@@ -136,9 +136,7 @@ app.use(function (req, res, next) {
 
 
 // log the client ip at every request
-var routes = require('./routes/index');
-var users = require('./routes/users');
-var todos = require('./routes/todos');
+var routes = require('./routes/index'); 
 var hosts = require('./routes/hosts');
 var inits = require('./routes/init');
 var homes = require('./routes/home');
@@ -149,8 +147,6 @@ var influxQuery = require('./routes/influx');
 
 // api rest
 app.use('/', routes);
-app.use('/users', users);
-app.use('/todos', todos);
 app.use('/home', homes);
 app.use('/hosts', hosts);
 app.use('/init', inits);
