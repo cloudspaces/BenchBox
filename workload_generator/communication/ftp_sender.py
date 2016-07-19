@@ -4,7 +4,7 @@
 from ftplib import FTP
 import traceback
 import sys, os
-
+import time
 
 # -------------------------------------------------------------------------------
 # Upload a file to a remove ftp server
@@ -24,7 +24,7 @@ class ftp_sender():
         self.ftp_port = ftp_port
         self.ftp_user = ftp_user
         self.ftp_pass = ftp_pass
-        self.ftp_root = ftp_root
+        self.ftp_root = ftp_root # ~/dropbox , ~/stacksync_folder
 
         self.ftp_home = "/home/vagrant"
 
@@ -148,10 +148,11 @@ class ftp_sender():
             print "move to " + self.ftp_root
             self.ftp.cwd(self.ftp_root)
         idx_try = 0
-        while True:
+        while idx_try < 5:
             idx_try = +1
+            time.sleep(idx_try)
             try:
-                self.ftp.rename(src, tgt)
+                self.ftp.rename(src, tgt)  # remote file already exists
                 break  # if not failed continue..
             except Exception:
                 if idx_try == 3:  # 3 move attemps failed
