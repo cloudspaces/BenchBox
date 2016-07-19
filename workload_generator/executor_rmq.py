@@ -184,11 +184,12 @@ class Commands(object):
 
     @staticmethod
     def _file_type_size_by_path(file_path=None):
+        print file_path
         if file_path is None:
             return "None", 0
         file_name = os.path.basename(file_path)
         try:
-            file_name_part = file_name.split('')
+            file_name_part = file_name.split('.')
         except:
             return "None", 0
         if len(file_name_part) == 1:
