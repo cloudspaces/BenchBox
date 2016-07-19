@@ -223,7 +223,6 @@ class StereotypeExecutorU1(StereotypeExecutor):
             "file_size": file_size,
             "file_type": file_type,
             'operation': operation_name,
-            'file_size': file_size,
             'time': calendar.timegm(time.gmtime()) * 1000,
         }
         data = {
