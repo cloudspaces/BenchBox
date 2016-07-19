@@ -150,8 +150,11 @@ class Capture(object):
             self.metric_network_counter_curr = psutil.net_io_counters(pernic=True)[self.metric_network_netiface]
             curr_time = metrics['time']
             elapsed_time = (curr_time - last_time) / 1000  # seconds
+            if elapsed_time == 0:
+                return False
             for key, value in self.metric_network_counter_curr.__dict__.items():
-                metrics[key] = (value - getattr(self.metric_network_counter_prev, key)) / elapsed_time  # unit is seconds
+                    metrics[key] = (value - getattr(self.metric_network_counter_prev, key)) / elapsed_time  # unit is seconds
+
             self.metric_network_counter_prev = self.metric_network_counter_curr
 
         # assign hard disk usage

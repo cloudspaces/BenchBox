@@ -166,7 +166,8 @@ class Commands(object):
                 operations += 1  # executant de forma indefinida...
                 operation_executed, to_wait, file_path = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
                 file_type, file_size = self._file_type_size_by_path(file_path)
-                time.sleep(5)  # preventConnection close use with the next one or both
+                #print file_type, file_size, operation_executed, to_wait
+                time.sleep(to_wait)  # preventConnection close use with the next one or both
                 # self.rmq_connection.sleep(5)
                 self.stereotype_executor.notify_operation(
                     operation_name=operation_executed,
@@ -177,15 +178,15 @@ class Commands(object):
                     file_size=file_size,
                     file_type=file_type)
 
-                print to_wait, operation_executed
-                print colored("[TEST]: INFO {} --> {} // {} // {} // {}({})s".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory, operation_executed, to_wait), 'red')
+                #print to_wait, operation_executed
+                print colored("[TEST]: INFO {} --> {}|{}|{} // {} // {} // {}({})s".format(time.ctime(time.time()), operations,file_size,file_type, self.is_running, self.sync_directory, operation_executed, to_wait), 'red')
         else:
             print '[TEST]: WARNING: need warmup 1st!'
 
     @staticmethod
     def _file_type_size_by_path(file_path=None):
-        print file_path
-        if file_path is None:
+        print "SOURCE: >> {}".format(file_path)
+        if type(file_path) is not str:
             return "None", 0
         file_name = os.path.basename(file_path)
         try:
@@ -195,7 +196,7 @@ class Commands(object):
         if len(file_name_part) == 1:
             return "Folder", 0
         else:
-            file_name_part[1], os.path.getsize(file_path)
+            return file_name_part[1], os.path.getsize(file_path)
 
     def start(self, body=None):
         if body is None:
