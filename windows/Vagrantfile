@@ -21,7 +21,7 @@ nodes = [
      :port_fwd => 5000,
      :vm_is_windows => true, # if box is windows add the appropriate setups
      :vm_is_gui => true,
-     :vm_name => 'chenglong_windows',
+     #:vm_name => 'chenglong_windows',
      :vm_cpu => "2",
      :vm_ram => "2048",
     }, # contains the pc-clients && log monitor
@@ -35,7 +35,7 @@ nodes = [
      :shared_vagrant_folder_as => '/home/vagrant/vagrant',
      :vm_is_windows => false,
      :vm_is_gui => false,
-     :vm_name => 'chenglong_benchbox',
+     #:vm_name => 'chenglong_benchbox',
      :vm_cpu => "1",
      :vm_ram => "512",
     }

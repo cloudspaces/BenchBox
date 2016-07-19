@@ -24,7 +24,7 @@ var influxClientMetricsReady = false;
 var influxServerMetricsReady = false;
 influxClientMetrics.getDatabaseNames(function (err, arrDBS) {
     if (err) {
-        console.log("InfluxDB failed to START")
+        console.log("InfluxDB failed to START");
         throw err;
     }
     if (arrDBS.indexOf(constants.influx.client_metrics.database) > -1) {
@@ -136,7 +136,7 @@ app.use(function (req, res, next) {
 
 
 // log the client ip at every request
-var routes = require('./routes/index'); 
+var routes = require('./routes/index');
 var hosts = require('./routes/hosts');
 var inits = require('./routes/init');
 var homes = require('./routes/home');
