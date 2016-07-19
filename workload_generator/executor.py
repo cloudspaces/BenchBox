@@ -54,18 +54,18 @@ class StereotypeExecutorU1(StereotypeExecutor):
 
         self.rmq_url = urlparse.urlparse(self.rmq_path_url)
         self.rmq_connection = None
+
         try:
             self.rmq_connection = pika.BlockingConnection(
                 pika.ConnectionParameters(
                     host=self.rmq_url.hostname,
-                    heartbeat_interval=5,
+                    heartbeat_interval=0,
                     virtual_host=self.rmq_url.path[1:],
                     credentials=pika.PlainCredentials(self.rmq_url.username, self.rmq_url.password)
                 )
             )
         except Exception as ex:
             print ex.message
-            exit(0)
             # failed to create rabbit connection
         self.rmq_channel = self.rmq_connection.channel()
 
@@ -225,9 +225,14 @@ class StereotypeExecutorU1(StereotypeExecutor):
             'tags': tags
         }
         msg = json.dumps(data)  # setup pika sender settings
-        self.rmq_channel.basic_publish(
-            exchange='metrics_ops',  # rabbit queue that receive these messages
-            routing_key=hostname,
-            body=msg)
-
+        while True:
+            try:
+                self.rmq_channel.basic_publish(
+                    exchange='metrics_ops',  # rabbit queue that receive these messages
+                    routing_key=hostname,
+                    body=msg)
+                return 0
+            except Exception as ex:
+                print ex.message
+                self.initialize_rmq_channel()
 

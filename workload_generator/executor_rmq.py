@@ -164,11 +164,13 @@ class Commands(object):
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
                 operation_executed, to_wait = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
+                
                 self.stereotype_executor.notify_operation(
                     operation_name=operation_executed,
                     profile=self.stereotype,
                     personal_cloud=self.target_personal_cloud,
                     hostname=self.hostname)
+
                 print to_wait, operation_executed
                 time.sleep(10)
                 print colored("[TEST]: INFO {} --> {} // {} // {} // {}({})s".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory, operation_executed, to_wait), 'red')
