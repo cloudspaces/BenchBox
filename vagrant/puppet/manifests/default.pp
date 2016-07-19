@@ -12,7 +12,7 @@ node 'benchBox' {
   class {
     'benchbox':
   }
-
+  ->
   exec {
     'run message queue boostrap benchBox status':
       command => 'nohup ./startPeerConsumer.sh & ',
