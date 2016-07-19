@@ -12,6 +12,7 @@ import math
 import json
 from py_sniffer.sniffer import Sniffer
 from threading import Thread
+import pcapy
 
 
 class Capture(object):
@@ -43,15 +44,29 @@ class Capture(object):
 
         self.metric_network_counter_curr = None
         self.metric_network_netiface = None
-        iface_candidate = ['enp4s0f2', 'eth0']
-        for iface in iface_candidate:
-            if iface in psutil.net_io_counters(pernic=True):
-                self.metric_network_counter_curr = psutil.net_io_counters(pernic=True)[iface]
-                self.metric_network_counter_prev = self.metric_network_counter_curr
-                self.metric_network_netiface = iface
-                break
-            else:
-                continue
+        if self.platform_is_windows:
+            # iface = "\\Device\\NPF_{EDB20D9F-1750-46D6-ADE7-76940B8DF917}"
+            # iface = "\\Device\\NPF_{EDB20D9F-1750-46D6-ADE7-76940B8DF917}"
+            iface_candidate = "Local Area Connection"  # 10.0.2.15
+            self.metric_network_counter_curr = psutil.net_io_counters(pernic=True)[iface_candidate]
+            self.metric_network_counter_prev = self.metric_network_counter_curr
+            self.metric_network_netiface = iface_candidate
+            # if iface == pcapy.findalldevs()[0]:
+            #     print "OKEY"
+            # else:
+            #     iface = pcapy.findalldevs()[0]
+            #     print "WARNING!"
+            #     pass
+        else:
+            iface_candidate = ['enp4s0f2', 'eth0']
+            for iface in iface_candidate:
+                if iface in psutil.net_io_counters(pernic=True):
+                    self.metric_network_counter_curr = psutil.net_io_counters(pernic=True)[iface]
+                    self.metric_network_counter_prev = self.metric_network_counter_curr
+                    self.metric_network_netiface = iface
+                    break
+                else:
+                    continue
 
         # if none has been selected then, none network iface metric will be reported
         self.rmq_url = urlparse.urlparse(self.rmq_path_url)
@@ -93,6 +108,7 @@ class Capture(object):
     Retrieve the psutil metrics
     '''
     def notify_status(self):
+
         print "curr state metrics"
         # retrieve the current state metrics from the personal client capturer
         # current metrics is a local variable
@@ -257,17 +273,23 @@ class Capture(object):
             pass  # public cloud has none this args
 
         # set the capture flags
-        self.is_monitor_capturing = True
-        self.is_sync_client_running = True
         # run the capture threads
-        self.sync_client = Thread(target=self._pc_client)
-        self.sync_client.start()
-        self.monitor = Thread(target=self._test)
-        self.monitor.start()
 
+
+        # start personal cloud client
+        self.sync_client = Thread(target=self._pc_client)
+        self.is_sync_client_running = True
+        self.sync_client.start()
+        self.is_sync_client_running = True
+
+        # start capturer loop
         self.traffic_monitor = Sniffer(personal_cloud=self.personal_cloud)
+        self.is_monitor_capturing = True
         self.traffic_monitor.run()
 
+        # start emit metric to rabbit
+        self.monitor = Thread(target=self._test)
+        self.monitor.start()
 
         return "{} say start".format(self.whoami)
         # self.sync_client = None

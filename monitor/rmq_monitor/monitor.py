@@ -20,7 +20,7 @@ class Monitor(object):
 
     # name of the current dummyhost => the physical machine => ast10,ast12,ast13
     def __init__(self, personal_cloud=None, hostname=None):
-        print "constructor"
+        print "constructor: {}[{}]".format(hostname, personal_cloud)
         self.hostname = hostname
         self.sync_client = None
         print personal_cloud
