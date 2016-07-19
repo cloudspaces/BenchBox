@@ -36,12 +36,12 @@ def run_command(cmd, dir):
 
 
 class ActionHandler(object):
-    def __init__(self, target = 'windows', is_dummy=False):
+    def __init__(self, target ='windows', is_dummy=False):
         print "vagrant handler"
         self.hostname = socket.gethostname()
         self.target = target
         self.working_dir = None
-        home = os.path.expanduser('~')
+        home = os.path.expanduser('~') # milax or vagrant
 
         # tell the dummy host which benchbox virtual machines to emit
         # if is_dummy:
@@ -49,9 +49,7 @@ class ActionHandler(object):
         #     self.working_dir = "{}\{}".format(home,'BenchBox/vagrant')
         # else:
 
-
-
-        if is_dummy: #  llamadas tipo vagrant up
+        if is_dummy:  # llamadas tipo vagrant up
             if target == 'windows': # para lanzar dentro de prod_status windows
                 self.working_dir = "{}/{}".format(home,'BenchBox/windows')
                 # aqui quizas haya un fork de 4 tipo
@@ -399,26 +397,24 @@ class ProdStatusService():
         # target
         is_dummyHost = False
         target_os = None
-        try:
-            with open('/vagrant/target','r') as r:
-                target_os = r.read().splitlines()[0]
-        except:
-            print "This is not a BenchBox machine"
-            with open('./target','r') as r:
-                target_os = r.read().splitlines()[0]
-            is_dummyHost = True
 
         rmq_url = None
+
+
 
         try:
             with open('/vagrant/rabbitmq','r') as r:
                 rmq_url = r.read().splitlines()[0]
+            with open('/vagrant/target','r') as r:
+                target_os = r.read().splitlines()[0]
         except:
             print "This is not a BenchBox machine"
             with open('./rabbitmq','r') as r:
                 rmq_url = r.read().splitlines()[0]
+            with open('./target','r') as r:
+                target_os = r.read().splitlines()[0]
             is_dummyHost = True
-        status_exchanger = 'status_exchanger'
+
         emit_status_rpc = ProduceStatus(rmq_url=rmq_url, target_os=target_os, is_dummyHost=is_dummyHost)
 
         hostname = socket.gethostname()
@@ -437,13 +433,10 @@ class ProdStatusService():
             with open('/vagrant/hostname', 'r') as f:
                 dummyhost = f.read().splitlines()[0]
 
-        # dummyhost = hostname
-
         if is_dummyHost:
             host_queue = "{}.{}".format(hostname.lower(), hostname.lower())
         else:
             host_queue = "{}.{}".format(dummyhost, hostname.lower())  # this is the format, that rmq.js target_queue needs!
-        # status_msg
 
         print " [Out] emit: emit_status_rpc.call({})".format(host_queue)
         response = emit_status_rpc.call(status_msg, host_queue)
@@ -457,8 +450,6 @@ class ProdStatusService():
             consumer_rpc.listen()
             # except Exception as ex:
             #    print "{} prod_status Consumer exception".format(ex.message)
-
-
 
         ''' dummy host does all the following setup operations '''
 
