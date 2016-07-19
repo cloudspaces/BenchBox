@@ -164,7 +164,8 @@ class Commands(object):
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
                 operation_executed, to_wait = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
-                
+                time.sleep(5) # preventConnection close use with the next one or both
+                # self.rmq_connection.sleep(5)
                 self.stereotype_executor.notify_operation(
                     operation_name=operation_executed,
                     profile=self.stereotype,
@@ -172,7 +173,6 @@ class Commands(object):
                     hostname=self.hostname)
 
                 print to_wait, operation_executed
-                time.sleep(10)
                 print colored("[TEST]: INFO {} --> {} // {} // {} // {}({})s".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory, operation_executed, to_wait), 'red')
         else:
             print '[TEST]: WARNING: need warmup 1st!'
