@@ -208,7 +208,7 @@ class Capture(object):
 
         metric_reader = None
         # metric values generator
-
+        self.is_monitor_capturing = True
         operations = 0
         while self.is_sync_client_running and self.is_monitor_capturing:
             # while the client is running
@@ -256,12 +256,14 @@ class Capture(object):
         except KeyError:
             pass  # public cloud has none this args
 
+        # set the capture flags
+        self.is_monitor_capturing = True
+        self.is_sync_client_running = True
+        # run the capture threads
         self.sync_client = Thread(target=self._pc_client)
         self.sync_client.start()
         self.monitor = Thread(target=self._test)
         self.monitor.start()
-        self.is_monitor_capturing = True
-        self.is_sync_client_running = True
 
         self.traffic_monitor = Sniffer(personal_cloud=self.personal_cloud)
         self.traffic_monitor.run()
