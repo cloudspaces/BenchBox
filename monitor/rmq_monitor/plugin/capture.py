@@ -284,8 +284,12 @@ class Capture(object):
         return total_size
 
     def start(self, body):
-
-        self.test_id = body['test_id']
+        print body
+        try:
+            self.test_id = body['test_id']
+        except:
+            pass
+            self.test_id = 0
         self.personal_cloud = body['msg']['test']['testClient']
         try:
             self.personal_cloud_ip = body['msg']['{}-ip'.format(self.personal_cloud.lower())]

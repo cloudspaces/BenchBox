@@ -180,7 +180,6 @@ class Commands(object):
             print '[TEST]: WARNING: need warmup 1st!'
 
     def start(self, body=None):
-
         if body is None:
             body = {
                 "msg": {
@@ -191,7 +190,11 @@ class Commands(object):
                     "dropbox-port": ""
                 }
             }
-        self.test_id = body['test_id']
+        try:
+            self.test_id = body['test_id']
+        except:
+            self.test_id = 0
+            pass
         print '[START_TEST]: {}'.format(body)
         if not self.is_warmup:
             return '[START_TEST]: WARNING: require warmup!'

@@ -215,6 +215,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
                 if (index == 'test-check') {
                     // lookup in checkbox
+                    // onclick download checkbox checked hosts
                     $('.' + index).each(function () {
                         // console.log(this)
                         if ($(this).prop('checked')) {
@@ -224,14 +225,18 @@ angular.module('app', ['ngRoute', 'ngResource'])
                              return item._id == checkedId
                              });
                              */
-                            queryDownloadInfluxMeasurement(this.name)
+
+                            queryDownloadInfluxMeasurement(this.name, "benchbox", $scope.testID);
+                            queryDownloadInfluxMeasurement(this.name, "benchbox_workload", $scope.testID)
+
                         }
                     })
                 } else {
                     var host = $scope.hosts[index];
                     console.log(host);
                     console.log("Download the metrics of this host: ", host.hostname);
-                    queryDownloadInfluxMeasurement(host.hostname);
+                    queryDownloadInfluxMeasurement(host.hostname, "benchbox");
+                    queryDownloadInfluxMeasurement(host.hostname, "benchbox_workload");
                 }
                 // invoke ajax request to the node server, the server does influx query and returns the result as ajax response.
             };
@@ -244,7 +249,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
                 switch (target) {
                     case "windows":
-                        console.log("show windows"); 
+                        console.log("show windows");
                         $('#rpc-linux').hide();
                         $('#rpc-windows').show();
                         break;
@@ -257,7 +262,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                         console.log("unhandled target operating system")
                         break;
                 }
- 
+
             };
 
             $scope.getAllMetrics = function () {
@@ -423,20 +428,20 @@ angular.module('app', ['ngRoute', 'ngResource'])
                     // monitor start
                     $scope.run.testMonitor = 'start';
                     $scope.rmq('test-check', 'monitor', 'monitor');
-                    
+
                     // executor warmup
                     console.log('MonitorStart');
                     $scope.run.testOperation = 'warmup'; // hello / warmup / start / stop
                     $scope.rmq('test-check', 'executor', 'executor');
                     console.log('ExecutorWarmup');
-         
+
                     // start
-                    setTimeout(function(){
+                    setTimeout(function () {
                         $scope.run.testOperation = 'start'; // hello / warmup / start / stop
                         $scope.rmq('test-check', 'executor', 'executor');
                         console.log('ExecutorStart');
                     }, 3000);
-                    
+
                     // Now can stop
                     // ponemos un temporizador de 5S hasta que se pueda volver a empezar lo correcto seria imponer
                     // cuando todos los hosts que se van a aplicar coincidan de estado, o tener dos botones...
@@ -561,16 +566,28 @@ testConnection = function (ip, port, cb) {
     });
 };
 
-queryDownloadInfluxMeasurement = function (measurement) {
+queryDownloadInfluxMeasurement = function (measurement, table, testID) {
+    // target hostname
     console.log("Download measurement: ", measurement);
+    if (table == undefined) {
+        table = "benchbox"
+    }
     var influx_query;
     if (measurement == undefined) {
         measurement = "all";
-        influx_query = "select * from benchbox ";
+        influx_query = "select * from " + table + " ";
     } else {
-        influx_query = "select * from benchbox where hostname = '" + measurement + "'";
+        influx_query = "select * from " + table + " where hostname = '" + measurement + "'";
     }
-    console.log(influx_query)
+
+    if (testID == undefined) {
+        // nothing to join
+    } else {
+        influx_query += " and test_id = '" + testID + "'"
+    }
+
+
+    console.log(influx_query);
     $.ajax({
         url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
         data: {query: influx_query},
@@ -594,7 +611,9 @@ queryDownloadInfluxMeasurement = function (measurement) {
             $.notify('Error! ' + err, 'error');
         }
     })
+
 };
+
 queryDropInfluxMeasurement = function (measurement) {
     $.ajax({
         url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
