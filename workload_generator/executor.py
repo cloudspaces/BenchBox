@@ -115,6 +115,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
     def do_upload(self, op_name="UPLOAD", personal_cloud=None):
         print colored(op_name, 'cyan')
         synthetic_file_name, isFile = self.data_generator.create_file_or_directory()
+
         print "{} :>>> NEW ".format(synthetic_file_name)
         if isFile:
             action = CreateFile(synthetic_file_name, FS_SNAPSHOT_PATH)
@@ -123,7 +124,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         '''Get the time to wait for this transition in millis'''
         to_wait = self.get_waiting_time()
         action.perform_action(self.ftp_client.keep_alive())
-        return to_wait
+        return to_wait, synthetic_file_name
 
 
     def do_sync(self, op_name="SYNC", personal_cloud=None):
@@ -132,12 +133,12 @@ class StereotypeExecutorU1(StereotypeExecutor):
         print synthetic_file_name
         if synthetic_file_name is None:
             print "no file selected!"
-            return 0
+            return 0, None
         else:
             action = UpdateFile(synthetic_file_name, FS_SNAPSHOT_PATH)
             to_wait = self.get_waiting_time()
             action.perform_action(self.ftp_client.keep_alive())
-            return to_wait
+            return to_wait, synthetic_file_name
 
     def do_delete(self, op_name="DELETE", personal_cloud=None):
         print colored(op_name, 'yellow')
@@ -150,10 +151,10 @@ class StereotypeExecutorU1(StereotypeExecutor):
             '''Get the time to wait for this transition in millis'''
             to_wait = self.get_waiting_time()
             action.perform_action(self.ftp_client.keep_alive())
-            return to_wait
+            return to_wait, synthetic_file_name
         else:
             print "No file selected!"
-            return 0
+            return 0, None
 
     def do_move(self, op_name="MOVE", personal_cloud=None):
         print colored(op_name, 'magenta')
@@ -168,10 +169,10 @@ class StereotypeExecutorU1(StereotypeExecutor):
             '''Get the time to wait for this transition in millis'''
             to_wait = self.get_waiting_time()
             action.perform_action(self.ftp_client.keep_alive())
-            return to_wait
+            return to_wait, synthetic_file_name
         else:
             print "No file selected!"
-            return 0
+            return 0, None
 
     def do_download(self, op_name="DOWNLOAD", personal_cloud=None):
         print colored(op_name, 'blue')
@@ -182,7 +183,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         publisher = Publisher(personal_cloud=personal_cloud)
         # b.publish('sample/sample.txt', '/aaaa/sample.txt')
         publisher.publish(synthetic_file_name, FS_SNAPSHOT_PATH)  #
-        return to_wait
+        return to_wait, synthetic_file_name
 
     def do_idle(self, op_name="IDLE", personal_cloud=None):
         print colored(op_name, 'blue')
@@ -192,7 +193,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             return to_wait
         except Exception as ex:
             print ex.message
-            return 0
+            return 0, None
 
     def do_start(self, op_name="START", personal_cloud=None):
         print colored(op_name, 'blue')
@@ -202,12 +203,11 @@ class StereotypeExecutorU1(StereotypeExecutor):
             return to_wait
         except Exception as ex:
             print ex.message
-            return 0
+            return 0, None
 
-    def notify_operation(self,
-                         profile="sync-heavy", personal_cloud="dropbox",
+    def notify_operation(self, profile="sync-heavy", personal_cloud="dropbox",
                          hostname=None, operation_name=None,
-                         file_size="", test_id=None):
+                         file_size="", file_type="", test_id=None):
         tags = ''
 
         if tags == '':
@@ -215,12 +215,14 @@ class StereotypeExecutorU1(StereotypeExecutor):
                 'profile': profile,
                 'hostname': hostname,
                 'client': personal_cloud,
-                'test_id': test_id
+                'test_id': test_id,
+                'file_type': file_type
             }
 
         metrics = {
+            "file_size": "",
             'operation': operation_name,
-            # 'file_size': "",
+            'file_size': file_size,
             'time': calendar.timegm(time.gmtime()) * 1000,
         }
         data = {

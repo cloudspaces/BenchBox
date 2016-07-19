@@ -164,7 +164,8 @@ class Commands(object):
 
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
-                operation_executed, to_wait = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
+                operation_executed, (to_wait, file_path) = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
+                file_type, file_size = self._file_type_size_by_path(file_path)
                 time.sleep(5)  # preventConnection close use with the next one or both
                 # self.rmq_connection.sleep(5)
                 self.stereotype_executor.notify_operation(
@@ -172,12 +173,25 @@ class Commands(object):
                     profile=self.stereotype,
                     personal_cloud=self.target_personal_cloud,
                     hostname=self.hostname,
-                    test_id=self.test_id)
+                    test_id=self.test_id,
+                    file_size=file_size,
+                    file_type=file_type)
 
                 print to_wait, operation_executed
                 print colored("[TEST]: INFO {} --> {} // {} // {} // {}({})s".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory, operation_executed, to_wait), 'red')
         else:
             print '[TEST]: WARNING: need warmup 1st!'
+
+    @staticmethod
+    def _file_type_size_by_path(file_path=None):
+        if file_path is None:
+            return "None", 0
+        file_name = os.path.basename(file_path)
+        file_name_part = file_name.split('')
+        if len(file_name_part) == 1:
+            return "Folder", 0
+        else:
+            file_name_part[1], os.path.getsize(file_path)
 
     def start(self, body=None):
         if body is None:
