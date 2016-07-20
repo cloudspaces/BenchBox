@@ -24,7 +24,7 @@ manager/output
 manager/credentials.old
 manager/hosts
 # manager/*.csv
-test
+!workload_generator/test
 credentials
 
 # simulator/data
