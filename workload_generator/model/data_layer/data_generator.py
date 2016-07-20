@@ -281,7 +281,7 @@ class DataGenerator(object):
         '''We have to respect both temporal and spatial localities, as well as to model updates themselves'''
         '''Make use of the UpdateManager for the last aspect'''
         '''1) If there is a file that has been updated, check if we should continue editing it'''
-        if self.current_updated_file == None or time.time()-self.last_update_time > 1: #TODO: This threshold should be changed by a real distribution
+        if self.current_updated_file == None or time.time()-self.last_update_time > 30: #TODO: This threshold should be changed by a real distribution
             '''2) Select a random file of the given type to update (this is a simple approach, which can be
             sophisticated, if necessary, by adding individual "edit probabilities" to files based on distributions)'''
             self.current_updated_file, self.current_updated_file_type = self.file_system.get_file_based_on_type_popularity(
