@@ -152,8 +152,8 @@ class Capture(object):
             elapsed_time = (curr_time - last_time) / 1000  # seconds
             if elapsed_time == 0:
                 return True
-            for key, value in self.metric_network_counter_curr.__dict__.items():
-                    metrics[key] = (value - getattr(self.metric_network_counter_prev, key)) / elapsed_time  # unit is seconds
+            # for key, value in self.metric_network_counter_curr.__dict__.items():
+            #         metrics[key] = (value - getattr(self.metric_network_counter_prev, key)) / elapsed_time  # unit is seconds
 
             self.metric_network_counter_prev = self.metric_network_counter_curr
 
