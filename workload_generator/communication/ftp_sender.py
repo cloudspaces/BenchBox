@@ -4,7 +4,7 @@
 from ftplib import FTP
 import traceback
 import sys, os
-
+import time
 
 # -------------------------------------------------------------------------------
 # Upload a file to a remove ftp server
@@ -24,7 +24,7 @@ class ftp_sender():
         self.ftp_port = ftp_port
         self.ftp_user = ftp_user
         self.ftp_pass = ftp_pass
-        self.ftp_root = ftp_root
+        self.ftp_root = ftp_root  # ~/dropbox , ~/stacksync_folder
 
         self.ftp_home = "/home/vagrant"
 
@@ -32,7 +32,7 @@ class ftp_sender():
         print ">> {} <<  ".format(self.ftp.pwd())
         if sub_folder:
 
-            self.ftp.cwd(self.ftp_home)  # move to home
+            self._cwd_home()  # move to home
             print self.ftp.pwd()
             if self.ftp_root:
                 print "from " + self.ftp.pwd()
@@ -57,7 +57,7 @@ class ftp_sender():
         print ">> {} <<  ".format(self.ftp.pwd())
 
         sub_folder = os.path.dirname(ftp_rel_path)
-        self.ftp.cwd(self.ftp_home)  # move to home
+        self._cwd_home()  # move to home
 
         if self.ftp_root:
             print "move to " + self.ftp_root
@@ -87,7 +87,7 @@ class ftp_sender():
     def rm(self, fname, sub_folder=None):
 
         if sub_folder:
-            self.ftp.cwd(self.ftp_home)  # move to home
+            self._cwd_home()  # move to home
 
             if self.ftp_root:
                 print "move to " + self.ftp_root
@@ -99,9 +99,13 @@ class ftp_sender():
 
         try:
             self.ftp.delete(os.path.basename(fname))
-        except Exception as e:
+        except Exception as ex:
+            print ex.message
             print "rm folder >> {}".format(fname)
-            self.ftp.rmd(os.path.basename(fname))
+            try:
+                self.ftp.rmd(os.path.basename(fname))
+            except Exception:
+                pass
             # traceback.print_exc(file=sys.stderr)
 
             # yes, there was an error...
@@ -109,7 +113,7 @@ class ftp_sender():
     def rmd(self, fname, sub_folder=None):
 
         if sub_folder:
-            self.ftp.cwd(self.ftp_home)  # move to home
+            self._cwd_home() # move to home
 
             if self.ftp_root:
                 print "move to " + self.ftp_root
@@ -142,16 +146,17 @@ class ftp_sender():
         self.ftp.close()
 
     def mv(self, src, tgt):
-        self.ftp.cwd(self.ftp_home)  # move to home
+        self._cwd_home()  # move to home
 
         if self.ftp_root:
             print "move to " + self.ftp_root
             self.ftp.cwd(self.ftp_root)
         idx_try = 0
-        while True:
-            idx_try = +1
+        while idx_try < 5:
+            idx_try += 1
+            time.sleep(idx_try)
             try:
-                self.ftp.rename(src, tgt)
+                self.ftp.rename(src, tgt)  # remote file already exists
                 break  # if not failed continue..
             except Exception:
                 if idx_try == 3:  # 3 move attemps failed
@@ -187,6 +192,13 @@ class ftp_sender():
                 self.ftp.connect(self.ftp_host, self.ftp_port)  # NEEDED # socket set timeout 1 week timeout
                 self.ftp.login(self.ftp_user, self.ftp_pass)
         return self
+
+    def _cwd_home(self):
+        try:
+            self.ftp.cwd(self.ftp_home)  # move to home
+        except:
+            self.ftp_home = "/"
+            self.ftp.cwd(self.ftp_home)
 
 
 if __name__ == '__main__':

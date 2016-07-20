@@ -98,7 +98,7 @@
                 title="Clean metrics from influxDB of the selected hosts">Reset Metrics
         </button>
         <button class="btn btn-default" ng-click="getMetrics('test-check')"
-                title="Download metrics from influxDB of the selected hosts">Download Metrics
+                title="Download metrics from influxDB of the selected hosts">Current Metrics
         </button>
         <button class="btn btn-default" ng-click="getAllMetrics()"
                 title="Download all metrics from benchbox measurement">
@@ -270,12 +270,12 @@
             <!--
             <option ng-value="backupsample">backupsample</option>
             -->
-            <option ng-value="backup-heavy">backup-heavy</option>
-            <option ng-value="backup-occasional">backup-occasional</option>
-            <option ng-value="download-heavy">download-heavy</option>
-            <option ng-value="download-occasional">download-occasional</option>
-            <option ng-value="sync-heavy">sync-heavy</option>
-            <option ng-value="sync-occasional">sync-occasional</option>
+            <option ng-value="backup_heavy" >backup-heavy</option>
+            <option ng-value="backup_occasional">backup-occasional</option>
+            <option ng-value="download_heavy">download-heavy</option>
+            <option ng-value="download_occasional">download-occasional</option>
+            <option ng-value="sync_heavy">sync-heavy</option>
+            <option ng-value="sync_occasional">sync-occasional</option>
         </select>
         <select ng-model="run.testClient">
             <option ng-value="stacksync">StackSync</option>

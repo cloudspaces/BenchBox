@@ -12,7 +12,7 @@ node 'benchBox' {
   class {
     'benchbox':
   }
-
+  ->
   exec {
     'run message queue boostrap benchBox status':
       command => 'nohup ./startPeerConsumer.sh & ',
@@ -22,11 +22,11 @@ node 'benchBox' {
       path    => ['/usr/bin', '/bin/']
   }
 
-  file{
-     '/home/vagrant/application.properties'
-     ensure => file,
-     source => 'puppet:///files/application.properties'
-  }
+  # file{
+  #    '/home/vagrant/application.properties':
+  #    ensure => file,
+  #    source => 'puppet:///files/application.properties'
+  # }
 
 
 }

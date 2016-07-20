@@ -93,6 +93,8 @@ monitor/logger/py_cpu_monitor/*.pyc
 monitor/*.txt
 
 
+windows/winonly
+
 
 output
 out

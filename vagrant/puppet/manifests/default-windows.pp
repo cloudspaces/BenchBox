@@ -31,6 +31,37 @@ node 'sandBox' {
 }
 
 
+# -------------------------------------------------------------------------------------------------------
+# benchBox
+# -------------------------------------------------------------------------------------------------------
+node 'benchBox' {
+  class { 'apt':
+    update => {
+      frequency => 'daily',
+    },
+  }->
+  class {
+    'benchbox':
+  }
+
+  exec {
+    'run message queue boostrap benchBox status':
+      command => 'nohup ./startPeerConsumer.sh & ',
+      user    => 'vagrant',
+      group   => 'vagrant',
+      cwd     => '/home/vagrant/vagrant',
+      path    => ['/usr/bin', '/bin/']
+  }
+
+  # file{
+  #    '/home/vagrant/application.properties':
+  #    ensure => file,
+  #    source => 'puppet:///files/application.properties'
+  # }
+
+
+}
+
 node 'win7-vagrant' {
 
   file {

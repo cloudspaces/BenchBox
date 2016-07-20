@@ -36,12 +36,12 @@ def run_command(cmd, dir):
 
 
 class ActionHandler(object):
-    def __init__(self, target = 'windows', is_dummy=False):
+    def __init__(self, target ='windows', is_dummy=False):
         print "vagrant handler"
         self.hostname = socket.gethostname()
         self.target = target
         self.working_dir = None
-        home = os.path.expanduser('~')
+        home = os.path.expanduser('~') # milax or vagrant
 
         # tell the dummy host which benchbox virtual machines to emit
         # if is_dummy:
@@ -49,9 +49,7 @@ class ActionHandler(object):
         #     self.working_dir = "{}\{}".format(home,'BenchBox/vagrant')
         # else:
 
-
-
-        if is_dummy: #  llamadas tipo vagrant up
+        if is_dummy:  # llamadas tipo vagrant up
             if target == 'windows': # para lanzar dentro de prod_status windows
                 self.working_dir = "{}/{}".format(home,'BenchBox/windows')
                 # aqui quizas haya un fork de 4 tipo
@@ -84,7 +82,13 @@ class ActionHandler(object):
 
     def vagrantUp(self):
         print 'vagrantUp'
-        print subprocess.check_output(["vagrant", "up"], cwd=self.working_dir)
+        while True:
+            try:
+                print subprocess.check_output(["vagrant", "up"], cwd=self.working_dir)
+                break
+            except:
+                print "try again vagrant up"
+                pass
         return 'vagrantUp/OK'
 
     def vagrantProvision(self):
@@ -129,7 +133,13 @@ class ActionHandler(object):
         # clear the sandBox filesystem and cached files
         print 'tearDown'
         if self.target == "windows":
-            return None # noop unimplemented exception
+            if self.hostname == "sandBox":
+                remove_inner_path('/Users/vagrant/Dropbox/*')
+                remove_inner_path('/Users/vagrant/stacksync_folder/*')
+            elif self.hostname == "benchBox":
+                remove_inner_path('/home/vagrant/output/*')
+
+            return None  # noop unimplemented exception
         try:
             output = ''
             if self.hostname == 'sandBox':              # todo if sandbox
@@ -211,7 +221,7 @@ class ProduceStatus(object):
         if rmq_url == 'localhost':
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
                     host=rmq_url,
-                    heartbeat_interval=5
+                    heartbeat_interval=0
             ))
         else:
             print 'RabbitMQ instance'
@@ -219,7 +229,7 @@ class ProduceStatus(object):
             url = urlparse.urlparse(url_str)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=url.hostname,
-                heartbeat_interval=5,
+                heartbeat_interval=0,
                 virtual_host=url.path[1:],
                 credentials=pika.PlainCredentials(url.username, url.password)
             ))
@@ -279,7 +289,7 @@ class ConsumeAction(object):
             url = urlparse.urlparse(url_str)
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=url.hostname,
-                    heartbeat_interval=5,
+                    heartbeat_interval=0,
                     virtual_host=url.path[1:],
                     credentials=pika.PlainCredentials(url.username, url.password)
             ))
@@ -399,26 +409,21 @@ class ProdStatusService():
         # target
         is_dummyHost = False
         target_os = None
-        try:
-            with open('/vagrant/target','r') as r:
-                target_os = r.read().splitlines()[0]
-        except:
-            print "This is not a BenchBox machine"
-            with open('./target','r') as r:
-                target_os = r.read().splitlines()[0]
-            is_dummyHost = True
-
         rmq_url = None
 
         try:
             with open('/vagrant/rabbitmq','r') as r:
                 rmq_url = r.read().splitlines()[0]
+            with open('/vagrant/target','r') as r:
+                target_os = r.read().splitlines()[0]
         except:
             print "This is not a BenchBox machine"
             with open('./rabbitmq','r') as r:
                 rmq_url = r.read().splitlines()[0]
+            with open('./target','r') as r:
+                target_os = r.read().splitlines()[0]
             is_dummyHost = True
-        status_exchanger = 'status_exchanger'
+
         emit_status_rpc = ProduceStatus(rmq_url=rmq_url, target_os=target_os, is_dummyHost=is_dummyHost)
 
         hostname = socket.gethostname()
@@ -426,7 +431,7 @@ class ProdStatusService():
         if status_msg is None:
             status_msg = "Hello from {} ".format(hostname)
 
-        if topic is None:
+        if topic is not None:
             hostname = topic
 
         try:  # this means that its a dummyhost
@@ -437,13 +442,10 @@ class ProdStatusService():
             with open('/vagrant/hostname', 'r') as f:
                 dummyhost = f.read().splitlines()[0]
 
-        # dummyhost = hostname
-
         if is_dummyHost:
             host_queue = "{}.{}".format(hostname.lower(), hostname.lower())
         else:
             host_queue = "{}.{}".format(dummyhost, hostname.lower())  # this is the format, that rmq.js target_queue needs!
-        # status_msg
 
         print " [Out] emit: emit_status_rpc.call({})".format(host_queue)
         response = emit_status_rpc.call(status_msg, host_queue)
@@ -457,8 +459,6 @@ class ProdStatusService():
             consumer_rpc.listen()
             # except Exception as ex:
             #    print "{} prod_status Consumer exception".format(ex.message)
-
-
 
         ''' dummy host does all the following setup operations '''
 

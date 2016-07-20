@@ -24,7 +24,7 @@ var influxClientMetricsReady = false;
 var influxServerMetricsReady = false;
 influxClientMetrics.getDatabaseNames(function (err, arrDBS) {
     if (err) {
-        console.log("InfluxDB failed to START")
+        console.log("InfluxDB failed to START");
         throw err;
     }
     if (arrDBS.indexOf(constants.influx.client_metrics.database) > -1) {
@@ -137,8 +137,6 @@ app.use(function (req, res, next) {
 
 // log the client ip at every request
 var routes = require('./routes/index');
-var users = require('./routes/users');
-var todos = require('./routes/todos');
 var hosts = require('./routes/hosts');
 var inits = require('./routes/init');
 var homes = require('./routes/home');
@@ -149,8 +147,6 @@ var influxQuery = require('./routes/influx');
 
 // api rest
 app.use('/', routes);
-app.use('/users', users);
-app.use('/todos', todos);
 app.use('/home', homes);
 app.use('/hosts', hosts);
 app.use('/init', inits);
@@ -232,14 +228,14 @@ amqp.connect(amqp_url, function (err, conn) {
     // ------------------------------------------------------------------------
 
 
-    conn.createChannel(function(err, ch){
+    conn.createChannel(function (err, ch) {
         // sparated channel for network and other metrics... will duplicate the server channel usage
         var ex = 'sync_server';
         ch.assertExchange(ex, 'fanout', {durable: false});
-        ch.assertQueue('', {exclusive:true}, function(err, q){
-            console.log(" ["+ex+"] waiting for server metric connection")
+        ch.assertQueue('', {exclusive: true}, function (err, q) {
+            console.log(" [" + ex + "] waiting for server metric connection")
             ch.bindQueue(q.queue, ex, '');
-            ch.consume(q.queue, function(msg){
+            ch.consume(q.queue, function (msg) {
                 ch.ack(msg);
                 var data = JSON.parse(msg.content);
                 console.log(data);
@@ -249,8 +245,8 @@ amqp.connect(amqp_url, function (err, conn) {
                 var point = metrics;
                 var hostname = msg.fields.routingKey; // measurement goes here
                 tags['hostname'] = hostname;
-                var measurement = "benchbox";
-                if (influxServerMetricsReady){
+                var measurement = "benchbox_server";
+                if (influxServerMetricsReady) {
                     console.log("write server metrics to influx");
                     // write server metrics
                     influxServerMetrics.writePoint(measurement, point, tags, function () {
@@ -263,9 +259,8 @@ amqp.connect(amqp_url, function (err, conn) {
     });
 
 
-
     // ------------------------------------------------------------------------
-    // -- Metrics RabbitMQ handlers :: forward to influxdb # & impala TODO
+    // -- Metrics RabbitMQ handlers :: collect sandBox monitoring stats metrics
     // -------------------------------------------------------------------------
 
     conn.createChannel(function (err, ch) {
@@ -278,32 +273,84 @@ amqp.connect(amqp_url, function (err, conn) {
                 // console.log(" [" + ex + "] " + msg.content.toString());
                 ch.ack(msg);
                 var data = JSON.parse(msg.content);
+                // console.log(data)
                 var metrics = data.metrics;
+                var op_time = data.metrics.time;
                 var tags = data.tags;
                 var point = metrics;
                 var hostname = msg.fields.routingKey;
                 tags['hostname'] = hostname;
-                var measurement = "benchbox";
+                var measurement = "benchbox"; 
 
                 if (influxClientMetricsReady) {
                     influxClientMetrics.writePoint(measurement, point, tags, function () {
-                        console.log("done writing [" + hostname+ "]: cpu["+metrics.cpu +"] ram["+metrics.ram+"], hdd["+metrics.disk+"], net[out("+metrics.bytes_sent+")/in("+metrics.bytes_recv+")]");
+                        console.log("[" + hostname + "][" + op_time + "]: " + ex + " -> cpu[" + metrics.cpu + "] ram[" + metrics.ram + "], hdd[" + metrics.disk + "], net[out(" + metrics.bytes_sent + ")/in(" + metrics.bytes_recv + "), file("+metrics.disk+","+metrics.files+")]");
+                        
+                        /*
+                         { files: 1,
+                         dropin: 0,
+                         dropout: 0,
+                         ram: 171581440,
+                         disk: 336,
+                         packets_sent: 2,
+                         bytes_recv: 152,
+                         packets_recv: 2,
+                         bytes_sent: 324,
+                         errout: 0,
+                         errin: 0,
+                         net: 2,
+                         cpu: 0 }
+                         */
+                    });
+                }
+            }, {noAck: false}); // ignore if none reached, none blocking queue
+        })
+    })
+
+
+    // ------------------------------------------------------------------------
+    // -- Metrics RabbitMQ handlers :: collect benchBox workload generator ops
+    // -------------------------------------------------------------------------
+
+    conn.createChannel(function (err, ch) {
+        var ex = 'metrics_ops'; // routing channel
+        ch.assertExchange(ex, 'fanout', {durable: false});
+        ch.assertQueue('', {exclusive: true}, function (err, q) {
+            console.log(' [' + ex + '] waiting for client metric connection');
+            ch.bindQueue(q.queue, ex, '');
+            ch.consume(q.queue, function (msg) {
+                // console.log(" [" + ex + "] " + msg.content.toString());
+                ch.ack(msg);
+                var data = JSON.parse(msg.content);
+                var metrics = data.metrics;
+                var op_time = data.metrics.time;
+                // console.log(JSON.stringify(data.metrics));
+                var tags = data.tags;
+                var point = metrics;
+                var hostname = msg.fields.routingKey;
+                tags['hostname'] = hostname;  // which dummyHost it belongs
+                var measurement = "benchbox_workload"; // the database 
+
+                if (influxClientMetricsReady) {
+                    influxClientMetrics.writePoint(measurement, point, tags, function () {
+                        console.log("[" + hostname + "][" + op_time  + "]: " + ex + " -> " + metrics.operation + ", "+ metrics.file_size + ", "+metrics.file_type);
+                        // console.log("done writing [" + hostname+ "]: cpu["+metrics.cpu +"] ram["+metrics.ram+"], hdd["+metrics.disk+"], net[out("+metrics.bytes_sent+")/in("+metrics.bytes_recv+")]");
 
                         /*
-                        { files: 1,
-                            dropin: 0,
-                            dropout: 0,
-                            ram: 171581440,
-                            disk: 336,
-                            packets_sent: 2,
-                            bytes_recv: 152,
-                            packets_recv: 2,
-                            bytes_sent: 324,
-                            errout: 0,
-                            errin: 0,
-                            net: 2,
-                            cpu: 0 }
-                        */
+                         { files: 1,
+                         dropin: 0,
+                         dropout: 0,
+                         ram: 171581440,
+                         disk: 336,
+                         packets_sent: 2,
+                         bytes_recv: 152,
+                         packets_recv: 2,
+                         bytes_sent: 324,
+                         errout: 0,
+                         errin: 0,
+                         net: 2,
+                         cpu: 0 }
+                         */
                     });
                 }
             }, {noAck: false}); // ignore if none reached, none blocking queue

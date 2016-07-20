@@ -4,7 +4,7 @@ from plugin.capture_dropbox import Dropbox as dropbox
 from plugin.capture_googledrive import GoogleDrive as googledrive
 from plugin.capture_owncloud import OwnCloud as ownloud
 from plugin.capture_stacksync import StackSync as stacksync
-
+import psutil
 
 # this class will be invoked by monitor_rmq
 # this class has an instance monitor_py and sniffer_py
@@ -20,7 +20,8 @@ class Monitor(object):
 
     # name of the current dummyhost => the physical machine => ast10,ast12,ast13
     def __init__(self, personal_cloud=None, hostname=None):
-        print "constructor"
+        print "constructor: {}[{}]".format(hostname, personal_cloud)
+        self.test_id = None
         self.hostname = hostname
         self.sync_client = None
         print personal_cloud
@@ -62,7 +63,7 @@ class Monitor(object):
                     "dropbox-port": ""
                 }
             }
-
+        self._sync_client_selector(request=body)
         self.sync_client.hello(body)
         return 0, "[Hello]: response"
         #    return 0  # successfully logged to personal cloud service
@@ -81,16 +82,19 @@ class Monitor(object):
                 "msg": {
                     "test": {
                         "testClient": "dropbox",
+                        "testProfile": "sync-occasional"
                     },
                     "dropbox-ip": "",
                     "dropbox-port": ""
                 }
             }
 
+        self._sync_client_selector(request=body)
         self.monitor_state = "start_monitor"
+        result = None
         if not self.sync_client.is_monitor_capturing:  # if not capturing start otherwise noop
-            self.sync_client.start(body)
-        return 0, "[Start]: response"
+            result = self.sync_client.start(body)
+        return 0, "[Start]: response {}".format(result)
 
     '''
     RMQ request to warmup the dummyhost=>[sandbox|benchbox]
@@ -107,7 +111,7 @@ class Monitor(object):
                     "dropbox-port": ""
                 }
             }
-
+        self._sync_client_selector(request=body)
         self.monitor_state = "warmup_monitor"
         self.sync_client.warmup(body)
         return 0, "[Warmup]: response"
@@ -128,13 +132,16 @@ class Monitor(object):
                 }
             }
 
+        print body
+        self._sync_client_selector(request=body)
         self.monitor_state = "stop_monitor"
+        result = None
         if self.sync_client.is_monitor_capturing:  # if its capturing, stop it to capture
-            self.sync_client.stop(body)
+            result = self.sync_client.stop(body)
         # else:
         #     self.client.stop(body)  # remove this
 
-        return 0, "[Stop]: response"
+        return 0, "[Stop]: response {}".format(result)
 
     '''
     RMQ request to display the executor status
@@ -153,3 +160,17 @@ class Monitor(object):
 
         # self.monitor_state = ""
         return "{} -> {}".format(datetime.datetime.now().isoformat(), self.executor_state)
+
+    def exit(self):
+        exit(0)
+
+    """
+    Personal Cloud
+    """
+    def _sync_client_selector(self, request=None):
+        personal_cloud = request['msg']['test']['testClient']
+        if self.sync_client is None:
+                self.sync_client = eval("{}".format(personal_cloud.lower()))(self.hostname)
+        #     # raise NotImplemented
+        #     return 0  # if no personal cloud is forwarded
+        #

@@ -1,5 +1,5 @@
 import publisher_credentials
-import traceback
+import traceback, os
 from plugin.pub_box import Box as box
 from plugin.pub_clouddrive import CloudDrive as clouddrive
 from plugin.pub_dropbox import Dropbox as dropbox
@@ -23,7 +23,7 @@ class Publisher(object):
         if personal_cloud is None:
             raise NotImplemented
         else:
-            self.action = eval("{}".format(personal_cloud))()
+            self.action = eval("{}".format(personal_cloud.lower()))()
 
     def publish(self, local_file_path, dst_remote_path = "/"):
         """
@@ -32,8 +32,16 @@ class Publisher(object):
         :param remote_path:
         :return:
         """
+        send_output_to = os.path.relpath(local_file_path, dst_remote_path)  # / == output
+        send_to_remote = "/{}".format(send_output_to)
+        print local_file_path, "Send to remote: ", send_to_remote
+
         # try:
-        self.action.publish(local_file_path, dst_remote_path)
+        self.action.publish(local_file_path, send_to_remote)
+        # while True:
+        #     # try download the uploaded file
+        #     # not try download check if exists.
+        #     pass
         return 0
         # except Exception as ex:
         #     print ex.message

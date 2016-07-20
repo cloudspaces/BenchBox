@@ -52,10 +52,12 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
     # "git clone -b development --recursive https://github.com/CloudSpaces/BenchBox.git; " \
     # "git clone -b development --recursive https://github.com/CloudSpaces/BenchBox.git; " \
 
-
+    print ""
+    print "Start setup benchbox: WINDOWS"
+    print ""
     str_cmd_win = " " \
               "" \
-              "cd BenchBox; " \
+              "cd ~/BenchBox; " \
               "cd windows; " \
               "echo '{}' > rabbitmq; " \
               "echo '{}' > profile; " \
@@ -77,7 +79,9 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
                         h['stacksync-ip'], h['stacksync-port'],
                         h['owncloud-ip'], h['impala-ip'], h['graphite-ip'])
     print str_cmd_win
-    print "Start setup benchbox"
+    print ""
+    print "Start setup benchbox: LINUX"
+    print ""
     str_cmd = " " \
           "echo 'check if Git is installed...'; " \
           "echo '{}' | sudo -S apt-get install git; " \
@@ -85,8 +89,8 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
           "echo '{}' | sudo pip install --upgrade pip; " \
           "echo 'check if BenchBox is installed...'; " \
           "" \
-          "if [ -d BenchBox ]; then " \
-          "cd BenchBox; " \
+          "if [ -d ~/BenchBox ]; then " \
+          "cd ~/BenchBox; " \
           "" \
           "git pull; " \
           "else " \
@@ -124,19 +128,21 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
                     h['stacksync-ip'], h['stacksync-port'],
                     h['owncloud-ip'], h['impala-ip'], h['graphite-ip'],
                     h['passwd'])
-    print 'sendQuery...'
-
+    print str_cmd
+    print ""
+    print 'sendQuery...: '
+    print ""
     if h["target"] == "windows":
         print "TARGET IS WINDOWS: {}".format(h["target"])
         print rmi(h['ip'], h['user'], h['passwd'], str_cmd)
-        return rmi(h['ip'], h['user'], h['passwd'], str_cmd_win)
+        return rmi(hostname=h['ip'], login=h['user'], passwd=h['passwd'], cmd=str_cmd_win, target=h["target"])
     else:
         print "TARGET IS LINUX: {}".format(h["target"])
-        return rmi(h['ip'], h['user'], h['passwd'], str_cmd)
+        return rmi(hostname=h['ip'], login=h['user'], passwd=h['passwd'], cmd=str_cmd, target=h["target"])
 
 
-def rmi(hostname, login, passwd, cmd, callback=None):
-    print "sendQuery to: "+hostname, login, passwd
+def rmi(hostname, login, passwd, cmd, target=None):
+    print "sendQuery to: "+hostname, login, passwd, target
     rmiTry = 0
     while True:
         rmiTry += 1

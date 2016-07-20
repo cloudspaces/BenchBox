@@ -41,14 +41,16 @@ class Sniffer(Thread):
         print "Quiting"
         parent_process = psutil.Process(parent_pid)
         for child in parent_process.children(recursive=True):
-            child.kill()
-        self.target.capture_quit()
-        # time.sleep(5)
-        print "Quit parent.kill()"
+            print child.kill()
         parent_process.kill()
 
 
+        # self.target.capture_quit()
+        # time.sleep(5)
+        print "Quit parent.kill()"
+        print "Do exit"
         # print "Quited"
+
 
     def cancel(self):
         '''

@@ -21,7 +21,7 @@ nodes = [
      :port_fwd => 5000,
      :vm_is_windows => true, # if box is windows add the appropriate setups
      :vm_is_gui => true,
-     :vm_name => 'chenglong_windows',
+     #:vm_name => 'chenglong_windows',
      :vm_cpu => "2",
      :vm_ram => "2048",
     }, # contains the pc-clients && log monitor
@@ -35,7 +35,7 @@ nodes = [
      :shared_vagrant_folder_as => '/home/vagrant/vagrant',
      :vm_is_windows => false,
      :vm_is_gui => false,
-     :vm_name => 'chenglong_benchbox',
+     #:vm_name => 'chenglong_benchbox',
      :vm_cpu => "1",
      :vm_ram => "512",
     }
@@ -58,7 +58,7 @@ Vagrant.configure(2) do |config|
                          "--memory", node[:vm_ram].to_s,
                          "--cpus", node[:vm_cpu].to_s,
                      ]
-        vm.gui = node[:vm_is_gui]
+        # vm.gui = node[:vm_is_gui]
         vm.name = node[:vm_name]
 
       end
@@ -87,6 +87,10 @@ Vagrant.configure(2) do |config|
         # nodeconfig.vm.network "forwarded_port", guest: node[:port_fwd], host: node[:port_fwd]
         node_config.vm.guest = :windows
         node_config.vm.communicator = "winrm"
+        node_config.vm.guest = "windows"
+        node_config.ssh.insert_key = false
+        node_config.winrm.username = "vagrant"
+        node_config.winrm.password = "vagrant"
         node_config.vm.network :forwarded_port, guest: 3389, host: 3389 # windows RDP
         node_config.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true # windows winrm default port
         # setting up larger timeout and halt timeout, due to updates and upgrades
@@ -142,7 +146,7 @@ Vagrant.configure(2) do |config|
           }
           puppet.manifests_path = "../vagrant/puppet/manifests"
           puppet.module_path = "../vagrant/puppet/modules"
-          puppet.manifest_file = "default.pp"
+          puppet.manifest_file = "default-windows.pp"
         end
       end
 

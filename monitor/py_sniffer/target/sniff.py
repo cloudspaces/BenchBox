@@ -17,7 +17,7 @@ class Sniff(object):
             self.platform_is_windows = True
             self.iface = "\\Device\\NPF_{EDB20D9F-1750-46D6-ADE7-76940B8DF917}"
             self.my_ip = "10.0.2.15"
-        else: # when the operating system is linux
+        else:  # when the operating system is linux
             self.platform_is_windows = False
             try:
                 self.iface = pcapy.findalldevs()[0]  #
@@ -281,7 +281,7 @@ class Sniff(object):
                 # todo: >
                 sys.exit()
         except AttributeError:
-            print "nt is ruthless, bypass rule is_root!!!"
+            print " nt is ruthless, bypass rule is_root!!!"
 
     @staticmethod
     def sizeof_fmt(num, suffix='B'):

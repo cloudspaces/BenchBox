@@ -90,7 +90,7 @@ class DataGenerator(object):
         '''Create the file system'''
         time.sleep(1)
         if not DEBUG: 
-            subprocess.call([FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH])
+            subprocess.call([FS_IMAGE_PATH, FS_IMAGE_CONFIG_PATH])        
         time.sleep(1)
 
     '''Generate the logical structure of the initial snapshot before migration to sandbox'''
@@ -115,7 +115,7 @@ class DataGenerator(object):
         '''Create a realistic name'''
         synthetic_file_base_path += get_random_alphanumeric_string(random.randint(1,20)) + \
                                     self.r.choice(self.stereotype_file_types_extensions[file_type])
-        print "CREATING FILE: ", synthetic_file_base_path, str(size)        
+         
         
         '''Invoke SDGen to generate realistic file contents'''
         characterization = DATA_CHARACTERIZATIONS_PATH + file_type
@@ -125,13 +125,15 @@ class DataGenerator(object):
                 '''Decide whether we have to create a new file or to take deduplicated content'''
                 if self.file_level_deduplication_ratio < self.r.random():
                     cp = subprocess.call(['java', '-jar', DATA_GENERATOR_PATH, characterization, str(size), synthetic_file_base_path], cwd=DATA_GENERATOR_PROPERTIES_DIR)
-                    print "Generating new synthetic file..."                    
+                    print "--------------------------------------------------------"
+                    print "CREATING [NEW] FILE: ", synthetic_file_base_path, str(size)                         
                 else: 
                     '''Get a random file as content and store it with a new name'''
                     src_path, file_type = self.file_system.get_file_based_on_type_popularity(self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
                     if src_path== None: 
                         return None
-                    print "Generating deduplicated file..."
+                    print "--------------------------------------------------------"
+                    print "CREATING [DEDUPLICATED] FILE: ", synthetic_file_base_path, str(size)  
                     shutil.copyfile(src_path, synthetic_file_base_path)
             except Exception as ex:
                 print ex
@@ -148,10 +150,12 @@ class DataGenerator(object):
         src_path, file_type = self.file_system.get_file_based_on_type_popularity( 
             self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
         dest_path = self.file_system.get_random_fs_directory(FS_SNAPSHOT_PATH)
-        print "MOVE FILE: ", src_path, " TO: ", dest_path
+        print "--------------------------------------------------------"
         if src_path == None or dest_path == None:
             print "WARNING: No files to move!", src_path, dest_path
             return None, None
+        
+        print "MOVE FILE: ", src_path, " TO: ", dest_path
         dest_path += src_path.split(os.sep)[-1]
         success = True
         if not DEBUG:            
@@ -171,6 +175,7 @@ class DataGenerator(object):
 
     '''Move and empty directory to a random place within the synthetic file system'''
     def move_directory(self):
+        print "--------------------------------------------------------"
         src_path = self.file_system.get_empty_directory(FS_SNAPSHOT_PATH)
         if src_path == None:
             print "WARNING: No empty directories to move!"
@@ -208,11 +213,11 @@ class DataGenerator(object):
 
     '''Delete a file at random depending on the file type popularity for this stereotype'''
     def delete_file(self):
+        print "--------------------------------------------------------"
         to_delete, file_type = self.file_system.get_file_based_on_type_popularity( 
-            self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)        
-        print "DELETING FILE: ", to_delete
+            self.stereotype_file_types_probabilities, self.stereotype_file_types_extensions)
         if to_delete == None: return None
-          
+        print "DELETING FILE: ", to_delete  
         success = True         
         if not DEBUG:
             try:
@@ -232,6 +237,7 @@ class DataGenerator(object):
 
     '''Create a directory in a random point of the file system'''
     def create_directory(self):
+        print "--------------------------------------------------------"
         '''Pick a random position in the fs hierarchy (consider only dirs)'''
         directory_path = self.file_system.get_random_fs_directory(FS_SNAPSHOT_PATH)
         to_create = directory_path + get_random_alphanumeric_string()
@@ -253,9 +259,10 @@ class DataGenerator(object):
     '''Delete an empty directory from the structure, if it does exist. If not,
     we prefer to do not perform file deletes as they may yield cascade operations'''
     def delete_directory(self):
+        print "--------------------------------------------------------"
         dir_path_to_delete = self.file_system.get_empty_directory(FS_SNAPSHOT_PATH)
-        print "DELETING DIRECTORY: ", dir_path_to_delete
-        if dir_path_to_delete != None and (DEBUG or os.listdir(dir_path_to_delete) == []):  # do not remove root directory
+        if dir_path_to_delete != None and (DEBUG or os.listdir(dir_path_to_delete) == []):  # do not remove root directory            
+            print "DELETING DIRECTORY: ", dir_path_to_delete
             success = True
             if not DEBUG:
                 try:
@@ -270,18 +277,19 @@ class DataGenerator(object):
         return None
 
     def update_file(self):
+        print "--------------------------------------------------------"
         '''We have to respect both temporal and spatial localities, as well as to model updates themselves'''
         '''Make use of the UpdateManager for the last aspect'''
         '''1) If there is a file that has been updated, check if we should continue editing it'''
-        if self.current_updated_file == None or time.time()-self.last_update_time > 1: #TODO: This threshold should be changed by a real distribution
+        if self.current_updated_file == None or time.time()-self.last_update_time > 30: #TODO: This threshold should be changed by a real distribution
             '''2) Select a random file of the given type to update (this is a simple approach, which can be
             sophisticated, if necessary, by adding individual "edit probabilities" to files based on distributions)'''
             self.current_updated_file, self.current_updated_file_type = self.file_system.get_file_based_on_type_popularity(
                     self.file_type_update_probabilities, self.stereotype_file_types_extensions)
             self.last_update_time = time.time()
 
-        print "FILE TO EDIT: ", self.current_updated_file
-        if self.current_updated_file != None:
+        if self.current_updated_file != None:            
+            print "FILE TO EDIT: ", self.current_updated_file
             '''3) Select the type of update to be done (Prepend, Middle or Append)'''
             update_type = self.file_system.get_fitness_proportionate_element(self.file_update_location_probabilities)
             if not DEBUG:
@@ -321,10 +329,12 @@ class DataGenerator(object):
         
 if __name__ == '__main__':
     # import random
+    r = random.Random()
+    r.seed(123)
     test_iterations=1
     for i in range(test_iterations):
         data_generator = DataGenerator()
-        data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backup-heavy")
+        data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "download-occasional")
         # data_generator.initialize_from_recipe(STEREOTYPE_RECIPES_PATH + "backupsample")
         data_generator.create_file_system_snapshot()
         data_generator.initialize_file_system_tree(FS_SNAPSHOT_PATH)
@@ -336,7 +346,7 @@ if __name__ == '__main__':
         }
         number_of_ops = 500
         for j in range(number_of_ops):
-            todo = random.randint(0, 3)
+            todo = r.randint(0, 3)
             do_list[todo]()
 
         '''DANGER! This deletes a directory recursively!'''

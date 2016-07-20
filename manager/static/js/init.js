@@ -215,6 +215,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
                 if (index == 'test-check') {
                     // lookup in checkbox
+                    // onclick download checkbox checked hosts
                     $('.' + index).each(function () {
                         // console.log(this)
                         if ($(this).prop('checked')) {
@@ -224,14 +225,18 @@ angular.module('app', ['ngRoute', 'ngResource'])
                              return item._id == checkedId
                              });
                              */
-                            queryDownloadInfluxMeasurement(this.name)
+
+                            queryDownloadInfluxMeasurement(this.name, "benchbox", $scope.testID);
+                            queryDownloadInfluxMeasurement(this.name, "benchbox_workload", $scope.testID)
+
                         }
                     })
                 } else {
                     var host = $scope.hosts[index];
                     console.log(host);
                     console.log("Download the metrics of this host: ", host.hostname);
-                    queryDownloadInfluxMeasurement(host.hostname);
+                    queryDownloadInfluxMeasurement(host.hostname, "benchbox");
+                    queryDownloadInfluxMeasurement(host.hostname, "benchbox_workload");
                 }
                 // invoke ajax request to the node server, the server does influx query and returns the result as ajax response.
             };
@@ -244,7 +249,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
 
                 switch (target) {
                     case "windows":
-                        console.log("show windows"); 
+                        console.log("show windows");
                         $('#rpc-linux').hide();
                         $('#rpc-windows').show();
                         break;
@@ -257,7 +262,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                         console.log("unhandled target operating system")
                         break;
                 }
- 
+
             };
 
             $scope.getAllMetrics = function () {
@@ -277,14 +282,16 @@ angular.module('app', ['ngRoute', 'ngResource'])
                              return item._id == checkedId
                              });
                              */
-                            queryDropInfluxMeasurement(this.name)
+                            queryDropInfluxMeasurement(this.name, "benchbox");
+                            queryDropInfluxMeasurement(this.name, "benchbox_workload")
                         }
                     })
                 } else {
                     var host = $scope.hosts[index];
                     console.log(host);
                     console.log("Drop measurement: ", host.hostname);
-                    queryDropInfluxMeasurement(host.hostname);
+                    queryDropInfluxMeasurement(host.hostname, "benchbox_workload");
+                    queryDropInfluxMeasurement(host.hostname, "benchbox");
                 }
 
 
@@ -329,6 +336,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                 })
             };
 
+            $scope.testID = 0;
 
 
             /**
@@ -400,6 +408,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                             console.log("rmqHost: " + cmd, this.name, checkedId, host[0]);
                             host[0].rmq_queue = targetHost.toLowerCase();
                             host[0].test_setup = $scope.run; // aqui dentro esta la variable testTarget = "windows or linux"
+                            host[0].testID = $scope.testID;
                             // console.log(host[0])
                             rmqHost(host[0], cmd)
                         }
@@ -414,7 +423,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
             $scope.startStop = function () {
                 console.log("START & STOP click");
                 var btn = document.getElementById('btn-start-stop');
-
+                $scope.testID = (new Date).getTime(); // update testID
                 btn.disabled = true;
                 if ($scope.is_running) {
                     // desible the button
@@ -428,11 +437,12 @@ angular.module('app', ['ngRoute', 'ngResource'])
                     $scope.rmq('test-check', 'executor', 'executor');
                     console.log('ExecutorWarmup');
 
-
                     // start
-                    $scope.run.testOperation = 'start'; // hello / warmup / start / stop
-                    $scope.rmq('test-check', 'executor', 'executor');
-                    console.log('ExecutorStart');
+                    setTimeout(function () {
+                        $scope.run.testOperation = 'start'; // hello / warmup / start / stop
+                        $scope.rmq('test-check', 'executor', 'executor');
+                        console.log('ExecutorStart');
+                    }, 3000);
 
                     // Now can stop
                     // ponemos un temporizador de 5S hasta que se pueda volver a empezar lo correcto seria imponer
@@ -558,16 +568,27 @@ testConnection = function (ip, port, cb) {
     });
 };
 
-queryDownloadInfluxMeasurement = function (measurement) {
+queryDownloadInfluxMeasurement = function (measurement, table, testID) {
+    // target hostname
     console.log("Download measurement: ", measurement);
+    if (table == undefined) {
+        table = "benchbox"
+    }
     var influx_query;
     if (measurement == undefined) {
-        measurement = "all";
-        influx_query = "select * from benchbox ";
+        influx_query = "select * from " + table + " ";
     } else {
-        influx_query = "select * from benchbox where hostname = '" + measurement + "'";
+        influx_query = "select * from " + table + " where hostname = '" + measurement + "'";
     }
-    console.log(influx_query)
+
+    if (testID == undefined) {
+        // nothing to join
+    } else {
+        influx_query += " and test_id = '" + testID + "'"
+    }
+
+
+    console.log(influx_query);
     $.ajax({
         url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
         data: {query: influx_query},
@@ -581,7 +602,7 @@ queryDownloadInfluxMeasurement = function (measurement) {
             console.log(data);
             var milliseconds = (new Date).getTime();
             var withHeader = true;
-            var output_name = "report_" + measurement + "_" + milliseconds;
+            var output_name = "report_" + measurement + "_" + table + "_" + testID + "" + milliseconds;
             JSONToCSVConvertor(data[0], output_name, withHeader);
             console.log("JSONToCSVConverter end")
             // there is a limit to the size...
@@ -591,21 +612,34 @@ queryDownloadInfluxMeasurement = function (measurement) {
             $.notify('Error! ' + err, 'error');
         }
     })
+
 };
-queryDropInfluxMeasurement = function (measurement) {
+
+queryDropInfluxMeasurement = function (measurement, table) {
+
+
+    // target hostname
+    console.log("Drop measurement: ", measurement);
+    if (table == undefined) {
+        table = "benchbox"
+    }
+    var influx_query;
+    influx_query = "drop series from "+table+" where hostname = '" + measurement + "'";
+
+
     $.ajax({
         url: 'http://' + location.hostname + ':' + location.port + "/influx/query",
-        data: {query: "drop series from benchbox where hostname = '" + measurement + "'"},
+        data: {query: influx_query},
         timeout: 6000000,
         dataType: 'json',
         type: 'GET',
         success: function (data) {
             // download json as csv file
             console.log("influx response: ");
-            $.notify("Success DROP " + measurement + "query", 'success');
+            $.notify("Success DROP " + influx_query + "query", 'success');
         },
         error: function (err) {
-            $.notify('Measurement ' + measurement + ' is clean! ', 'info');
+            $.notify('Measurement ' + influx_query + ' is clean! ', 'info');
         }
     })
 };
@@ -624,7 +658,8 @@ rmqHost = function (host, cmd, cb) {
         cmd: cmd,
         target_queue: host.rmq_queue,
         test: host.test_setup,
-        target: host.test_setup.testTarget
+        target: host.test_setup,
+        test_id: host.testID,
     };
 
     appendAllParams(args, 'bb-config');
@@ -712,10 +747,6 @@ appendAllHosts = function (target, className) {
 notifyButtonById = function (btnId) {
     // self
 };
-
-$.fn.graphite.defaults.url = "https://" + location.hostname + ":8443/renderer/";
-$.fn.graphite.defaults.width = "450";
-$.fn.graphite.defaults.height = "300";
 
 
 $('#btnFixImage').click(function () {

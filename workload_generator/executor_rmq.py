@@ -58,18 +58,21 @@ class Commands(object):
             cls._instance = super(Commands, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
-    def __init__(self, receipt):
+    def __init__(self, receipt, hostname):
         print '[INIT_EXECUTOR_RMQ]: rpc commands'
+        self.hostname = hostname  # the name of the dummyHost
         self.is_warmup = False
         self.is_running = False
         self.sync_directory = None  # stacksync_folder, Dropbox, ....
         self.target_ftp_target = None
+        self.target_personal_cloud = None # Dropbox, Box, GoogleDrive
         self.stereotype = receipt  # backupsample
         self.stereotype_executor = None
         self.monitor_state = "Unknown"
         # update ftp_root_directory
         self.fs_abs_target_folder = None
         self.execute = None
+        self.test_id = None
         # self.data_generator = DataGenerator()
 
         # start the monitoring stuff. # todo
@@ -100,7 +103,8 @@ class Commands(object):
                     "test": {
                         "testTarget": "linux",
                         "testFolder": "Dropbox",
-                        "testProfile": "backup-heavy",
+                        "testProfile": "sync-occasional",
+                        "testClient": "dropbox"
                     },
                     "dropbox-ip": "",
                     "dropbox-port": ""
@@ -116,6 +120,7 @@ class Commands(object):
             self.sync_directory = body['msg']['test']['testFolder']
             self.stereotype_executor = StereotypeExecutorU1()  # tornar a assignar
 
+            self.target_personal_cloud = body['msg']['test']['testClient']
             self.target_ftp_target = body['msg']['test']['testTarget']
             self.target_ftp_home = None
 
@@ -126,6 +131,7 @@ class Commands(object):
             else:
                 print "Unhandled sandbox target host"
 
+            self.stereotype_executor.initialize_rmq_channel()
             self.stereotype_executor.initialize_ftp_client_by_directory(root_dir=self.sync_directory, ftp_home=self.target_ftp_home)
 
             self.fs_abs_target_folder = '{}/{}'.format(self.target_ftp_home, self.sync_directory)  # target ftp_client dir absolute path
@@ -155,16 +161,51 @@ class Commands(object):
             self.is_running = True
             # TODO loop
             operations = 0
+
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
-                self.stereotype_executor.execute()
-                # time.sleep(3)
-                print colored("[TEST]: INFO {} --> {} // {} // {} ".format(time.ctime(time.time()), operations, self.is_running, self.sync_directory), 'red')
+                operation_executed, to_wait, file_path = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
+                file_type, file_size = self._file_type_size_by_path(file_path)
+                #print file_type, file_size, operation_executed, to_wait
+                time.sleep(to_wait)  # preventConnection close use with the next one or both
+                # self.rmq_connection.sleep(5)
+                self.stereotype_executor.notify_operation(
+                    operation_name=operation_executed,
+                    profile=self.stereotype,
+                    personal_cloud=self.target_personal_cloud,
+                    hostname=self.hostname,
+                    test_id=self.test_id,
+                    file_size=file_size,
+                    file_type=file_type,
+                    file_path=file_path
+                )
+
+                #print to_wait, operation_executed
+                print colored("[TEST]: INFO {} --> {}|{}|{} // {} // {} // {}({})s".format(time.ctime(time.time()), operations,file_size,file_type, self.is_running, self.sync_directory, operation_executed, to_wait), 'red')
         else:
             print '[TEST]: WARNING: need warmup 1st!'
 
-    def start(self, body=None):
+    @staticmethod
+    def _file_type_size_by_path(file_path=None):
+        print "SOURCE: >> {}".format(file_path)
+        if type(file_path) is not str:
+            return "None", 0
+        file_name = os.path.basename(file_path)
+        try:
+            file_name_part = file_name.split('.')
+        except:
+            return "None", 0
+        if len(file_name_part) == 1:
+            return "Folder", 0
+        else:
+            try:
+                fsize = os.path.getsize(file_path)
+                return file_name_part[1], fsize
+            except:
+                fsize = 0
+                return "None", fsize
 
+    def start(self, body=None):
         if body is None:
             body = {
                 "msg": {
@@ -175,7 +216,11 @@ class Commands(object):
                     "dropbox-port": ""
                 }
             }
-
+        try:
+            self.test_id = body['test_id']
+        except:
+            self.test_id = 0
+            pass
         print '[START_TEST]: {}'.format(body)
         if not self.is_warmup:
             return '[START_TEST]: WARNING: require warmup!'
@@ -183,7 +228,7 @@ class Commands(object):
             return '[START_TEST]: INFO: already running!'
         else:
             # SELF THREAD START
-            time.sleep(10)  # para que el
+            time.sleep(2)  # para que el
             print '[START_TEST]: INFO: instance thread'
             self.execute = Thread(target=self._test)
             self.execute.start()
@@ -202,24 +247,27 @@ class Commands(object):
                     "dropbox-port": ""
                 }
             }
+        print body
 
+        print "clear the content of the sintetic workload generator filesystem"
+        remove_inner_path('/home/vagrant/output/*')  # clear the directory after stoping the workload_generator
 
         if self.is_running:
             print '[STOP_TEST]: stop test {}'.format(body)
             self.is_running = False
             self.is_warmup = False
-            self.execute.join()
-
+            # self.execute.join() => es para sol amb el is_running
             self.monitor_state = "executor Stopped!"
             response_msg = '[STOP_TEST]: SUCCESS: stop test'
         else:
             response_msg = '[STOP_TEST]: WARNING: no test is running'
+            self.is_warmup = False
 
         self.is_warmup = False
-        print "clear the content of the sintetic workload generator filesystem"
-        remove_inner_path('/home/vagrant/output/*')  # clear the directory after stoping the workload_generator
-        # time.sleep(10)
         return response_msg
+
+    def exit(self):
+        exit(0)
 
     def keepalive(self, body=None):
         if body is None:
@@ -236,7 +284,7 @@ class Commands(object):
 
 
 class ExecuteRMQ(object):
-    def __init__(self, rmq_url='', host_queue='', profile=''):
+    def __init__(self, rmq_url='', host_queue='', profile='', hostname="TEST"):
         """
         This class contains the rabbitmq request handlers, that will call Commands contained in Commands class
         :param rmq_url: url where the rabbitmq server is hosted
@@ -247,11 +295,11 @@ class ExecuteRMQ(object):
         print "Executor operation consumer: "
         url = urlparse.urlparse(rmq_url)
         self.profile = profile
-        self.actions = Commands(profile)
+        self.actions = Commands(receipt=profile, hostname=hostname)
         self.queue_name = host_queue
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=url.hostname,
-            heartbeat_interval=5,
+            heartbeat_interval=0,  # unset heartbeat hope it running forever but none stable
             virtual_host=url.path[1:],
             credentials=pika.PlainCredentials(url.username, url.password)
         ))
@@ -301,17 +349,17 @@ if __name__ == '__main__':
         rmq_url = r.read().splitlines()[0]
     dummyhost = None
     # start the ftp sender
-    stereotype_receipt = 'backup-heavy'
+    stereotype_receipt = 'sync-occasional'
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
     queue_name = '{}.{}'.format(dummyhost, 'executor')
+    singleton()
     if len(sys.argv) == 1:  # means no parameters
         # DEFAULT: dummy
         # use file look
-        singleton()
         while True:
             # try:
-            executor = ExecuteRMQ(rmq_url, queue_name, stereotype_receipt)
+            executor = ExecuteRMQ(rmq_url=rmq_url, host_queue=queue_name, profile=stereotype_receipt, hostname=dummyhost)
             # todo fer que stereotype_receipt y personal cloud sigui dinamic
             executor.listen()
             # except Exception as ex:
@@ -320,7 +368,7 @@ if __name__ == '__main__':
 
     else:
         profile = "StackSync"
-        actions = Commands(receipt=stereotype_receipt)
+        actions = Commands(receipt=stereotype_receipt, hostname=dummyhost)
         while True:
             print 'write command: hello|warmup|start|stop'
             teclat = raw_input()
@@ -332,7 +380,7 @@ if __name__ == '__main__':
             except AttributeError as e:
                 print e.message
                 print "ACK: {}".format(teclat)
-            time.sleep(1)
+            time.sleep(5)
 
 
 
