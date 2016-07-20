@@ -299,6 +299,7 @@ class Capture(object):
             pass
             self.test_id = 0
         self.personal_cloud = body['msg']['test']['testClient']
+        self.stereotype_recipe = body['msg']['test']['testProfile']
         try:
             self.personal_cloud_ip = body['msg']['{}-ip'.format(self.personal_cloud.lower())]
             self.personal_cloud_port = body['msg']['{}-port'.format(self.personal_cloud.lower())]
