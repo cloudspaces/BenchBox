@@ -36,7 +36,6 @@ class StereotypeExecutorU1(StereotypeExecutor):
         StereotypeExecutor.__init__(self)
         self.rmq_channel = None
         self.ftp_client = None
-        self.current_operation = "SYNC"  # assign default initial, current operation
         # AttributeError: 'StereotypeExecutorU1' object has no attribute 'current_operation'
         # el keep alive puede ser por run o por to_wait operation...
 
@@ -82,9 +81,6 @@ class StereotypeExecutorU1(StereotypeExecutor):
                 ftp_home=ftp_home  # default home directory
         )
 
-    def initialize_from_stereotype_recipe(self, stereotype_recipe):
-        StereotypeExecutor.initialize_from_stereotype_recipe(self, stereotype_recipe)
-
     def create_fs_snapshot_and_migrate_to_sandbox(self):
         '''Initialize the file system in addition to the models'''
         self.data_generator.create_file_system_snapshot()
@@ -107,7 +103,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         self.next_operation()
         to_execute = getattr(self, 'do_' + self.next_action.lower())
         to_wait, file_path = to_execute(personal_cloud=personal_cloud)
-        return self.operation_chain.current_state,  to_wait, file_path
+        return self.next_action.lower(),  to_wait, file_path
 
     def update_current_time(self):
         self.current_time = time.time()
