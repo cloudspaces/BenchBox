@@ -131,7 +131,7 @@ class Capture(object):
                    }
 
         try:
-            if self.is_sync_client_running:  # the sync client is running
+            if self.sync_client_proc is None and self.is_sync_client_running:  # the sync client is running
                 self.sync_client_proc = psutil.Process(self.sync_client_proc_pid)
         except Exception as ex:
             print ex.message    # no sync client running
@@ -230,8 +230,6 @@ class Capture(object):
 
     def _test(self):
 
-        metric_reader = None
-        # metric values generator
         self.is_monitor_capturing = True
         operations = 0
         while self.is_monitor_capturing:
@@ -241,6 +239,7 @@ class Capture(object):
                 self.is_sync_client_running = self.notify_status()  # at each emit report if pid still running
                 time.sleep(1)  # get metrics each second
             else:
+                self.sync_client_proc = None
                 # this forwards the captured metric to the rabbit server
                 time.sleep(5)  # if client is not running wait 5
 
