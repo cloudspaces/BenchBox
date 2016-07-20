@@ -24,8 +24,8 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
       puts "BOX/LOAD #{node[:hostname]}"
       
       # nodeconfig.vm.box_url = box_url
-      # nodeconfig.ssh.username = "vagrant"
-      # nodeconfig.ssh.password = "vagrant"
+      nodeconfig.ssh.username = "vagrant"
+      nodeconfig.ssh.password = "vagrant"
       nodeconfig.vm.box = node[:box]
       nodeconfig.vm.hostname = node[:hostname] # capat: hostnamectl
       nodeconfig.vm.network :private_network, ip: node[:ip]

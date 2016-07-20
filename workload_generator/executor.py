@@ -206,9 +206,9 @@ class StereotypeExecutorU1(StereotypeExecutor):
             print ex.message
             return 0, None
 
-    def notify_operation(self, profile="sync-heavy", personal_cloud="dropbox",
+    def notify_operation(self, profile="sync-occasional", personal_cloud="dropbox",
                          hostname=None, operation_name=None,
-                         file_size="", file_type="", test_id=None):
+                         file_size="", file_type="", file_path="", test_id=None):
         tags = ''
 
         if tags == '':
@@ -220,6 +220,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             }
 
         metrics = {
+            "file_path": file_path,
             "file_size": file_size,
             "file_type": file_type,
             'operation': operation_name,

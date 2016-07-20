@@ -103,7 +103,7 @@ class Commands(object):
                     "test": {
                         "testTarget": "linux",
                         "testFolder": "Dropbox",
-                        "testProfile": "download-heavy",
+                        "testProfile": "sync-occasional",
                         "testClient": "dropbox"
                     },
                     "dropbox-ip": "",
@@ -176,7 +176,9 @@ class Commands(object):
                     hostname=self.hostname,
                     test_id=self.test_id,
                     file_size=file_size,
-                    file_type=file_type)
+                    file_type=file_type,
+                    file_path=file_path
+                )
 
                 #print to_wait, operation_executed
                 print colored("[TEST]: INFO {} --> {}|{}|{} // {} // {} // {}({})s".format(time.ctime(time.time()), operations,file_size,file_type, self.is_running, self.sync_directory, operation_executed, to_wait), 'red')
@@ -347,7 +349,7 @@ if __name__ == '__main__':
         rmq_url = r.read().splitlines()[0]
     dummyhost = None
     # start the ftp sender
-    stereotype_receipt = 'download-heavy'
+    stereotype_receipt = 'sync-occasional'
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
     queue_name = '{}.{}'.format(dummyhost, 'executor')
