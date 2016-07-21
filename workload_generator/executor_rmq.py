@@ -103,7 +103,7 @@ class Commands(object):
                     "test": {
                         "testTarget": "linux",
                         "testFolder": "Dropbox",
-                        "testProfile": "backup-occasional",
+                        "testProfile": "download-occasional",
                         "testClient": "dropbox"
                     },
                     "dropbox-ip": "",
@@ -349,7 +349,7 @@ if __name__ == '__main__':
         rmq_url = r.read().splitlines()[0]
     dummyhost = None
     # start the ftp sender
-    stereotype_receipt = 'backup-occasional'
+    stereotype_receipt = 'download-occasional'
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
     queue_name = '{}.{}'.format(dummyhost, 'executor')

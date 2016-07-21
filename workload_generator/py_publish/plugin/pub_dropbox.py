@@ -50,6 +50,7 @@ class Dropbox():
             print ex.message
 
         f = open(src, 'r')
+        response = None
         try:
             response = self.client.files_upload(f, tgt, mode=dropbox.files.WriteMode('overwrite'))
         # except dropbox.exceptions.ApiError as ex:
