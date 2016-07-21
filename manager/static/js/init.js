@@ -226,7 +226,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                              });
                              */
 
-                            queryDownloadInfluxMeasurement(this.name, "benchbox", $scope.testID);
+                            // queryDownloadInfluxMeasurement(this.name, "benchbox", $scope.testID);
                             queryDownloadInfluxMeasurement(this.name, "benchbox_workload", $scope.testID)
 
                         }
@@ -235,7 +235,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                     var host = $scope.hosts[index];
                     console.log(host);
                     console.log("Download the metrics of this host: ", host.hostname);
-                    queryDownloadInfluxMeasurement(host.hostname, "benchbox");
+                    // queryDownloadInfluxMeasurement(host.hostname, "benchbox");
                     queryDownloadInfluxMeasurement(host.hostname, "benchbox_workload");
                 }
                 // invoke ajax request to the node server, the server does influx query and returns the result as ajax response.
