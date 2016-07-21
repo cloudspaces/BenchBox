@@ -103,7 +103,7 @@ class Commands(object):
                     "test": {
                         "testTarget": "linux",
                         "testFolder": "Dropbox",
-                        "testProfile": "sync-occasional",
+                        "testProfile": "backup-occasional",
                         "testClient": "dropbox"
                     },
                     "dropbox-ip": "",
@@ -349,7 +349,7 @@ if __name__ == '__main__':
         rmq_url = r.read().splitlines()[0]
     dummyhost = None
     # start the ftp sender
-    stereotype_receipt = 'sync-occasional'
+    stereotype_receipt = 'backup-occasional'
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
     queue_name = '{}.{}'.format(dummyhost, 'executor')
@@ -367,6 +367,7 @@ if __name__ == '__main__':
             #     print "Some connection exception happened..."
 
     else:
+
         profile = "StackSync"
         actions = Commands(receipt=stereotype_receipt, hostname=dummyhost)
         while True:

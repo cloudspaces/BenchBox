@@ -82,7 +82,7 @@ class Monitor(object):
                 "msg": {
                     "test": {
                         "testClient": "dropbox",
-                        "testProfile": "sync-occasional"
+                        "testProfile": "backup-occasional"
                     },
                     "dropbox-ip": "",
                     "dropbox-port": ""
