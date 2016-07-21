@@ -52,7 +52,8 @@ class Dropbox():
         f = open(src, 'r')
         try:
             response = self.client.files_upload(f, tgt, mode=dropbox.files.WriteMode('overwrite'))
-        except dropbox.exceptions.ApiError as ex:
+        # except dropbox.exceptions.ApiError as ex:
+        except Exception as ex:
             print ex.message
 
         print 'uploaded: ', response
