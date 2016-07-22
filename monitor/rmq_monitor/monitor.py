@@ -57,10 +57,10 @@ class Monitor(object):
             body = {
                 "msg": {
                     "test": {
-                        "testClient": "dropbox",
+                        "testClient": "box",
                     },
-                    "dropbox-ip": "",
-                    "dropbox-port": ""
+                    "box-ip": "",
+                    "box-port": ""
                 }
             }
         self._sync_client_selector(request=body)
@@ -81,11 +81,11 @@ class Monitor(object):
             body = {
                 "msg": {
                     "test": {
-                        "testClient": "dropbox",
+                        "testClient": "box",
                         "testProfile": "download-occasional"
                     },
-                    "dropbox-ip": "",
-                    "dropbox-port": ""
+                    "box-ip": "",
+                    "box-port": ""
                 }
             }
 
@@ -96,25 +96,6 @@ class Monitor(object):
             result = self.sync_client.start(body)
         return 0, "[Start]: response {}".format(result)
 
-    '''
-    RMQ request to warmup the dummyhost=>[sandbox|benchbox]
-    '''
-    def warmup(self, body=None):
-
-        if body is None:
-            body = {
-                "msg": {
-                    "test": {
-                        "testClient": "dropbox",
-                    },
-                    "dropbox-ip": "",
-                    "dropbox-port": ""
-                }
-            }
-        self._sync_client_selector(request=body)
-        self.monitor_state = "warmup_monitor"
-        self.sync_client.warmup(body)
-        return 0, "[Warmup]: response"
 
     '''
     RMQ request to stop personal cloud client
@@ -125,10 +106,10 @@ class Monitor(object):
             body = {
                 "msg": {
                     "test": {
-                        "testClient": "dropbox",
+                        "testClient": "box",
                     },
-                    "dropbox-ip": "",
-                    "dropbox-port": ""
+                    "box-ip": "",
+                    "box-port": ""
                 }
             }
 
@@ -147,21 +128,11 @@ class Monitor(object):
     RMQ request to display the executor status
     '''
     def keepalive(self, body=None):
-        if body is None:
-            body = {
-                "msg": {
-                    "test": {
-                        "testClient": "dropbox",
-                    },
-                    "dropbox-ip": "",
-                    "dropbox-port": ""
-                }
-            }
 
         # self.monitor_state = ""
         return "{} -> {}".format(datetime.datetime.now().isoformat(), self.executor_state)
 
-    def exit(self):
+    def exit(self, body=None):
         exit(0)
 
     """
