@@ -185,7 +185,9 @@ amqp.connect(amqp_url, function (err, conn) {
         });
         ch.prefetch(1);
         ch.consume(q, function rpc_reply(msg) {
+            
             var host_status = JSON.parse(msg.content);  // nomes el missatge esta en json
+            console.log(msg)
             console.log("" +
                 "[" + msg.properties.replyTo + "] --> " +
                 "[" + msg.fields.consumerTag + "] " +
