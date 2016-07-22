@@ -205,6 +205,8 @@ amqp.connect(amqp_url, function (err, conn) {
                 var status_attr = 'status';
                 if (dummyhost != vboxhost) {
                     status_attr += '_' + vboxhost
+                }else{
+                    status_attr = ""
                 }
                 try {
                     console.log(host);
