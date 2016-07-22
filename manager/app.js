@@ -204,15 +204,21 @@ amqp.connect(amqp_url, function (err, conn) {
                 if (dummyhost != vboxhost) {
                     status_attr += '_' + vboxhost
                 }
-                console.log('status_old:    ' + host[status_attr]);
-                host[status_attr] = status;
-                console.log('status_updated: ' + status);
-                host.save(function (err) {
-                    if (err) {
-                        console.log("Save one failed");
-                        console.log(err.message)
-                    }
-                })
+                try {
+                    console.log(host)
+                    console.log('status_old:    ' + host[status_attr]);
+                    host[status_attr] = status;
+                    console.log('status_updated: ' + status);
+                    host.save(function (err) {
+                        if (err) {
+                            console.log("Save one failed");
+                            console.log(err.message)
+                        }
+                    })
+                }
+                catch (err) {
+                    console.log(err.message);
+                }
             });
             var result = "manager Joined queue " + host_status.host + "! ";
             var callbackChannel = msg.properties.replyTo;
