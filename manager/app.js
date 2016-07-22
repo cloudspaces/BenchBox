@@ -205,7 +205,7 @@ amqp.connect(amqp_url, function (err, conn) {
                     status_attr += '_' + vboxhost
                 }
                 try {
-                    console.log(host)
+                    console.log(host);
                     console.log('status_old:    ' + host[status_attr]);
                     host[status_attr] = status;
                     console.log('status_updated: ' + status);
