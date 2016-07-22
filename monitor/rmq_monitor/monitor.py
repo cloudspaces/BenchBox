@@ -119,7 +119,8 @@ class Monitor(object):
         result = None
         if self.sync_client.is_monitor_capturing:  # if its capturing, stop it to capture
             result = self.sync_client.stop(body)
-        # else:
+
+         # else:
         #     self.client.stop(body)  # remove this
 
         return 0, "[Stop]: response {}".format(result)
