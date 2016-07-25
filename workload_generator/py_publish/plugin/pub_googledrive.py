@@ -21,8 +21,10 @@ class GoogleDrive():
 
         self.whoami = (self).__class__.__name__
         print self.whoami
-        curr_dir = os.path.expanduser('.')
-        credential_dir = os.path.join(curr_dir, '.credentials')
+        curr_dir = os.path.dirname(os.path.realpath(__file__))
+
+        credential_dir = os.path.join(curr_dir, 'credentials')
+        print credential_dir
         if not os.path.exists(credential_dir):
             os.makedirs(credential_dir)
         credential_path = os.path.join(credential_dir, CACHED_CREDENTIAL_FILE)
