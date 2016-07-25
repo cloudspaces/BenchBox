@@ -11,7 +11,8 @@ class GoogleDrive(Capture):
         if self.platform_is_windows:
             self.pc_cmd = "/Program Files (x86)/Google/Drive/googledrivesync.exe",
             self.proc_name = "googledrivesync.exe"
-            self.sync_folder = ""
+            self.sync_folder = "/Users/vagrant/Google Drive"
+            self.sync_folder_cleanup = "/Users/vagrant/Google Drive/*"
         else:
             self.pc_cmd = ""
             self.proc_name = ""

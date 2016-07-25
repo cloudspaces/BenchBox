@@ -57,10 +57,10 @@ class Monitor(object):
             body = {
                 "msg": {
                     "test": {
-                        "testClient": "box",
+                        "testClient": "GoogleDrive",
                     },
-                    "box-ip": "",
-                    "box-port": ""
+                    "googledrive-ip": "",
+                    "googledrive-port": ""
                 }
             }
         self._sync_client_selector(request=body)
@@ -81,11 +81,11 @@ class Monitor(object):
             body = {
                 "msg": {
                     "test": {
-                        "testClient": "box",
+                        "testClient": "GoogleDrive",
                         "testProfile": "download-occasional"
                     },
-                    "box-ip": "",
-                    "box-port": ""
+                    "googledrive-ip": "",
+                    "googledrive-port": ""
                 }
             }
 
@@ -106,10 +106,10 @@ class Monitor(object):
             body = {
                 "msg": {
                     "test": {
-                        "testClient": "box",
+                        "testClient": "GoogleDrive",
                     },
-                    "box-ip": "",
-                    "box-port": ""
+                    "googledrive-ip": "",
+                    "googledrive-port": ""
                 }
             }
 
