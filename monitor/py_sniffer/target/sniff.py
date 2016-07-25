@@ -175,10 +175,10 @@ class Sniff(object):
         self.decoder = EthDecoder()     # packet decoder
 
         self.live_capture = pcapy.open_live(
-            self.iface,
-            args['max_bytes'],
-            args['promiscuous'],
-            args['read_timeout']
+            device=self.iface,
+            snaplen=args['max_bytes'],
+            promisc=args['promiscuous'],
+            to_ms=args['read_timeout']
         )
 
         self.packet_limit = args['packet_limit']  # -1

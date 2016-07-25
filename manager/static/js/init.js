@@ -226,7 +226,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                              });
                              */
 
-                            queryDownloadInfluxMeasurement(this.name, "benchbox", $scope.testID);
+                            // queryDownloadInfluxMeasurement(this.name, "benchbox", $scope.testID);
                             queryDownloadInfluxMeasurement(this.name, "benchbox_workload", $scope.testID)
 
                         }
@@ -235,7 +235,7 @@ angular.module('app', ['ngRoute', 'ngResource'])
                     var host = $scope.hosts[index];
                     console.log(host);
                     console.log("Download the metrics of this host: ", host.hostname);
-                    queryDownloadInfluxMeasurement(host.hostname, "benchbox");
+                    // queryDownloadInfluxMeasurement(host.hostname, "benchbox");
                     queryDownloadInfluxMeasurement(host.hostname, "benchbox_workload");
                 }
                 // invoke ajax request to the node server, the server does influx query and returns the result as ajax response.
@@ -432,17 +432,20 @@ angular.module('app', ['ngRoute', 'ngResource'])
                     $scope.rmq('test-check', 'monitor', 'monitor');
 
                     // executor warmup
-                    console.log('MonitorStart');
-                    $scope.run.testOperation = 'warmup'; // hello / warmup / start / stop
-                    $scope.rmq('test-check', 'executor', 'executor');
-                    console.log('ExecutorWarmup');
+
 
                     // start
                     setTimeout(function () {
-                        $scope.run.testOperation = 'start'; // hello / warmup / start / stop
+                        console.log('MonitorStart');
+                        $scope.run.testOperation = 'warmup'; // hello / warmup / start / stop
                         $scope.rmq('test-check', 'executor', 'executor');
-                        console.log('ExecutorStart');
-                    }, 3000);
+                        console.log('ExecutorWarmup');
+                        setTimeout(function () {
+                            $scope.run.testOperation = 'start'; // hello / warmup / start / stop
+                            $scope.rmq('test-check', 'executor', 'executor');
+                            console.log('ExecutorStart');
+                        }, 10000);
+                    }, 5000); //
 
                     // Now can stop
                     // ponemos un temporizador de 5S hasta que se pueda volver a empezar lo correcto seria imponer
@@ -624,7 +627,7 @@ queryDropInfluxMeasurement = function (measurement, table) {
         table = "benchbox"
     }
     var influx_query;
-    influx_query = "drop series from "+table+" where hostname = '" + measurement + "'";
+    influx_query = "drop series from " + table + " where hostname = '" + measurement + "'";
 
 
     $.ajax({

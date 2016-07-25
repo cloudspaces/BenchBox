@@ -83,13 +83,6 @@ class Commands(object):
         if body is None:
             body = {
                 "cmd": "hello",
-                "msg": {
-                    "test": {
-                        "testClient": "dropbox",
-                    },
-                    "dropbox-ip": "",
-                    "dropbox-port": ""
-                }
             }
 
         print '[HELLO]: hello world {}'.format(body['cmd'])
@@ -101,13 +94,13 @@ class Commands(object):
             body = {
                 "msg": {
                     "test": {
-                        "testTarget": "linux",
-                        "testFolder": "Dropbox",
-                        "testProfile": "sync-occasional",
-                        "testClient": "dropbox"
+                        "testTarget": "windows",
+                        "testFolder": "Box Sync",
+                        "testProfile": "download-occasional",
+                        "testClient": "box"
                     },
-                    "dropbox-ip": "",
-                    "dropbox-port": ""
+                    "box-ip": "",
+                    "box-port": ""
                 }
             }
 
@@ -210,10 +203,10 @@ class Commands(object):
             body = {
                 "msg": {
                     "test": {
-                        "testClient": "dropbox",
+                        "testClient": "box",
                     },
-                    "dropbox-ip": "",
-                    "dropbox-port": ""
+                    "box-ip": "",
+                    "box-port": ""
                 }
             }
         try:
@@ -237,18 +230,6 @@ class Commands(object):
 
     def stop(self, body=None):
 
-        if body is None:
-            body = {
-                "msg": {
-                    "test": {
-                        "testClient": "dropbox",
-                    },
-                    "dropbox-ip": "",
-                    "dropbox-port": ""
-                }
-            }
-        print body
-
         print "clear the content of the sintetic workload generator filesystem"
         remove_inner_path('/home/vagrant/output/*')  # clear the directory after stoping the workload_generator
 
@@ -270,16 +251,6 @@ class Commands(object):
         exit(0)
 
     def keepalive(self, body=None):
-        if body is None:
-            body = {
-                "msg": {
-                    "test": {
-                        "testClient": "dropbox",
-                    },
-                    "dropbox-ip": "",
-                    "dropbox-port": ""
-                }
-            }
         return "{} -> {}".format(datetime.datetime.now().isoformat(), self.monitor_state)
 
 
@@ -349,7 +320,7 @@ if __name__ == '__main__':
         rmq_url = r.read().splitlines()[0]
     dummyhost = None
     # start the ftp sender
-    stereotype_receipt = 'sync-occasional'
+    stereotype_receipt = 'download-occasional'
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
     queue_name = '{}.{}'.format(dummyhost, 'executor')
@@ -367,6 +338,7 @@ if __name__ == '__main__':
             #     print "Some connection exception happened..."
 
     else:
+
         profile = "StackSync"
         actions = Commands(receipt=stereotype_receipt, hostname=dummyhost)
         while True:

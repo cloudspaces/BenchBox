@@ -344,7 +344,7 @@ class Capture(object):
         # self.monitor.join()
         # self.sync_client.join()
 
-        # self.traffic_monitor.rage_quit()
+        self.traffic_monitor.rage_quit()
 
         # self.sync_client_proc_pid
         # how to stop process

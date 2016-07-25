@@ -185,7 +185,9 @@ amqp.connect(amqp_url, function (err, conn) {
         });
         ch.prefetch(1);
         ch.consume(q, function rpc_reply(msg) {
+            
             var host_status = JSON.parse(msg.content);  // nomes el missatge esta en json
+            console.log(msg.content.toString());
             console.log("" +
                 "[" + msg.properties.replyTo + "] --> " +
                 "[" + msg.fields.consumerTag + "] " +
@@ -203,16 +205,24 @@ amqp.connect(amqp_url, function (err, conn) {
                 var status_attr = 'status';
                 if (dummyhost != vboxhost) {
                     status_attr += '_' + vboxhost
+                }else{
+                    status_attr = ""
                 }
-                console.log('status_old:    ' + host[status_attr]);
-                host[status_attr] = status;
-                console.log('status_updated: ' + status);
-                host.save(function (err) {
-                    if (err) {
-                        console.log("Save one failed");
-                        console.log(err.message)
-                    }
-                })
+                try {
+                    console.log(host);
+                    console.log('status_old:    ' + host[status_attr]);
+                    host[status_attr] = status;
+                    console.log('status_updated: ' + status);
+                    host.save(function (err) {
+                        if (err) {
+                            console.log("Save one failed");
+                            console.log(err.message)
+                        }
+                    })
+                }
+                catch (err) {
+                    console.log(err.message);
+                }
             });
             var result = "manager Joined queue " + host_status.host + "! ";
             var callbackChannel = msg.properties.replyTo;
