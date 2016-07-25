@@ -174,7 +174,10 @@ class ftp_sender():
         self.ftp.cwd(folder)
 
     def cwd(self, folder):
-        self.ftp.cwd(folder)
+        try:
+            self.ftp.cwd(folder)
+        except Exception as ex:
+            print ex.message
 
     def get_ftp_host(self):
         return self.ftp_host
