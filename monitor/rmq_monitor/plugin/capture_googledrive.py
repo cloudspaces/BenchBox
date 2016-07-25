@@ -9,7 +9,7 @@ class GoogleDrive(Capture):
         self.whoami = (self).__class__.__name__
         print self.whoami
         if self.platform_is_windows:
-            self.pc_cmd = "/Program Files (x86)/Google/Drive/googledrivesync.exe",
+            self.pc_cmd = "/Program Files (x86)/Google/Drive/googledrivesync.exe"
             self.proc_name = "googledrivesync.exe"
             self.sync_folder = "/Users/vagrant/Google Drive"
             self.sync_folder_cleanup = "/Users/vagrant/Google Drive/*"
@@ -17,7 +17,8 @@ class GoogleDrive(Capture):
             self.pc_cmd = ""
             self.proc_name = ""
             self.sync_folder = ""
+            self.sync_folder_cleanup = ""
 
-    def hello(self):
-        print "{} say hello".format(self.whoami)
+    def hello(self, body):
+        print "{} say hello".format(self.whoami, body)
 

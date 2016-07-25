@@ -20,5 +20,5 @@ class Box(Capture):
             self.sync_folder_cleanup = ""
 
     def hello(self, body):
-        print "{} say hello".format(self.whoami)
+        print "{} say hello".format(self.whoami, body)
 

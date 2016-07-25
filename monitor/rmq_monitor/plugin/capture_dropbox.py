@@ -12,7 +12,7 @@ class Dropbox(Capture):
         self.whoami = (self).__class__.__name__
         print self.whoami
         if self.platform_is_windows:
-            self.pc_cmd = "/Program Files (x86)/Dropbox/Client/Dropbox.exe",
+            self.pc_cmd = "/Program Files (x86)/Dropbox/Client/Dropbox.exe"
             self.proc_name = "Dropbox.exe"
             self.sync_folder = "/Users/vagrant/Dropbox"
             self.sync_folder_cleanup = "/Users/vagrant/Dropbox/*"
