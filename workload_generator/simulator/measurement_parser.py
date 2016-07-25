@@ -45,6 +45,16 @@ def parse_benchbox_trace(input_file, output_dir, provider, stereotype):
     print "Parsing BENCHBOX file: ", input_file    
     first_line = True
     
+    file_categories = {'AppBinary' : ['.o', '.msf', '.jar', '.dat', '.ini', '.dll', '.log', '.mo', '.lock', '.npy', '.exe'],
+                       'AudioVideo' : ['.mp3', '.ogg', '.wav', '.au'],
+                       'Pict' : ['.jpeg','.png','.gif', '.svg', '.tif', '.bmp'], 
+                       'Code' : ['.php', '.html', '.js', '.xml', '.h', '.c', '.java', '.py', '.css', '.htm', '.cpp', '.r', '.hpp', '.json', '.d', '.m'],
+                       'Docs' : ['.pdf', '.txt', '.tmp', '.doc', '.odt', '.docx', '.xls', '.csv', '.tex', '.po'],
+                       'Compressed' : ['.gz', '.zip']}
+    
+    file_upload_category_counter = {'AppBinary' : 0, 'AudioVideo' : 0, 'Pict' : 0, 'Code' : 0, 'Docs' : 0, 'Compressed' : 0}
+    file_operations = {'move' : 0, 'sync' : 0, 'upload' : 0, 'download' : 0, 'delete' : 0, 'idle': 0, 'start': 0}
+    
     per_operation_file = dict()
     for k in ["move", "sync", "upload", "download", "delete"]:    
         per_operation_file[k] = open(output_dir + provider + "-" + stereotype + "-" + k + ".dat", "w")
@@ -56,12 +66,35 @@ def parse_benchbox_trace(input_file, output_dir, provider, stereotype):
         if first_line:
             first_line = False 
             continue
+    
+        file_operations[operation] += 1
+        
+        if operation == "upload":
+            for k in file_categories.keys():
+                if "."+file_type in file_categories[k]:
+                    file_upload_category_counter[k] += 1
         
         for k in per_operation_file.keys():
             if k == operation:
                 print >> per_operation_file[k], time + '\t' + file_size  + '\t1' 
             else:
                 print >> per_operation_file[k], time + '\t0' + '\t0'
+    
+    '''Check that the fraction of files created is the same that the specified in the recipe'''            
+    print file_upload_category_counter
+    total_uploaded_files = 0.0
+    for v in file_upload_category_counter.values():
+        total_uploaded_files += v      
+    for k in file_upload_category_counter.keys():
+        print k, file_upload_category_counter[k]/total_uploaded_files
+     
+    '''Check that the fraction of operations is the same that in the recipe'''   
+    print file_operations
+    total_file_operations = 0.0
+    for v in file_operations.values():
+        total_file_operations += v      
+    for k in file_operations.keys():
+        print k, file_operations[k]/total_file_operations
     
 if __name__ == '__main__':
     
