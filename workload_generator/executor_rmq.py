@@ -95,12 +95,12 @@ class Commands(object):
                 "msg": {
                     "test": {
                         "testTarget": "windows",
-                        "testFolder": "Box Sync",
-                        "testProfile": "download-occasional",
-                        "testClient": "box"
+                        "testFolder": "Google Drive",
+                        "testProfile": "download-heavy",
+                        "testClient": "GoogleDrive"
                     },
-                    "box-ip": "",
-                    "box-port": ""
+                    "googledrive-ip": "",
+                    "googledrive-port": ""
                 }
             }
 
@@ -203,10 +203,11 @@ class Commands(object):
             body = {
                 "msg": {
                     "test": {
-                        "testClient": "box",
+                        "testClient": "GoogleDrive",
+                        "testFolder": "Google Drive"
                     },
-                    "box-ip": "",
-                    "box-port": ""
+                    "googledrive-ip": "",
+                    "googledrive-port": ""
                 }
             }
         try:
@@ -320,7 +321,7 @@ if __name__ == '__main__':
         rmq_url = r.read().splitlines()[0]
     dummyhost = None
     # start the ftp sender
-    stereotype_receipt = 'download-occasional'
+    stereotype_receipt = 'download-heavy'
     with open('/vagrant/hostname', 'r') as f:
         dummyhost = f.read().splitlines()[0]
     queue_name = '{}.{}'.format(dummyhost, 'executor')
@@ -331,7 +332,6 @@ if __name__ == '__main__':
         while True:
             # try:
             executor = ExecuteRMQ(rmq_url=rmq_url, host_queue=queue_name, profile=stereotype_receipt, hostname=dummyhost)
-            # todo fer que stereotype_receipt y personal cloud sigui dinamic
             executor.listen()
             # except Exception as ex:
             #     print ex.message
@@ -339,7 +339,7 @@ if __name__ == '__main__':
 
     else:
 
-        profile = "StackSync"
+        # profile = "Box"
         actions = Commands(receipt=stereotype_receipt, hostname=dummyhost)
         while True:
             print 'write command: hello|warmup|start|stop'
