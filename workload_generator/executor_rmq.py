@@ -158,8 +158,9 @@ class Commands(object):
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
                 operation_executed, to_wait, file_path = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
+                print operation_executed, to_wait, file_path
                 file_type, file_size = self._file_type_size_by_path(file_path)
-                #print file_type, file_size, operation_executed, to_wait
+                print file_type, file_size, operation_executed, to_wait
                 time.sleep(to_wait)  # preventConnection close use with the next one or both
                 # self.rmq_connection.sleep(5)
                 self.stereotype_executor.notify_operation(
@@ -186,7 +187,8 @@ class Commands(object):
         file_name = os.path.basename(file_path)
         try:
             file_name_part = file_name.split('.')
-        except:
+        except Exception as ex:
+            print ex.message
             return "None", 0
         if len(file_name_part) == 1:
             return "Folder", 0
@@ -194,7 +196,8 @@ class Commands(object):
             try:
                 fsize = os.path.getsize(file_path)
                 return file_name_part[1], fsize
-            except:
+            except Exception as ex:
+                print ex.message
                 fsize = 0
                 return "None", fsize
 
@@ -212,7 +215,8 @@ class Commands(object):
             }
         try:
             self.test_id = body['test_id']
-        except:
+        except Exception as ex:
+            print ex.message
             self.test_id = 0
             pass
         print '[START_TEST]: {}'.format(body)

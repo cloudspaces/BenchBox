@@ -40,13 +40,15 @@ class StereotypeExecutorU1(StereotypeExecutor):
         # el keep alive puede ser por run o por to_wait operation...
 
     def initialize_rmq_channel(self):
+        print "INITIALIZE_RMQ_CHANNEL"
         self.rmq_path_url = None
 
         try:
             self.rmq_path = "rabbitmq"
             with open(self.rmq_path, 'r') as read_file:
                 self.rmq_path_url = read_file.read().splitlines()[0]
-        except IOError:
+        except IOError as ex:
+            print ex.message
             self.rmq_path = "/vagrant/rabbitmq"
             with open(self.rmq_path, 'r') as read_file:
                 self.rmq_path_url = read_file.read().splitlines()[0]
@@ -102,6 +104,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
         '''Get the next operation to be done'''
         self.next_operation()
         to_execute = getattr(self, 'do_' + self.next_action.lower())
+        print to_execute
         to_wait, file_path = to_execute(personal_cloud=personal_cloud)
         return self.next_action.lower(),  to_wait, file_path
 
@@ -236,5 +239,6 @@ class StereotypeExecutorU1(StereotypeExecutor):
                 return 0
             except Exception as ex:
                 print ex.message
+                print "Failed publish metric"
                 self.initialize_rmq_channel()
 

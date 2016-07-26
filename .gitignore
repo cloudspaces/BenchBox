@@ -138,3 +138,4 @@ windows/profile
 windows/ss.*.*
 
 target
+!workload_generator/py_publish/plugin/credentials
