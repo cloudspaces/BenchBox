@@ -436,8 +436,8 @@ class ProdStatusService():
         if status_msg is None:
             status_msg = "Hello from {} ".format(hostname)
 
-        if topic is not None:
-            hostname = topic
+        # if topic is None:
+        #     hostname = topic
 
         try:  # this means that its a dummyhost
             with open('./hostname', 'r') as f:
