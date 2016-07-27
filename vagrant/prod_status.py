@@ -407,7 +407,7 @@ class ProdStatusService():
     def main(self, status_msg, topic):
         ''' dummy host says hello to the manager '''
         # target
-        is_dummyHost = False
+        is_dummy_host = None  # significa que es una maquina fisica
         target_os = None
         rmq_url = None
 
@@ -416,17 +416,22 @@ class ProdStatusService():
                 rmq_url = r.read().splitlines()[0]
             with open('/vagrant/target','r') as r:
                 target_os = r.read().splitlines()[0]
-        except:
-            print "This is not a BenchBox machine"
+        except Exception as ex:
+            print ex.message
+            print "This is not a Physical machine, it has vagrant root folder!"
             with open('./rabbitmq','r') as r:
                 rmq_url = r.read().splitlines()[0]
             with open('./target','r') as r:
                 target_os = r.read().splitlines()[0]
-            is_dummyHost = True
-
-        emit_status_rpc = ProduceStatus(rmq_url=rmq_url, target_os=target_os, is_dummyHost=is_dummyHost)
 
         hostname = socket.gethostname()
+
+        if hostname is 'benchBox' or hostname is 'sandBox':
+            is_dummy_host = False
+        else:
+            is_dummy_host = True
+
+        emit_status_rpc = ProduceStatus(rmq_url=rmq_url, target_os=target_os, is_dummyHost=is_dummy_host)
 
         if status_msg is None:
             status_msg = "Hello from {} ".format(hostname)
@@ -436,26 +441,28 @@ class ProdStatusService():
 
         try:  # this means that its a dummyhost
             with open('./hostname', 'r') as f:
-                dummyhost = f.read().splitlines()[0]
+                dummy_host = f.read().splitlines()[0]
 
-        except: # this means that its sandBox or benchBox
+        except Exception as ex:  # this means that its sandBox or benchBox
+            print ex.message
             with open('/vagrant/hostname', 'r') as f:
-                dummyhost = f.read().splitlines()[0]
+                dummy_host = f.read().splitlines()[0]
 
-        if is_dummyHost:
-            host_queue = "{}.{}".format(hostname.lower(), hostname.lower())
+        if is_dummy_host:
+            host_queue = "{}.{}".format(hostname.lower(), hostname.lower())  # es maquina fisica
         else:
-            host_queue = "{}.{}".format(dummyhost, hostname.lower())  # this is the format, that rmq.js target_queue needs!
+            host_queue = "{}.{}".format(dummy_host, hostname.lower())  # es maquina virtual
+            # this is the format, that rmq.js target_queue needs!
 
         print " [Out] emit: emit_status_rpc.call({})".format(host_queue)
         response = emit_status_rpc.call(status_msg, host_queue)
-        emit_status_rpc.close() # emit setup done response
+        emit_status_rpc.close()  # emit setup done response
         print " [In] recv: Got response from manager: %r" % (response,)
 
         ''' crear una cua amb el propi host name de tipus direct '''
         while True:
             # try:
-            consumer_rpc = ConsumeAction(rmq_url, host_queue, target_os, is_dummyHost)
+            consumer_rpc = ConsumeAction(rmq_url, host_queue, target_os, is_dummy_host)
             consumer_rpc.listen()
             # except Exception as ex:
             #    print "{} prod_status Consumer exception".format(ex.message)
