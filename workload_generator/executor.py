@@ -223,7 +223,7 @@ class StereotypeExecutorU1(StereotypeExecutor):
             "file_size": file_size,
             "file_type": file_type,
             'operation': operation_name,
-            'time': calendar.timegm(time.gmtime()) * 1000,
+            'time':  self.get_curr_milli_time(),
         }
         data = {
             'metrics': metrics,
@@ -242,3 +242,6 @@ class StereotypeExecutorU1(StereotypeExecutor):
                 print "Failed publish metric"
                 self.initialize_rmq_channel()
 
+    @staticmethod
+    def get_curr_milli_time():
+        return lambda: int(round(time.time() * 1000))

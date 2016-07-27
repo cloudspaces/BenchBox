@@ -30,7 +30,7 @@ class EmitMetric(object):
         metrics = {'cpu': random.randint(0, 100),
                 'ram': random.randint(0, 100),
                 'net': random.randint(0, 100),
-                'time': calendar.timegm(time.gmtime()) * 1000}
+                'time': self.get_curr_milli_time()}
         tags = {
             'profile': 'backup-heavy',
             'credentials': 'pc_credentials'
@@ -51,6 +51,10 @@ class EmitMetric(object):
 
     def tsNow(self):
         return int(time.time())
+
+    @staticmethod
+    def get_curr_milli_time():
+        return lambda: int(round(time.time() * 1000))
 
 if __name__ == '__main__':
     print " [x] emit(key, value)"

@@ -7,12 +7,10 @@ import shutil
 import signal
 import urlparse
 import pika
-import calendar
 import math
 import json
 from py_sniffer.sniffer import Sniffer
 from threading import Thread
-import pcapy
 
 
 class Capture(object):
@@ -127,7 +125,7 @@ class Capture(object):
                    'dropout': 0,
                    'disk': 0,
                    'files': 0,
-                   'time': calendar.timegm(time.gmtime()) * 1000
+                   'time': self.get_curr_milli_time()
                    }
 
         try:
@@ -373,5 +371,6 @@ class Capture(object):
         except Exception as ex:
             print ex.message
 
-
-
+    @staticmethod
+    def get_curr_milli_time():
+        return lambda: int(round(time.time() * 1000))
