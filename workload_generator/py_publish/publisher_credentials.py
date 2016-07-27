@@ -10,9 +10,10 @@ CREDENTIALS_DROPBOX = {
 # http://opensource.box.com/box-python-sdk/tutorials/intro.html
 # https://app.box.com/developers/services/edit/
 CREDENTIALS_BOX = {
-    "auth_token": "4FvPqlHUUSrVbyh8VlLPIwD3XO1W8YS4",  # refreash this token each 1h ... expire
-    "client_id": "70aqoieinjn4lrdo6oj9d5y5646166ch",
-    "client_secret": "U53MpEPemjHSfTlrfK27Ws6h7ugdgqP7"
+    "auth_token": "G6IrZtnPafwL7Ud6dmk7GaOmBbgBGGK7",  # refreash this token each 1h ... expire
+    "client_id": "lyk5wlgetcan0ur7x15pzg9ekvh9p02k",
+    "client_secret": "U53MpEPemjHSfTlrfK27Ws6h7ugdgqP7",
+    "refresh_token" : "eEeIvvvLqKtgLbxqD6KnS0sWO3tUjfxR9lY7Ps7x94eqil4wi1FQUAZypmXURR5Y"
 }
 
 # https://developers.google.com/drive/v3/web/quickstart/python#prerequisites
