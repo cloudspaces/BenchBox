@@ -127,7 +127,7 @@ workload_generator/updates_content/
 workload_generator/user_stereotypes/size/
 workload_generator/user_stereotypes/type/
 workload_generator/communication/*.save
-
+workload_generator/external/impressions_config
 
 windows/*.key
 windows/*.ip
