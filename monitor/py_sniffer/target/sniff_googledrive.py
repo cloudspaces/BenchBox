@@ -127,17 +127,11 @@ class GoogleDrive(Sniff):
         # print "the flow is: {}".format(flow)
         # data goes through
         if flow == "down":
-            if "d.v.dropbox.com" in src_host:
-                self.metric_curr["meta_down"]["size"] += total_size
-                self.metric_curr["meta_down"]["c"] += 1
-            elif "cloudfront" in src_host:
+            if "1e100.net" in src_host:
                 # im download from server == data down
                 self.metric_curr["data_down"]["size"] += total_size
                 self.metric_curr["data_down"]["c"] += 1
-            elif "dropbox" in src_host:
-                self.metric_curr["meta_down"]["size"] += total_size
-                self.metric_curr["meta_down"]["c"] += 1
-            elif "amazonaws" in src_host:
+            elif "1e100.net" in src_host:
                 self.metric_curr["data_down"]["size"] += total_size
                 self.metric_curr["data_down"]["c"] += 1
             else:
@@ -147,17 +141,11 @@ class GoogleDrive(Sniff):
         # elif flow == "up":
         else:
 
-            if "d.v.dropbox.com" in dst_host:
-                self.metric_curr["meta_up"]["size"] += total_size
-                self.metric_curr["meta_up"]["c"] += 1
-            elif "cloudfront" in dst_host:
+            if "1e100.net" in dst_host:
                 # im download from server == data down
                 self.metric_curr["data_up"]["size"] += total_size
                 self.metric_curr["data_up"]["c"] += 1
-            elif "dropbox" in dst_host:
-                self.metric_curr["meta_up"]["size"] += total_size
-                self.metric_curr["meta_up"]["c"] += 1
-            elif "amazonaws" in dst_host:
+            elif "1e100.net" in dst_host:
                 self.metric_curr["data_up"]["size"] += total_size
                 self.metric_curr["data_up"]["c"] += 1
             else:
@@ -246,8 +234,8 @@ class GoogleDrive(Sniff):
         else:
             print "packet skipped"
         '''
-        # print ip2hostname_cache
-        # print traffic_flow_dict
+        # print self.ip2hostname_cache
+        # print self.traffic_flow_dict
         # print ">>>>"
         self.metric_curr['epoch'] = self.get_epoch_ms()
         self.metric_curr['idx'] = self.packet_index

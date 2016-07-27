@@ -109,7 +109,6 @@ class Capture(object):
     '''
     def notify_status(self):
 
-        print "curr state metrics"
         # retrieve the current state metrics from the personal client capturer
         # current metrics is a local variable
         metrics = {'cpu': 0,
@@ -137,7 +136,11 @@ class Capture(object):
         # assign ram and cpu usage
         if self.sync_client_proc is not None:
             # we got a process and gota collect metrics
-            cpu_usage = int(math.ceil(self.sync_client_proc.cpu_percent(0)))
+            try:
+                cpu_usage = int(math.ceil(self.sync_client_proc.cpu_percent(0)))
+            except Exception as ex:
+                print ex.message
+                return False
             ram_usage = self.sync_client_proc.memory_info().rss
             metrics['cpu'] = cpu_usage
             metrics['ram'] = ram_usage
@@ -150,10 +153,13 @@ class Capture(object):
             elapsed_time = (curr_time - last_time) / 1000  # seconds
             if elapsed_time == 0:
                 return True
-            # for key, value in self.metric_network_counter_curr.__dict__.items():
-            #         metrics[key] = (value - getattr(self.metric_network_counter_prev, key)) / elapsed_time  # unit is seconds
 
-            self.metric_network_counter_prev = self.metric_network_counter_curr
+            for key, value in self.metric_network_counter_curr.__dict__.items():
+                    metrics[key] = (value - getattr(self.metric_network_counter_prev, key)) / elapsed_time  # unit is seconds
+
+        print " {} > pid[{}], running[{}], proc[{}], cpu[{}], ram[{}]".format(metrics['time'], self.sync_client_proc_pid, self.is_sync_client_running, self.sync_client_proc, metrics['cpu'], metrics['ram'])
+
+        self.metric_network_counter_prev = self.metric_network_counter_curr
 
         # assign hard disk usage
         if self.platform_is_windows:
@@ -305,6 +311,10 @@ class Capture(object):
 
         # set the capture flags
         # run the capture threads
+
+        for proc in psutil.process_iter():
+            if proc.name() == self.proc_name:
+                proc.kill()  # force quit like a boss
 
         self.is_monitor_capturing = True
 
