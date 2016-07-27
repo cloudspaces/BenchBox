@@ -373,4 +373,4 @@ class Capture(object):
 
     @staticmethod
     def get_curr_milli_time():
-        return lambda: int(round(time.time() * 1000))
+        return int(round(time.time() * 1000))

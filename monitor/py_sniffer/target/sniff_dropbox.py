@@ -36,7 +36,7 @@ class Dropbox(Sniff):
 
     def __on_recv_pkts(self, ip_header, data):
 
-        if self.shutdown:
+        if self.capture_thread.shutdown:
             raise StopIteration
 
         # print ip_header

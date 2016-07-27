@@ -54,7 +54,7 @@ class EmitMetric(object):
 
     @staticmethod
     def get_curr_milli_time():
-        return lambda: int(round(time.time() * 1000))
+        return int(round(time.time() * 1000))
 
 if __name__ == '__main__':
     print " [x] emit(key, value)"
