@@ -426,7 +426,7 @@ class ProdStatusService():
 
         hostname = socket.gethostname()
 
-        if hostname is 'benchBox' or hostname is 'sandBox':
+        if hostname == 'benchBox' or hostname == 'sandBox':
             is_dummy_host = False
         else:
             is_dummy_host = True
