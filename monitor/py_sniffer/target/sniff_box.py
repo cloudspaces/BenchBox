@@ -14,18 +14,6 @@ class Box(Sniff):
             "(port " + " || port ".join(self.capture_filter_ports) + ") && (host " + " && host ".join(self.capture_filter_ips) + ")",  # filter
         )
 
-    def capture(self):
-        self.capture_thread = Thread(target=self.live_capture.loop, args=[self.packet_limit, self.__on_recv_pkts])
-        self.capture_thread.start()
-        return self.capture_thread
-
-    def capture_quit(self):
-        self.capture_thread.join(self.capture_thread, timeout=1)
-
-
-    def hello(self):
-        print "{} say hello".format(self.whoami)
-
     def __on_recv_pkts(self, ip_header, data):
 
 
@@ -164,56 +152,6 @@ class Box(Sniff):
                 # use whois to resolve this ip's # aqui no entrara nunca ni referenciando por ip
                 self.metric_curr["misc_up"]["size"] += total_size
                 self.metric_curr["misc_up"]["c"] += 1
-
-
-
- 
-
-        ## classifica data & metadata per dropbox
-
-        # print "{}:{}   ~>>~   {}:{}".format(src_host, src_port, dst_host, dst_port)
-        '''
-        print "Meta up:   {}".format(self.metric_curr["meta_up"]["size"])
-        print "Meta down: {}".format(self.metric_curr["meta_down"]["size"])
-        print "Data up:   {}".format(self.metric_curr["data_up"]["size"])
-        print "Data down: {}".format(self.metric_curr["data_down"]["size"])
-        print "Comp up:   {}".format(self.metric_curr["comp_up"]["size"])
-        print "Comp down: {}".format(self.metric_curr["comp_down"]["size"])
-        print "Misc up:   {}".format(self.metric_curr["misc_up"]["size"])
-        print "Misc down: {}".format(self.metric_curr["misc_down"]["size"])
-        print "Total up:   {}".format(self.metric_curr["total_up"]["size"])
-        print "Total down: {}".format(self.metric_curr["total_down"]["size"])
-        '''
-
-        '''
-        desc = "{0: >20}:{1: >6}   ~>>>{2: >10}>>>~   {3: >20}:{4: >6} {5: >5}".format(src_host, src_port, total_size,
-                                                                                       dst_host, dst_port, flow)
-        stat = "{0: >20}={1:>8} >> meta [{2: >10}/{3: >10}] data[{4: >10}/{5: >10}] total[{6: >10}/{7: >10}]".format(
-                self.packet_index, self.get_time(),
-                self.metric_curr["meta_up"]["size"],
-                self.metric_curr["meta_down"]["size"],
-                self.metric_curr["data_up"]["size"],
-                self.metric_curr["data_down"]["size"],
-                self.metric_curr["total_up"]["size"],
-                self.metric_curr["total_down"]["size"]
-        )
-
-        print desc
-        print stat
-        '''
-        '''
-        print "{}:{}   ~>>~   {}:{}".format(src_host, src_port, dst_host, dst_port)
-        print "Meta up:   {}".format(sizeof_fmt(self.metric_curr["meta_up"]["size"]))
-        print "Meta down: {}".format(sizeof_fmt(self.metric_curr["meta_down"]["size"]))
-        print "Data up:   {}".format(sizeof_fmt(self.metric_curr["data_up"]["size"]))
-        print "Data down: {}".format(sizeof_fmt(self.metric_curr["data_down"]["size"]))
-        print "Comp up:   {}".format(sizeof_fmt(self.metric_curr["comp_up"]["size"]))
-        print "Comp down: {}".format(sizeof_fmt(self.metric_curr["comp_down"]["size"]))
-        '''
-
-        # http://www.wired.com/2016/03/epic-story-dropboxs-exodus-amazon-cloud-empire/
-        # voy a suponer que dropbox y amazon son datos
-        # y ec son metadatos...
 
         dst_key = "{}:{}".format(dst_host, dst_host)
         src_key = "{}:{}".format(src_host, src_port)

@@ -7,7 +7,7 @@ import time
 from time import gmtime, strftime
 import whois
 import copy
-
+from threading import Thread
 
 class Sniff(object):
 
@@ -187,6 +187,26 @@ class Sniff(object):
         self.traffic_flow_dict = {}    #
         self.capture_thread = None
         self.packet_index = 0  # index of the captured packet
+
+    def hello(self):
+        print "{} say hello".format(self.whoami)
+
+    def capture(self):
+        self.capture_thread = Thread(target=self.live_capture.loop, args=[self.packet_limit, self.__on_recv_pkts])
+        self.capture_thread.start()
+        self.capture_thread.shutdown=False
+        return self.capture_thread
+
+    def capture_quit(self):
+        # Thread.join(self.capture_thread, timeout=1) this never happens
+        try:
+            self.capture_thread.shutdown=True
+            self.capture_thread.join(timeout=1)
+            # self.live_capture.break_loop()
+        except Exception as ex:
+            print ex.message
+
+        pass
 
     def get_hostname_by_ip(self, ip):
         if ip in self.ip2hostname_cache:

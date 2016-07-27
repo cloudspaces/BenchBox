@@ -16,19 +16,7 @@ class GoogleDrive(Sniff):
             "(port " + " || port ".join(self.capture_filter_ports) + ") && (host " + " && host ".join(self.capture_filter_ips) + ")",  # filter
         )
 
-    def capture(self):
-        self.capture_thread = Thread(target=self.live_capture.loop, args=[self.packet_limit, self.__on_recv_pkts])
-        self.capture_thread.start()
-        return self.capture_thread
-
-    def capture_quit(self):
-        Thread.join(self.capture_thread, timeout=1)
-
-    def hello(self):
-        print "{} say hello".format(self.whoami)
-
     def __on_recv_pkts(self, ip_header, data):
-
 
         # print ip_header
         # print "<<<<"
@@ -46,14 +34,11 @@ class GoogleDrive(Sniff):
         src_host = self.get_hostname_by_ip(packet_type.get_ip_src())
         dst_host = self.get_hostname_by_ip(packet_type.get_ip_dst())
 
-        # print "get_header_size: {}".format(packet_type.get_header_size())  # ip header size, always 20 bytes
-        # print "get_size: {}".format(packet_type.get_size())
         self.add_flow(src_host, dst_host, ether_packet.get_size())
 
         # TCP OR UDP
         packet_protocol = packet_type.child()
         packet_protocol_type = packet_protocol.__class__.__name__
-        # print "{}[{}]".format(packet_protocol_type, packet_protocol.protocol)
 
         src_port = 0
         dst_port = 0
@@ -62,8 +47,8 @@ class GoogleDrive(Sniff):
             # this is UDP
             # print "get_header_size: {}".format(packet_protocol.get_header_size())           # always 8 bytes
             # print "get_size: {}".format(packet_protocol.get_size())
-            # print "get_uh_dport: {}".format(packet_protocol.get_uh_dport())                # todo:  dest port
-            # print "get_uh_sport: {}".format(packet_protocol.get_uh_sport())                # todo:  source port
+            # print "get_uh_dport: {}".format(packet_protocol.get_uh_dport())
+            # print "get_uh_sport: {}".format(packet_protocol.get_uh_sport())
             src_port = packet_protocol.get_uh_sport()
             dst_port = packet_protocol.get_uh_dport()
         elif packet_protocol.protocol == 6:
@@ -83,24 +68,8 @@ class GoogleDrive(Sniff):
             # print packet_protocol.protocol
             raise NotImplemented
 
-        # con todos los parametros aclarados hay que clasificarlo entre
-
-        # data_up, data_down
-
-        # metadata_up, metadata_down
-
-        # notify_up, notify_down
-        # print self.desktop_client
-
-        ## classifica data & metadata per stacksync
-        # print src_host, src_port, dst_host, dst_port, src_ip, dst_ip
-
         self.packet_index += 1
- 
-         # print "parse the request uri ...  preparar los dominios que havia en el paper en formato regexp"
 
-        # print src_port
-        # print dst_port
         if src_port == 443 or dst_port == 443:
             # print "Okey"
             pass
@@ -152,54 +121,6 @@ class GoogleDrive(Sniff):
                 # use whois to resolve this ip's # aqui no entrara nunca ni referenciando por ip
                 self.metric_curr["misc_up"]["size"] += total_size
                 self.metric_curr["misc_up"]["c"] += 1
-
-
-
-        ## classifica data & metadata per dropbox
-
-        # print "{}:{}   ~>>~   {}:{}".format(src_host, src_port, dst_host, dst_port)
-        '''
-        print "Meta up:   {}".format(self.metric_curr["meta_up"]["size"])
-        print "Meta down: {}".format(self.metric_curr["meta_down"]["size"])
-        print "Data up:   {}".format(self.metric_curr["data_up"]["size"])
-        print "Data down: {}".format(self.metric_curr["data_down"]["size"])
-        print "Comp up:   {}".format(self.metric_curr["comp_up"]["size"])
-        print "Comp down: {}".format(self.metric_curr["comp_down"]["size"])
-        print "Misc up:   {}".format(self.metric_curr["misc_up"]["size"])
-        print "Misc down: {}".format(self.metric_curr["misc_down"]["size"])
-        print "Total up:   {}".format(self.metric_curr["total_up"]["size"])
-        print "Total down: {}".format(self.metric_curr["total_down"]["size"])
-        '''
-
-        '''
-        desc = "{0: >20}:{1: >6}   ~>>>{2: >10}>>>~   {3: >20}:{4: >6} {5: >5}".format(src_host, src_port, total_size,
-                                                                                       dst_host, dst_port, flow)
-        stat = "{0: >20}={1:>8} >> meta [{2: >10}/{3: >10}] data[{4: >10}/{5: >10}] total[{6: >10}/{7: >10}]".format(
-                self.packet_index, self.get_time(),
-                self.metric_curr["meta_up"]["size"],
-                self.metric_curr["meta_down"]["size"],
-                self.metric_curr["data_up"]["size"],
-                self.metric_curr["data_down"]["size"],
-                self.metric_curr["total_up"]["size"],
-                self.metric_curr["total_down"]["size"]
-        )
-
-        print desc
-        print stat
-        '''
-        '''
-        print "{}:{}   ~>>~   {}:{}".format(src_host, src_port, dst_host, dst_port)
-        print "Meta up:   {}".format(sizeof_fmt(self.metric_curr["meta_up"]["size"]))
-        print "Meta down: {}".format(sizeof_fmt(self.metric_curr["meta_down"]["size"]))
-        print "Data up:   {}".format(sizeof_fmt(self.metric_curr["data_up"]["size"]))
-        print "Data down: {}".format(sizeof_fmt(self.metric_curr["data_down"]["size"]))
-        print "Comp up:   {}".format(sizeof_fmt(self.metric_curr["comp_up"]["size"]))
-        print "Comp down: {}".format(sizeof_fmt(self.metric_curr["comp_down"]["size"]))
-        '''
-
-        # http://www.wired.com/2016/03/epic-story-dropboxs-exodus-amazon-cloud-empire/
-        # voy a suponer que dropbox y amazon son datos
-        # y ec son metadatos...
 
         dst_key = "{}:{}".format(dst_host, dst_host)
         src_key = "{}:{}".format(src_host, src_port)
