@@ -254,27 +254,40 @@ class Capture(object):
         print "start running [{}] {}".format(self.proc_name, self.pc_cmd)
         try_start = 10
         while self.is_monitor_capturing:  # keep resume personal cloud even if the personal cloud stops
-            time.sleep(5)
+            time.sleep(2)
             while self.is_sync_client_running is False and self.is_monitor_capturing:
-                self.sync_proc = subprocess.Popen(self.pc_cmd, shell=True)
                 try_start -= 1
                 if try_start == 0:
                     print "Unable to start {}".format(self.personal_cloud)
                     break
-                time.sleep(3)
                 try:
                     #  pid lookup
                     is_running = False
                     client_pid = None
+                    candidate = []
+                    personal_cloud_proc = None
                     for proc in psutil.process_iter():
                         if proc.name() == self.proc_name:
+                            candidate.append(proc)
+                            personal_cloud_proc = proc
                             is_running = True
-                            client_pid = proc.pid
-                            break
+
+                    # google drive instances two process
+                    # pick the one with most ram
+
                     if is_running:
+                        for p in candidate:
+                            if personal_cloud_proc.memory_info().rss >= p.memory_info().rss:
+                                pass
+                            else:
+                                personal_cloud_proc = p
+                        client_pid = personal_cloud_proc.pid
                         self.is_sync_client_running = True
                         self.sync_client_proc_pid = client_pid
                         print "SYNC client running with pid[{}]".format(client_pid)
+                    else:
+                        self.sync_proc = subprocess.Popen(self.pc_cmd, shell=True)
+                        time.sleep(5)
                 except Exception as ex:
                     print ex.message
                     print "Couldn't load sync client"
@@ -352,7 +365,7 @@ class Capture(object):
         # self.monitor.join()
         # self.sync_client.join()
 
-        self.traffic_monitor.rage_quit()
+
 
         # self.sync_client_proc_pid
         # how to stop process
@@ -366,6 +379,8 @@ class Capture(object):
                 fields = line.split()
                 proc_pid = fields[0]
                 os.kill(int(proc_pid), signal.SIGKILL)
+
+        self.traffic_monitor.rage_quit()
 
         return "{} say stop".format(self.whoami)
 
