@@ -209,9 +209,9 @@ amqp.connect(amqp_url, function (err, conn) {
                     status_attr += ""
                 }
                 try {
-                    console.log(host);
+                    // console.log(host);
                     console.log('status_old:    ' + host[status_attr]);
-                    console.log(status_attr);
+                    // console.log(status_attr);
                     host[status_attr] = status;
                     console.log('status_updated: ' + status);
                     console.log(host);

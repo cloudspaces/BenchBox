@@ -4,7 +4,7 @@ var router = express.Router();
 var zerorpc = require('zerorpc');
 
 var client = new zerorpc.Client({
-    timeout: 3000,  // Sets the number of seconds to wait for a response before considering the call timed out. Defaults to 30.
+    timeout: 30000,  // Sets the number of seconds to wait for a response before considering the call timed out. Defaults to 30.
     heartbeatInterval: 100000 // Sets the number of miliseconds to send send heartbeats to connected servers. Defaults to 5000ms.
 });
 
