@@ -161,8 +161,8 @@ def rmi(hostname, login, passwd, cmd, target=None):
         except pxssh.ExceptionPxssh, e:
             continue
         break
-    print "LAST: OUTPUT"
-    print colored(last_output, 'blue')
+    # print "LAST: OUTPUT"
+    # print colored(last_output, 'blue')
     return last_output
 
 '''
