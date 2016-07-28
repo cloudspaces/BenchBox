@@ -49,6 +49,9 @@ class Monitor(object):
             return 0
         self.sync_client.notify_status()
 
+    def warmup(self, body=None):
+
+        return 0, "[Warmup]: response"
 
     def hello(self, body=None):
         #try:

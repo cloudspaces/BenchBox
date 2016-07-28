@@ -50,10 +50,10 @@ class ActionHandler(object):
         # else:
 
         if is_dummy:  # llamadas tipo vagrant up
-            if target == 'windows': # para lanzar dentro de prod_status windows
+            if target == 'windows':  # para lanzar dentro de prod_status windows
                 self.working_dir = "{}/{}".format(home,'BenchBox/windows')
                 # aqui quizas haya un fork de 4 tipo
-            elif target == 'linux': # para apuntar dentro de prod_status linux
+            elif target == 'linux':  # para apuntar dentro de prod_status linux
                 self.working_dir = "{}/{}".format(home,'BenchBox/vagrant')
         else: # cuando es lanzado dentro del sandBox de windows
             self.working_dir = os.getcwd()
@@ -358,7 +358,7 @@ cwd : directory
 def power_command(cmd, script):
     print cmd
     print script
-    request= "{} {}".format(cmd, script)
+    request = "{} {}".format(cmd, script)
     child = subprocess.Popen(request)
     child.communicate()[0]
     rc = child.returncode
@@ -413,17 +413,21 @@ class ProdStatusService():
         rmq_url = None
 
         try:
-            with open('/vagrant/rabbitmq','r') as r:
+            with open('/vagrant/rabbitmq', 'r') as r:
                 rmq_url = r.read().splitlines()[0]
-            with open('/vagrant/target','r') as r:
+            with open('/vagrant/target', 'r') as r:
                 target_os = r.read().splitlines()[0]
+            with open('/vagrant/hostname', 'r') as f:
+                dummy_hostname = f.read().splitlines()[0]
         except Exception as ex:
             print ex.message
-            print "This is not a Physical machine, it has vagrant root folder!"
-            with open('./rabbitmq','r') as r:
+            print "This is a Physical machine, no vagrant folder found! "
+            with open('./rabbitmq', 'r') as r:
                 rmq_url = r.read().splitlines()[0]
-            with open('./target','r') as r:
+            with open('./target', 'r') as r:
                 target_os = r.read().splitlines()[0]
+            with open('./hostname', 'r') as f:
+                dummy_hostname = f.read().splitlines()[0]
 
         hostname = socket.gethostname()
 
@@ -440,19 +444,10 @@ class ProdStatusService():
         # if topic is None:
         #     hostname = topic
 
-        try:  # this means that its a dummyhost
-            with open('./hostname', 'r') as f:
-                dummy_host = f.read().splitlines()[0]
-
-        except Exception as ex:  # this means that its sandBox or benchBox
-            print ex.message
-            with open('/vagrant/hostname', 'r') as f:
-                dummy_host = f.read().splitlines()[0]
-
         if is_dummy_host:
             host_queue = "{}.{}".format(hostname.lower(), hostname.lower())  # es maquina fisica
         else:
-            host_queue = "{}.{}".format(dummy_host, hostname.lower())  # es maquina virtual
+            host_queue = "{}.{}".format(dummy_hostname, hostname.lower())  # es maquina virtual
             # this is the format, that rmq.js target_queue needs!
 
         print " [Out] emit: emit_status_rpc.call({})".format(host_queue)

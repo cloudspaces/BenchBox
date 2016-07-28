@@ -2,6 +2,7 @@
 
 echo "Kill all python process"
 taskkill /f /im python.exe /t
+taskkill /f /im pythonservice.exe /t
 echo "-----------------"
 echo "Start prod_status"
 echo "-----------------"
