@@ -81,11 +81,11 @@ class Monitor(object):
             body = {
                 "msg": {
                     "test": {
-                        "testClient": "GoogleDrive",
+                        "testClient": "box",
                         "testProfile": "download-occasional"
                     },
-                    "googledrive-ip": "",
-                    "googledrive-port": ""
+                    "box-ip": "",
+                    "box-port": ""
                 }
             }
 
@@ -106,10 +106,10 @@ class Monitor(object):
             body = {
                 "msg": {
                     "test": {
-                        "testClient": "GoogleDrive",
+                        "testClient": "box",
                     },
-                    "googledrive-ip": "",
-                    "googledrive-port": ""
+                    "box-ip": "",
+                    "box-port": ""
                 }
             }
 

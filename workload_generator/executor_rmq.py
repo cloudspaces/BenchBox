@@ -95,12 +95,12 @@ class Commands(object):
                 "msg": {
                     "test": {
                         "testTarget": "windows",
-                        "testFolder": "Google Drive",
+                        "testFolder": "Box Sync",
                         "testProfile": "download-heavy",
-                        "testClient": "GoogleDrive"
+                        "testClient": "box"
                     },
-                    "googledrive-ip": "",
-                    "googledrive-port": ""
+                    "box-ip": "",
+                    "box-port": ""
                 }
             }
 
@@ -206,11 +206,11 @@ class Commands(object):
             body = {
                 "msg": {
                     "test": {
-                        "testClient": "GoogleDrive",
-                        "testFolder": "Google Drive"
+                        "testClient": "box",
+                        "testFolder": "Box Sync"
                     },
-                    "googledrive-ip": "",
-                    "googledrive-port": ""
+                    "box-ip": "",
+                    "box-port": ""
                 }
             }
         try:

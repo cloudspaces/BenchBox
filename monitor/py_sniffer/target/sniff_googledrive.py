@@ -120,9 +120,6 @@ class GoogleDrive(Sniff):
                 # im download from server == data down
                 self.metric_curr["data_down"]["size"] += total_size
                 self.metric_curr["data_down"]["c"] += 1
-            elif "1e100.net" in src_host:
-                self.metric_curr["data_down"]["size"] += total_size
-                self.metric_curr["data_down"]["c"] += 1
             else:
                 # use whois to resole this
                 self.metric_curr["misc_down"]["size"] += total_size
@@ -132,9 +129,6 @@ class GoogleDrive(Sniff):
 
             if "1e100.net" in dst_host:
                 # im download from server == data down
-                self.metric_curr["data_up"]["size"] += total_size
-                self.metric_curr["data_up"]["c"] += 1
-            elif "1e100.net" in dst_host:
                 self.metric_curr["data_up"]["size"] += total_size
                 self.metric_curr["data_up"]["c"] += 1
             else:

@@ -152,7 +152,7 @@ if __name__ == '__main__':
         #     with open('../vagrant/hostname', 'r') as r:
         #         dummyhost = r.read().splitlines()[0]
 
-        profile = "GoogleDrive"
+        profile = "box"
         actions = Commands(personal_cloud=profile, hostname=dummyhost)
         while True:
             print 'write command: hello|warmup|start|stop'
