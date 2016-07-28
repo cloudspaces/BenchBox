@@ -310,10 +310,10 @@ class Capture(object):
     def start(self, body):
         print body
         try:
-            self.test_id = body['test_id']
-        except:
-            pass
-            self.test_id = 0
+            self.test_id = body['msg']['test_id']
+        except Exception as ex:
+            print ex.message
+            self.test_id = 54321
         self.personal_cloud = body['msg']['test']['testClient']
         self.stereotype_recipe = body['msg']['test']['testProfile']
         try:

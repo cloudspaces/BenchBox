@@ -214,10 +214,10 @@ class Commands(object):
                 }
             }
         try:
-            self.test_id = body['test_id']
+            self.test_id = body['msg']['test_id']
         except Exception as ex:
             print ex.message
-            self.test_id = 0
+            self.test_id = 12345
             pass
         print '[START_TEST]: {}'.format(body)
         if not self.is_warmup:

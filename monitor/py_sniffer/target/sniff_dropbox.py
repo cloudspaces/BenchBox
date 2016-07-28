@@ -25,7 +25,7 @@ class Dropbox(Sniff):
         # Thread.join(self.capture_thread, timeout=1) this never happens
         try:
             self.capture_thread.shutdown=True
-            self.capture_thread.join(timeout=1)
+            # self.capture_thread.join(timeout=1)
         except Exception as ex:
             print ex.message
 
