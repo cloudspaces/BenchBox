@@ -103,7 +103,8 @@ class ActionHandler(object):
 
     def vagrantDestroy(self):
         print 'vagrantDestroy'
-        print subprocess.check_output(['vagrant', 'destroy', '-f'],cwd=self.working_dir) # vagrant destroy -f # force yes
+        # print subprocess.check_output(['vagrant', 'destroy', '-f'],cwd=self.working_dir) # vagrant destroy -f # force yes
+        print subprocess.check_output(['vagrant', 'halt'],cwd=self.working_dir) # vagrant destroy -f # force yes
         return 'vagrantDestroy/OK'
 
 
