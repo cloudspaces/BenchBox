@@ -61,7 +61,7 @@ BENCHBOX_IP = '192.168.56.2'
 CPU_MONITOR_PORT = 11000
 
 # this is max waiting time for each operation
-MAX_WAITING_TIME = 6 # 60*30  # 60*30  #For our experiments, the max waiting time is set to 30 mins
+MAX_WAITING_TIME = 60*30  # 60*30  #For our experiments, the max waiting time is set to 30 mins
 MIN_WAITING_TIME = 0.5   # For our experiments, the min waiting time is set to 0.1 secs
 FILE_SIZE_MAX = 100000000  # max file size 100 MB
 
