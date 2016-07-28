@@ -37,7 +37,7 @@ nodes = [
      :vm_is_gui => false,
      #:vm_name => 'chenglong_benchbox',
      :vm_cpu => "1",
-     :vm_ram => "512",
+     :vm_ram => "1024",
     }
 ]
 
@@ -58,7 +58,7 @@ Vagrant.configure(2) do |config|
                          "--memory", node[:vm_ram].to_s,
                          "--cpus", node[:vm_cpu].to_s,
                      ]
-        # vm.gui = node[:vm_is_gui]
+        vm.gui = node[:vm_is_gui]
         vm.name = node[:vm_name]
 
       end
