@@ -1,5 +1,8 @@
 import boxsdk
-import bottle
+try:
+    import bottle
+except Exception as ex:
+    print ex.message
 import os
 from threading import Thread, Event
 import webbrowser
