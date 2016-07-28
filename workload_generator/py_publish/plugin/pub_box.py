@@ -1,5 +1,11 @@
 import boxsdk
+import bottle
+import os
+from threading import Thread, Event
+import webbrowser
 from py_publish.publisher_credentials import CREDENTIALS_BOX
+from wsgiref.simple_server import WSGIServer, WSGIRequestHandler, make_server
+from boxsdk import OAuth2
 
 class Box():
 
@@ -13,19 +19,22 @@ class Box():
         self.refresh_token = None
 
         TOKEN = CREDENTIALS_BOX['auth_token']
+
         CLIENT_ID = CREDENTIALS_BOX['client_id']
         CLIENT_SECRET = CREDENTIALS_BOX['client_secret']
+        oauth, self.access_token, self.refresh_token = self.authenticate(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
+
         if self.access_token is None:
             self.access_token = TOKEN
         # if self.refresh_token is None:
 
-        oauth = boxsdk.OAuth2(
-            client_id=CLIENT_ID,
-            client_secret=CLIENT_SECRET,
-            store_tokens=self.store_token_function,
-            access_token=self.access_token,
-            refresh_token=self.refresh_token
-        )
+        # oauth = boxsdk.OAuth2(
+        #     client_id=CLIENT_ID,
+        #     client_secret=CLIENT_SECRET,
+        #     store_tokens=self.store_token_function,
+        #     access_token=self.access_token,
+        #     refresh_token=self.refresh_token
+        # )
         # create instance of box class
 
         self.client = boxsdk.Client(oauth)
@@ -42,10 +51,6 @@ class Box():
         print app.name
         print app.login
         print app.avatar_url
-
-
-
-
 
     def publish(self, src, tgt):
         print "{} say publish".format(self.whoami)
@@ -74,7 +79,13 @@ class Box():
         while idx < len(path_array) - 1:
             print idx, path_array[idx]
             next_folder = path_array[idx]
-            item_list = current_folder.get_items(limit=100, offset=0)
+            try:
+                item_list = current_folder.get_items(limit=100, offset=0)
+            except boxsdk.exception.BoxOAuthException as ex:
+                print ex.message
+
+                # try refreash token
+
             print 'This is the first 100 items in the root folder:'
             for item in item_list:
                 if next_folder == item.name:
@@ -85,7 +96,6 @@ class Box():
                     print "missing_folder!"
 
             idx += 1
-
 
         file_name = path_array.pop()
 
@@ -109,12 +119,59 @@ class Box():
             f = current_folder.upload_stream(f, file_name)
             print f.name
 
-
-
     def download(self, remote, local):
         print "{} say download".format(self.whoami)
-
 
     def store_token_function(self, access_token, refresh_token):
         self.access_token = access_token
         self.refresh_token = refresh_token
+
+    def authenticate(self, client_id="", client_secret=""):
+
+        oauth_class = boxsdk.OAuth2
+
+        class StoppableWSGIServer(bottle.ServerAdapter):
+            def __init__(self, *args, **kwargs):
+                super(StoppableWSGIServer, self).__init__(*args, **kwargs)
+                self._server = None
+
+            def run(self, app):
+                server_cls = self.options.get('server_class', WSGIServer)
+                handler_cls = self.options.get('handler_class', WSGIRequestHandler)
+                self._server = make_server(self.host, self.port, app, server_cls, handler_cls)
+                self._server.serve_forever()
+
+            def stop(self):
+                self._server.shutdown()
+
+        auth_code = {}
+        auth_code_is_available = Event()
+
+        local_oauth_redirect = bottle.Bottle()
+
+        @local_oauth_redirect.get('/')
+        def get_token():
+            auth_code['auth_code'] = bottle.request.query.code
+            auth_code['state'] = bottle.request.query.state
+            auth_code_is_available.set()
+
+        local_server = StoppableWSGIServer(host='localhost', port=8080)
+        server_thread = Thread(target=lambda: local_oauth_redirect.run(server=local_server))
+        server_thread.start()
+
+        oauth = oauth_class(
+            client_id=client_id,
+            client_secret=client_secret,
+        )
+        auth_url, csrf_token = oauth.get_authorization_url('http://localhost:8080')
+        webbrowser.open(auth_url)
+
+        auth_code_is_available.wait()
+        local_server.stop()
+        assert auth_code['state'] == csrf_token
+        access_token, refresh_token = oauth.authenticate(auth_code['auth_code'])
+
+        print('access_token: ' + access_token)
+        print('refresh_token: ' + refresh_token)
+
+        return oauth, access_token, refresh_token
