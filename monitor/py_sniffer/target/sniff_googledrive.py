@@ -18,8 +18,9 @@ class GoogleDrive(Sniff):
 
     def capture(self):
         self.capture_thread = Thread(target=self.live_capture.loop, args=[self.packet_limit, self.__on_recv_pkts])
+        self.capture_thread.name = self.whoami
+        self.capture_thread.shutdown = False
         self.capture_thread.start()
-        self.capture_thread.shutdown=False
         return self.capture_thread
 
     def capture_quit(self):
@@ -27,7 +28,6 @@ class GoogleDrive(Sniff):
         try:
             self.capture_thread.shutdown=True
             self.capture_thread.join(timeout=1)
-            # self.live_capture.break_loop()
         except Exception as ex:
             print ex.message
 
@@ -38,9 +38,12 @@ class GoogleDrive(Sniff):
 
     def __on_recv_pkts(self, ip_header, data):
 
-        # print ip_header
-        # print "<<<<"
-        # print "getts: {} getcaplen: {} getlen: {}".format(ip_header.getts(), ip_header.getcaplen(), ip_header.getlen())
+        if self.capture_thread.shutdown:
+            raise StopIteration
+
+        if self.capture_thread.shutdown:
+            print "Try exit by shutdown {}".format(self.whoami)
+            self.name.exit()
 
         ether_packet = self.decoder.decode(data)
         total_size = ether_packet.get_size()

@@ -366,6 +366,12 @@ angular.module('app', ['ngRoute', 'ngResource'])
                     case "Mega":
                         $scope.run.testFolder = "mega_folder";
                         break;
+                    case "GoogleDrive":
+                        $scope.run.testFolder = "Google Drive";
+                        break;
+                    case "Box":
+                        $scope.run.testFolder = "Box Sync";
+                        break;
                     default:
                         console.log("UNHANDLED PERSONAL_CLOUD!!!");
                         return;

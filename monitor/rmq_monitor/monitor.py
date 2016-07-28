@@ -145,7 +145,12 @@ class Monitor(object):
     def _sync_client_selector(self, request=None):
         personal_cloud = request['msg']['test']['testClient']
         if self.sync_client is None:
-                self.sync_client = eval("{}".format(personal_cloud.lower()))(self.hostname)
-        #     # raise NotImplemented
+            self.sync_client = eval("{}".format(personal_cloud.lower()))(self.hostname)
+        elif self.sync_client.whoami.lower() == personal_cloud.lower():
+            pass
+        else:
+            self.sync_client = eval("{}".format(personal_cloud.lower()))(self.hostname)
+
+            #     # raise NotImplemented
         #     return 0  # if no personal cloud is forwarded
         #

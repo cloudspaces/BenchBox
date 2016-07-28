@@ -41,7 +41,10 @@ class Sniffer(Thread):
         print "Quiting"
         parent_process = psutil.Process(parent_pid)
         for child in parent_process.children(recursive=True):
-            print child.kill()
+            try:
+                print child.kill()
+            except Exception as ex:
+                print ex.message # process no longer exists
         # parent_process.kill()
 
         # self.target.capture_quit()
