@@ -74,6 +74,6 @@ class Publisher(object):
 
 if __name__ == "__main__":
 
-    b = dropbox()
+    b = box()
     b.hello()
     b.publish('sample/sample.txt', '/aaaa/sample.txt')
