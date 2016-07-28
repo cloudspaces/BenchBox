@@ -36,12 +36,12 @@ def run_command(cmd, dir):
 
 
 class ActionHandler(object):
-    def __init__(self, target ='windows', is_dummy=False):
+    def __init__(self, target='windows', is_dummy=False):
         print "vagrant handler"
         self.hostname = socket.gethostname()
         self.target = target
         self.working_dir = None
-        home = os.path.expanduser('~') # milax or vagrant
+        home = os.path.expanduser('~')  # milax or vagrant
 
         # tell the dummy host which benchbox virtual machines to emit
         # if is_dummy:
@@ -129,7 +129,7 @@ class ActionHandler(object):
 
 
     "este script es compartido entre sandBox y benchBox"
-    def tearDown(self): #
+    def tearDown(self):  #
         # clear the sandBox filesystem and cached files
         print 'tearDown'
         if self.target == "windows":
@@ -394,6 +394,7 @@ def parse_args(argv):
 class ProdStatusService():
 
     def __init__(self):
+
         print "Noop"
 
     def start(self):

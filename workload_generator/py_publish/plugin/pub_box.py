@@ -10,8 +10,8 @@ from py_publish.publisher_credentials import CREDENTIALS_BOX
 from wsgiref.simple_server import WSGIServer, WSGIRequestHandler, make_server
 from boxsdk import OAuth2
 
-class Box():
 
+class Box():
 
     def __init__(self):
 

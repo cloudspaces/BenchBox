@@ -1,5 +1,11 @@
 
 
+echo "Kill all python process"
+taskkill /f /im python.exe /t
+echo "-----------------"
+echo "Start prod_status"
+echo "-----------------"
+
 
 echo "Starting sandBox prod status"
 
