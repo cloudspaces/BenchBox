@@ -42,7 +42,7 @@ class Sniffer(Thread):
         parent_process = psutil.Process(parent_pid)
         for child in parent_process.children(recursive=True):
             print child.kill()
-        parent_process.kill()
+        # parent_process.kill()
 
         # self.target.capture_quit()
         # time.sleep(5)

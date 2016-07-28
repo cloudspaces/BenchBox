@@ -365,8 +365,6 @@ class Capture(object):
         # self.monitor.join()
         # self.sync_client.join()
 
-
-
         # self.sync_client_proc_pid
         # how to stop process
         if self.platform_is_windows:  # stop in windows
