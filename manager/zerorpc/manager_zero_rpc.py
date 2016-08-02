@@ -84,11 +84,13 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
     print ""
     str_cmd = " " \
           "echo 'check if Git is installed...'; " \
+          "dpkg-query -W git; " \
+          "if [ $? -ne 0 ]; then " \
           "echo '{}' | sudo -S apt-get install git; " \
           "echo 'check upgrade pip'; " \
           "echo '{}' | sudo pip install --upgrade pip; " \
           "echo 'check if BenchBox is installed...'; " \
-          "" \
+          "fi; " \
           "if [ -d ~/BenchBox ]; then " \
           "cd ~/BenchBox; " \
           "" \
