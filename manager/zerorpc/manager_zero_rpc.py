@@ -146,7 +146,7 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
 def rmi(hostname, login, passwd, cmd, target=None):
     print "sendQuery to: "+hostname, login, passwd, target
     print "-----------------------------------------------"
-    print cmd
+    # print cmd
     rmiTry = 0
     while True:
         rmiTry += 1
