@@ -78,7 +78,7 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
                         h['cred_dropbox'], h['hostname'],
                         h['stacksync-ip'], h['stacksync-port'],
                         h['owncloud-ip'], h['impala-ip'], h['graphite-ip'])
-    print str_cmd_win
+    # print str_cmd_win
     print ""
     print "Start setup benchbox: LINUX"
     print ""
@@ -131,12 +131,12 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
                     h['owncloud-ip'], h['impala-ip'], h['graphite-ip'],
                     h['passwd'])
     # print str_cmd
-    print ""
-    print 'sendQuery...: {}'.format(h['target']);
-    print ""
+    # print ""
+    # print 'sendQuery...: {}'.format(h['hostname']);
+    # print ""
     if h["target"] == "windows":
         print "TARGET IS WINDOWS: {}".format(h["target"])
-        print rmi(h['ip'], h['user'], h['passwd'], str_cmd)
+        rmi(h['ip'], h['user'], h['passwd'], str_cmd)
         return rmi(hostname=h['ip'], login=h['user'], passwd=h['passwd'], cmd=str_cmd_win, target=h["target"])
     else:
         print "TARGET IS LINUX: {}".format(h["target"])
