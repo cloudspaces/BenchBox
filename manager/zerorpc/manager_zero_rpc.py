@@ -130,9 +130,9 @@ def setup_benchbox(h):  # tell all the hosts to download BenchBox
                     h['stacksync-ip'], h['stacksync-port'],
                     h['owncloud-ip'], h['impala-ip'], h['graphite-ip'],
                     h['passwd'])
-    print str_cmd
+    # print str_cmd
     print ""
-    print 'sendQuery...: '
+    print 'sendQuery...: {}'.format(h['target']);
     print ""
     if h["target"] == "windows":
         print "TARGET IS WINDOWS: {}".format(h["target"])
