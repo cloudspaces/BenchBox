@@ -429,10 +429,19 @@ angular.module('app', ['ngRoute', 'ngResource'])
             $scope.startStop = function () {
                 console.log("START & STOP click");
                 var btn = document.getElementById('btn-start-stop');
-                $scope.testID = (new Date).getTime(); // update testID
+                var testIndex = document.getElementById('test-index');
+
+                if (testIndex.value == ""){
+                    $scope.testID = (new Date).getTime(); // update testID
+                    console.info("Assign random test identifier"+ $scope.testID)
+                }else{
+                    $scope.testID = testIndex.value;
+                    console.info("Assign static identifier"+ $scope.testID)
+                }
+
                 btn.disabled = true;
                 if ($scope.is_running) {
-                    // desible the button
+                    // disable the button
                     // monitor start
                     $scope.run.testMonitor = 'start';
                     $scope.rmq('test-check', 'monitor', 'monitor');

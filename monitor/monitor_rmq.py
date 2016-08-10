@@ -5,6 +5,7 @@ import sys
 import urlparse
 import signal
 import json
+import getopt
 import time
 # from rmq_monitor.Commands import Commands
 from rmq_monitor.monitor import Monitor as Commands
@@ -91,6 +92,34 @@ class MonitorRMQ(object):
         self.channel.start_consuming()
 
 
+
+
+def parse_args(argv):
+
+    print "Arguments: {}".format(argv)
+    try:
+        opts, args = getopt.getopt(argv, "hc:,s:,i:", ["client=" , "stereo=", "id="])
+    except getopt.GetoptError:
+        print '*.py -c <client> -s <stereo> -i <id> '
+        sys.exit(2)
+
+    client = None
+    stereo = None
+    id = None
+    for opt, arg in opts:
+        if opt == '-h':
+            sys.exit()
+        elif opt in ("-c", "--client"):
+            client = arg
+        elif opt in ("-s", "--stereo"):
+            stereo = arg
+        elif opt in ("-i", "--id"):
+            id = arg
+
+    print client, stereo, id
+    return client, stereo, id
+
+
 if __name__ == '__main__':
     print "Monitor_rmq.py [START] {}".format(sys.argv)
     rmq_url = None
@@ -138,7 +167,14 @@ if __name__ == '__main__':
             #     if connection_try > 2:
             #         break  # exit the infinit loop
 
-    else:
+    else:  # con parametros
+
+
+        # personal cloud
+        # receta
+        #
+
+        personal_cloud, stereo_recipe, test_id = parse_args(sys.argv[1:])
 
         # print "monitor_rmq.OLD.py"
         #
@@ -152,8 +188,7 @@ if __name__ == '__main__':
         #     with open('../vagrant/hostname', 'r') as r:
         #         dummyhost = r.read().splitlines()[0]
 
-        profile = "box"
-        actions = Commands(personal_cloud=profile, hostname=dummyhost)
+        actions = Commands(personal_cloud=personal_cloud, hostname=dummyhost)
         while True:
             print 'write command: hello|warmup|start|stop'
             teclat = raw_input()
@@ -161,7 +196,18 @@ if __name__ == '__main__':
             try:
                 toExecute = getattr(actions, teclat)
                 print toExecute
-                output = toExecute()
+                body = {
+                    "msg": {
+                        "test": {
+                            "testClient": personal_cloud,
+                            "testProfile": stereo_recipe
+                        },
+                        "test_id": test_id,
+                        "{}-ip".format(personal_cloud): "",
+                        "{}-box-port".format(personal_cloud): ""
+                    }
+                }
+                output = toExecute(body)
             except AttributeError as e:
                 print e.message
                 print "ACK: {}".format(teclat)

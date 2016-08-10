@@ -57,15 +57,7 @@ class Monitor(object):
         #try:
         print "[Hello]: Hello World"
         if body is None:
-            body = {
-                "msg": {
-                    "test": {
-                        "testClient": "GoogleDrive",
-                    },
-                    "googledrive-ip": "",
-                    "googledrive-port": ""
-                }
-            }
+            return "no body specified"
         self._sync_client_selector(request=body)
         self.sync_client.hello(body)
         return 0, "[Hello]: response"
@@ -81,16 +73,7 @@ class Monitor(object):
     def start(self, body=None):
         #try:
         if body is None:
-            body = {
-                "msg": {
-                    "test": {
-                        "testClient": "box",
-                        "testProfile": "download-occasional"
-                    },
-                    "box-ip": "",
-                    "box-port": ""
-                }
-            }
+            return "no body specified"
 
         self._sync_client_selector(request=body)
         self.monitor_state = "start_monitor"
@@ -106,15 +89,7 @@ class Monitor(object):
     def stop(self, body=None):
 
         if body is None:
-            body = {
-                "msg": {
-                    "test": {
-                        "testClient": "box",
-                    },
-                    "box-ip": "",
-                    "box-port": ""
-                }
-            }
+            return "no body specified"
 
         print body
         self._sync_client_selector(request=body)
