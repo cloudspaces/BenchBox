@@ -15,7 +15,7 @@ from executor import StereotypeExecutorU1
 from termcolor import colored
 import shutil
 import glob
-
+import getopt
 
 def singleton(lockfile="executor_rmq.pid"):
     if os.path.exists(lockfile):
@@ -80,30 +80,13 @@ class Commands(object):
         # sshpass -p vagrant rsync -rvnc --delete ../output/ vagrant@192.168.56.101:stacksync_folder/
 
     def hello(self, body=None):
-        if body is None:
-            body = {
-                "cmd": "hello",
-            }
-
-        print '[HELLO]: hello world {}'.format(body['cmd'])
-        return '[HELLO]: hello world response'
+        print '[HELLO]: response'
+        return '[HELLO]: response '.format(self.hostname)
 
     def warmup(self, body=None):
 
         if body is None:
-            body = {
-                "msg": {
-                    "test": {
-                        "testTarget": "windows",
-                        "testFolder": "Box Sync",
-                        "testProfile": "download-heavy",
-                        "testClient": "box"
-                    },
-                    "box-ip": "",
-                    "box-port": ""
-                }
-            }
-
+            return None
         print '[WARMUP]: {} '.format(body)
         print FS_SNAPSHOT_PATH
         print STEREOTYPE_RECIPES_PATH
@@ -203,16 +186,7 @@ class Commands(object):
 
     def start(self, body=None):
         if body is None:
-            body = {
-                "msg": {
-                    "test": {
-                        "testClient": "box",
-                        "testFolder": "Box Sync"
-                    },
-                    "box-ip": "",
-                    "box-port": ""
-                }
-            }
+            return None
         try:
             self.test_id = body['msg']['test_id']
         except Exception as ex:
@@ -317,6 +291,38 @@ class ExecuteRMQ(object):
         self.channel.start_consuming()
 
 
+def parse_args(argv):
+
+    print "Arguments: {}".format(argv)
+    try:
+        opts, args = getopt.getopt(argv, "hc:,s:,i:,t:,f:", ["client=" , "stereo=", "id=", "target=", "folder="])
+    except getopt.GetoptError:
+        print '*.py -c <client> -s <stereo> -i <id> -t <target> -f <folder>'
+        sys.exit(2)
+
+    client = None
+    stereo = None
+    test_idx = None
+    sandbox_target = None
+    client_folder = None
+
+    for opt, arg in opts:
+        if opt == '-h':
+            sys.exit()
+        elif opt in ("-c", "--client"):
+            client = arg
+        elif opt in ("-s", "--stereo"):
+            stereo = arg
+        elif opt in ("-i", "--id"):
+            test_idx = int(arg)
+        elif opt in ("-t", "--target"):
+            sandbox_target = arg
+        elif opt in ("-f", "--folder"):
+            client_folder = arg
+
+    print client, stereo, test_idx, sandbox_target, client_folder
+    return client, stereo, test_idx, sandbox_target, client_folder
+
 if __name__ == '__main__':
     print "executor.py is ran when warmup and its queue remains established... WAITING RPC"
     # read the url from path: /vagrant/rmq.url.txt
@@ -343,7 +349,21 @@ if __name__ == '__main__':
 
     else:
 
-        # profile = "Box"
+        personal_cloud, stereo_recipe, test_id, target, folder = parse_args(sys.argv[1:])
+
+        body = {
+            "msg": {
+                "test": {
+                    "testTarget": target,
+                    "testClient": personal_cloud,
+                    "testFolder": folder,
+                    "testProfile": stereo_recipe
+                },
+                "{}-ip".format(personal_cloud.lower()): "",
+                "{}-port".format(personal_cloud.lower()): "",
+                "test_id": test_id
+            }
+        }
         actions = Commands(receipt=stereotype_receipt, hostname=dummyhost)
         while True:
             print 'write command: hello|warmup|start|stop'
@@ -352,7 +372,7 @@ if __name__ == '__main__':
             try:
                 toExecute = getattr(actions, teclat)
                 print toExecute
-                output = toExecute()
+                output = toExecute(body)
             except AttributeError as e:
                 print e.message
                 print "ACK: {}".format(teclat)

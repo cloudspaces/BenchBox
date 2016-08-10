@@ -60,7 +60,7 @@ class Monitor(object):
             return "no body specified"
         self._sync_client_selector(request=body)
         self.sync_client.hello(body)
-        return 0, "[Hello]: response"
+        return 0, "[Hello]: response {}".format(self.hostname)
         #    return 0  # successfully logged to personal cloud service
         # except Exception as ex:
         #     print ex.message

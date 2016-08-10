@@ -91,6 +91,7 @@ class MonitorRMQ(object):
         print "[Consumer] Awaiting RPC requests"
         self.channel.start_consuming()
 
+
 def parse_args(argv):
 
     print "Arguments: {}".format(argv)
@@ -186,6 +187,17 @@ if __name__ == '__main__':
         #         dummyhost = r.read().splitlines()[0]
 
         actions = Commands(personal_cloud=personal_cloud, hostname=dummyhost)
+        body = {
+            "msg": {
+                "test": {
+                    "testClient": personal_cloud,
+                    "testProfile": stereo_recipe
+                },
+                "test_id": test_id,
+                "{}-ip".format(personal_cloud.lower()): "",
+                "{}-box-port".format(personal_cloud.lower()): ""
+            }
+        }
         while True:
             print 'write command: hello|warmup|start|stop'
             teclat = raw_input()
@@ -193,17 +205,7 @@ if __name__ == '__main__':
             try:
                 toExecute = getattr(actions, teclat)
                 print toExecute
-                body = {
-                    "msg": {
-                        "test": {
-                            "testClient": personal_cloud,
-                            "testProfile": stereo_recipe
-                        },
-                        "test_id": test_id,
-                        "{}-ip".format(personal_cloud): "",
-                        "{}-box-port".format(personal_cloud): ""
-                    }
-                }
+
                 output = toExecute(body)
             except AttributeError as e:
                 print e.message
