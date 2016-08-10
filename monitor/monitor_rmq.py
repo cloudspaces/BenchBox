@@ -91,9 +91,6 @@ class MonitorRMQ(object):
         print "[Consumer] Awaiting RPC requests"
         self.channel.start_consuming()
 
-
-
-
 def parse_args(argv):
 
     print "Arguments: {}".format(argv)
@@ -105,7 +102,7 @@ def parse_args(argv):
 
     client = None
     stereo = None
-    id = None
+    test_idx = None
     for opt, arg in opts:
         if opt == '-h':
             sys.exit()
@@ -114,10 +111,10 @@ def parse_args(argv):
         elif opt in ("-s", "--stereo"):
             stereo = arg
         elif opt in ("-i", "--id"):
-            id = arg
+            test_idx = int(arg)
 
-    print client, stereo, id
-    return client, stereo, id
+    print client, stereo, test_idx
+    return client, stereo, test_idx
 
 
 if __name__ == '__main__':
