@@ -140,7 +140,11 @@ class Commands(object):
 
             while self.is_running:
                 operations += 1  # executant de forma indefinida...
-                operation_executed, to_wait, file_path = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
+                try:
+                    operation_executed, to_wait, file_path = self.stereotype_executor.execute(personal_cloud=self.target_personal_cloud)
+                except Exception as ex:
+                    print ex.message
+                    continue
                 print operation_executed, to_wait, file_path
                 file_type, file_size = self._file_type_size_by_path(file_path)
                 print file_type, file_size, operation_executed, to_wait
