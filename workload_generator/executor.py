@@ -179,6 +179,8 @@ class StereotypeExecutorU1(StereotypeExecutor):
         '''Get the time to wait for this transition in millis'''
         to_wait = self.get_waiting_time()
         synthetic_file_name = self.data_generator.create_file()
+        if synthetic_file_name is None:
+            return 0, None
         print "{} :>>> PUBLISH: ".format(synthetic_file_name)
         publisher = Publisher(personal_cloud=personal_cloud)
         # b.publish('sample/sample.txt', '/aaaa/sample.txt')
