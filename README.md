@@ -8,7 +8,7 @@
     [Building Stereotype Recipes](#building-stereotype-recipes)
     [Implementation](#implementation)
 [Features](#features)
-[Install](#installation-and-hello-world)
+[Install](#install)
     [Usage](#usage)
 [Licensing](#licensing)
 [Contact](#contact)
@@ -68,29 +68,27 @@ BenchBox has been devised taking into account the different types of evaluations
 * **Experiment recipes are easyly shared** they are tinny files.
 
 
-
-
-
-
-
-
-
-
-
-
 # Install
 
+BenchBox can be setup as follow, there are two roles, master or slave, the master deploy the manager server, while the slave are holding the experimentation instances of BenchBox:
+1. Clone the benchBox repository at each of the machines that will be the master host and launch the manager service.
 
-How to configure a Manager? 
-first download the BenchBox repository:
+
+```
+
+git clone https://github.com/cloudspaces/BenchBox.git;
+cd BenchBox/manager;
+vagrant up;
 
 ```
 
-git clone https://github.com/cloudspaces/BenchBox.git
-cd BenchBox/manager_gui
-./init.sh
+2. Once the manager service is running open a browser to the manager interface:
 
-```
+Default address is: <a href="localhost:8888">Manager interface</a>  
+
+3. 
+
+
 
 This lines will allow you to bootsrap the manager role, as the current device.
 if nothing fails after running the init.sh you will have the dependencies installed for the role, the following programs will be installed: Graphite log server, which will collect realtime sandbox metrics such as cpu, ram, disc, network. an mongodb server this will store the frontend sessions and deployment device credentials. as the frontend application server. and zerorpc server which will be used as communication relay for the manager-frontend with the BenchBox instances.
