@@ -3,13 +3,13 @@
 **Table of Contents**
 
 [Concept](#concept)
-[Architecture](#architecture)
-[Deployment Lifecycle](#deployment-lifecycle)
-[Building Stereotype Recipes](#building-stereotype-recipes)
-[Implementation](#implementation)
+    [Architecture](#architecture)
+    [Deployment Lifecycle](#deployment-lifecycle)
+    [Building Stereotype Recipes](#building-stereotype-recipes)
+    [Implementation](#implementation)
 [Features](#features)
 [Install](#installation-and-hello-world)
-[Usage](#usage)
+    [Usage](#usage)
 [Licensing](#licensing)
 [Contact](#contact)
 
@@ -57,7 +57,15 @@ BenchBox has been devised taking into account the different types of evaluations
 
 # Features
 
-
+* **Benchmarking tool for Personal Clouds** 
+    * providers support:
+        Dropbox
+        StackSync
+* **Experiments that simulate real user behaviour** using user-stereotypes
+* **Same experiments workloads with differents providers** using pseudo random seeds
+* **Easy to setup** one line installation.
+* **Recreate filesystems that resembles real** using Impressions and SDGen 
+* **Experiment recipes are easyly shared** they are tinny files.
 
 
 
