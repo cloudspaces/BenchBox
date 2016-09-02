@@ -3,10 +3,10 @@
 **Table of Contents**
 
 [Concept](#concept)
-    [Architecture](#architecture)
-    [Deployment Lifecycle](#deployment-lifecycle)
-    [Building Stereotype Recipes](#building-stereotype-recipes)
-    [Implementation](#implementation)
+[Architecture](#architecture)
+[Deployment Lifecycle](#deployment-lifecycle)
+[Building Stereotype Recipes](#building-stereotype-recipes)
+[Implementation](#implementation)
 [Features](#features)
 [Install](#install)
     [Usage](#usage)
@@ -71,22 +71,17 @@ BenchBox has been devised taking into account the different types of evaluations
 # Install
 
 BenchBox can be setup as follow, there are two roles, master or slave, the master deploy the manager server, while the slave are holding the experimentation instances of BenchBox:
-1. Clone the benchBox repository at each of the machines that will be the master host and launch the manager service.
 
+1. Clone the benchBox repository at the machines that will be the master host and launch the manager service.
 
 ```
-
 git clone https://github.com/cloudspaces/BenchBox.git;
 cd BenchBox/manager;
 vagrant up;
-
 ```
-
 2. Once the manager service is running open a browser to the manager interface:
-
-Default address is: <a href="localhost:8888">Manager interface</a>  
-
-3. 
+default address is: <a href="localhost:8888">Manager interface (localhost:8888)</a>  
+3. Thrid step
 
 
 
