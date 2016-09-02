@@ -80,34 +80,28 @@ cd BenchBox/manager;
 vagrant up;
 ```
 2. Once the manager service is running open a browser to the manager interface:
-default address is: <a href="localhost:8888">Manager interface (localhost:8888)</a>  
-3. Thrid step
-
-
-
-This lines will allow you to bootsrap the manager role, as the current device.
-if nothing fails after running the init.sh you will have the dependencies installed for the role, the following programs will be installed: Graphite log server, which will collect realtime sandbox metrics such as cpu, ram, disc, network. an mongodb server this will store the frontend sessions and deployment device credentials. as the frontend application server. and zerorpc server which will be used as communication relay for the manager-frontend with the BenchBox instances.
-
-
----
-
+<a href="localhost:8888">Manager interface</a>  
 the frontend will be launced by default:
-
 ```
-
-localhost:3000
-
+localhost:8888
 ```
+3. At the manager
+<p align="center">
+  <img width="700" src="manager/public/manager_interface.png">
+</p>
 
 once the frontend is available you can setup BenchBox instances at the Host tab.
 define for each instance, their ip, hostname and their logging. click add.
 afterward click the more button and define the personal cloud credentials.
 by default the host-logging has to be the same as the host-password and owncloud login has to be the same as owncloud password
 
-once you have the instances defined try to ping the users with the ping button to test the connection. if the connection is established then you can proceed to configure and deploy the BenchBox suit to each of the instances. when the instances has been launched. then you can use the execute button to run testing. defining the number of operations, stereotype profile, the interval between operations.
+once you have the testing instances succesfully binded, test the connection using the ping. if the connection is established then you can proceed to configure and deploy the BenchBox slave instances to each of the host. Once the instances are running launched. We will be able to perform evaluations.
 
-once the test start you can use the monitoring tab to visualize realtime metrics of the benchBox instances about cpu usage, memory usage, disk usage, network usage...
+Once the test start you can use the monitoring tab to visualize realtime metrics of the benchBox instances, metrics like cpu usage, memory usage, disk usage, network usage are currently supported...
 
+<p align="center">
+  <img width="700" src="manager/public/monitor_graphana_dashboard.png">
+</p>
 
 # Usage
 
