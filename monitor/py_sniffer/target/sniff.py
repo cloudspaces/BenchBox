@@ -240,25 +240,6 @@ class Sniff(object):
     def notify_stats(self):
         # todo report the stats over time since the last interval
         # elapsed time
-        """
-        if self.traffic_counter["epoch"] == self.traffic_counter_old["epoch"]:
-            print self.traffic_counter_old['idx'], self.traffic_counter['idx'],
-            (self.traffic_counter["epoch"] - self.traffic_counter_old["epoch"])
-            return {
-                "data_rate": {
-                    "size_up": 0,
-                    "size_down": 0,
-                    "pack_up": 0,
-                    "pack_down": 0
-                },
-                "meta_rate": {
-                    "size_up": 0,
-                    "size_down": 0,
-                    "pack_up": 0,
-                    "pack_down": 0,
-                }, "time": self.traffic_counter["epoch"]            # create timestamp
-            }
-        """
 
         # just get the increment of each notify
         data_up_size_rate = (self.metric_curr["data_up"]["size"] - self.metric_prev["data_up"]["size"])
