@@ -9,7 +9,7 @@
 [Implementation](#implementation)
 [Features](#features)
 [Install](#install)
-    [Usage](#usage)
+[Usage](#usage)
 [Licensing](#licensing)
 [Contact](#contact)
 
@@ -61,58 +61,49 @@ BenchBox has been devised taking into account the different types of evaluations
     * providers support:
         Dropbox
         StackSync
-* **Experiments that simulate real user behaviour** using user-stereotypes
+* **Experiments that simulate real user behaviour** [using user-stereotypes](https://github.com/cloudspaces/BenchBox/tree/master/workload_generator/user_stereotypes)
 * **Same experiments workloads with differents providers** using pseudo random seeds
 * **Easy to setup** one line installation.
-* **Recreate filesystems that resembles real** using Impressions and SDGen 
-* **Experiment recipes are easyly shared** they are tinny files.
+* **Recreate filesystems that resembles real**, using Impressions and SDGen 
+* **Experiment recipes are easyly shared**, they are contained within tinny files.
 
 
 # Install
 
 BenchBox can be setup as follow, there are two roles, master or slave, the master deploy the manager server, while the slave are holding the experimentation instances of BenchBox:
 
-1. Clone the benchBox repository at the machines that will be the master host and launch the manager service.
-
+To install BenchBox Clone clone the current repository to the machine that will be the master host and launch the manager service.
 ```
 git clone https://github.com/cloudspaces/BenchBox.git;
 cd BenchBox/manager;
 vagrant up;
 ```
-2. Once the manager service is running open a browser to the manager interface:
-<a href="localhost:8888">Manager interface</a>  
-the frontend will be launced by default:
-```
-localhost:8888
-```
-3. At the manager
-<p align="center">
-  <img width="700" src="manager/public/manager_interface.png">
-</p>
 
-once the frontend is available you can setup BenchBox instances at the Host tab.
-define for each instance, their ip, hostname and their logging. click add.
-afterward click the more button and define the personal cloud credentials.
-by default the host-logging has to be the same as the host-password and owncloud login has to be the same as owncloud password
-
-once you have the testing instances succesfully binded, test the connection using the ping. if the connection is established then you can proceed to configure and deploy the BenchBox slave instances to each of the host. Once the instances are running launched. We will be able to perform evaluations.
-
-Once the test start you can use the monitoring tab to visualize realtime metrics of the benchBox instances, metrics like cpu usage, memory usage, disk usage, network usage are currently supported...
-
-<p align="center">
-  <img width="700" src="manager/public/monitor_graphana_dashboard.png">
-</p>
 
 # Usage
 
 
-pantallazos uso de la interficie
-
+1. Once the manager service is running open a browser to the manager interface:
+<a href="localhost:8888">Manager interface</a>  
+By default the frontend will be launced at:
+```
+localhost:8888
+```
+2. The manager interface will look as follow:
+<p align="center">
+  <img width="700" src="manager/public/manager_interface.png">
+</p>
+Once the frontend is available we can add BenchBox instances. After we have the testing instances succesfully binded, tested the connection using the ping. If the connection is established we can proceed to configure and deploy the BenchBox slave instances to each of the host. 
+3. Launching experiments:
+When the instances are succesfully deployed. We will be able to perform evaluations. During the evaluation the monitoring tab allows us to visualize realtime metrics of the benchBox instances, metrics like CPU usage, memory usage, disk usage, network usage that are currently supported...
+<p align="center">
+  <img width="700" src="manager/public/monitor_graphana_dashboard.png">
+</p>
 
 
 
 # Issue Tracking
-We use the GitHub issue tracking.
+We use the [GitHub issue tracking](https://github.com/cloudspaces/BenchBox/issues).
 
 # Licensing
 Copyright (c) 2015 AST Research Group, Universitat Rovira i Virgili.
