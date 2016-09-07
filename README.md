@@ -18,7 +18,7 @@
 BenchBox is a tool that adopts a user-centric performance evaluation methodology based on user stereotypes. An stereotype describes the behavior of a group of users with similar storage activity, which enables flexible and realistic performance evaluation of Personal Clouds. BenchBox enables researchers and practitioners to deploy benchmarks with varying rates of user stereotypes, as well as to monitor the desktop clients activity.
 
 <p align="center">
-  <img width="700" src="http://ast-deim.urv.cat/web/images/software/BenchBox/benchbox_architecture.png">
+  <img width="700" src="manager/public/benchbox_architecture.png">
 </p>
 
 # Architecture
