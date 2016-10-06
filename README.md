@@ -96,7 +96,7 @@ vagrant up;
 
 
 1. Once the manager service is running open a browser to the manager interface:
-<a href="localhost:8888">Manager interface</a>  
+<a href="localhost:8888">Manager interface</a>
 By default the frontend will be launced at:
 ```
 localhost:8888
@@ -117,6 +117,14 @@ When the instances are succesfully deployed. We will be able to perform evaluati
 
 # 9. Issue Tracking
 We use the [GitHub issue tracking](https://github.com/cloudspaces/BenchBox/issues).
+<br>
+<pre>
+Dependencies:
+vagrant: 1.8.7
+virtualbox: 4.3
+openssh-server
+</pre>
+
 
 <a name="licensing"></a>
 
